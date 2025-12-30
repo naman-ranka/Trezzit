@@ -1,5 +1,11 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+
 # Vercel
 .vercel
+
 
 # OS
 .DS_Store

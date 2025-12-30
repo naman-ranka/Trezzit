@@ -35,4 +35,39 @@ Includes meta tags, structured data, Open Graph, and Twitter Cards. See [SEO-CHE
 
 ---
 
-**Live:** [trezzit.com](https://trezzit.com)  **App:** [app.trezzit.com](https://app.trezzit.com)
+## Development
+
+### Prerequisites
+- Node.js & npm
+- Python (optional, for image optimization)
+
+### Setup
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Building CSS
+The project uses Tailwind CSS (v3). To build the styles:
+```bash
+# Watch mode for development
+npx tailwindcss -i ./input.css -o ./public/assets/css/styles.css --watch
+
+# Build for production (minified)
+npx tailwindcss -i ./input.css -o ./public/assets/css/styles.css --minify
+```
+
+### Optimize Images
+To resize and convert images to WebP:
+```bash
+python scripts/optimize_images.py
+```
+
+## Deployment
+
+The site is a static HTML project. Ensure the full `public` directory is served.
+- Vercel: Point the root directory to `.` and the output directory to `public` (or just serve `public`).
+
+### Live Links
+**Live:** [trezzit.com](https://trezzit.com)  
+**App:** [app.trezzit.com](https://app.trezzit.com)
