@@ -1,24 +1,208 @@
 ---
-const chips = ['No signup demo', 'Friends can join later', 'Free for now'];
+const receiptItems = [
+  ['Organic Bananas', '$3.45', ['You', 'Aarav', 'Maya']],
+  ['Whole Milk Gallon', '$3.89', ['You', 'Aarav', 'Maya', 'Chetan']],
+  ['Tide Laundry Pods', '$12.97', ['You', 'Chetan']],
+  ['Motor Oil 5W-30', '$24.88', ['You']],
+  ['Nike T-Shirt', '$19.99', ['Aarav']],
+  ['Ibuprofen 200MG', '$8.47', ['You', 'Maya']],
+];
+
+const people = [
+  ['You', '$20.22'],
+  ['Aarav', '$9.11'],
+  ['Maya', '$5.96'],
+  ['Chetan', '$15.70'],
+];
 ---
 
-<section class="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_0.9fr] lg:px-8">
-  <div class="flex flex-col justify-center">
-    <div class="mb-5 flex flex-wrap gap-2">
-      {chips.map((chip) => (
-        <span class="rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-100">{chip}</span>
-      ))}
+<section class="relative isolate flex min-h-[65vh] items-center overflow-hidden border-b border-slate-800 px-4 py-20 sm:px-6 lg:min-h-[75vh] lg:px-8">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="mx-auto grid w-full max-w-6xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+    <div class="text-center lg:text-left">
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
+        <span class="h-1.5 w-1.5 rounded-full bg-emerald-300"></span>
+        No signup demo · Friends can join later · Free for now
+      </div>
+      <h1 class="mx-auto mt-6 max-w-3xl text-balance text-5xl font-bold tracking-tight text-slate-100 md:text-6xl lg:mx-0 lg:text-7xl">
+        Split the receipt now.
+      </h1>
+      <p class="mx-auto mt-5 max-w-xl text-xl leading-relaxed text-slate-400 md:text-2xl lg:mx-0">
+        Scan, tap items, send the link. Free, no account needed.
+      </p>
+      <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
+        <a class="rounded-xl bg-brand-500 px-8 py-4 text-center font-semibold text-white shadow-[0_0_30px_-5px_rgba(79,70,229,0.4)] transition-all hover:-translate-y-0.5 hover:bg-brand-400" href="https://app.trezzit.com/try-receipt">
+          Try receipt demo
+        </a>
+        <a class="rounded-xl border border-slate-700 px-8 py-4 text-center font-medium text-slate-300 transition-all hover:-translate-y-0.5 hover:border-slate-500 hover:text-slate-100" href="https://app.trezzit.com/demo">
+          Open bill calculator
+        </a>
+      </div>
+      <a class="mt-4 inline-flex text-sm text-slate-500 transition-colors hover:text-slate-300" href="https://app.trezzit.com/signup">
+        or sign up to save groups
+      </a>
     </div>
-    <h1 class="max-w-3xl text-5xl font-bold tracking-normal text-white sm:text-6xl">Split the receipt now.</h1>
-    <p class="mt-5 max-w-2xl text-xl text-slate-300">Scan, tap items, send the link.</p>
-    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-      <a class="rounded-md bg-brand-500 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-brand-600" href="https://app.trezzit.com/try-receipt">Try receipt demo</a>
-      <a class="rounded-md border border-white/15 px-5 py-3 text-center text-sm font-semibold text-slate-100 hover:bg-white/10" href="https://app.trezzit.com/demo">Open bill calculator</a>
-    </div>
-  </div>
-  <div class="rounded-lg border border-dashed border-white/20 bg-slate-950/70 p-6">
-    <div class="aspect-[4/5] rounded-md border border-white/10 bg-slate-900/80 p-4 text-sm text-slate-400">
-      [placeholder for screenshot: receipt demo, item assignment, final balances]
+
+    <div class="hero-before-after group relative rounded-3xl border border-slate-700/80 bg-slate-950/70 p-4 shadow-xl shadow-indigo-500/10 backdrop-blur" tabindex="0" aria-label="Animated receipt before and parsed item split after">
+      <div class="grid gap-4 md:grid-cols-[0.82fr_1fr] md:items-center">
+        <figure class="receipt-paper rotate-[-2deg] rounded-2xl bg-slate-100 p-5 text-slate-950 shadow-2xl shadow-black/30">
+          <figcaption class="border-b border-dashed border-slate-300 pb-3 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-slate-500">
+            Friday night dinner at Joe's
+          </figcaption>
+          <div class="mt-4 space-y-2 font-mono text-xs">
+            <div class="flex justify-between"><span>Walmart Supercenter</span><span>07/24/25</span></div>
+            {receiptItems.map(([name, price]) => (
+              <div class="flex justify-between gap-4">
+                <span>{name}</span>
+                <span>{price}</span>
+              </div>
+            ))}
+            <div class="border-t border-dashed border-slate-300 pt-2">
+              <div class="flex justify-between"><span>Tax</span><span>$3.67</span></div>
+              <div class="flex justify-between text-sm font-bold"><span>Total</span><span>$77.32</span></div>
+            </div>
+          </div>
+          <div class="scan-beam" aria-hidden="true"></div>
+        </figure>
+
+        <div class="relative">
+          <div class="arrow-line hidden md:block" aria-hidden="true"></div>
+          <div class="rounded-2xl border border-slate-700 bg-slate-900/95 p-4 shadow-2xl shadow-black/30">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-300">Parsed split</p>
+                <h2 class="mt-1 text-lg font-semibold text-slate-100">Each item, each person, automatic</h2>
+              </div>
+              <span class="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">Reviewed</span>
+            </div>
+            <div class="mt-4 space-y-2">
+              {receiptItems.map(([name, price, assigned], index) => (
+                <div class="parsed-row flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-2" style={`--i:${index}`}>
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-medium text-slate-200">{name}</p>
+                    <p class="font-mono text-xs text-slate-500">{price}</p>
+                  </div>
+                  <div class="flex -space-x-2">
+                    {assigned.map((person) => (
+                      <span class="grid h-7 w-7 place-items-center rounded-full border border-slate-900 bg-brand-500 text-[10px] font-bold text-white" title={person}>{person[0]}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div class="balance-card mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-brand-500/30 bg-brand-500/10 p-3">
+              {people.map(([name, total]) => (
+                <div>
+                  <p class="text-xs text-slate-400">{name}</p>
+                  <p class="font-mono text-sm font-semibold text-slate-100">{total}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<style>
+  .hero-glow {
+    position: absolute;
+    inset: -20% -10% auto;
+    height: 620px;
+    background:
+      radial-gradient(circle at 28% 38%, rgba(79, 70, 229, 0.24), transparent 34%),
+      radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.12), transparent 28%);
+    filter: blur(36px);
+    pointer-events: none;
+  }
+
+  .hero-before-after:hover .receipt-paper,
+  .hero-before-after:focus .receipt-paper {
+    animation: receipt-settle 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .receipt-paper {
+    position: relative;
+    overflow: hidden;
+    animation: receipt-settle 1100ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .scan-beam {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(79, 70, 229, 0.2) 48%, rgba(79, 70, 229, 0.45) 50%, transparent 54%);
+    animation: scan-pass 3.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  }
+
+  .arrow-line {
+    position: absolute;
+    left: -42px;
+    top: 50%;
+    height: 2px;
+    width: 58px;
+    background: linear-gradient(90deg, rgba(79, 70, 229, 0), rgba(129, 140, 248, 0.9));
+    animation: arrow-draw 1.4s 450ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -4px;
+    height: 10px;
+    width: 10px;
+    border-right: 2px solid rgba(129, 140, 248, 0.9);
+    border-top: 2px solid rgba(129, 140, 248, 0.9);
+    transform: rotate(45deg);
+  }
+
+  .parsed-row {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: row-in 680ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation-delay: calc(680ms + var(--i) * 120ms);
+  }
+
+  .balance-card {
+    animation: pulse-total 720ms 1.65s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  @keyframes receipt-settle {
+    from { opacity: 0; transform: rotate(-2deg) translateY(14px); }
+    to { opacity: 1; transform: rotate(0deg) translateY(0); }
+  }
+
+  @keyframes scan-pass {
+    0%, 12% { transform: translateY(-100%); opacity: 0; }
+    24%, 74% { opacity: 1; }
+    86%, 100% { transform: translateY(100%); opacity: 0; }
+  }
+
+  @keyframes arrow-draw {
+    from { clip-path: inset(0 100% 0 0); opacity: 0; }
+    to { clip-path: inset(0 0 0 0); opacity: 1; }
+  }
+
+  @keyframes row-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse-total {
+    0% { transform: scale(0.96); opacity: 0.7; }
+    70% { transform: scale(1.025); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .receipt-paper,
+    .scan-beam,
+    .arrow-line,
+    .parsed-row,
+    .balance-card {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
