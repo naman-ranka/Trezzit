@@ -1,19 +1,52 @@
 ---
-const steps = ['Upload', 'Group', 'Self-map', 'People-map', 'Result'];
+const wizardSteps = ['Upload', 'Group', 'Self', 'People', 'Result'];
 ---
 
-<section class="border-t border-white/10 px-4 py-16 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-7xl">
-    <p class="text-sm font-semibold text-brand-300">Move From Splitwise Cleanly</p>
-    <h2 class="mt-3 text-3xl font-bold text-white">CSV in, verified Trezzit group out.</h2>
-    <p class="mt-4 max-w-3xl text-slate-300">Import a Splitwise CSV into a fresh Trezzit group, create placeholders during mapping, and check balances after import.</p>
-    <div class="mt-8 grid gap-3 md:grid-cols-5">
-      {steps.map((step) => (
-        <div class="rounded-lg border border-white/10 bg-slate-950 p-4 text-sm font-semibold text-white">{step}</div>
-      ))}
+<section class="reveal-section border-t border-slate-800 px-4 py-20 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="max-w-3xl">
+      <p class="font-mono text-sm font-semibold uppercase tracking-[0.16em] text-brand-300">05 · Migration</p>
+      <h2 class="mt-3 text-4xl font-bold tracking-tight text-slate-100 md:text-5xl">From Splitwise to Trezzit in 5 steps.</h2>
+      <p class="mt-4 text-lg leading-relaxed text-slate-400">
+        Export your Splitwise group as CSV. Upload to Trezzit. Map people. Verify balances. Done.
+      </p>
     </div>
-    <div class="mt-6 rounded-lg border border-dashed border-white/20 bg-slate-950 p-6 text-sm text-slate-400">
-      [placeholder for screenshot: Splitwise CSV import Vaul sheet]
+
+    <div class="mt-10 grid gap-4 lg:grid-cols-[1fr_auto_1.2fr_auto_1fr] lg:items-center">
+      <div class="rounded-2xl border border-orange-400/30 bg-orange-400/10 p-6">
+        <div class="grid h-12 w-12 place-items-center rounded-xl bg-orange-400/15 text-2xl text-orange-200">CSV</div>
+        <h3 class="mt-5 text-xl font-semibold text-slate-100">Splitwise CSV</h3>
+        <p class="mt-2 text-sm text-slate-400">Use the export file with date, description, cost, currency, and person columns.</p>
+      </div>
+      <div class="hidden h-px w-12 bg-gradient-to-r from-slate-700 to-brand-500 lg:block"></div>
+      <div class="rounded-2xl border border-slate-700 bg-slate-800/50 p-6 shadow-xl shadow-indigo-500/10">
+        <h3 class="text-xl font-semibold text-slate-100">Map people</h3>
+        <div class="mt-5 flex gap-1">
+          {wizardSteps.map((step, index) => (
+            <span class:list={['rounded-full px-2.5 py-1 text-[11px] font-medium', index < 4 ? 'bg-brand-500 text-white' : 'bg-slate-700 text-slate-300']}>{step}</span>
+          ))}
+        </div>
+        <div class="mt-5 space-y-2">
+          {[
+            ['Naman Ranka', 'You'],
+            ['Aarav Shah', 'Create placeholder'],
+            ['Maya Iyer', 'Existing friend'],
+          ].map(([name, status]) => (
+            <div class="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-900 px-3 py-2">
+              <span class="text-sm text-slate-200">{name}</span>
+              <span class="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-400">{status}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="hidden h-px w-12 bg-gradient-to-r from-brand-500 to-emerald-500 lg:block"></div>
+      <div class="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6">
+        <div class="grid h-12 w-12 place-items-center rounded-xl bg-emerald-500/15 text-2xl text-emerald-200">✓</div>
+        <h3 class="mt-5 text-xl font-semibold text-slate-100">Verified Trezzit group</h3>
+        <p class="mt-2 text-sm text-slate-400">Final balances are checked against the Splitwise total before import completes.</p>
+      </div>
     </div>
+
+    <p class="mt-6 text-sm text-slate-500">Fresh group only · Balance check ±$0.01</p>
   </div>
 </section>
