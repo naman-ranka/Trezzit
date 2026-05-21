@@ -1,24 +1,53 @@
 ---
+const bills = [
+  ['Cabin groceries', '$42.70', 'Maya owes $18.20'],
+  ['Firewood run', '$24.00', 'Settled'],
+  ['Breakfast stop', '$31.60', 'Aarav owes $10.53'],
+];
 ---
 
-<section class="border-t border-white/10 px-4 py-16 sm:px-6 lg:px-8">
-  <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1fr]">
+<section class="reveal-section border-t border-slate-800 px-4 py-20 sm:px-6 lg:px-8">
+  <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.95fr_1fr] lg:items-center">
     <div>
-      <p class="text-sm font-semibold text-brand-300">When You Want More, Ask AI</p>
-      <h2 class="mt-3 text-3xl font-bold text-white">AI helps with receipts and questions.</h2>
-      <ul class="mt-5 space-y-2 text-slate-300">
-        <li>Authenticated receipt scanning uses Gemini.</li>
-        <li>Trezzit exposes 13 MCP tools for compatible agents.</li>
-        <li>AI can read balances, search bills, inspect items, and create constrained writes.</li>
-        <li>The dedicated AI page has the protocol detail.</li>
-      </ul>
-      <a class="mt-6 inline-flex rounded-md border border-white/15 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-white/10" href="/ai">Open AI page</a>
+      <p class="font-mono text-sm font-semibold uppercase tracking-[0.16em] text-brand-300">06 · AI integration</p>
+      <h2 class="mt-3 text-4xl font-bold tracking-tight text-slate-100 md:text-5xl">Ask your AI agent about your money.</h2>
+      <p class="mt-4 text-lg leading-relaxed text-slate-400">
+        Authenticated receipt scanning uses Gemini. Trezzit also exposes 13 MCP tools for Claude, Cursor, ChatGPT, and Gemini — protocol detail on the AI page.
+      </p>
+      <a class="mt-6 inline-flex min-h-11 items-center rounded-xl border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-300 transition-all hover:-translate-y-0.5 hover:border-brand-500/60 hover:text-slate-100" href="/ai">
+        Open AI page →
+      </a>
     </div>
-    <div class="rounded-lg border border-white/10 bg-slate-950 p-5">
-      <pre class="overflow-auto rounded-md bg-slate-900 p-4 text-sm text-brand-100"><code>{`user: How much did Maya owe from the cabin trip?
-tool: get_balances({ group: "Cabin trip" })
-trezzit: Maya owes $18.20`}</code></pre>
-      <div class="mt-4 aspect-video rounded-md border border-dashed border-white/20 p-4 text-sm text-slate-400">[placeholder for friendly app screenshot]</div>
+
+    <div class="grid gap-4 md:grid-cols-[1fr_0.92fr]">
+      <div class="rounded-2xl border border-slate-700 bg-slate-950 p-5 shadow-xl shadow-black/30">
+        <div class="mb-4 flex gap-2">
+          <span class="h-3 w-3 rounded-full bg-rose-400"></span>
+          <span class="h-3 w-3 rounded-full bg-amber-400"></span>
+          <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
+        </div>
+        <pre class="overflow-auto text-sm leading-7 text-slate-300"><code>{`user: "How much did Maya owe from the cabin trip?"
+trezzit MCP: get_balances({group: "Cabin trip"})
+→ Maya owes $18.20`}</code></pre>
+      </div>
+
+      <div class="rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-xl shadow-indigo-500/10">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold text-slate-100">Cabin trip</h3>
+          <span class="rounded-full bg-brand-500/10 px-2.5 py-1 text-xs text-brand-300">3 open</span>
+        </div>
+        <div class="mt-5 space-y-3">
+          {bills.map(([title, amount, status]) => (
+            <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+              <div class="flex items-center justify-between gap-3">
+                <span class="text-sm font-medium text-slate-200">{title}</span>
+                <span class="font-mono text-sm text-brand-300">{amount}</span>
+              </div>
+              <p class="mt-1 text-xs text-slate-500">{status}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   </div>
 </section>
