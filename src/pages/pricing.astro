@@ -1,37 +1,48 @@
 ---
 import Base from '../layouts/Base.astro';
 
+const included = ['Unlimited groups and members', 'Itemized bills and split methods', 'Signed-in receipt scanning', 'Splitwise CSV import', 'Placeholders and invites', 'MCP access within platform limits'];
 const faqs = [
-  ['Will this stay free?', 'Trezzit is free while the product grows. Premium features arrive once payments ship; there is no paid plan to buy today.'],
-  ['Are receipt scans limited?', 'There are no shipped paid quotas today. The product does cache repeat receipt uploads by SHA-256 hash.'],
-  ['Do friends need accounts?', 'No. You can add placeholders first, then invite friends later by QR or magic link.'],
+  ['Will this stay free?', 'Trezzit is bootstrapped and free now because there is not a paid feature worth charging for yet. When that changes, current users get grandfathered into the old terms before anything surprise-bills them.'],
+  ['Do I need a credit card?', 'No. There is no payment flow in the product today, and no card is collected on signup.'],
+  ['Are receipt scans limited?', 'There are no shipped paid quotas today. Repeat uploads are cached by SHA-256 image hash so duplicate scans do not trigger another model call.'],
+  ['Do friends need accounts?', 'No. Add placeholders by name, then invite them by QR or magic link later.'],
+  ['What is not included?', 'Trezzit does not move money between bank accounts and does not currently sell a Pro or team tier.'],
 ];
 ---
 
 <Base
-  title="Trezzit Pricing — Free, Forever for Now"
+  title="Trezzit Pricing - Free, Forever for Now"
   description="Trezzit is free while payments and premium tiers are not yet shipped. No fake quotas, no surprise Pro wall."
 >
-  <section class="bg-slate-950 px-4 py-20 sm:px-6 lg:px-8">
-    <div class="mx-auto max-w-4xl">
-      <p class="font-mono text-sm text-brand-300">Pricing</p>
-      <h1 class="mt-4 text-4xl font-bold text-white md:text-6xl">Free, forever — for now.</h1>
-      <p class="mt-6 text-xl text-slate-300">Premium features arrive once we ship payments. No credit card. No quotas. No surprise Pro wall.</p>
-      <div class="mt-10 rounded-xl border border-brand-300/30 bg-slate-900 p-8">
-        <h2 class="text-2xl font-semibold text-white">$0 today</h2>
-        <p class="mt-3 text-slate-300">Itemized splitting, groups, placeholders, public demos, receipt scanning for signed-in users, Splitwise CSV import, and MCP access within platform rate limits.</p>
-        <a href="https://app.trezzit.com/signup" class="mt-6 inline-flex rounded-lg bg-brand-500 px-5 py-3 font-medium text-white hover:bg-brand-400">Sign up free</a>
+  <section class="bg-slate-950 py-16 md:py-24">
+    <div class="section-shell text-center">
+      <p class="eyebrow">No credit card</p>
+      <h1 class="mt-4 text-5xl font-bold tracking-tight text-slate-50 md:text-7xl">Free, forever - for now.</h1>
+      <p class="mt-6 text-xl text-slate-400">No quotas. No upsell path yet. No surprise Pro wall.</p>
+      <div class="mx-auto mt-10 max-w-md rounded-2xl border border-slate-700 bg-slate-800/50 p-8 text-left shadow-2xl shadow-indigo-500/10">
+        <p class="text-sm font-semibold text-brand-300">Free</p>
+        <p class="money mt-3 text-4xl font-bold text-white">$0/month</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          {included.map((item) => <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-brand-400"></span><span>{item}</span></li>)}
+        </ul>
+        <a href="https://app.trezzit.com/signup" class="mt-8 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-500 px-5 font-semibold text-white hover:bg-brand-400">Sign up free</a>
       </div>
+      <p class="mx-auto mt-10 max-w-2xl text-left text-lg italic leading-relaxed text-slate-400">Trezzit is bootstrapped and free now because there is not a paid feature worth charging for yet. When there is, current users get grandfathered. The product earns pricing only after payments and premium workflows are real, not before.</p>
     </div>
   </section>
-  <section class="bg-slate-900 px-4 py-16 sm:px-6 lg:px-8">
-    <div class="mx-auto grid max-w-4xl gap-4">
-      {faqs.map(([question, answer]) => (
-        <article class="rounded-xl border border-white/10 bg-slate-950 p-6">
-          <h2 class="text-lg font-semibold text-white">{question}</h2>
-          <p class="mt-2 text-slate-300">{answer}</p>
-        </article>
-      ))}
+  <section class="bg-slate-900 py-16 md:py-24">
+    <div class="section-shell max-w-3xl">
+      <h2 class="text-3xl font-bold text-slate-50">FAQ</h2>
+      <div class="mt-8 divide-y divide-slate-800 rounded-2xl border border-slate-800 bg-slate-950/70">
+        {faqs.map(([question, answer], index) => (
+          <details class="group p-5" open={index === 0}>
+            <summary class="cursor-pointer list-none font-semibold text-slate-100">{question}</summary>
+            <p class="mt-3 text-slate-400">{answer}</p>
+          </details>
+        ))}
+      </div>
+      <p class="mt-8 text-center text-sm text-slate-500">No credit card required.</p>
     </div>
   </section>
 </Base>
