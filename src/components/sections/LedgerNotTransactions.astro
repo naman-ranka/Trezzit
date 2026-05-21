@@ -1,21 +1,97 @@
 ---
 const bullets = [
-  'Every bill breaks into items.',
-  'Every item breaks into person-level shares.',
-  'Balances come from rows you can inspect.',
-  'AI and budgeting work because the data is itemized.',
+  { before: 'Every bill breaks into items (', code: 'BillItem', after: ')' },
+  { before: 'Every item breaks into person-shares (', code: 'ItemShare', after: ')' },
+  { before: "Balances come from rows you can inspect, not totals you can't audit" },
+  { before: 'AI categorization, budgeting, and MCP queries all read the same item-level data' },
+];
+
+const rows = [
+  ['BillItem', 'Organic Bananas', '$3.45', 'N+C+P'],
+  ['ItemShare', 'Motor Oil 5W-30', '$24.88', 'Naman'],
+  ['ItemShare', 'Ibuprofen 200MG', '$8.47', 'N+P'],
 ];
 ---
 
-<section id="ledger" class="border-b border-white/10 bg-slate-900">
-  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8">
-    <div>
-      <p class="font-mono text-sm text-brand-300">01 / Ledger</p>
-      <h2 class="mt-3 text-3xl font-semibold text-white">Ledger, Not Transactions</h2>
-      <ul class="mt-6 list-inside list-disc space-y-3 text-slate-300">
-        {bullets.map((bullet) => <li>{bullet}</li>)}
+<section id="ledger" class="border-b border-slate-800 bg-slate-900 py-16 md:py-24">
+  <div class="section-shell grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+    <div class="reveal">
+      <p class="eyebrow">01 Â/ The data model</p>
+      <h2 class="mt-4 text-4xl font-bold tracking-tight text-slate-50 md:text-5xl">The ledger is the product.</h2>
+      <div class="mt-6 space-y-4 text-lg leading-relaxed text-slate-400">
+        <p>Trezzit does not stop at a transaction total. Every dollar is an <code>ItemShare</code> row tied to a <code>BillItem</code>, so the app can explain exactly who owns each line.</p>
+        <p>That structure enables item-wise splitting, item-wise budgeting, item-wise AI categorization, and item-wise MCP queries. The same source rows drive the human UI and the agent interface.</p>
+      </div>
+      <ul class="mt-8 space-y-4">
+        {bullets.map((bullet) => (
+          <li class="flex gap-3 text-slate-300">
+            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-400"></span>
+            <span>{bullet.before}{bullet.code && <code>{bullet.code}</code>}{bullet.after}</span>
+          </li>
+        ))}
       </ul>
     </div>
-    <div class="aspect-[16/10] rounded-xl border border-dashed border-brand-300/40 bg-slate-800 p-6 font-mono text-sm text-brand-300">[placeholder for screenshot]</div>
+
+    <div class="ledger-flow reveal relative rounded-2xl border border-slate-800 bg-slate-950/70 p-5 shadow-lg shadow-indigo-500/10">
+      <svg class="absolute inset-0 h-full w-full text-brand-500/40" aria-hidden="true">
+        <path class="flow-line" d="M145 156 C250 80 330 80 438 156" fill="none" stroke="currentColor" stroke-width="1.5" />
+        <path class="flow-line second" d="M438 156 C540 230 630 230 730 156" fill="none" stroke="currentColor" stroke-width="1.5" />
+      </svg>
+      <div class="relative grid gap-4 md:grid-cols-3">
+        <div class="rounded-xl border border-slate-700 bg-[#f8f5ee] p-4 font-mono text-[11px] text-slate-900">
+          <p class="text-center font-bold tracking-widest">WALMART</p>
+          <div class="my-3 border-t border-dashed border-slate-400"></div>
+          <p>Organic Bananas <span class="float-right">$3.45</span></p>
+          <p>Whole Milk <span class="float-right">$3.89</span></p>
+          <p>Tide Pods <span class="float-right">$12.97</span></p>
+          <p class="mt-3 font-bold">TOTAL <span class="float-right">$77.32</span></p>
+        </div>
+        <div class="rounded-xl border border-slate-700 bg-slate-900 p-4">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-brand-300">BillItem / ItemShare</p>
+          <div class="mt-3 space-y-2">
+            {rows.map(([type, name, amount, people]) => (
+              <div class="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+                <div class="flex justify-between gap-3"><span class="text-xs text-slate-300">{name}</span><span class="money text-xs text-slate-50">{amount}</span></div>
+                <p class="mt-1 font-mono text-[10px] text-slate-500">{type} Â/ {people}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div class="rounded-xl border border-slate-700 bg-slate-900 p-4">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-brand-300">Balance</p>
+          <div class="mt-4 space-y-3">
+            <div class="flex justify-between text-sm"><span class="text-slate-300">Naman</span><span class="money text-slate-50">$36.41</span></div>
+            <div class="flex justify-between text-sm"><span class="text-slate-300">Chetan</span><span class="money text-slate-50">$6.77</span></div>
+            <div class="flex justify-between text-sm"><span class="text-slate-300">Adi</span><span class="money text-slate-50">$20.96</span></div>
+            <div class="flex justify-between text-sm"><span class="text-slate-300">Prachi</span><span class="money text-slate-50">$13.18</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="relative mt-4 grid grid-cols-3 text-center font-mono text-[10px] uppercase tracking-wider text-slate-500">
+        <span>receipt</span><span>extract Â/ split</span><span>balance</span>
+      </div>
+    </div>
   </div>
 </section>
+
+<style>
+  .flow-line {
+    stroke-dasharray: 420;
+    stroke-dashoffset: 420;
+  }
+  .ledger-flow.in-view .flow-line {
+    animation: draw 900ms ease forwards;
+  }
+  .ledger-flow.in-view .second {
+    animation-delay: 450ms;
+  }
+  @keyframes draw {
+    to { stroke-dashoffset: 0; }
+  }
+  @media (max-width: 767px) {
+    .ledger-flow svg { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flow-line { stroke-dashoffset: 0; }
+  }
+</style>

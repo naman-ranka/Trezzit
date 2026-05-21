@@ -1,21 +1,89 @@
----
+﻿---
 const bullets = [
-  'JPEG, PNG, WebP, and PDF uploads are supported.',
-  'Two-pass Google Gemini pipeline extracts items, totals, tax, discounts, and warnings.',
-  'Re-uploaded receipt images are cached by SHA-256 hash.',
-  'Review sheet surfaces mismatches before saving.',
+  'JPEG, PNG, WebP, PDF supported',
+  'Two-pass Gemini: Flash-Lite then Flash for accuracy',
+  'SHA-256 image caching - re-upload is free',
+  'Review sheet surfaces total mismatches before saving',
+];
+
+const items = [
+  ['Organic Bananas', '$3.45'],
+  ['Whole Milk Gallon', '$3.89'],
+  ['Tide Laundry Pods', '$12.97'],
+  ['Motor Oil 5W-30', '$24.88'],
+  ['Nike T-Shirt', '$19.99'],
+  ['Ibuprofen 200MG', '$8.47'],
 ];
 ---
 
-<section id="receipts" class="border-b border-white/10 bg-slate-950">
-  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8">
-    <div class="aspect-[16/10] rounded-xl border border-dashed border-brand-300/40 bg-slate-800 p-6 font-mono text-sm text-brand-300">[placeholder for screenshot]</div>
-    <div>
-      <p class="font-mono text-sm text-brand-300">02 / Receipts</p>
-      <h2 class="mt-3 text-3xl font-semibold text-white">Scan to Structured Rows</h2>
-      <ul class="mt-6 list-inside list-disc space-y-3 text-slate-300">
-        {bullets.map((bullet) => <li>{bullet}</li>)}
+<section id="receipts" class="border-b border-slate-800 bg-slate-950 py-16 md:py-24">
+  <div class="section-shell grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+    <div class="scan-demo reveal rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-indigo-500/10">
+      <div class="grid gap-5 md:grid-cols-[0.9fr_1fr]">
+        <div class="scan-receipt relative overflow-hidden rounded-xl border border-slate-700 bg-[#f8f5ee] p-5 font-mono text-xs text-slate-900">
+          <div class="scan-line"></div>
+          <p class="text-center font-bold tracking-widest">WALMART SUPERCENTER</p>
+          <p class="text-center text-[10px] text-slate-500">July 24, 2025</p>
+          <div class="my-4 border-t border-dashed border-slate-400"></div>
+          {items.map(([name, price]) => <p class="mb-2 flex justify-between gap-4"><span>{name}</span><span>{price}</span></p>)}
+          <div class="mt-4 border-t border-dashed border-slate-400 pt-3 font-bold">
+            <p class="flex justify-between"><span>TOTAL</span><span>$77.32</span></p>
+          </div>
+        </div>
+        <div class="parsed-panel space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            {[
+              ['Merchant', 'Walmart'],
+              ['Date', 'Jul 24, 2025'],
+              ['Total', '$77.32'],
+              ['Tax', '$3.67'],
+            ].map(([label, value], index) => (
+              <div class="data-card rounded-xl border border-slate-700 bg-slate-950 p-3" style={`--d:${index * 80}ms`}>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-slate-500">{label}</p>
+                <p class="money mt-1 text-sm font-semibold text-slate-100">{value}</p>
+              </div>
+            ))}
+          </div>
+          <div class="rounded-xl border border-slate-700 bg-slate-950 p-4">
+            <div class="flex items-center justify-between">
+              <p class="font-mono text-[11px] uppercase tracking-wider text-brand-300">Parsed items</p>
+              <span class="rounded-full bg-brand-500/10 px-2 py-1 text-[10px] text-brand-300">review ready</span>
+            </div>
+            <div class="mt-3 divide-y divide-slate-800">
+              {items.map(([name, price], index) => (
+                <div class="item-row flex justify-between gap-3 py-2 text-sm" style={`--d:${index * 70}ms`}>
+                  <span class="text-slate-300">{name}</span>
+                  <span class="money text-slate-50">{price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <p class="eyebrow">02 / Receipt intelligence</p>
+      <h2 class="mt-4 text-4xl font-bold tracking-tight text-slate-50 md:text-5xl">Scan once. Get every line.</h2>
+      <p class="mt-6 text-lg leading-relaxed text-slate-400">Two-pass Google Gemini pipeline extracts items, totals, tax, discounts, and merchant - then caches the result by SHA-256 image hash so re-uploading the same receipt is free.</p>
+      <ul class="mt-8 space-y-4">
+        {bullets.map((bullet) => (
+          <li class="flex gap-3 text-slate-300"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-400"></span><span>{bullet}</span></li>
+        ))}
       </ul>
     </div>
   </div>
 </section>
+
+<style>
+  .scan-line { position: absolute; inset-inline: 0; top: -18%; height: 28%; background: linear-gradient(to bottom, transparent, rgba(79, 70, 229, 0.22), transparent); border-top: 1px solid rgba(79, 70, 229, 0.55); opacity: 0; }
+  .data-card, .item-row { opacity: 0; transform: translateY(10px); }
+  .scan-demo.in-view .scan-line { animation: scan-pass 1.15s ease forwards; }
+  .scan-demo.in-view .scan-receipt { animation: receipt-shift 800ms ease 900ms forwards; }
+  .scan-demo.in-view .data-card { animation: reveal-scan 420ms ease calc(900ms + var(--d)) forwards; }
+  .scan-demo.in-view .item-row { animation: reveal-scan 360ms ease calc(1250ms + var(--d)) forwards; }
+  @keyframes scan-pass { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translateY(420%); } }
+  @keyframes receipt-shift { to { transform: translateX(-4px) scale(0.985); filter: saturate(0.92); } }
+  @keyframes reveal-scan { to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .scan-line { display: none; } .data-card, .item-row { opacity: 1; transform: none; } }
+</style>

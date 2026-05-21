@@ -1,21 +1,53 @@
 ---
+const placeholders = [
+  ['Aarav', 'Not invited', 'Send invite', ''],
+  ['Maya', 'Invited', 'Copy Â/ Regenerate Â/ Revoke', 'https://app.trezzit.com/join/ph_maya_8K2'],
+  ['Chetan', 'Joined', 'Claimed account', ''],
+  ['Prachi', 'Invited', 'Copy Â/ Share', 'https://app.trezzit.com/join/ph_prachi_Q9M'],
+];
 const bullets = [
-  'Add placeholders for friends who have not signed up.',
-  'Send QR or magic-link invites.',
-  'When someone joins, their bills and payments move to their account.',
-  'Web push keeps changes visible without requiring constant check-ins.',
+  'Add by name, no signup',
+  'QR + magic-link invites',
+  'All prior bills + payments transfer on join',
+  'Web push keeps everyone in sync',
 ];
 ---
 
-<section id="groups" class="border-b border-white/10 bg-slate-900">
-  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8">
-    <div>
-      <p class="font-mono text-sm text-brand-300">05 / Groups</p>
-      <h2 class="mt-3 text-3xl font-semibold text-white">Groups Without Account Pressure</h2>
-      <ul class="mt-6 list-inside list-disc space-y-3 text-slate-300">
-        {bullets.map((bullet) => <li>{bullet}</li>)}
+<section id="groups" class="border-b border-slate-800 bg-slate-900 py-16 md:py-24">
+  <div class="section-shell grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+    <div class="reveal rounded-2xl border border-slate-800 bg-slate-950/70 p-5 shadow-lg shadow-indigo-500/10">
+      <p class="mb-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Placeholders</p>
+      <div class="space-y-3">
+        {placeholders.map(([name, status, action, url]) => (
+          <article class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="font-semibold text-slate-100">{name}</p>
+                <p class={`mt-1 text-xs ${status === 'Joined' ? 'text-emerald-400' : status === 'Invited' ? 'text-amber-300' : 'text-slate-500'}`}>{status}</p>
+              </div>
+              <button class="min-h-11 rounded-xl border border-slate-700 px-3 text-sm font-medium text-slate-300">{action}</button>
+            </div>
+            {url && (
+              <div class="mt-3 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2">
+                <p class="text-[11px] font-medium text-slate-500">Invite link active</p>
+                <p class="mt-1 break-all font-mono text-[11px] text-brand-300">{url}</p>
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+      <div class="mt-5 rounded-xl border border-brand-500/30 bg-brand-500/10 p-4 text-center text-sm font-medium leading-relaxed text-slate-300">
+        "'Aarav' has 4 bills and 2 payments where you're owed $32.50. Joining moves them to your account."
+      </div>
+    </div>
+
+    <div class="reveal">
+      <p class="eyebrow">05 Â/ Placeholder users</p>
+      <h2 class="mt-4 text-4xl font-bold tracking-tight text-slate-50 md:text-5xl">Friends don't need accounts. Until they do.</h2>
+      <p class="mt-6 text-lg leading-relaxed text-slate-400">Add anyone as a placeholder. They appear in groups, show up on bills, contribute to balances. When they sign up later, every bill and payment automatically transfers to their new account.</p>
+      <ul class="mt-8 space-y-4">
+        {bullets.map((bullet) => <li class="flex gap-3 text-slate-300"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-400"></span><span>{bullet}</span></li>)}
       </ul>
     </div>
-    <div class="aspect-[16/10] rounded-xl border border-dashed border-brand-300/40 bg-slate-800 p-6 font-mono text-sm text-brand-300">[placeholder for screenshot]</div>
   </div>
 </section>

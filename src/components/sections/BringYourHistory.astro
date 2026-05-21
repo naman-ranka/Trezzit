@@ -1,22 +1,57 @@
 ---
-const bullets = [
-  'Import Splitwise CSVs through a five-step wizard.',
-  'Upload, create or choose a fresh group, map yourself, map people, import.',
-  'Placeholder users cover friends without accounts.',
-  'Server checks final balances within one cent.',
+const steps = [
+  ['UPLOAD', 'Import from Splitwise', 'Drop the .csv export.'],
+  ['GROUP', 'Create a group', 'Fresh group only.'],
+  ['SELF_MAP', 'Which one is you?', 'Choose your CSV row.'],
+  ['PEOPLE_MAP', 'Map people', 'Account, placeholder, or create new.'],
+  ['RESULT', 'Import complete', 'Server verifies balances.'],
 ];
 ---
 
-<section id="imports" class="border-b border-white/10 bg-slate-950">
-  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8">
-    <div class="aspect-[16/10] rounded-xl border border-dashed border-brand-300/40 bg-slate-800 p-6 font-mono text-sm text-brand-300">[placeholder for screenshot]</div>
-    <div>
-      <p class="font-mono text-sm text-brand-300">04 / Import</p>
-      <h2 class="mt-3 text-3xl font-semibold text-white">Bring Your History</h2>
-      <ul class="mt-6 list-inside list-disc space-y-3 text-slate-300">
-        {bullets.map((bullet) => <li>{bullet}</li>)}
-      </ul>
-      <p class="mt-5 text-sm text-slate-500">Honest constraint: Splitwise CSV import targets a fresh group with zero existing bills or payments.</p>
+<section id="imports" class="border-b border-slate-800 bg-slate-950 py-16 md:py-24">
+  <div class="section-shell grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+    <div class="reveal">
+      <p class="eyebrow">04 Â/ Migration</p>
+      <h2 class="mt-4 text-4xl font-bold tracking-tight text-slate-50 md:text-5xl">Move from Splitwise in 30 seconds.</h2>
+      <p class="mt-6 text-lg leading-relaxed text-slate-400">Five steps, real CSV, real placeholder users, server-side balance verification. Import into a fresh group only - your existing groups stay untouched.</p>
+      <div class="mt-7 flex flex-wrap gap-2 text-xs text-slate-400">
+        <span class="rounded-full border border-slate-700 px-3 py-1">Fresh group only</span>
+        <span class="rounded-full border border-slate-700 px-3 py-1">Balance check +/- $0.01</span>
+      </div>
+    </div>
+
+    <div class="reveal rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-indigo-500/10">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <p class="font-semibold text-slate-50">Import from Splitwise</p>
+          <p class="text-sm text-slate-500">Step 4 of 5 Â/ Map people</p>
+        </div>
+        <span class="rounded-lg bg-brand-500 px-3 py-2 text-sm font-semibold text-white">Continue</span>
+      </div>
+      <div class="mt-5 grid gap-3 md:grid-cols-5">
+        {steps.map(([key, title, detail], index) => (
+          <article class={`rounded-xl border p-3 ${index === 3 ? 'border-brand-500/40 bg-brand-500/10' : 'border-slate-700 bg-slate-950'}`}>
+            <p class="font-mono text-[10px] font-semibold uppercase tracking-wider text-brand-300">{key}</p>
+            <h3 class="mt-2 text-sm font-semibold text-slate-100">{title}</h3>
+            <p class="mt-2 min-h-10 text-xs leading-relaxed text-slate-500">{detail}</p>
+          </article>
+        ))}
+      </div>
+      <div class="mt-5 rounded-xl border border-slate-700 bg-slate-950 p-4">
+        <p class="font-mono text-[11px] uppercase tracking-wider text-slate-500">People mapping</p>
+        <div class="mt-3 space-y-3">
+          {[
+            ['Naman Ranka', 'This is me', 'selected'],
+            ['Aarav Shah', 'Create placeholder', 'new'],
+            ['Maya Patel', 'Existing account', 'linked'],
+          ].map(([name, action, state]) => (
+            <div class="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 p-3">
+              <span class="text-sm font-medium text-slate-200">{name}</span>
+              <span class={`rounded-full px-2 py-1 text-xs ${state === 'selected' ? 'bg-brand-500 text-white' : 'bg-slate-800 text-slate-300'}`}>{action}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   </div>
 </section>

@@ -1,21 +1,145 @@
 ---
-const bullets = [
-  'App UI exposes Equal, Percent, Exact, and Shares.',
-  'API/MCP can reach the fifth Adjusted split type.',
-  'Tax and tip distribute proportionally after the item split.',
-  'The result is a balance you can audit item by item.',
+const members = [
+  { id: 'naman', name: 'Naman', initial: 'N', color: '#4F46E5' },
+  { id: 'chetan', name: 'Chetan', initial: 'C', color: '#8b5cf6' },
+  { id: 'adi', name: 'Adi', initial: 'A', color: '#06b6d4' },
+  { id: 'prachi', name: 'Prachi', initial: 'P', color: '#10b981' },
+];
+
+const items = [
+  { id: 'bananas', name: 'Organic Bananas', price: 3.45 },
+  { id: 'milk', name: 'Whole Milk Gallon', price: 3.89 },
+  { id: 'tide', name: 'Tide Laundry Pods', price: 12.97 },
+  { id: 'oil', name: 'Motor Oil 5W-30', price: 24.88 },
+  { id: 'tshirt', name: 'Nike T-Shirt', price: 19.99 },
+  { id: 'ibuprofen', name: 'Ibuprofen 200MG', price: 8.47 },
 ];
 ---
 
-<section class="border-b border-white/10 bg-slate-900">
-  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8">
-    <div>
-      <p class="font-mono text-sm text-brand-300">03 / Splits</p>
-      <h2 class="mt-3 text-3xl font-semibold text-white">Splits That Preserve Intent</h2>
-      <ul class="mt-6 list-inside list-disc space-y-3 text-slate-300">
-        {bullets.map((bullet) => <li>{bullet}</li>)}
-      </ul>
+<section class="border-b border-slate-800 bg-slate-900 py-16 md:py-24">
+  <div class="section-shell">
+    <div class="reveal max-w-3xl">
+      <p class="eyebrow">03 / Per-item splitting</p>
+      <h2 class="mt-4 text-4xl font-bold tracking-tight text-slate-50 md:text-5xl">Tap who had what. Math is automatic.</h2>
+      <p class="mt-6 text-lg leading-relaxed text-slate-400">Item-by-item, person-by-person assignment. The same row can be shared by 3 roommates or owned by one. Tax and tip distribute proportionally. Totals update live.</p>
+      <p class="mt-4 text-sm text-slate-500">App UI: Equal, Percent, Exact, Shares. API/MCP: also Adjusted.</p>
     </div>
-    <div class="aspect-[16/10] rounded-xl border border-dashed border-brand-300/40 bg-slate-800 p-6 font-mono text-sm text-brand-300">[placeholder for screenshot]</div>
+
+    <div class="split-demo reveal mt-12 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/80 shadow-lg shadow-indigo-500/10">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 p-5">
+        <div class="grid grid-cols-4 rounded-xl border border-slate-700 bg-slate-900 p-1 text-xs text-slate-400">
+          {['Equal', 'Percent', 'Exact', 'Shares'].map((label, index) => (
+            <span class={`rounded-lg px-3 py-2 text-center ${index === 0 ? 'bg-brand-500 text-white' : ''}`}>{label}</span>
+          ))}
+        </div>
+        <p class="split-caption font-mono text-xs uppercase tracking-wider text-brand-300">Bananas: shared groceries</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[760px] text-left text-sm">
+          <thead class="bg-slate-900/70 text-xs uppercase tracking-wider text-slate-500">
+            <tr>
+              <th class="px-5 py-4">Item</th>
+              <th class="px-5 py-4 text-right">Amount</th>
+              {members.map((member) => <th class="px-4 py-4 text-center">{member.name}</th>)}
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800">
+            {items.map((item) => (
+              <tr data-item={item.id}>
+                <td class="px-5 py-4 font-medium text-slate-200">{item.name}</td>
+                <td class="money px-5 py-4 text-right text-slate-300">${item.price.toFixed(2)}</td>
+                {members.map((member) => (
+                  <td class="px-4 py-4 text-center">
+                    <span data-avatar={`${item.id}:${member.id}`} style={`--c:${member.color}`} class="member-avatar mx-auto grid h-9 w-9 place-items-center rounded-full border border-slate-700 bg-slate-900 text-xs font-bold text-slate-500 transition-all duration-150">{member.initial}</span>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot class="border-t border-slate-700 bg-slate-900/70">
+            <tr>
+              <th class="px-5 py-4 text-slate-400">Live totals</th>
+              <th></th>
+              {members.map((member) => <th class="money px-4 py-4 text-center text-slate-50" data-total={member.id}>$0.00</th>)}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
   </div>
 </section>
+
+<script>
+  const config = {
+    members: ['naman', 'chetan', 'adi', 'prachi'],
+    items: {
+      bananas: 3.45,
+      milk: 3.89,
+      tide: 12.97,
+      oil: 24.88,
+      tshirt: 19.99,
+      ibuprofen: 8.47,
+    },
+    sequence: [
+      { item: 'bananas', members: ['naman', 'chetan', 'prachi'], description: 'shared groceries' },
+      { item: 'milk', members: ['naman', 'chetan', 'adi', 'prachi'], description: 'everyone drinks milk' },
+      { item: 'tide', members: ['naman', 'chetan'], description: 'household items for roommates' },
+      { item: 'oil', members: ['naman'], description: 'personal car maintenance' },
+      { item: 'tshirt', members: ['adi'], description: 'personal clothing item' },
+      { item: 'ibuprofen', members: ['naman', 'prachi'], description: 'medicine for two people' },
+    ],
+  };
+
+  function runSplitDemo(root) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      applyStep(root, config.sequence[config.sequence.length - 1], new Map());
+      return;
+    }
+    const assignments = new Map();
+    let index = 0;
+    const tick = () => {
+      applyStep(root, config.sequence[index], assignments);
+      index = (index + 1) % config.sequence.length;
+      window.setTimeout(tick, index === 0 ? 1800 : 1050);
+    };
+    tick();
+  }
+
+  function applyStep(root, step, assignments) {
+    assignments.set(step.item, step.members);
+    root.querySelector('.split-caption').textContent = `${step.item}: ${step.description}`;
+    for (const item of Object.keys(config.items)) {
+      for (const member of config.members) {
+        const avatar = root.querySelector(`[data-avatar="${item}:${member}"]`);
+        const active = (assignments.get(item) || []).includes(member);
+        avatar.classList.toggle('selected', active);
+      }
+    }
+    const totals = Object.fromEntries(config.members.map((member) => [member, 0]));
+    for (const [item, assigned] of assignments.entries()) {
+      for (const member of assigned) totals[member] += config.items[item] / assigned.length;
+    }
+    for (const [member, amount] of Object.entries(totals)) {
+      root.querySelector(`[data-total="${member}"]`).textContent = `$${amount.toFixed(2)}`;
+    }
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        runSplitDemo(entry.target);
+        observer.unobserve(entry.target);
+      }
+    }
+  }, { threshold: 0.35 });
+  document.querySelectorAll('.split-demo').forEach((demo) => observer.observe(demo));
+</script>
+
+<style>
+  .member-avatar.selected {
+    background: var(--c);
+    border-color: var(--c);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+  }
+</style>
