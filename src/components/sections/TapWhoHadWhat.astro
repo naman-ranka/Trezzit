@@ -1,33 +1,183 @@
 ---
-const rows = [
-  ['Paneer tacos', '$18.20', 'Maya, You'],
-  ['Garlic fries', '$9.50', 'Aarav'],
-  ['Tax + tip', '$7.84', 'Follows items'],
+const members = [
+  { id: 'naman', name: 'Naman', initial: 'N', color: '#4F46E5' },
+  { id: 'chetan', name: 'Chetan', initial: 'C', color: '#8b5cf6' },
+  { id: 'adi', name: 'Adi', initial: 'A', color: '#06b6d4' },
+  { id: 'prachi', name: 'Prachi', initial: 'P', color: '#10b981' },
+];
+
+const items = [
+  { id: 'bananas', name: 'Organic Bananas', price: 3.45 },
+  { id: 'milk', name: 'Whole Milk Gallon', price: 3.89 },
+  { id: 'tide', name: 'Tide Laundry Pods', price: 12.97 },
+  { id: 'oil', name: 'Motor Oil 5W-30', price: 24.88 },
+  { id: 'tshirt', name: 'Nike T-Shirt', price: 19.99 },
+  { id: 'ibuprofen', name: 'Ibuprofen 200MG', price: 8.47 },
 ];
 ---
 
-<section class="border-t border-white/10 px-4 py-16 sm:px-6 lg:px-8">
-  <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-2">
-    <div>
-      <p class="text-sm font-semibold text-brand-300">Tap Who Had What</p>
-      <h2 class="mt-3 text-3xl font-bold text-white">Split by item instead of arguing over the total.</h2>
-      <ul class="mt-5 space-y-2 text-slate-300">
-        <li>Use Equal, Percent, Exact, or Shares in the app.</li>
-        <li>Tax and tip follow the items.</li>
-        <li>Everyone sees a clean balance.</li>
-      </ul>
-    </div>
-    <div class="rounded-lg border border-white/10 bg-slate-950 p-4">
-      <div class="grid grid-cols-[1fr_auto_1fr] gap-3 border-b border-white/10 pb-3 text-xs uppercase text-slate-500">
-        <span>Item</span><span>Amount</span><span>People</span>
+<section class="reveal-section border-t border-slate-800 bg-slate-950/40 px-4 py-20 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="grid gap-8 lg:grid-cols-[0.72fr_1fr] lg:items-end">
+      <div>
+        <p class="font-mono text-sm font-semibold uppercase tracking-[0.16em] text-brand-300">03 · Item splitting</p>
+        <h2 class="mt-3 text-4xl font-bold tracking-tight text-slate-100 md:text-5xl">Tap who had what. Math is automatic.</h2>
+        <p class="mt-4 text-lg leading-relaxed text-slate-400">
+          Per-item, per-person assignment. The whole bill, not just totals. Tax and tip distribute proportionally.
+        </p>
       </div>
-      {rows.map(([item, amount, people]) => (
-        <div class="grid grid-cols-[1fr_auto_1fr] gap-3 border-b border-white/10 py-3 text-sm last:border-0">
-          <span class="text-white">{item}</span>
-          <span class="font-mono text-brand-300">{amount}</span>
-          <span class="text-slate-300">{people}</span>
-        </div>
-      ))}
+      <div class="rounded-2xl border border-slate-700 bg-slate-900/80 p-4">
+        <p class="text-sm font-medium text-slate-300" data-demo-caption>Waiting to split the grocery run…</p>
+      </div>
+    </div>
+
+    <div class="split-demo mt-8 overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 p-4 shadow-xl shadow-indigo-500/10" data-split-demo>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[760px] border-separate border-spacing-0 text-left">
+          <thead>
+            <tr>
+              <th class="rounded-tl-2xl border-b border-slate-700 bg-slate-950 px-4 py-4 text-sm font-semibold text-slate-300">Item</th>
+              <th class="border-b border-slate-700 bg-slate-950 px-4 py-4 text-right text-sm font-semibold text-slate-300">Price</th>
+              {members.map((member) => (
+                <th class="border-b border-slate-700 bg-slate-950 px-3 py-4 text-center text-sm font-semibold text-slate-300">
+                  <span class="mx-auto grid h-10 w-10 place-items-center rounded-full text-sm font-bold text-white" style={`background:${member.color}`}>{member.initial}</span>
+                  <span class="mt-2 block">{member.name}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr data-item={item.id}>
+                <td class="border-b border-slate-800 px-4 py-4">
+                  <p class="font-medium text-slate-100">{item.name}</p>
+                  <p class="text-xs text-slate-500">split per item</p>
+                </td>
+                <td class="border-b border-slate-800 px-4 py-4 text-right font-mono text-sm text-brand-300">${item.price.toFixed(2)}</td>
+                {members.map((member) => (
+                  <td class="border-b border-slate-800 px-3 py-4 text-center">
+                    <button
+                      class="avatar-toggle mx-auto grid h-10 w-10 place-items-center rounded-full border border-slate-700 bg-slate-950 text-sm font-bold text-slate-500 transition-all"
+                      type="button"
+                      data-member={member.id}
+                      data-color={member.color}
+                      aria-label={`${member.name} had ${item.name}`}
+                    >
+                      {member.initial}
+                    </button>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="rounded-bl-2xl bg-slate-950 px-4 py-4 text-sm font-semibold text-slate-300" colspan="2">Live totals</td>
+              {members.map((member) => (
+                <td class="bg-slate-950 px-3 py-4 text-center last:rounded-br-2xl">
+                  <span class="font-mono text-sm font-semibold text-slate-100" data-total={member.id}>$0.00</span>
+                </td>
+              ))}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  const itemPrices = {
+    bananas: 3.45,
+    milk: 3.89,
+    tide: 12.97,
+    oil: 24.88,
+    tshirt: 19.99,
+    ibuprofen: 8.47,
+  };
+
+  const sequence = [
+    { item: 'bananas', members: ['naman', 'chetan', 'prachi'], description: 'shared groceries' },
+    { item: 'milk', members: ['naman', 'chetan', 'adi', 'prachi'], description: 'everyone drinks milk' },
+    { item: 'tide', members: ['naman', 'chetan'], description: 'household items for roommates' },
+    { item: 'oil', members: ['naman'], description: 'personal car maintenance' },
+    { item: 'tshirt', members: ['adi'], description: 'personal clothing item' },
+    { item: 'ibuprofen', members: ['naman', 'prachi'], description: 'medicine for two people' },
+  ];
+
+  const initSplitDemo = () => {
+    const root = document.querySelector('[data-split-demo]');
+    if (!root || root.dataset.ready === 'true') return;
+    root.dataset.ready = 'true';
+
+    const caption = document.querySelector('[data-demo-caption]');
+    const totals = { naman: 0, chetan: 0, adi: 0, prachi: 0 };
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const updateTotals = () => {
+      Object.keys(totals).forEach((key) => (totals[key] = 0));
+      sequence.forEach(({ item, members }) => {
+        const active = Array.from(root.querySelectorAll(`[data-item="${item}"] .is-selected`)).map((button) => button.dataset.member);
+        const splitMembers = active.length ? active : members.filter(() => false);
+        splitMembers.forEach((member) => {
+          totals[member] += itemPrices[item] / splitMembers.length;
+        });
+      });
+      Object.entries(totals).forEach(([member, total]) => {
+        const target = root.querySelector(`[data-total="${member}"]`);
+        if (target) target.textContent = `$${total.toFixed(2)}`;
+      });
+    };
+
+    const selectMembers = (step) => {
+      const row = root.querySelector(`[data-item="${step.item}"]`);
+      if (!row) return;
+      row.querySelectorAll('.avatar-toggle').forEach((button) => {
+        const selected = step.members.includes(button.dataset.member);
+        button.classList.toggle('is-selected', selected);
+        button.style.background = selected ? button.dataset.color : '#020617';
+        button.style.color = selected ? '#fff' : '#64748b';
+        button.style.borderColor = selected ? button.dataset.color : '#334155';
+      });
+      if (caption) caption.textContent = `${row.querySelector('p')?.textContent}: ${step.description}.`;
+      updateTotals();
+    };
+
+    if (reduced) {
+      sequence.forEach(selectMembers);
+      return;
+    }
+
+    let index = 0;
+    const play = () => {
+      selectMembers(sequence[index]);
+      index += 1;
+      if (index < sequence.length) window.setTimeout(play, 1050);
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        play();
+        observer.disconnect();
+      }
+    }, { threshold: 0.35 });
+    observer.observe(root);
+  };
+
+  initSplitDemo();
+  document.addEventListener('astro:page-load', initSplitDemo);
+</script>
+
+<style>
+  .avatar-toggle.is-selected {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avatar-toggle {
+      transition: none;
+      transform: none !important;
+    }
+  }
+</style>
