@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+
+const meta = {
+  title: 'Splitwise CSV Import for Trezzit',
+  description: 'Move from Splitwise to Trezzit with CSV import, name mapping, placeholder members, settlement-aware rows, and balance verification within one cent.',
+  canonical: '/import',
+  schema: {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'From Splitwise to Trezzit',
+  },
+};
+
+const steps = ['Upload', 'Group', 'You', 'Map', 'Done'];
+---
+
+<Base meta={meta}>
+  <Section eyebrow="Import" title="From Splitwise to Trezzit." body="Trezzit imports Splitwise CSV exports with a guided name-mapping flow, then verifies balances before committing the migration." />
+  <Section title="5-step migration." className="bg-slate-950/50">
+    <div class="mt-8 grid gap-4 md:grid-cols-5">
+      {steps.map((step, index) => (
+        <div class="rounded-xl border border-slate-800 bg-slate-950 p-5">
+          <p class="font-mono text-sm text-brand-100">0{index + 1}</p>
+          <h3 class="mt-3 text-xl font-semibold text-white">{step}</h3>
+        </div>
+      ))}
+    </div>
+  </Section>
+  <Section title="Balance-verified, 1-cent tolerance." body="Trezzit recomputes every member's group balance after import and rolls back the whole transaction if it does not match Splitwise's Total balance row within a 1-cent tolerance." />
+  <Section title="Auto-detects who you are." body="The mapping step checks literal You, then full name, then first name, and shows a likely-you suggestion when it finds a match." className="bg-slate-950/50" />
+  <Section title="Unknown names become invitable placeholders." body="Exact matches auto-fill. New names become placeholder members, and shareable invite links are generated after import." />
+  <Section title="Settlement-aware." body="Splitwise Settle all balances rows and paid, settlement, owed, or repaid descriptions become first-class settlement records, not bills." className="bg-slate-950/50">
+    <a class="mt-8 inline-flex rounded-full bg-brand-500 px-6 py-3 font-medium text-white hover:bg-brand-600" href="https://app.trezzit.com">Start importing</a>
+  </Section>
+</Base>

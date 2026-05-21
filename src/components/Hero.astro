@@ -1,0 +1,30 @@
+<section class="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-[1.1fr_0.9fr] md:items-center md:py-28">
+  <div>
+    <p class="mb-5 inline-flex rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-2 text-sm font-medium text-brand-100">
+      Ledger-First direction
+    </p>
+    <h1 class="max-w-4xl text-5xl font-bold tracking-tight text-white md:text-7xl">
+      Your money app should know which items were yours.
+    </h1>
+    <p class="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">
+      Trezzit stores every receipt as <code class="font-mono text-brand-100">BillItem</code> rows and every person's portion as
+      <code class="font-mono text-brand-100">ItemShare.share_amount</code>, so splitting, budgeting, categories, and AI answers all use the same item-level truth.
+    </p>
+    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+      <a class="rounded-full bg-brand-500 px-6 py-3 text-center font-medium text-white hover:bg-brand-600" href="https://app.trezzit.com/try-receipt">Try the receipt scanner</a>
+      <a class="rounded-full border border-slate-700 bg-slate-800 px-6 py-3 text-center font-medium text-slate-200 hover:bg-slate-700" href="/ledger">See the ledger model</a>
+    </div>
+  </div>
+  <div class="rounded-2xl border border-slate-800 bg-slate-950 p-5 shadow-2xl shadow-brand-950/30">
+    <div class="mb-4 flex items-center justify-between border-b border-slate-800 pb-3 text-xs text-slate-500">
+      <span class="font-mono">item_share.row</span>
+      <span>category_status: AI_SUGGESTED</span>
+    </div>
+    <div class="space-y-3 font-mono text-sm">
+      <div class="grid grid-cols-[1fr_auto] gap-4 rounded-lg bg-slate-900 p-4"><span>BillItem.name</span><span class="text-white">Latte</span></div>
+      <div class="grid grid-cols-[1fr_auto] gap-4 rounded-lg bg-slate-900 p-4"><span>BillItem.price</span><span class="text-white">$5.75</span></div>
+      <div class="grid grid-cols-[1fr_auto] gap-4 rounded-lg bg-slate-900 p-4"><span>ItemShare.person</span><span class="text-white">Naman</span></div>
+      <div class="grid grid-cols-[1fr_auto] gap-4 rounded-lg bg-brand-500/15 p-4 text-brand-100"><span>ItemShare.share_amount</span><span>$2.88</span></div>
+    </div>
+  </div>
+</section>

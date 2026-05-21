@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import LedgerTable from '../components/LedgerTable.astro';
+import SplitTableAnimation from '../components/SplitTableAnimation.astro';
+
+const meta = {
+  title: 'Trezzit Ledger - BillItem and ItemShare Model',
+  description: 'Learn how Trezzit stores every shared expense as BillItem and ItemShare rows for precise splitting, categories, audit trails, and AI queries.',
+  canonical: '/ledger',
+  schema: {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'Trezzit Ledger Model',
+  },
+};
+---
+
+<Base meta={meta}>
+  <Section eyebrow="Ledger" title="What is an item share?" body="An ItemShare is one person's portion of one BillItem. It carries the amount, split type, category, and tags that make shared spending usable as personal finance data." />
+  <Section title="Why store every dollar this way?" body="Whole-bill totals are too coarse. Trezzit stores Bill -> BillItem[] -> ItemShare[] so item-level splitting, item-level categories, and AI queries all refer to the same record. Source: backend/bills_new/models/core_models.py:1029-1052." className="bg-slate-950/50">
+    <LedgerTable />
+  </Section>
+  <Section title="Per-item categories." body="Every item share can carry its own category, so different people can use different finance taxonomies on the same shared receipt. Source: backend/bills_new/models/core_models.py:1069-1075." />
+  <Section title="Per-item split methods (mixed bills)." body="The split type lives on the ItemShare row, which is why one receipt can mix equal, percentage, exact, shares, and adjusted methods. Source: backend/bills_new/models/core_models.py:1052; backend/bills_new/models/choices.py:8." className="bg-slate-950/50">
+    <SplitTableAnimation />
+  </Section>
+  <Section title="The version and audit trail." body="Bills are versioned for optimistic concurrency, and edits write audit rows with who changed what and when. Source: backend/bills_new/models/core_models.py:730,800-810,890-921." />
+  <Section title="What this enables." body="The ledger powers the feature set and the MCP page. Read the product surface at /features, or the AI protocol surface at /ai." className="bg-slate-950/50" />
+</Base>

@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-slate-900 font-inter text-slate-50 antialiased;
+}
+
+a {
+  @apply transition-colors;
+}
+
+::selection {
+  @apply bg-brand-500 text-white;
+}

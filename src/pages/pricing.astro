@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+
+const meta = {
+  title: 'Trezzit Pricing - Free Forever For Now',
+  description: 'Trezzit is free, forever for now. Paid features arrive when payments ship. No fake Pro plan, no fabricated tier pricing.',
+  canonical: '/pricing',
+  schema: {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: 'Trezzit',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  },
+};
+---
+
+<Base meta={meta}>
+  <Section eyebrow="Pricing" title="Free, forever (for now)." body="The current Trezzit marketing site does not need a pricing maze. There is one available tier today: free access while the product grows." />
+  <section class="px-6 pb-24">
+    <div class="mx-auto grid max-w-6xl gap-6 md:grid-cols-[1fr_0.8fr]">
+      <div class="rounded-2xl border border-brand-500/40 bg-brand-500/10 p-8">
+        <p class="text-sm font-semibold uppercase tracking-[0.16em] text-brand-100">Current plan</p>
+        <h2 class="mt-4 text-5xl font-bold text-white">Free</h2>
+        <ul class="mt-8 space-y-3 text-slate-200">
+          <li>Itemized receipt splitting</li>
+          <li>Groups, members, balances, and settlements</li>
+          <li>Splitwise CSV migration flow</li>
+          <li>Receipt scanner demo at /try-receipt</li>
+          <li>MCP server surface for AI clients</li>
+        </ul>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-950 p-8">
+        <h2 class="text-2xl font-semibold text-white">Premium later</h2>
+        <p class="mt-4 text-lg leading-8 text-slate-300">Paid features arrive when we ship payments. No date, no fake Pro plan.</p>
+      </div>
+    </div>
+  </section>
+</Base>

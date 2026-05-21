@@ -1,0 +1,25 @@
+---
+const nav = [
+  ['Ledger', '/ledger'],
+  ['Features', '/features'],
+  ['AI', '/ai'],
+  ['Import', '/import'],
+  ['Pricing', '/pricing'],
+  ['Changelog', '/changelog'],
+];
+---
+
+<header class="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <a href="/" class="flex items-center gap-3 font-semibold text-white">
+      <span class="grid size-8 place-items-center rounded-lg bg-brand-500 text-sm font-bold">T</span>
+      <span>Trezzit</span>
+    </a>
+    <nav class="hidden items-center gap-6 text-sm text-slate-300 md:flex">
+      {nav.map(([label, href]) => <a class="hover:text-white" href={href}>{label}</a>)}
+    </nav>
+    <a class="rounded-full bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600" href="https://app.trezzit.com/try-receipt">
+      Try scanner
+    </a>
+  </div>
+</header>
