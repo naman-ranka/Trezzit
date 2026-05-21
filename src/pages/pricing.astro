@@ -1,30 +1,48 @@
 ---
 import Base from '../layouts/Base.astro';
+
+const faqs = [
+  ['Is Trezzit really free?', 'Yes. There is no shipped payment system or paid plan today.'],
+  ['Do I need a credit card?', 'No. The public demos and signup flow do not ask for one.'],
+  ['Are receipt scans quota limited?', 'There are no monthly scan quotas in the product today.'],
+  ['Do friends need accounts?', 'No. Add them as placeholders and invite them later.'],
+  ['What happens when pricing changes?', "We'll announce it on the changelog before it affects users."],
+];
 ---
 
 <Base
   title="Trezzit Pricing - Free Bill Splitting"
   description="Trezzit is free for now. Try the receipt demo, use the bill calculator, and start a group without a credit card."
 >
-  <main class="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-    <p class="text-sm font-semibold text-brand-300">Pricing</p>
-    <h1 class="mt-3 text-4xl font-bold text-white">Free, forever - for now.</h1>
-    <p class="mt-4 text-lg text-slate-300">
-      Premium features arrive once we ship payments. No credit card. No quotas. No surprise Pro wall.
-    </p>
-    <section class="mt-10 rounded-lg border border-white/10 bg-slate-950 p-8">
-      <h2 class="text-2xl font-semibold text-white">Free plan</h2>
-      <p class="mt-3 text-slate-300">Use Trezzit while the product grows.</p>
-      <ul class="mt-6 space-y-3 text-slate-300">
-        <li>Receipt demo and bill calculator before signup.</li>
-        <li>Saved groups and real receipt scans after signup.</li>
-        <li>Itemized splitting, placeholder friends, imports, balances, and settlements.</li>
-        <li>No monthly scan quotas in the product today.</li>
-      </ul>
-      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a class="rounded-md bg-brand-500 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-brand-600" href="https://app.trezzit.com/try-receipt">Try receipt demo</a>
-        <a class="rounded-md border border-white/15 px-5 py-3 text-center text-sm font-semibold text-slate-100 hover:bg-white/10" href="https://app.trezzit.com/demo">Open bill calculator</a>
+  <main class="px-4 py-16 sm:px-6 lg:px-8">
+    <section class="mx-auto max-w-4xl text-center">
+      <p class="inline-flex rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-300">No credit card</p>
+      <div class="mt-8 rounded-3xl border border-brand-500/30 bg-[radial-gradient(circle_at_50%_0%,rgba(79,70,229,0.26),transparent_36%),#020617] p-8 shadow-2xl shadow-indigo-500/10 md:p-12">
+        <p class="font-mono text-sm font-semibold uppercase tracking-[0.16em] text-brand-300">Pricing today</p>
+        <h1 class="mt-3 text-5xl font-bold tracking-tight text-slate-100 md:text-6xl">Free, forever — for now.</h1>
+        <p class="mt-5 text-lg text-slate-400">No credit card. No quotas. No paid plan today.</p>
+        <ul class="mx-auto mt-8 grid max-w-2xl gap-3 text-left text-slate-300 sm:grid-cols-3">
+          <li class="rounded-2xl border border-slate-700 bg-slate-900 p-4">Unlimited groups while free</li>
+          <li class="rounded-2xl border border-slate-700 bg-slate-900 p-4">Receipt demo and calculator</li>
+          <li class="rounded-2xl border border-slate-700 bg-slate-900 p-4">Saved groups after signup</li>
+        </ul>
       </div>
+      <p class="mx-auto mt-8 max-w-3xl text-left text-lg italic leading-8 text-slate-400">
+        Trezzit is free because there is not a paid feature worth charging for yet. The old Pro-tier story is gone: no fake scan limits, no missed launch date, no surprise wall. When payments ship, pricing will be explained plainly and current users will hear about it first.
+      </p>
+    </section>
+
+    <section class="mx-auto mt-12 max-w-3xl">
+      <h2 class="text-2xl font-semibold text-slate-100">Questions</h2>
+      <div class="mt-5 space-y-3">
+        {faqs.map(([q, a], index) => (
+          <details class="rounded-2xl border border-slate-700 bg-slate-800/40 p-5" open={index === 0}>
+            <summary class="cursor-pointer font-semibold text-slate-100">{q}</summary>
+            <p class="mt-3 text-slate-400">{a}</p>
+          </details>
+        ))}
+      </div>
+      <p class="mt-8 text-center text-sm text-slate-500">No credit card today. Pricing changes will be posted on the changelog.</p>
     </section>
   </main>
 </Base>

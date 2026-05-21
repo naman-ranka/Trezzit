@@ -1,20 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 
-const tools = [
-  'create_bill',
-  'get_balances',
-  'get_context',
-  'search_bills',
-  'list_groups',
-  'get_group_details',
-  'resolve_participants',
-  'create_settlement',
-  'get_bill_details',
-  'delete_bill',
-  'get_expenses',
-  'get_person_info',
-  'get_receipt_upload_presigned_url',
+const grouped = [
+  ['Read', ['get_balances', 'get_context', 'search_bills', 'list_groups', 'get_group_details', 'resolve_participants', 'get_bill_details', 'get_expenses', 'get_person_info']],
+  ['Write', ['create_bill', 'create_settlement', 'get_receipt_upload_presigned_url']],
+  ['Destructive', ['delete_bill']],
 ];
 ---
 
@@ -22,59 +12,69 @@ const tools = [
   title="Trezzit AI - Receipt Scanning and Agent Tools"
   description="Trezzit uses Gemini receipt scanning and offers MCP tools for compatible AI agents over itemized expense data."
 >
-  <main class="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-    <p class="text-sm font-semibold text-brand-300">AI</p>
-    <h1 class="mt-3 text-4xl font-bold text-white">AI helps with receipts and questions.</h1>
-    <p class="mt-4 text-lg text-slate-300">
-      Trezzit uses Gemini for authenticated receipt processing, then exposes itemized expense data to compatible AI agents through MCP.
-    </p>
-
-    <div class="mt-10 grid gap-4">
-      <details class="rounded-lg border border-white/10 bg-slate-950 p-5" open>
-        <summary class="cursor-pointer font-semibold text-white">13-tool inventory</summary>
-        <div class="mt-4 grid gap-2 sm:grid-cols-2">
-          {tools.map((tool) => <code class="rounded-md bg-slate-900 px-3 py-2 text-sm text-brand-100">{tool}</code>)}
+  <main class="px-4 py-16 sm:px-6 lg:px-8">
+    <section class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+      <div>
+        <p class="font-mono text-sm font-semibold uppercase tracking-[0.16em] text-brand-300">AI</p>
+        <h1 class="mt-3 text-5xl font-bold tracking-tight text-slate-100 md:text-6xl">AI helps with receipts and questions.</h1>
+        <p class="mt-5 text-xl leading-relaxed text-slate-400">Gemini helps parse authenticated receipt scans. MCP lets compatible agents ask questions over itemized expense data.</p>
+      </div>
+      <div class="rounded-2xl border border-slate-700 bg-slate-950 p-5 shadow-xl shadow-indigo-500/10">
+        <div class="mb-4 flex gap-2 text-xs text-slate-500">
+          <span class="rounded-full bg-brand-500 px-2 py-1 text-white">Claude</span><span>Cursor</span><span>ChatGPT</span><span>Gemini</span>
         </div>
-      </details>
-
-      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
-        <summary class="cursor-pointer font-semibold text-white">OAuth 2.1</summary>
-        <p class="mt-4 text-slate-300">Trezzit has real OAuth login, authorize, token, logout, dynamic client registration, and metadata endpoints for MCP clients.</p>
-      </details>
-
-      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
-        <summary class="cursor-pointer font-semibold text-white">JSON-RPC examples</summary>
-        <pre class="mt-4 overflow-auto rounded-md bg-slate-900 p-4 text-sm text-brand-100"><code>{`{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "tools/call",
-  "params": {
-    "name": "get_balances",
-    "arguments": { "scope": "by_group" }
+        <pre class="overflow-auto text-sm leading-7 text-slate-300"><code>{`{
+  "mcpServers": {
+    "trezzit": {
+      "url": "https://api.trezzit.com/api/mcp",
+      "auth": "oauth"
+    }
   }
 }`}</code></pre>
-      </details>
+      </div>
+    </section>
 
-      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
-        <summary class="cursor-pointer font-semibold text-white">Rate limits</summary>
-        <p class="mt-4 text-slate-300">MCP writes are limited to 5 per minute and 30 per hour. Reads are limited to 60 per minute and 600 per hour.</p>
-      </details>
-
-      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
-        <summary class="cursor-pointer font-semibold text-white">Client compatibility</summary>
-        <p class="mt-4 text-slate-300">Trezzit recognizes Claude, Cursor, ChatGPT, and Gemini client families, and works with MCP-aware clients that support the auth flow.</p>
-        <div class="mt-4 flex flex-wrap gap-2 text-sm text-slate-200">
-          <span class="rounded-md border border-white/10 px-3 py-2">Claude</span>
-          <span class="rounded-md border border-white/10 px-3 py-2">Cursor</span>
-          <span class="rounded-md border border-white/10 px-3 py-2">ChatGPT</span>
-          <span class="rounded-md border border-white/10 px-3 py-2">Gemini</span>
+    <section class="mx-auto mt-10 grid max-w-6xl gap-6 lg:grid-cols-[0.92fr_1fr]">
+      <div class="rounded-2xl border border-slate-700 bg-slate-900 p-5">
+        <p class="font-mono text-xs uppercase tracking-[0.16em] text-slate-500">Agent replay</p>
+        <div class="mt-4 space-y-3 font-mono text-sm text-slate-300">
+          <p>called get_context → found Cabin trip</p>
+          <p>called get_balances → returned Maya owes $18.20</p>
+          <p>returned answer → "Maya owes $18.20"</p>
         </div>
-      </details>
+      </div>
+      <div class="rounded-2xl border border-slate-700 bg-slate-900 p-5">
+        <p class="text-sm text-slate-500">Works with</p>
+        <div class="mt-4 grid grid-cols-2 gap-3 text-center text-sm font-semibold text-slate-300 sm:grid-cols-4">
+          {['Claude', 'Cursor', 'ChatGPT', 'Gemini'].map((client) => <span class="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3">{client}</span>)}
+        </div>
+      </div>
+    </section>
 
-      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
-        <summary class="cursor-pointer font-semibold text-white">Split method note</summary>
-        <p class="mt-4 text-slate-300">The app exposes four split methods: Equal, Percent, Exact, and Shares. A fifth method, Adjusted, exists in the backend and is reachable via API/MCP paths.</p>
-      </details>
-    </div>
+    <section class="mx-auto mt-12 max-w-6xl">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-100">13 MCP tools</h2>
+      <div class="mt-6 grid gap-4 lg:grid-cols-3">
+        {grouped.map(([title, tools]) => (
+          <article class:list={['rounded-2xl border bg-slate-800/40 p-5', title === 'Destructive' ? 'border-amber-500/40' : 'border-slate-700']}>
+            <h3 class="text-xl font-semibold text-slate-100">{title}</h3>
+            <div class="mt-4 flex flex-wrap gap-2">
+              {tools.map((tool) => <code class="rounded-lg bg-slate-950 px-2.5 py-1.5 text-xs text-brand-200">{tool}</code>)}
+            </div>
+          </article>
+        ))}
+      </div>
+      <p class="mt-6 text-sm text-slate-500">OAuth 2.1 with metadata endpoints protects MCP access. See app docs for setup details.</p>
+    </section>
+
+    <section class="mx-auto mt-10 max-w-4xl space-y-3">
+      {['Protocol details', 'Rate limits', 'Split methods'].map((title) => (
+        <details class="rounded-2xl border border-slate-700 bg-slate-800/40 p-5">
+          <summary class="cursor-pointer font-semibold text-slate-100">{title}</summary>
+          <p class="mt-3 text-slate-400">
+            {title === 'Protocol details' ? 'JSON-RPC 2.0 at the MCP endpoint, with OAuth login, authorize, token, registration, and metadata endpoints.' : title === 'Rate limits' ? 'Writes are limited to 5/min and 30/hour. Reads are limited to 60/min and 600/hour.' : 'The app exposes Equal, Percent, Exact, and Shares. Adjusted exists through API/MCP paths.'}
+          </p>
+        </details>
+      ))}
+    </section>
   </main>
 </Base>

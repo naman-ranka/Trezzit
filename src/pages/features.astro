@@ -2,48 +2,13 @@
 import Base from '../layouts/Base.astro';
 
 const jobs = [
-  {
-    id: 'try',
-    title: 'Try',
-    scenario: 'When you need proof before making an account.',
-    claim: 'The pre-scanned receipt demo and no-signup bill calculator are real public routes.',
-  },
-  {
-    id: 'scan',
-    title: 'Scan',
-    scenario: 'When a paper receipt needs to become line items.',
-    claim: 'Authenticated receipt scanning supports JPEG, PNG, WebP, and PDF uploads through a Gemini pipeline.',
-  },
-  {
-    id: 'split',
-    title: 'Split',
-    scenario: 'When everyone had different items.',
-    claim: 'The app exposes Equal, Percent, Exact, and Shares split methods.',
-  },
-  {
-    id: 'invite',
-    title: 'Invite',
-    scenario: 'When friends should not block the group by delaying signup.',
-    claim: 'Placeholder people can later claim their bills and payments through invite links.',
-  },
-  {
-    id: 'import',
-    title: 'Import',
-    scenario: 'When old Splitwise history needs a cleaner home.',
-    claim: 'Trezzit imports Splitwise CSVs into fresh groups through a five-step wizard.',
-  },
-  {
-    id: 'settle',
-    title: 'Settle',
-    scenario: 'When the group needs one clean balance.',
-    claim: 'Balances come from bill items, item shares, payments, and settlements.',
-  },
-  {
-    id: 'ask-ai',
-    title: 'Ask AI',
-    scenario: 'When you want a compatible agent to answer expense questions.',
-    claim: 'Trezzit exposes 13 MCP tools over JSON-RPC with OAuth 2.1.',
-  },
+  ['try', 'Try', 'When you need proof before making an account.', 'Receipt demo and calculator run without login. The receipt demo uses pre-scanned demo data; the calculator saves nothing.', 'Open demos first'],
+  ['scan', 'Scan', 'When a paper receipt needs to become line items.', 'Authenticated receipt scanning supports JPEG, PNG, WebP, and PDF, then lets you review extracted rows before saving.', 'Review before save'],
+  ['split', 'Split', 'When everyone had different items.', 'The app exposes Equal, Percent, Exact, and Shares split methods, with tax and tip following item assignments.', '4 app split modes'],
+  ['invite', 'Invite', 'When friends should not block the group by delaying signup.', 'Add placeholder people, share invite links, and transfer prior bills and payments when they join.', 'Friends can join later'],
+  ['import', 'Import', 'When old Splitwise history needs a cleaner home.', 'Import a Splitwise CSV into a fresh group through upload, group, self-map, people-map, and result steps.', 'Fresh group only'],
+  ['settle', 'Settle', 'When the group needs one clean balance.', 'Balances come from bill items, item shares, payments, and settlements so the group can inspect what changed.', 'Auditable balances'],
+  ['ask-ai', 'Ask AI', 'When you want a compatible agent to answer expense questions.', 'Trezzit exposes 13 MCP tools over JSON-RPC with OAuth 2.1. Protocol details live on the AI page.', '13 MCP tools'],
 ];
 ---
 
@@ -51,18 +16,39 @@ const jobs = [
   title="Trezzit Features - Scan, Split, Invite, Settle"
   description="Trezzit helps groups split receipts item by item, add friends without accounts, import Splitwise CSVs, and settle balances."
 >
-  <main class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-    <p class="text-sm font-semibold text-brand-300">Features</p>
-    <h1 class="mt-3 text-4xl font-bold text-white">Built around the jobs groups actually have.</h1>
-    <div class="mt-10 grid gap-6">
-      {jobs.map((job) => (
-        <section id={job.id} class="grid gap-6 rounded-lg border border-white/10 bg-slate-950 p-6 lg:grid-cols-[0.8fr_1fr]">
+  <main class="px-4 py-16 sm:px-6 lg:px-8">
+    <section class="mx-auto max-w-6xl">
+      <p class="font-mono text-sm font-semibold uppercase tracking-[0.16em] text-brand-300">Features</p>
+      <h1 class="mt-3 max-w-3xl text-5xl font-bold tracking-tight text-slate-100 md:text-6xl">Built around the jobs groups actually have.</h1>
+      <p class="mt-5 max-w-2xl text-xl leading-relaxed text-slate-400">
+        Try the value first, then use saved groups when you want real receipt processing, invite links, imports, and AI access.
+      </p>
+    </section>
+
+    <div class="mx-auto mt-12 grid max-w-6xl gap-5">
+      {jobs.map(([id, title, scenario, claim, badge], index) => (
+        <section id={id} class="reveal-section grid gap-6 rounded-3xl border border-slate-700 bg-slate-800/40 p-6 shadow-xl shadow-black/10 lg:grid-cols-[0.82fr_1fr] lg:items-center">
           <div>
-            <h2 class="text-2xl font-semibold text-white">{job.title}</h2>
-            <p class="mt-3 text-slate-300">When you use it: {job.scenario}</p>
-            <p class="mt-3 text-sm text-slate-400">{job.claim}</p>
+            <p class="font-mono text-sm text-brand-300">0{index + 1}</p>
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-100">{title}</h2>
+            <p class="mt-3 text-slate-300">When you use it: {scenario}</p>
+            <p class="mt-3 text-sm leading-6 text-slate-500">{claim}</p>
           </div>
-          <div class="aspect-video rounded-md border border-dashed border-white/20 bg-slate-900 p-4 text-sm text-slate-400">[placeholder for screenshot]</div>
+          <div class="rounded-2xl border border-slate-700 bg-slate-950 p-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <span class="font-medium text-slate-200">{title} workflow</span>
+              <span class="rounded-full bg-brand-500/10 px-2.5 py-1 text-xs text-brand-300">{badge}</span>
+            </div>
+            <div class="mt-4 grid gap-2 sm:grid-cols-3">
+              {[1, 2, 3].map((step) => (
+                <div class="rounded-xl border border-slate-800 bg-slate-900 p-3">
+                  <p class="font-mono text-xs text-slate-500">step {step}</p>
+                  <div class="mt-3 h-2 rounded-full bg-slate-800"></div>
+                  <div class="mt-2 h-2 w-2/3 rounded-full bg-brand-500/50"></div>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
       ))}
     </div>
