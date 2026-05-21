@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/static-build.mjs",
-    "astro:build": "astro build",
-    "preview": "astro preview"
+    "build": "astro build",
+    "preview": "astro preview",
+    "fallback-build": "node scripts/static-build.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",
