@@ -11,12 +11,12 @@ const rows = [
 ];
 ---
 
-<div class="mt-10 overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
-  <div class="grid grid-cols-[1fr_1fr] border-b border-slate-800 bg-slate-900 px-4 py-3 font-mono text-xs uppercase text-slate-400">
+<div class="mt-10 overflow-hidden rounded-xl border border-white/10 bg-[#070815]">
+  <div class="grid grid-cols-[1fr_1fr] border-b border-white/10 bg-white/[0.03] px-4 py-3 font-mono text-xs uppercase text-slate-400">
     <span>Field</span>
     <span>Value</span>
   </div>
-  <div class="divide-y divide-slate-800 font-mono text-sm">
+  <div class="divide-y divide-white/10 font-mono text-sm">
     {rows.map(([field, value]) => (
       <div class="grid grid-cols-[1fr_1fr] px-4 py-4">
         <span class="text-slate-400">{field}</span>

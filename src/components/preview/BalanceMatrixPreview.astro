@@ -1,0 +1,76 @@
+---
+const owed = [
+  ['Maya Rao', 'owes you', '$42.30', 'M', 'bg-emerald-500'],
+  ['Aarav Shah', 'owes you', '$18.75', 'A', 'bg-amber-500'],
+];
+const owe = [
+  ['Nico Chen', 'you owe', '$11.20', 'N', 'bg-sky-500'],
+];
+---
+
+<div class="card-hover mt-10 mx-auto max-w-md rounded-2xl border border-white/10 bg-white p-5 text-slate-950 shadow-2xl shadow-black/30">
+  <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+    <div>
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Cabin Trip balances</p>
+      <h3 class="mt-1 text-base font-bold text-[#0a0f3c]">Simplified</h3>
+    </div>
+    <div class="text-right">
+      <p class="text-xs text-slate-400">Net</p>
+      <p class="text-xl font-bold text-emerald-600">+$49.85</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="flex items-baseline justify-between pb-1 pt-3">
+      <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">You're owed</p>
+      <p class="text-xs font-semibold text-emerald-600">$61.05</p>
+    </div>
+    <div class="divide-y divide-slate-100">
+      {owed.map(([name, relation, amount, initial, color]) => (
+        <button type="button" class="flex w-full items-center gap-3 py-3 text-left transition-colors active:bg-slate-100/50">
+          <span class={`grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-white ${color}`}>{initial}</span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium text-gray-900">{name}</p>
+            <p class="text-xs text-slate-500">{relation}</p>
+          </div>
+          <span class="shrink-0 text-sm font-semibold text-emerald-600">{amount}</span>
+          <span class="ml-1 text-slate-300">›</span>
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <section>
+    <div class="flex items-baseline justify-between pb-1 pt-3">
+      <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">You owe</p>
+    </div>
+    <div class="divide-y divide-slate-100">
+      {owe.map(([name, relation, amount, initial, color]) => (
+        <button type="button" class="flex w-full items-center gap-3 py-3 text-left transition-colors active:bg-slate-100/50">
+          <span class={`grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-white ${color}`}>{initial}</span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium text-gray-900">{name}</p>
+            <p class="text-xs text-slate-500">{relation}</p>
+          </div>
+          <span class="shrink-0 text-sm font-semibold text-red-500">{amount}</span>
+          <span class="ml-1 text-slate-300">›</span>
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <section>
+    <button type="button" class="flex w-full items-center justify-between pb-1 pt-5 text-left">
+      <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">Around the group (4)</p>
+      <span class="text-slate-400">⌄</span>
+    </button>
+  </section>
+
+  <section class="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-400">
+    <span>View history</span>
+    <span aria-hidden="true">·</span>
+    <span>Simplified ⚙</span>
+    <span aria-hidden="true">·</span>
+    <span>Record a payment</span>
+  </section>
+</div>

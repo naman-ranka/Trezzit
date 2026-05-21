@@ -1,4 +1,5 @@
 ---
+import { Code } from 'astro:components';
 import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
 
@@ -13,9 +14,30 @@ const meta = {
   },
 };
 
-const readTools = ['get_context', 'list_groups', 'get_group_details', 'search_bills', 'get_bill_details', 'get_balances', 'get_expenses', 'get_person_info', 'resolve_participants'];
-const writeTools = ['create_bill', 'delete_bill', 'create_settlement', 'get_receipt_upload_presigned_url'];
-const toolCallExample = `{
+const tools = [
+  ['get_context', 'Read', 'Current user, available groups, and server capability context.'],
+  ['list_groups', 'Read', 'Groups the authorized person can inspect.'],
+  ['get_group_details', 'Read', 'Group members, currency, balances, and metadata.'],
+  ['search_bills', 'Read', 'Bill search across merchant names, descriptions, and dates.'],
+  ['get_bill_details', 'Read', 'Line items, participants, item shares, and audit-friendly bill detail.'],
+  ['get_balances', 'Read', 'Who owes whom inside the authorized group context.'],
+  ['get_expenses', 'Read', 'Item-share expense rows filtered by dates, groups, categories, tags, and search.'],
+  ['get_person_info', 'Read', 'Person records needed to resolve bill participants.'],
+  ['resolve_participants', 'Read', 'Name matching before a create_bill mutation.'],
+  ['get_receipt_upload_presigned_url', 'Read', 'Upload preparation for receipt bytes before bill creation.'],
+  ['create_bill', 'Write', 'Creates an attributed bill from structured bill and item-share data.'],
+  ['delete_bill', 'Write', 'Deletes an AI-created bill only inside the allowed mutation window.'],
+  ['create_settlement', 'Write', 'Records a settlement payment between people.'],
+];
+
+const listExample = `{
+  "jsonrpc": "2.0",
+  "method": "tools/list",
+  "params": {},
+  "id": 1
+}`;
+
+const callExample = `{
   "jsonrpc": "2.0",
   "method": "tools/call",
   "params": {
@@ -23,7 +45,8 @@ const toolCallExample = `{
     "arguments": {
       "group_id": "cabin-trip",
       "category": "Food",
-      "date_from": "2026-05-01"
+      "date_from": "2026-05-01",
+      "date_to": "2026-05-31"
     }
   },
   "id": 7
@@ -31,23 +54,77 @@ const toolCallExample = `{
 ---
 
 <Base meta={meta}>
-  <Section eyebrow="AI" title="Why MCP works here: item-level ledger." body="AI answers are only useful when the source data is precise. Trezzit can expose item shares directly, so an agent can explain which rows matched an answer." />
-  <Section title="Protocol: JSON-RPC, tools/list, tools/call, OAuth 2.1 scopes." body="Trezzit's MCP server is backend-only. It speaks JSON-RPC, separates read and write scopes, and uses OAuth 2.1 with PKCE instead of shared chat secrets." className="bg-slate-950/50" />
-  <Section title="The 13 tools.">
-    <div class="mt-8 grid gap-5 md:grid-cols-2">
-      <div class="rounded-xl border border-slate-800 bg-slate-950 p-6">
-        <h3 class="text-xl font-semibold text-white">Read</h3>
-        <div class="mt-4 flex flex-wrap gap-2">{readTools.map((tool) => <span class="rounded-full bg-slate-800 px-3 py-1 font-mono text-sm text-slate-200">{tool}</span>)}</div>
+  <Section
+    eyebrow="AI"
+    title="MCP works because the ledger is item-level."
+    body="Trezzit does not expose a chatbot over vague transaction blobs. It exposes MCP tools over item shares, bill items, group balances, and settlements, so an agent can cite the exact rows behind an answer."
+  />
+
+  <Section
+    eyebrow="Protocol"
+    title="JSON-RPC tools, OAuth 2.1 scopes."
+    body="The server is backend-only and provider-agnostic. Clients call tools/list and tools/call over JSON-RPC after OAuth 2.1 with PKCE; bills:read and bills:write scopes keep query access separate from mutations."
+    className="bg-white/[0.02]"
+  >
+    <!-- Source: agents/team-briefs/landing-research-synthesis.md §2; backend/bills_new/mcp/oauth/models.py:49-87 -->
+    <div class="mt-10 grid gap-5 lg:grid-cols-2">
+      <div class="overflow-hidden rounded-xl border border-white/10 bg-[#070815]">
+        <div class="border-b border-white/10 px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-400">tools/list</div>
+        <Code code={listExample} lang="json" theme="vitesse-dark" />
       </div>
-      <div class="rounded-xl border border-slate-800 bg-slate-950 p-6">
-        <h3 class="text-xl font-semibold text-white">Write and upload prep</h3>
-        <div class="mt-4 flex flex-wrap gap-2">{writeTools.map((tool) => <span class="rounded-full bg-brand-500/15 px-3 py-1 font-mono text-sm text-brand-100">{tool}</span>)}</div>
+      <div class="overflow-hidden rounded-xl border border-white/10 bg-[#070815]">
+        <div class="border-b border-white/10 px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-400">tools/call</div>
+        <Code code={callExample} lang="json" theme="vitesse-dark" />
       </div>
     </div>
   </Section>
-  <Section title="Sample tool calls." className="bg-slate-950/50">
-    <pre class="mt-8 overflow-x-auto rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-200"><code>{toolCallExample}</code></pre>
+
+  <Section eyebrow="Inventory" title="The 13 tools.">
+    <!-- Source: backend/bills_new/views_dir/mcp_server_views.py tool registry summarized in agents/team-briefs/landing-research-synthesis.md §2 -->
+    <div class="mt-10 overflow-hidden rounded-xl border border-white/10 bg-[#070815]">
+      <div class="grid grid-cols-[1fr_96px_1.5fr] border-b border-white/10 bg-white/[0.03] px-4 py-3 font-mono text-xs uppercase tracking-widest text-slate-500">
+        <span>Tool</span>
+        <span>Scope</span>
+        <span>What it gives the agent</span>
+      </div>
+      <div class="divide-y divide-white/10">
+        {tools.map(([tool, scope, description]) => (
+          <div class="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1fr_96px_1.5fr]">
+            <span class="font-mono text-slate-100">{tool}</span>
+            <span class={`font-mono text-xs uppercase tracking-wider ${scope === 'Write' ? 'text-brand-100' : 'text-slate-400'}`}>{scope}</span>
+            <span class="leading-6 text-slate-300">{description}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   </Section>
-  <Section title="Safety model." body="Write access is scoped. Write requests are limited to 60 per minute and 600 per hour per OAuth session. AI-created bills carry attribution, and AI-created bill mutation is limited to a 30-minute window before normal app controls take over." />
-  <Section title="Client setup." body="Claude, Cursor, ChatGPT, and Gemini-compatible MCP clients can connect because the protocol surface is provider-agnostic." className="bg-slate-950/50" />
+
+  <Section
+    eyebrow="Scopes"
+    title="Read and write are separate decisions."
+    body="A read-only client can inspect groups, bills, balances, expenses, people, and receipt-upload preparation. A write-scoped client can create bills, delete eligible AI-created bills, and create settlements."
+    className="bg-white/[0.02]"
+  >
+    <!-- Source: agents/team-briefs/landing-research-synthesis.md §2 auth + safety -->
+    <div class="mt-10 grid gap-4 md:grid-cols-3">
+      <div class="card-hover rounded-xl border border-white/10 bg-white/[0.03] p-5">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-400">bills:read</p>
+        <p class="mt-3 text-sm leading-6 text-slate-300">Search bills, inspect balances, resolve people, and query item-share expenses.</p>
+      </div>
+      <div class="card-hover rounded-xl border border-white/10 bg-white/[0.03] p-5">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-400">bills:write</p>
+        <p class="mt-3 text-sm leading-6 text-slate-300">Create attributed bills and settlements with per-session write limits.</p>
+      </div>
+      <div class="card-hover rounded-xl border border-white/10 bg-white/[0.03] p-5">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-400">mutation window</p>
+        <p class="mt-3 text-sm leading-6 text-slate-300">AI-created bills can be edited or deleted by the agent only inside the 30-minute window.</p>
+      </div>
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="Clients"
+    title="Works with MCP-capable clients."
+    body="Claude Code, Claude Desktop, Cursor, ChatGPT, Gemini-compatible clients, and any client that speaks MCP can connect to the same tool surface. Trezzit does not require a provider-specific integration."
+  />
 </Base>

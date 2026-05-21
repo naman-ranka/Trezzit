@@ -11,7 +11,7 @@ html {
 }
 
 body {
-  @apply bg-slate-900 font-inter text-slate-50 antialiased;
+  @apply bg-[#0A0B1A] font-inter text-slate-50 antialiased;
 }
 
 a {
@@ -20,4 +20,49 @@ a {
 
 ::selection {
   @apply bg-brand-500 text-white;
+}
+
+[data-animate='fade-up'] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-animate='fade-up'].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-hover {
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+
+.card-hover:hover {
+  transform: scale(1.015);
+  box-shadow: 0 16px 40px rgba(79, 70, 229, 0.08);
+}
+
+.primary-cta {
+  transition:
+    background-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+
+.primary-cta:hover {
+  box-shadow: 0 24px 48px rgba(79, 70, 229, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-animate='fade-up'],
+  .card-hover,
+  .primary-cta {
+    transition: none;
+  }
 }

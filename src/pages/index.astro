@@ -2,9 +2,12 @@
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Section from '../components/Section.astro';
-import LedgerTable from '../components/LedgerTable.astro';
 import SplitTableAnimation from '../components/SplitTableAnimation.astro';
 import ReceiptScanAnimation from '../components/ReceiptScanAnimation.astro';
+import LedgerTablePreview from '../components/preview/LedgerTablePreview.astro';
+import ItemSplitPreview from '../components/preview/ItemSplitPreview.astro';
+import BalanceMatrixPreview from '../components/preview/BalanceMatrixPreview.astro';
+import FabMenuPreview from '../components/preview/FabMenuPreview.astro';
 
 const meta = {
   title: 'Trezzit - Itemized Expense Ledger',
@@ -25,7 +28,11 @@ const mcpExample = `{
   "method": "tools/call",
   "params": {
     "name": "get_expenses",
-    "arguments": { "category": "Food", "group_id": "household" }
+    "arguments": {
+      "group_id": "cabin-trip",
+      "category": "Food",
+      "date_from": "2026-05-01"
+    }
   },
   "id": 42
 }`;
@@ -37,13 +44,14 @@ const mcpExample = `{
   <Section
     eyebrow="One model"
     title="One data model, four product surfaces."
-    body="Splitting, categories, budgeting, and AI queries all point back to the same atomic row: the item share. The product can stay precise because it does not translate between a splitter model and a finance model."
+    body="Trezzit stores the line item, the person, the amount, and the category at the same level of detail. That lets the app split by item, categorize by item, budget by your share, and answer AI questions without translating a group receipt into a fake personal transaction."
   >
+    <!-- Source: agents/team-briefs/landing-research-synthesis.md §1 claims 1, 8, 15, 21 -->
     <div class="mt-10 grid gap-4 md:grid-cols-4">
       {['Split by item', 'Categorize by item', 'Budget by your share', 'Ask AI by item'].map((item) => (
-        <div class="rounded-xl border border-slate-800 bg-slate-950 p-5">
+        <div class="card-hover rounded-xl border border-white/10 bg-white/[0.03] p-5">
           <p class="font-mono text-sm text-brand-100">ItemShare</p>
-          <h3 class="mt-3 text-xl font-semibold text-white">{item}</h3>
+          <h3 class="mt-3 text-lg font-semibold text-white">{item}</h3>
           <p class="mt-3 text-sm leading-6 text-slate-400">The surface changes. The source row does not.</p>
         </div>
       ))}
@@ -53,34 +61,38 @@ const mcpExample = `{
   <Section
     eyebrow="Proof"
     title="The ledger table."
-    body="The pitch is not that Trezzit has a database. The pitch is that every product answer comes from rows small enough to represent what each person actually consumed."
-    className="bg-slate-950/50"
+    body="A group dinner becomes rows small enough to preserve reality: Maya shares the pizza, you own the tiramisu, and the wine can split four ways. The category status sits beside the share that will later power personal finance and AI answers."
+    className="bg-white/[0.02]"
   >
-    <LedgerTable />
+    <!-- Source: backend/bills_new/models/core_models.py:1029-1052,1069-1075 -->
+    <LedgerTablePreview />
   </Section>
 
   <Section
     eyebrow="Split engine"
     title="Splitting is per item, not per bill."
-    body="One receipt can mix EQUAL, PERCENTAGE, EXACT, SHARES, and ADJUSTED methods. The split type lives on the ItemShare row, so a latte can be exact while the shared pizza is percentage-based."
+    body="One receipt can mix equal, percentage, exact, shares, and adjusted methods because split_type lives on the ItemShare row. The UI reflects that: each item has its own split control and participant rows."
   >
+    <!-- Source: backend/bills_new/models/core_models.py:1052; backend/bills_new/models/choices.py:8; frontend/src/components/billCreationV2/components/split/ItemSplitCard.jsx -->
+    <ItemSplitPreview />
     <SplitTableAnimation />
   </Section>
 
   <Section
     eyebrow="Personal finance"
     title="Personal expenses without lying."
-    body="A normal transaction tracker sees the whole group receipt. Trezzit can report only your ItemShare.share_amount rows, with your categories and tags attached to those shares."
-    className="bg-slate-950/50"
+    body="A transaction tracker sees who paid. Trezzit can see what you consumed. Your grocery run, coffee, dessert, tax, and tip can all roll up from ItemShare.share_amount instead of treating the whole receipt as yours."
+    className="bg-white/[0.02]"
   >
+    <!-- Source: agents/team-briefs/landing-research-synthesis.md §1 claims 3, 15, 17 -->
     <div class="mt-10 grid gap-4 md:grid-cols-2">
-      <div class="rounded-xl border border-slate-800 bg-slate-900 p-6">
-        <p class="text-sm uppercase text-slate-500">Transaction tracker</p>
+      <div class="card-hover rounded-xl border border-white/10 bg-white/[0.03] p-6">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-500">Transaction tracker</p>
         <p class="mt-4 text-4xl font-semibold text-white">$84.12</p>
         <p class="mt-2 text-slate-400">One grocery receipt, treated as one personal expense.</p>
       </div>
-      <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-6">
-        <p class="text-sm uppercase text-brand-100">Trezzit ledger</p>
+      <div class="card-hover rounded-xl border border-brand-500/40 bg-brand-500/10 p-6">
+        <p class="font-mono text-xs uppercase tracking-widest text-brand-100">Trezzit ledger</p>
         <p class="mt-4 text-4xl font-semibold text-white">$26.40</p>
         <p class="mt-2 text-slate-300">Only your shares, grouped by item-level categories.</p>
       </div>
@@ -90,32 +102,41 @@ const mcpExample = `{
   <Section
     eyebrow="Receipt AI"
     title="Receipt AI with validation."
-    body="Receipt scanning is useful only when it lands in the ledger cleanly. Trezzit extracts line items, checks that item prices reconcile to the total, then keeps the review step explicit."
+    body="Receipt scanning is an input, not the product. Trezzit extracts line items, checks that prices reconcile, keeps review visible, then saves the result into the same ledger model used by balances and AI tools."
   >
-    <ReceiptScanAnimation />
+    <!-- Source: frontend/src/components/billCreationV2/components/entry/ReceiptScannerV2.jsx and agents/team-briefs/landing-research-synthesis.md §4 screenshot inventory -->
+    <div class="grid gap-8 lg:grid-cols-[1fr_0.72fr] lg:items-center">
+      <ReceiptScanAnimation />
+      <FabMenuPreview />
+    </div>
   </Section>
 
   <Section
     eyebrow="MCP"
     title="MCP for the ledger."
-    body="An AI agent can call get_expenses and explain which item shares matched, rather than guessing from whole transaction names."
-    className="bg-slate-950/50"
+    body="An AI agent can ask for expenses, balances, bill details, or settlement creation through real MCP tools. Read and write scopes are separate, and write activity is attributed to the agent that created it."
+    className="bg-white/[0.02]"
   >
-    <pre class="mt-10 overflow-x-auto rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-200"><code>{mcpExample}</code></pre>
+    <!-- Source: agents/team-briefs/landing-research-synthesis.md §2 -->
+    <pre class="mt-10 overflow-x-auto rounded-xl border border-white/10 bg-[#070815] p-5 text-sm text-slate-200"><code>{mcpExample}</code></pre>
   </Section>
 
   <Section
     eyebrow="Migration"
     title="Migration and groups."
-    body="Splitwise CSV import is a guided flow: Upload, Group, You, Map, Done. Groups lock currency at creation, so Trezzit does exact group math instead of exchange-rate guesses."
-  />
+    body="Splitwise CSV import is a guided migration: Upload, Group, You, Map, Done. Once the group exists, balances are pre-aggregated for fast reads and the group currency stays locked so the math stays explicit."
+  >
+    <!-- Source: agents/team-briefs/landing-research-synthesis.md §3 and §1 claims 10, 20 -->
+    <BalanceMatrixPreview />
+  </Section>
 
   <Section
     eyebrow="Pricing"
     title="Free now."
-    body="Free, forever (for now). Premium features arrive when we ship payments."
-    className="bg-slate-950/50"
+    body="Free, forever (for now). Use the itemized splitter, receipt scanner demo, groups, import flow, and MCP surface while payments are not part of the product."
+    className="bg-white/[0.02]"
   >
-    <a class="mt-8 inline-flex rounded-full bg-brand-500 px-6 py-3 font-medium text-white hover:bg-brand-600" href="https://app.trezzit.com/try-receipt">Try the receipt scanner</a>
+    <!-- Source: agents/team-briefs/landing-research-synthesis.md §0 hard pricing rule -->
+    <a class="primary-cta mt-8 inline-flex rounded-full bg-brand-500 px-6 py-3 font-medium text-white hover:bg-brand-600" href="https://app.trezzit.com/try-receipt">Try the receipt scanner</a>
   </Section>
 </Base>

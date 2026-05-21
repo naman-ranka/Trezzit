@@ -1,0 +1,45 @@
+---
+const rows = [
+  ['#4821', 'Margherita Pizza', '$18.00', 'You', '$9.00', 'CONFIRMED', 'Food'],
+  ['#4821', 'Margherita Pizza', '$18.00', 'Maya', '$9.00', 'CONFIRMED', 'Food'],
+  ['#4821', 'Tiramisu (only you)', '$8.50', 'You', '$8.50', 'AI_SUGGESTED', 'Desserts'],
+  ['#4821', 'Wine bottle', '$42.00', 'Split 4 ways', '$10.50 ea', 'CONFIRMED', 'Drinks'],
+];
+---
+
+<div class="mt-10 overflow-hidden rounded-xl border border-white/10 bg-[#070815] shadow-2xl shadow-black/30">
+  <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+    <span class="font-mono text-xs uppercase tracking-widest text-slate-400">ledger.item_shares</span>
+    <span class="rounded-full bg-brand-500/10 px-3 py-1 font-mono text-[11px] text-brand-100">BillItem -> ItemShare</span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[900px] text-left font-mono text-sm">
+      <thead class="bg-white/[0.03] text-xs uppercase tracking-wider text-slate-500">
+        <tr>
+          <th class="px-4 py-4 font-medium">bill_id</th>
+          <th class="px-4 py-4 font-medium">item_name</th>
+          <th class="px-4 py-4 text-right font-medium">item_price</th>
+          <th class="px-4 py-4 font-medium">share_person</th>
+          <th class="px-4 py-4 text-right font-medium">share_amount</th>
+          <th class="px-4 py-4 font-medium">category_status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/10">
+        {rows.map(([billId, itemName, itemPrice, sharePerson, shareAmount, status, category]) => (
+          <tr class="text-slate-300 transition-colors hover:bg-white/[0.04]">
+            <td class="px-4 py-4 text-slate-500">{billId}</td>
+            <td class="px-4 py-4 text-slate-100">{itemName}</td>
+            <td class="px-4 py-4 text-right tabular-nums">{itemPrice}</td>
+            <td class="px-4 py-4">{sharePerson}</td>
+            <td class="px-4 py-4 text-right tabular-nums text-white">{shareAmount}</td>
+            <td class="px-4 py-4">
+              <span class="text-brand-100">{status}</span>
+              <span class="px-2 text-slate-600">|</span>
+              <span class="text-slate-300">{category}</span>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

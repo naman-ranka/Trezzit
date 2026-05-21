@@ -15,13 +15,13 @@ const meta = {
 };
 
 const sections = [
-  ['Ledger primitives', 'Trezzit stores bills as Bill rows, line items as BillItem rows, and every person portion as ItemShare rows. This is the core reason the product can split, categorize, budget, and answer AI queries from the same item-level record instead of mapping between incompatible abstractions.', 'Source: backend/bills_new/models/core_models.py:1029-1052'],
-  ['Split engine', 'Trezzit supports five split methods: equal, percentage, exact, shares, and adjusted. Because split_type lives on the ItemShare row, one receipt can mix methods across items without turning the bill into a compromise.', 'Source: backend/bills_new/models/choices.py:8; backend/bills_new/models/core_models.py:1052'],
-  ['Receipt ingestion', 'Receipt scanning turns a real receipt into ledger rows, then validation checks the math before the bill is saved. The marketing scaffold keeps this honest by showing extraction, reconciliation, and review as one pipeline.', 'Source: backend/bills_new/services_dir/create_bill.py:270'],
-  ['Personal finance', 'Every ItemShare can carry its own category and tags. That means your half of dinner can be personal Food while another person uses a different category, without changing the shared bill.', 'Source: backend/bills_new/models/core_models.py:1069-1075,1107-1112'],
-  ['Groups and settlements', 'Groups lock currency at creation, and settlements are stored as paired Payment rows. Balance reads come from pre-aggregated pairwise rows updated inside the same transaction as bill changes.', 'Source: backend/bills_new/models/core_models.py:669-679,1598-1633; backend/bills_new/models/stored_balances.py:14'],
-  ['CSV import', 'Splitwise import uses a five-step CSV flow: Upload, Group, You, Map, Done. Unknown names can become placeholder members, and the backend rolls back if recomputed balances do not match the Splitwise total balance row within one cent.', 'Source: frontend/src/components/csvImport/UniversalImportSheet.jsx; backend/bills_new/views_dir/csv_import_views.py:403-410'],
-  ['Notifications and PWA', 'Trezzit is a web product with PWA support and web push. This site avoids native app or mobile push claims because the shipped surface is web-first.', 'Source: research synthesis hard rules and notifications read'],
+  ['Ledger primitives', 'Trezzit stores bills as Bill rows, line items as BillItem rows, and every person portion as ItemShare rows. This is the core reason the product can split, categorize, budget, and answer AI queries from the same item-level record instead of mapping between incompatible abstractions.'],
+  ['Split engine', 'Trezzit supports five split methods: equal, percentage, exact, shares, and adjusted. Because split_type lives on the ItemShare row, one receipt can mix methods across items without turning the bill into a compromise.'],
+  ['Receipt ingestion', 'Receipt scanning turns a real receipt into ledger rows, then validation checks the math before the bill is saved. The marketing scaffold keeps this honest by showing extraction, reconciliation, and review as one pipeline.'],
+  ['Personal finance', 'Every ItemShare can carry its own category and tags. That means your half of dinner can be personal Food while another person uses a different category, without changing the shared bill.'],
+  ['Groups and settlements', 'Groups lock currency at creation, and settlements are stored as paired Payment rows. Balance reads come from pre-aggregated pairwise rows updated inside the same transaction as bill changes.'],
+  ['CSV import', 'Splitwise import uses a five-step CSV flow: Upload, Group, You, Map, Done. Unknown names can become placeholder members, and the backend rolls back if recomputed balances do not match the Splitwise total balance row within one cent.'],
+  ['Notifications and PWA', 'Trezzit is a web product with PWA support and web push. This site avoids native app or mobile push claims because the shipped surface is web-first.'],
 ];
 ---
 
@@ -29,11 +29,11 @@ const sections = [
   <Section eyebrow="Features" title="The product surfaces follow the ledger." body="This page is intentionally concrete: each feature is framed around the row or invariant that makes the claim true." />
   <section class="px-6 pb-24">
     <div class="mx-auto grid max-w-6xl gap-5 md:grid-cols-2">
-      {sections.map(([title, body, source]) => (
-        <article class="rounded-xl border border-slate-800 bg-slate-950 p-6">
+      <!-- Sources: backend/bills_new/models/core_models.py:1029-1052,669-679,1069-1075,1107-1112,1598-1633; backend/bills_new/models/choices.py:8; backend/bills_new/services_dir/create_bill.py:270; backend/bills_new/models/stored_balances.py:14; frontend/src/components/csvImport/UniversalImportSheet.jsx; backend/bills_new/views_dir/csv_import_views.py:403-410; agents/team-briefs/landing-research-synthesis.md §0 -->
+      {sections.map(([title, body]) => (
+        <article class="card-hover rounded-xl border border-white/10 bg-[#070815] p-6">
           <h2 class="text-2xl font-semibold text-white">{title}</h2>
           <p class="mt-4 text-base leading-7 text-slate-300">{body}</p>
-          <p class="mt-5 font-mono text-xs text-slate-500">{source}</p>
         </article>
       ))}
     </div>

@@ -9,10 +9,10 @@ export interface Props {
 const { eyebrow, title, body, className = '' } = Astro.props;
 ---
 
-<section class={`px-6 py-16 md:py-24 ${className}`}>
+<section data-animate="fade-up" class={`px-6 py-16 md:py-24 ${className}`}>
   <div class="mx-auto max-w-6xl">
-    {eyebrow && <p class="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-brand-100">{eyebrow}</p>}
-    <h2 class="max-w-3xl text-3xl font-semibold tracking-tight text-white md:text-5xl">{title}</h2>
+    {eyebrow && <p class="mb-4 font-mono text-xs uppercase tracking-widest text-slate-400">{eyebrow}</p>}
+    <h2 class="max-w-3xl text-2xl font-semibold tracking-[-0.03em] text-white md:text-3xl">{title}</h2>
     {body && <p class="mt-5 max-w-2xl text-lg leading-relaxed text-slate-300">{body}</p>}
     <slot />
   </div>

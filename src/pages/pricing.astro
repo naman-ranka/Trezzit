@@ -13,26 +13,48 @@ const meta = {
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   },
 };
+
+const included = [
+  'Itemized receipt splitting with per-item participant rows',
+  'Groups, members, balances, and first-class settlements',
+  'Splitwise CSV migration with name mapping and placeholders',
+  'Receipt scanner demo at /try-receipt',
+  'MCP server surface for compatible AI clients',
+  'Web product with PWA support',
+];
 ---
 
 <Base meta={meta}>
-  <Section eyebrow="Pricing" title="Free, forever (for now)." body="The current Trezzit marketing site does not need a pricing maze. There is one available tier today: free access while the product grows." />
+  <Section
+    eyebrow="Pricing"
+    title="Free, forever (for now)."
+    body="There is one available Trezzit tier today: free access while the product grows. Paid features arrive when payments ship; this page will change when a real paid plan exists."
+  >
+    <!-- Source: agents/team-briefs/landing-research-synthesis.md §0 hard pricing rule -->
+  </Section>
+
   <section class="px-6 pb-24">
     <div class="mx-auto grid max-w-6xl gap-6 md:grid-cols-[1fr_0.8fr]">
-      <div class="rounded-2xl border border-brand-500/40 bg-brand-500/10 p-8">
-        <p class="text-sm font-semibold uppercase tracking-[0.16em] text-brand-100">Current plan</p>
-        <h2 class="mt-4 text-5xl font-bold text-white">Free</h2>
+      <div class="card-hover rounded-2xl border border-brand-500/40 bg-brand-500/10 p-8">
+        <p class="font-mono text-xs uppercase tracking-widest text-brand-100">Current plan</p>
+        <h2 class="mt-4 text-4xl font-medium tracking-[-0.03em] text-white md:text-6xl">Free</h2>
+        <p class="mt-3 text-lg text-slate-300">$0 today. No fabricated scan quota. No hidden Pro card.</p>
         <ul class="mt-8 space-y-3 text-slate-200">
-          <li>Itemized receipt splitting</li>
-          <li>Groups, members, balances, and settlements</li>
-          <li>Splitwise CSV migration flow</li>
-          <li>Receipt scanner demo at /try-receipt</li>
-          <li>MCP server surface for AI clients</li>
+          {included.map((item) => (
+            <li class="flex gap-3">
+              <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span>
+              <span>{item}</span>
+            </li>
+          ))}
         </ul>
+        <a class="primary-cta mt-8 inline-flex rounded-full bg-brand-500 px-6 py-3 font-medium text-white hover:bg-brand-600" href="https://app.trezzit.com/try-receipt">Try the receipt scanner</a>
       </div>
-      <div class="rounded-2xl border border-slate-800 bg-slate-950 p-8">
-        <h2 class="text-2xl font-semibold text-white">Premium later</h2>
-        <p class="mt-4 text-lg leading-8 text-slate-300">Paid features arrive when we ship payments. No date, no fake Pro plan.</p>
+      <div class="rounded-2xl border border-white/10 bg-[#070815] p-8">
+        <p class="font-mono text-xs uppercase tracking-widest text-slate-400">Later</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] text-white md:text-3xl">Premium when payments exist.</h2>
+        <p class="mt-4 text-base leading-7 text-slate-300">
+          Stripe, Paddle, Razorpay, and paid tier enforcement are not part of the current codebase. When payments ship, premium features can have real pricing and real limits.
+        </p>
       </div>
     </div>
   </section>

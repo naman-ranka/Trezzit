@@ -1,8 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
-import LedgerTable from '../components/LedgerTable.astro';
-import SplitTableAnimation from '../components/SplitTableAnimation.astro';
+import LedgerTablePreview from '../components/preview/LedgerTablePreview.astro';
+import ItemSplitPreview from '../components/preview/ItemSplitPreview.astro';
 
 const meta = {
   title: 'Trezzit Ledger - BillItem and ItemShare Model',
@@ -14,17 +14,73 @@ const meta = {
     headline: 'Trezzit Ledger Model',
   },
 };
+
+const fields = [
+  ['Bill', 'The parent receipt or expense record: group, payer, date, currency, total, and version.'],
+  ['BillItem.name', 'The receipt line: pizza, tiramisu, wine bottle, service fee.'],
+  ['BillItem.price', 'The item amount that shares must reconcile against within one cent.'],
+  ['ItemShare.person', 'The person attached to this portion of the item.'],
+  ['ItemShare.share_amount', 'The amount that person owes for that item.'],
+  ['ItemShare.split_type', 'Equal, percentage, exact, shares, or adjusted, stored per share.'],
+  ['ItemShare.category', 'The category attached to this person share, not just the whole bill.'],
+  ['ItemShare.tags', 'User-defined tags layered onto the shared bill record.'],
+];
 ---
 
 <Base meta={meta}>
-  <Section eyebrow="Ledger" title="What is an item share?" body="An ItemShare is one person's portion of one BillItem. It carries the amount, split type, category, and tags that make shared spending usable as personal finance data." />
-  <Section title="Why store every dollar this way?" body="Whole-bill totals are too coarse. Trezzit stores Bill -> BillItem[] -> ItemShare[] so item-level splitting, item-level categories, and AI queries all refer to the same record. Source: backend/bills_new/models/core_models.py:1029-1052." className="bg-slate-950/50">
-    <LedgerTable />
+  <Section
+    eyebrow="Ledger"
+    title="BillItem is the line. ItemShare is your piece."
+    body="Trezzit stores a bill as a set of line items, then stores one share row per participant for each item. That is the atomic unit behind splitting, personal expense categorization, balances, imports, audit trails, and AI queries."
+  >
+    <!-- Source: backend/bills_new/models/core_models.py:1029-1052; backend/bills_new/services_dir/create_bill.py:209,298-350 -->
   </Section>
-  <Section title="Per-item categories." body="Every item share can carry its own category, so different people can use different finance taxonomies on the same shared receipt. Source: backend/bills_new/models/core_models.py:1069-1075." />
-  <Section title="Per-item split methods (mixed bills)." body="The split type lives on the ItemShare row, which is why one receipt can mix equal, percentage, exact, shares, and adjusted methods. Source: backend/bills_new/models/core_models.py:1052; backend/bills_new/models/choices.py:8." className="bg-slate-950/50">
-    <SplitTableAnimation />
+
+  <Section title="The model in one table." className="bg-white/[0.02]">
+    <!-- Source: backend/bills_new/models/core_models.py:1029-1052,1069-1075,1107-1112 -->
+    <LedgerTablePreview />
   </Section>
-  <Section title="The version and audit trail." body="Bills are versioned for optimistic concurrency, and edits write audit rows with who changed what and when. Source: backend/bills_new/models/core_models.py:730,800-810,890-921." />
-  <Section title="What this enables." body="The ledger powers the feature set and the MCP page. Read the product surface at /features, or the AI protocol surface at /ai." className="bg-slate-950/50" />
+
+  <Section
+    eyebrow="Fields"
+    title="The field names are the product behavior."
+    body="The marketing claim is concrete because these fields exist in the backend model and write path. Item shares are not a derived reporting trick; they are the rows the bill creation flow writes."
+  >
+    <!-- Source: backend/bills_new/models/core_models.py:1029-1148; backend/bills_new/services_dir/create_bill.py:270 -->
+    <div class="mt-10 grid gap-4 md:grid-cols-2">
+      {fields.map(([field, description]) => (
+        <article class="card-hover rounded-xl border border-white/10 bg-white/[0.03] p-5">
+          <h3 class="font-mono text-sm text-brand-100">{field}</h3>
+          <p class="mt-3 text-sm leading-6 text-slate-300">{description}</p>
+        </article>
+      ))}
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="Invariant"
+    title="The math has guardrails."
+    body="Every bill has at least one item. Every item is split into person-level rows. Item shares must sum to the item price within one cent, and the bill total must equal the sum of item prices."
+    className="bg-white/[0.02]"
+  >
+    <!-- Source: backend/bills_new/services_dir/create_bill.py:93,270; backend/bills_new/serializers_dir/savebill_serializer.py:164 -->
+  </Section>
+
+  <Section
+    eyebrow="Splits"
+    title="Mixed split methods are normal."
+    body="A single receipt can have shared groceries, one person's dessert, a weighted service fee, and an exact bottle split. The split type is stored where it belongs: on the share attached to the item."
+  >
+    <!-- Source: backend/bills_new/models/core_models.py:1052; backend/bills_new/models/choices.py:8 -->
+    <ItemSplitPreview />
+  </Section>
+
+  <Section
+    eyebrow="Audit"
+    title="Versioned bills, attributed writes."
+    body="Bill edits bump the bill version and write audit rows. MCP-created bills are attributed to the AI agent that created them, so the ledger can distinguish app actions from agent actions."
+    className="bg-white/[0.02]"
+  >
+    <!-- Source: backend/bills_new/models/core_models.py:730,800-810,890-921,180-181 -->
+  </Section>
 </Base>
