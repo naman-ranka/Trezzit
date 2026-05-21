@@ -1,6 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
+import McpConversationPreview from '../components/preview/McpConversationPreview.astro';
+import ReceiptHeroPreview from '../components/preview/ReceiptHeroPreview.astro';
+import BalanceMatrixPreview from '../components/preview/BalanceMatrixPreview.astro';
+import ScopeMatrixPreview from '../components/preview/ScopeMatrixPreview.astro';
 import ReceiptScanAnimation from '../components/ReceiptScanAnimation.astro';
 import SplitTableAnimation from '../components/SplitTableAnimation.astro';
 
@@ -17,23 +21,6 @@ const meta = {
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   },
 };
-
-const toolResponse = `{
-  "jsonrpc": "2.0",
-  "result": {
-    "tools": [
-      "get_context",
-      "list_groups",
-      "search_bills",
-      "get_expenses",
-      "create_bill",
-      "delete_bill",
-      "create_settlement",
-      "get_receipt_upload_presigned_url"
-    ],
-    "scopes": ["bills:read", "bills:write"]
-  }
-}`;
 ---
 
 <Base meta={meta}>
@@ -47,112 +34,68 @@ const toolResponse = `{
   />
 
   <section class="section-pad">
-    <div class="container-page grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-      <div>
+    <div class="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      <div class="fade-up">
         <p class="eyebrow">Real inventory</p>
-        <h2 class="mt-4 text-3xl font-semibold md:text-5xl">A real tool inventory, not a chat veneer.</h2>
-        <p class="mt-5 max-w-2xl text-lg leading-relaxed text-slate-300">The MCP server exposes 13 named tools. Read calls inspect groups, bills, balances, people, receipts, and item shares. Write calls create attributed bills, settlements, and AI-scoped deletions.</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">A real tool inventory, not a chat veneer.</h2>
+        <p class="mt-5 max-w-2xl text-lg leading-relaxed text-slate-300">`tools/list` returns 13 tools. `get_expenses` answers from item shares. `create_bill`, `create_settlement`, and `delete_bill` are scoped write tools with attribution instead of generic chat actions.</p>
       </div>
-      <div class="code-panel">
-        <pre><code>{`> tools/list
-${toolResponse}`}</code></pre>
-        <div class="mt-6 grid grid-cols-2 gap-3 text-sm text-slate-300">
-          {['Claude', 'Cursor', 'ChatGPT', 'Gemini-compatible'].map((name) => <span class="rounded-lg border border-slate-800 bg-slate-900 px-3 py-2">{name}</span>)}
-        </div>
-      </div>
+      <div class="fade-up"><McpConversationPreview /></div>
     </div>
   </section>
 
-  <section class="section-pad border-y border-slate-800 bg-slate-950/50">
-    <div class="container-page grid gap-10 lg:grid-cols-3">
-      <div class="lg:col-span-1">
-        <p class="eyebrow">Item shares</p>
-        <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Why itemized data changes the answer.</h2>
-      </div>
-      <div class="grid gap-4 lg:col-span-2">
-        <div class="code-panel"><pre><code>{`User: "How much did I spend on coffee during Cabin Trip?"
-Path: Bill -> BillItem -> ItemShare
-Filter: category = Coffee, person = you, group = Cabin Trip`}</code></pre></div>
-        <div class="grid gap-3 md:grid-cols-3">
-          {[
-            ['Espresso', '$4.50', 'Coffee'],
-            ['Shared tax', '$0.82', 'Tax'],
-            ['Tip share', '$2.05', 'Tip'],
-          ].map(([name, amount, category]) => (
-            <div class="surface p-5">
-              <span class="text-sm text-slate-400">{category}</span>
-              <strong class="mt-2 block text-xl">{name}</strong>
-              <span class="mt-3 block text-brand-300">{amount}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section-pad">
-    <div class="container-page">
-      <p class="eyebrow">Public demos</p>
-      <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Try it without an account.</h2>
-      <div class="mt-10 grid gap-4 md:grid-cols-3">
-        {[
-          ['Receipt demo', 'Scan a sample receipt and watch your share auto-track.', 'https://app.trezzit.com/try-receipt'],
-          ['Legacy bill calculator', 'A lower-polish public calculator kept available for comparison.', 'https://app.trezzit.com/demo'],
-          ['V2 bill creation demo', 'Try the newer bill creation flow as a standalone demo.', 'https://app.trezzit.com/demo/v2'],
-        ].map(([title, body, href]) => (
-          <a href={href} class="surface block p-6 transition hover:border-brand-500">
-            <h3 class="text-xl font-semibold">{title}</h3>
-            <p class="mt-3 text-slate-300">{body}</p>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="section-pad border-y border-slate-800 bg-slate-950/50">
-    <div class="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-      <div>
+  <section class="section-pad border-y border-white/10 bg-[#060713]">
+    <div class="container-page grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+      <div class="fade-up">
         <p class="eyebrow">Under the agent</p>
-        <h2 class="mt-4 text-3xl font-semibold md:text-5xl">The app under the agent.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-300">Receipt review, group balances, members, settlements, and itemized rows are still the product surface. The MCP server works because the app writes structured records first.</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">The app writes the ledger first.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-300">A bill becomes `BillItem` rows and one `ItemShare` row per person. That is why a group receipt can become your coffee, your share of tax, your category, and your answer inside an AI client.</p>
       </div>
-      <ReceiptScanAnimation />
+      <div class="grid gap-5 md:grid-cols-2">
+        <div class="fade-up"><ReceiptHeroPreview /></div>
+        <div class="fade-up md:pt-12"><BalanceMatrixPreview /></div>
+      </div>
     </div>
   </section>
 
   <section class="section-pad">
-    <div class="container-page grid gap-10 lg:grid-cols-2">
-      <div>
+    <div class="container-page grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div class="fade-up">
         <p class="eyebrow">Write safety</p>
-        <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Write tools need guardrails.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-300">Trezzit separates read and write scopes, rate-limits OAuth sessions, attributes MCP-created bills to the AI client, and limits MCP deletion to AI-created bills inside the mutation window.</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">Write tools need guardrails.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-300">OAuth scopes separate reads from mutations. MCP writes are logged through `AIAction`, attributed to the AI client, rate-limited at 60/min and 600/hr per OAuth session, and deletable through MCP only inside the 30-minute AI-created bill window.</p>
       </div>
-      <div class="grid gap-3">
-        {[
-          ['bills:read', 'Search bills, inspect item shares, read balances, prepare receipt uploads.'],
-          ['bills:write', 'Create bills, create settlements, and delete AI-created bills inside 30 minutes.'],
-          ['Rate limits', '60 requests per minute and 600 requests per hour per OAuth session.'],
-        ].map(([title, body]) => <div class="surface p-5"><strong>{title}</strong><p class="mt-2 text-slate-300">{body}</p></div>)}
-      </div>
+      <div class="fade-up"><ScopeMatrixPreview /></div>
     </div>
   </section>
 
-  <section class="section-pad border-y border-slate-800 bg-slate-950/50">
-    <div class="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-      <div>
-        <p class="eyebrow">Splits and import</p>
-        <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Split and import, concretely.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-300">Trezzit supports equal, percentage, exact, shares, and adjusted split methods per item. Splitwise CSV import follows Upload, Group, You, Map, Done, with balance verification before commit.</p>
+  <section class="section-pad border-y border-white/10 bg-[#060713]">
+    <div class="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      <div class="fade-up">
+        <p class="eyebrow">Receipt AI</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">Scan, review, then save structured records.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-300">Receipt scanning extracts items, prices, tax, and tip into a reviewable bill. The marketing page stays dark, but the product surface stays light because that is what the shipped app uses.</p>
       </div>
-      <SplitTableAnimation />
+      <div class="fade-up"><ReceiptScanAnimation /></div>
     </div>
   </section>
 
   <section class="section-pad">
-    <div class="container-page rounded-lg border border-brand-500/40 bg-brand-500/10 p-8 md:p-10">
+    <div class="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      <div class="fade-up">
+        <p class="eyebrow">Splits and import</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">Split and import, concretely.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-300">Trezzit supports equal, percentage, exact, shares, and adjusted split methods per item. Splitwise CSV import follows Upload, Group, You, Map, Done, then verifies balances within one cent before committing.</p>
+      </div>
+      <div class="fade-up"><SplitTableAnimation /></div>
+    </div>
+  </section>
+
+  <section class="section-pad border-t border-white/10 bg-[#060713]">
+    <div class="container-page rounded-lg border border-brand-500/35 bg-brand-500/10 p-8 md:p-10">
       <p class="eyebrow">Pricing</p>
-      <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Free while the product matures.</h2>
-      <p class="mt-5 max-w-2xl text-lg text-slate-300">Free, forever (for now). Premium features arrive when Trezzit ships payments infrastructure. There is no paid Pro plan or per-tier scan quota today.</p>
+      <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">Free while the product matures.</h2>
+      <p class="mt-5 max-w-2xl text-lg text-slate-300">Free, forever (for now). There is no paid Pro plan, no Stripe integration, and no per-tier scan quota today.</p>
       <a class="btn-primary mt-8" href="/pricing">Read pricing boundary</a>
     </div>
   </section>

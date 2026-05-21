@@ -1,0 +1,33 @@
+---
+import { Code } from 'astro:components';
+
+const snippets = [
+  ['Claude', 'bash', 'claude mcp add trezzit https://mcp.trezzit.com'],
+  ['Cursor', 'json', `{
+  "mcpServers": {
+    "trezzit": {
+      "url": "https://mcp.trezzit.com"
+    }
+  }
+}`],
+  ['ChatGPT', 'text', 'Add https://mcp.trezzit.com as an OAuth-backed MCP connector.'],
+  ['Gemini', 'json', `{
+  "server": "trezzit",
+  "transport": "streamable-http",
+  "url": "https://mcp.trezzit.com"
+}`],
+];
+---
+
+<div class="grid gap-4 lg:grid-cols-2">
+  {snippets.map(([name, lang, code]) => (
+    <article class="surface hover-card overflow-hidden bg-[#060713]">
+      <div class="border-b border-white/10 px-4 py-3">
+        <h3 class="text-base font-semibold text-white">{name}</h3>
+      </div>
+      <div class="overflow-hidden p-4 text-sm">
+        <Code code={code} lang={lang} theme="vitesse-dark" />
+      </div>
+    </article>
+  ))}
+</div>

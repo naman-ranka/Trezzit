@@ -1,0 +1,45 @@
+---
+import { Code } from 'astro:components';
+
+const call = `{
+  "jsonrpc": "2.0",
+  "id": 42,
+  "method": "tools/call",
+  "params": {
+    "name": "search_bills",
+    "arguments": {
+      "query": "coffee",
+      "group_id": 18,
+      "start_date": "2026-05-01",
+      "end_date": "2026-05-31",
+      "limit": 20
+    }
+  }
+}`;
+---
+
+<article class="surface hover-card overflow-hidden bg-[#060713]">
+  <div class="flex items-center gap-2 border-b border-white/10 px-4 py-3 text-xs text-slate-500">
+    <span class="h-2.5 w-2.5 rounded-full bg-red-400"></span>
+    <span class="h-2.5 w-2.5 rounded-full bg-yellow-400"></span>
+    <span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+    <span class="ml-2 font-mono">Claude + Trezzit MCP</span>
+  </div>
+  <div class="space-y-4 p-4 md:p-5">
+    <div class="ml-auto max-w-[88%] rounded-lg bg-brand-500 px-4 py-3 text-sm font-medium text-white">
+      How much did I spend on coffee in May with Mike's group?
+    </div>
+    <div class="max-w-full rounded-lg border border-white/10 bg-black/20 p-3">
+      <div class="mb-2 flex items-center justify-between text-xs">
+        <span class="font-mono uppercase tracking-widest text-white/50">internal tool call</span>
+        <span class="rounded-full bg-white/5 px-2 py-0.5 text-white/50">bills:read</span>
+      </div>
+      <div class="overflow-hidden rounded-md text-[12px]">
+        <Code code={call} lang="json" theme="vitesse-dark" />
+      </div>
+    </div>
+    <div class="mr-auto max-w-[92%] rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-slate-200">
+      You spent <strong class="font-semibold text-white">$57.40</strong> on coffee across 8 items, all with Mike's <strong class="font-semibold text-white">Cabin Trip</strong> group.
+    </div>
+  </div>
+</article>

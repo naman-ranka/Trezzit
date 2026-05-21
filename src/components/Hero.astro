@@ -20,11 +20,12 @@ const {
 } = Astro.props;
 ---
 
-<section class="section-pad overflow-hidden border-b border-slate-800">
-  <div class="container-page grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-    <div>
+<section class="section-pad relative overflow-hidden border-b border-white/10" data-hero-spotlight>
+  <div class="pointer-events-none absolute inset-0 opacity-80" style="background: radial-gradient(560px circle at var(--mx,50%) var(--my,30%), rgba(255,255,255,0.08), transparent 45%);"></div>
+  <div class="container-page relative grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+    <div class="fade-up">
       <p class="eyebrow">{eyebrow}</p>
-      <h1 class="mt-5 text-5xl font-bold tracking-tight text-white md:text-7xl">{title}</h1>
+      <h1 class="mt-5 text-4xl font-medium tracking-[-0.03em] text-white md:text-6xl">{title}</h1>
       <p class="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">{description}</p>
       {(primaryLabel || secondaryLabel) && (
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -33,7 +34,7 @@ const {
         </div>
       )}
     </div>
-    <div class="code-panel">
+    <div class="code-panel fade-up">
       <div class="mb-4 flex items-center gap-2 text-xs text-slate-500">
         <span class="h-3 w-3 rounded-full bg-red-400"></span>
         <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
@@ -56,3 +57,15 @@ const {
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const hero = document.querySelector('[data-hero-spotlight]');
+    if (!hero) return;
+    hero.addEventListener('pointermove', (event) => {
+      const rect = hero.getBoundingClientRect();
+      hero.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+      hero.style.setProperty('--my', `${event.clientY - rect.top}px`);
+    });
+  });
+</script>

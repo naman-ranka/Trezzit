@@ -1,0 +1,22 @@
+---
+const scopes = [
+  ['bills:read', ['get_context', 'list_groups', 'get_group_details', 'search_bills', 'get_bill_details', 'get_balances', 'get_expenses', 'get_person_info', 'resolve_participants', 'get_receipt_upload_presigned_url']],
+  ['bills:write', ['create_bill', 'delete_bill', 'create_settlement']],
+];
+---
+
+<div class="grid overflow-hidden rounded-lg border border-white/10 bg-[#060713] md:grid-cols-2">
+  {scopes.map(([scope, tools]) => (
+    <section class="border-b border-white/10 p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
+      <div class="flex items-center justify-between gap-3">
+        <code class="font-mono text-sm text-brand-300">{scope}</code>
+        <span class="rounded-full bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-300">{tools.length} tools</span>
+      </div>
+      <div class="mt-4 flex flex-wrap gap-2">
+        {tools.map((tool) => (
+          <span class="rounded-md border border-white/10 bg-white/[0.035] px-2 py-1 font-mono text-[11px] text-slate-300">{tool}</span>
+        ))}
+      </div>
+    </section>
+  ))}
+</div>

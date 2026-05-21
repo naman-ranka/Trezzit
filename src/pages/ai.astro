@@ -1,6 +1,11 @@
 ---
+import { Code } from 'astro:components';
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
+import SetupSnippetPreview from '../components/preview/SetupSnippetPreview.astro';
+import ToolInventoryPreview from '../components/preview/ToolInventoryPreview.astro';
+import ScopeMatrixPreview from '../components/preview/ScopeMatrixPreview.astro';
+import McpConversationPreview from '../components/preview/McpConversationPreview.astro';
 
 const meta = {
   title: 'Trezzit MCP Server - AI tools for expenses',
@@ -14,28 +19,55 @@ const meta = {
   },
 };
 
-const tools = [
-  ['get_context', 'Read', 'What Trezzit data can you access right now?'],
-  ['list_groups', 'Read', 'List my Trezzit groups.'],
-  ['get_group_details', 'Read', 'Show members and settings for Cabin Trip.'],
-  ['search_bills', 'Read', 'Find bills mentioning pasta from last month.'],
-  ['get_bill_details', 'Read', 'Open the item shares for this receipt.'],
-  ['get_balances', 'Read', 'Who owes whom in Cabin Trip?'],
-  ['get_expenses', 'Read', 'How much did I spend on Food this month?'],
-  ['get_person_info', 'Read', 'Who am I in this group?'],
-  ['resolve_participants', 'Read', 'Match Naman and Chetan before creating a bill.'],
-  ['create_bill', 'Write', 'Create a scoped bill from these receipt items.'],
-  ['delete_bill', 'Write', 'Delete the AI-created bill from 10 minutes ago.'],
-  ['create_settlement', 'Write', 'Record that I paid Chetan $20.'],
-  ['get_receipt_upload_presigned_url', 'Read', 'Prepare a receipt upload URL.'],
-];
-
-const clients = [
-  ['Claude Code', 'claude mcp add trezzit https://mcp.trezzit.com'],
-  ['Claude Desktop', '{ "mcpServers": { "trezzit": { "url": "https://mcp.trezzit.com" } } }'],
-  ['Cursor', 'cursor://mcp/install?server=https://mcp.trezzit.com'],
-  ['ChatGPT', 'Add https://mcp.trezzit.com as an OAuth-backed MCP connector.'],
-  ['Gemini-compatible', 'Use any MCP client that supports remote OAuth authorization.'],
+const examples = [
+  ['get_expenses', `{
+  "jsonrpc": "2.0",
+  "id": 101,
+  "method": "tools/call",
+  "params": {
+    "name": "get_expenses",
+    "arguments": {
+      "start_date": "2026-05-01",
+      "end_date": "2026-05-31",
+      "category": "Coffee",
+      "group_id": 18,
+      "limit": 50
+    }
+  }
+}`],
+  ['create_bill', `{
+  "jsonrpc": "2.0",
+  "id": 102,
+  "method": "tools/call",
+  "params": {
+    "name": "create_bill",
+    "arguments": {
+      "title": "Trattoria Romano",
+      "amount": 86.94,
+      "group_id": 18,
+      "date": "2026-05-21",
+      "split_method": "itemized",
+      "items": [
+        { "name": "Margherita Pizza", "price": 18.00, "split_among": [7, 9] },
+        { "name": "Espresso (x2)", "price": 6.00, "split_among": [11] }
+      ]
+    }
+  }
+}`],
+  ['search_bills', `{
+  "jsonrpc": "2.0",
+  "id": 103,
+  "method": "tools/call",
+  "params": {
+    "name": "search_bills",
+    "arguments": {
+      "query": "coffee",
+      "start_date": "2026-05-01",
+      "end_date": "2026-05-31",
+      "limit": 20
+    }
+  }
+}`],
 ];
 ---
 
@@ -44,127 +76,101 @@ const clients = [
     eyebrow="MCP server"
     title="Connect your AI to itemized money records."
     description="Trezzit exposes expense data through real MCP tools over OAuth 2.1. Agents can search bills, read balances, inspect item shares, upload receipts, and create attributed bill records."
-    primaryLabel="Connect"
+    primaryLabel="Connect from clients"
     primaryHref="#connect"
-    secondaryLabel="Try receipt demo"
-    secondaryHref="https://app.trezzit.com/try-receipt"
+    secondaryLabel="See tool catalog"
+    secondaryHref="#tools"
   />
 
   <section id="connect" class="section-pad">
     <div class="container-page">
-      <p class="eyebrow">Setup</p>
-      <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Connect from MCP clients.</h2>
-      <div class="mt-10 grid gap-4 lg:grid-cols-2">
-        {clients.map(([name, snippet]) => (
-          <article class="surface p-6">
-            <h3 class="text-xl font-semibold">{name}</h3>
-            <pre class="mt-4 overflow-x-auto rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-200"><code>{snippet}</code></pre>
-          </article>
-        ))}
+      <div class="max-w-3xl fade-up">
+        <p class="eyebrow">Setup</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">Connect from MCP clients.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-300">Claude, Cursor, ChatGPT, and Gemini-compatible clients can connect to the same remote OAuth-backed endpoint. Exact client UI varies; the boundary is JSON-RPC over MCP.</p>
       </div>
-      <p class="mt-6 max-w-3xl text-slate-300">Exact client setup screens may vary. The protocol boundary is the important part: the server is remote, OAuth-backed, and provider-agnostic for clients that speak MCP.</p>
+      <div class="mt-10 fade-up"><SetupSnippetPreview /></div>
     </div>
   </section>
 
-  <section class="section-pad border-y border-slate-800 bg-slate-950/50">
-    <div class="container-page grid gap-8 lg:grid-cols-2">
-      <div>
+  <section class="section-pad border-y border-white/10 bg-[#060713]">
+    <div class="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      <div class="fade-up">
         <p class="eyebrow">OAuth 2.1</p>
-        <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Scopes separate reading from writing.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-300">Trezzit uses OAuth 2.1 with PKCE. MCP clients request `bills:read` for inspection and `bills:write` when they need to create bills, settlements, or delete their own recent AI-created bills.</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">Scopes separate reading from writing.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-300">Trezzit uses OAuth 2.1 with PKCE. `bills:read` enables inspection and upload preparation. `bills:write` enables bill creation, settlement creation, and deleting AI-created bills inside the mutation window.</p>
       </div>
-      <div class="code-panel"><pre><code>{`GET /oauth/authorize
-  client_id=claude
-  code_challenge=S256(...)
-  scope=bills:read bills:write
+      <div class="fade-up"><ScopeMatrixPreview /></div>
+    </div>
+  </section>
 
-POST /oauth/token
-  grant_type=authorization_code
-  code_verifier=...`}</code></pre></div>
+  <section id="tools" class="section-pad">
+    <div class="container-page">
+      <div class="max-w-3xl fade-up">
+        <p class="eyebrow">Tool catalog</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">13 tools, named plainly.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-300">Read tools inspect context, groups, bills, balances, people, item-share expenses, and receipt upload preparation. Write tools create bills, create settlements, and delete recent AI-created bills.</p>
+      </div>
+      <div class="mt-10 fade-up"><ToolInventoryPreview /></div>
+    </div>
+  </section>
+
+  <section class="section-pad border-y border-white/10 bg-[#060713]">
+    <div class="container-page grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+      <div class="fade-up">
+        <p class="eyebrow">Conversation</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">The agent can ask ledger questions.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-300">A coffee question can resolve to a tool call, a group filter, and item-level matches instead of a guessed answer from chat history.</p>
+      </div>
+      <div class="fade-up"><McpConversationPreview /></div>
     </div>
   </section>
 
   <section class="section-pad">
     <div class="container-page">
-      <p class="eyebrow">Tool catalog</p>
-      <h2 class="mt-4 text-3xl font-semibold md:text-5xl">13 tools, named plainly.</h2>
-      <div class="mt-10 grid gap-3">
-        {tools.map(([name, mode, prompt]) => (
-          <article class="surface grid gap-4 p-5 md:grid-cols-[220px_90px_1fr] md:items-center">
-            <code class="font-mono text-brand-300">{name}</code>
-            <span class={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${mode === 'Write' ? 'bg-brand-500 text-white' : 'bg-slate-800 text-slate-300'}`}>{mode}</span>
-            <p class="text-slate-300">{prompt}</p>
+      <div class="max-w-3xl fade-up">
+        <p class="eyebrow">JSON-RPC</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">Sample tool calls.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-300">These examples use the endpoint shape implemented by the MCP view: `tools/call` with a tool name and argument object.</p>
+      </div>
+      <div class="mt-10 grid gap-4">
+        {examples.map(([name, code]) => (
+          <article class="surface overflow-hidden bg-[#060713]">
+            <div class="border-b border-white/10 px-4 py-3"><code class="font-mono text-sm text-brand-300">{name}</code></div>
+            <div class="overflow-hidden p-4 text-sm"><Code code={code} lang="json" theme="vitesse-dark" /></div>
           </article>
         ))}
       </div>
     </div>
   </section>
 
-  <section class="section-pad border-y border-slate-800 bg-slate-950/50">
-    <div class="container-page grid gap-8 lg:grid-cols-2">
-      <div>
-        <p class="eyebrow">Receipt upload</p>
-        <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Upload bytes, then create the bill.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-300">Receipt upload is a two-step flow. The agent asks Trezzit for a presigned URL, uploads the receipt bytes to storage, then calls `create_bill` with the receipt key and structured items.</p>
-      </div>
-      <div class="code-panel"><pre><code>{`1. tools/call get_receipt_upload_presigned_url
-2. PUT receipt bytes to the returned URL
-3. tools/call create_bill
-{
-  "group_id": "cab_trip",
-  "receipt_key": "receipts/2026/05/...",
-  "items": [
-    { "name": "Espresso", "amount": "4.50", "shares": [...] }
-  ]
-}`}</code></pre></div>
-    </div>
-  </section>
-
-  <section class="section-pad">
-    <div class="container-page">
-      <p class="eyebrow">Queries</p>
-      <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Expense questions become ledger filters.</h2>
-      <div class="mt-10 grid gap-4 md:grid-cols-2">
-        {[
-          'How much did I spend on Food in May 2026?',
-          'Find item shares tagged "work" from the last 90 days.',
-          'Show my Cabin Trip expenses grouped by category.',
-          'Search bills that mention espresso and include my share.',
-        ].map((prompt) => (
-          <div class="code-panel"><pre><code>{`User: "${prompt}"
-Tool: get_expenses
-Filters: date_range, category, tags, search, group`}</code></pre></div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="section-pad border-y border-slate-800 bg-slate-950/50">
-    <div class="container-page grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <div class="md:col-span-2 lg:col-span-4">
+  <section class="section-pad border-y border-white/10 bg-[#060713]">
+    <div class="container-page grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+      <div class="md:col-span-2 lg:col-span-4 fade-up">
         <p class="eyebrow">Mutation safety</p>
-        <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Write tools leave a trail.</h2>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">Write tools leave a trail.</h2>
       </div>
       {[
-        ['Attribution', 'MCPTokenMetadata records which AI client created a bill.'],
-        ['Audit', 'MCP writes are logged through AIAction audit records.'],
-        ['Rate limits', 'OAuth sessions are limited to 60 requests per minute and 600 per hour.'],
-        ['Delete window', 'MCP can delete its own AI-created bill only inside 30 minutes.'],
-      ].map(([title, body]) => <article class="surface p-6"><h3 class="text-xl font-semibold">{title}</h3><p class="mt-3 text-slate-300">{body}</p></article>)}
+        ['Attribution', 'Bills created through MCP carry AI-client attribution through token metadata.'],
+        ['Audit', 'MCP writes and read actions create `AIAction` audit rows with inputs, outputs, success, and errors.'],
+        ['Rate limits', 'Write calls use dual-window rate limits: 60 requests per minute and 600 per hour per OAuth session.'],
+        ['Delete window', 'MCP deletion is limited to the agent’s own AI-created bill inside a 30-minute window.'],
+      ].map(([title, body]) => (
+        <article class="surface hover-card p-6 fade-up"><h3 class="text-lg font-semibold">{title}</h3><p class="mt-3 text-sm leading-6 text-slate-300">{body}</p></article>
+      ))}
     </div>
   </section>
 
   <section class="section-pad">
     <div class="container-page">
-      <p class="eyebrow">Known limits</p>
-      <h2 class="mt-4 text-3xl font-semibold md:text-5xl">Boundaries stated plainly.</h2>
+      <div class="max-w-3xl fade-up">
+        <p class="eyebrow">Known limits</p>
+        <h2 class="mt-4 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">Boundaries stated plainly.</h2>
+      </div>
       <div class="mt-10 grid gap-4 md:grid-cols-2">
-        {[
-          'No bank sync.',
-          'No payment processor or paid tier today.',
-          'No native iOS or Android app-store apps.',
-          'No cross-currency totals or exchange-rate math.',
-        ].map((limit) => <div class="surface p-6 text-lg text-slate-200">{limit}</div>)}
+        {['No bank sync.', 'No Stripe or paid Pro plan today.', 'No native iOS or Android app-store apps.', 'No cross-currency totals or exchange-rate math.'].map((limit) => (
+          <div class="surface hover-card p-6 text-lg text-slate-200 fade-up">{limit}</div>
+        ))}
       </div>
     </div>
   </section>

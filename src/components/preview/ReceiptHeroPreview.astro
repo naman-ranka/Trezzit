@@ -1,0 +1,54 @@
+---
+const people = [
+  ['Y', 'You', 'bg-[#0a0f3c]'],
+  ['A', 'Aarav', 'bg-amber-500'],
+  ['M', 'Maya', 'bg-emerald-500'],
+];
+const items = [
+  ['Margherita Pizza', '$18.00', 'Food & Dining', 'You'],
+  ['Carbonara', '$16.00', 'Food & Dining', 'Aarav'],
+  ['Caesar Salad', '$12.00', 'Food & Dining', 'Maya'],
+  ['Sparkling Water (x3)', '$9.00', 'Drinks', 'Aarav'],
+  ['Tiramisu', '$8.00', 'Desserts', 'You'],
+  ['Espresso (x2)', '$6.00', 'Coffee', 'Maya'],
+];
+---
+
+<article class="mx-auto max-w-[390px] overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-950 shadow-2xl shadow-black/30">
+  <div class="border-b border-dashed border-slate-200 px-5 py-4 text-center">
+    <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Trattoria Romano</p>
+    <p class="text-[11px] text-slate-400">Saturday · table 7 · 3 guests</p>
+  </div>
+  <div class="divide-y divide-slate-100">
+    {items.map(([name, amount, category, owner]) => (
+      <div class="px-5 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <p class="truncate text-sm font-semibold text-[#0a0f3c]">{name}</p>
+          <p class="text-sm font-semibold text-[#0a0f3c]">{amount}</p>
+        </div>
+        <div class="mt-2 flex items-center justify-between gap-2">
+          <p class="text-[11px] text-slate-400">{category}</p>
+          <div class="flex gap-1.5">
+            {people.map(([initial, person, color]) => (
+              <span class={`inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-[10px] font-semibold ${person === owner ? `${color} text-white` : 'border border-slate-200 bg-white text-slate-400'}`}>{initial}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+  <div class="border-t border-dashed border-slate-200 px-5 py-3 text-xs text-slate-500">
+    <div class="flex justify-between"><span>Subtotal</span><span>$69.00</span></div>
+    <div class="flex justify-between"><span>Tax (8%)</span><span>$5.52</span></div>
+    <div class="flex justify-between"><span>Tip (18%)</span><span>$12.42</span></div>
+    <div class="mt-1.5 flex justify-between border-t border-slate-100 pt-1.5 font-semibold text-[#0a0f3c]"><span>Total</span><span>$86.94</span></div>
+  </div>
+  <div class="m-4 rounded-2xl bg-[#0a0f3c] p-5 text-white">
+    <p class="text-[11px] font-semibold uppercase tracking-wider text-white/70">Your share, auto-tracked</p>
+    <div class="mt-2 flex items-baseline justify-between gap-3">
+      <span class="text-[28px] font-semibold leading-tight">$32.73</span>
+      <span class="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">Food & Dining</span>
+    </div>
+    <p class="mt-3 text-xs leading-5 text-white/70">Assigned items flow into your personal item-share ledger, tagged by category.</p>
+  </div>
+</article>

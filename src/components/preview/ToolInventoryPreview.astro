@@ -1,0 +1,32 @@
+---
+const tools = [
+  ['get_context', 'Read', 'Loads profile, groups, members, recent bills, pending settlements, and balance summary.'],
+  ['list_groups', 'Read', 'Lists non-deleted groups with member counts and group currency.'],
+  ['get_group_details', 'Read', 'Returns a group, its settings, and all members for ID lookup.'],
+  ['search_bills', 'Read', 'Searches bill titles/descriptions by text, date range, amount, group, and limit.'],
+  ['get_bill_details', 'Read', 'Opens one bill with items, item shares, payments, and your balance impact.'],
+  ['get_balances', 'Read', 'Returns current balance summary by person, group, and currency.'],
+  ['get_expenses', 'Read', 'Returns your ItemShare expense rows with category, tags, bill context, and group.'],
+  ['get_person_info', 'Read', 'Looks up a person by ID when you share at least one group.'],
+  ['resolve_participants', 'Read', 'Fuzzy-matches names to person IDs before creating bills or settlements.'],
+  ['get_receipt_upload_presigned_url', 'Read', 'Creates a presigned PUT URL for receipt image or PDF upload preparation.'],
+  ['create_bill', 'Write', 'Creates an equal, itemized, percentage, or custom-split bill with attribution.'],
+  ['delete_bill', 'Write', 'Deletes an AI-created bill only inside the allowed mutation window.'],
+  ['create_settlement', 'Write', 'Records a settlement payment in a group and returns updated balance details.'],
+];
+---
+
+<div class="overflow-hidden rounded-lg border border-white/10 bg-[#060713]">
+  <div class="grid grid-cols-[1fr_auto] border-b border-white/10 px-4 py-3 text-xs font-mono uppercase tracking-widest text-white/50 md:grid-cols-[220px_1fr_90px]">
+    <span>Tool</span>
+    <span class="hidden md:block">Description</span>
+    <span>Scope</span>
+  </div>
+  {tools.map(([name, mode, description]) => (
+    <div class="grid gap-2 border-b border-white/10 px-4 py-4 last:border-0 md:grid-cols-[220px_1fr_90px] md:items-center">
+      <code class="font-mono text-sm text-brand-300">{name}</code>
+      <p class="text-sm leading-6 text-slate-300">{description}</p>
+      <span class={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${mode === 'Write' ? 'bg-brand-500 text-white' : 'bg-white/5 text-slate-300'}`}>{mode}</span>
+    </div>
+  ))}
+</div>
