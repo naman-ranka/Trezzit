@@ -1,0 +1,29 @@
+---
+const links = [
+  ['AI', '/ai'],
+  ['Demos', '/demos'],
+  ['Features', '/features'],
+  ['Pricing', '/pricing'],
+  ['Changelog', '/changelog'],
+  ['Security', '/security'],
+];
+---
+
+<footer class="border-t border-slate-800 bg-slate-950">
+  <div class="container-page grid gap-10 py-12 md:grid-cols-[1.2fr_1fr]">
+    <div>
+      <a href="/" class="flex items-center gap-3 font-semibold text-white">
+        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 font-bold">T</span>
+        <span>Trezzit</span>
+      </a>
+      <p class="mt-4 max-w-md text-sm leading-6 text-slate-400">
+        Itemized expense records for groups, receipt review, Splitwise CSV migration, and MCP clients that need real tools rather than a chat veneer.
+      </p>
+    </div>
+    <nav class="grid grid-cols-2 gap-3 text-sm text-slate-400 sm:grid-cols-3" aria-label="Footer navigation">
+      {links.map(([label, href]) => <a class="transition hover:text-white" href={href}>{label}</a>)}
+      <a class="transition hover:text-white" href="https://app.trezzit.com/try-receipt">Receipt demo</a>
+      <a class="transition hover:text-white" href="https://app.trezzit.com/demo">Legacy demo</a>
+    </nav>
+  </div>
+</footer>

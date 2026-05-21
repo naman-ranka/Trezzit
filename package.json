@@ -1,11 +1,24 @@
 {
+  "name": "trezzit-landing-ai-native",
+  "type": "module",
+  "version": "0.1.0",
   "scripts": {
-    "build": "tailwindcss -i ./input.css -o ./public/assets/css/styles.css --minify",
-    "dev": "tailwindcss -i ./input.css -o ./public/assets/css/styles.css --watch"
+    "dev": "astro dev",
+    "build": "node scripts/static-build.mjs",
+    "astro:build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.0",
+    "@astrojs/sitemap": "^3.4.0",
+    "@astrojs/tailwind": "^6.0.2",
+    "@astrojs/vercel": "^8.2.4",
+    "astro": "^5.9.0",
+    "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.23",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.19"
+    "typescript": "^5.8.3"
   }
 }

@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+
+const meta = {
+  title: 'Trezzit Pricing - free, with no paid tiers today',
+  description: 'Trezzit is free, forever for now. There is no Stripe integration, no paid Pro plan, and no per-tier scan quota today.',
+  canonical: '/pricing',
+  schema: { '@context': 'https://schema.org', '@type': 'Product', name: 'Trezzit', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } },
+};
+---
+
+<Base meta={meta}>
+  <Hero
+    eyebrow="Pricing"
+    title="Free, forever (for now)."
+    description="Trezzit has no paid tiers today. Premium features arrive when payments infrastructure ships, not before."
+    primaryLabel="Try receipt demo"
+    primaryHref="https://app.trezzit.com/try-receipt"
+    secondaryLabel="Read AI docs"
+    secondaryHref="/ai"
+  />
+  <section class="section-pad">
+    <div class="container-page grid gap-6 lg:grid-cols-2">
+      <article class="surface p-8">
+        <p class="eyebrow">Available today</p>
+        <h2 class="mt-4 text-3xl font-semibold">Free, forever (for now)</h2>
+        <ul class="mt-6 space-y-3 text-slate-300">
+          <li>Itemized group bills and receipt review.</li>
+          <li>Five split methods at the item-share level.</li>
+          <li>Splitwise CSV import for non-empty migration into a new group.</li>
+          <li>MCP read and write tools with OAuth 2.1 scopes.</li>
+        </ul>
+      </article>
+      <article class="surface border-brand-500/40 p-8">
+        <p class="eyebrow">Not available today</p>
+        <h2 class="mt-4 text-3xl font-semibold">No paid tiers</h2>
+        <ul class="mt-6 space-y-3 text-slate-300">
+          <li>No Stripe integration.</li>
+          <li>No paid Pro plan.</li>
+          <li>No per-tier scan quota.</li>
+          <li>No launch-date promise for premium features.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</Base>

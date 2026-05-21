@@ -1,0 +1,33 @@
+---
+export interface Props {
+  meta: {
+    title: string;
+    description: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    canonical: string;
+    schema?: Record<string, unknown>;
+  };
+}
+
+const { meta } = Astro.props;
+const canonical = new URL(meta.canonical, Astro.site ?? 'https://trezzit.com').toString();
+const ogImage = new URL(meta.ogImage ?? '/og-ai-native.png', Astro.site ?? 'https://trezzit.com').toString();
+---
+
+<title>{meta.title}</title>
+<meta name="description" content={meta.description} />
+<link rel="canonical" href={canonical} />
+<meta property="og:type" content="website" />
+<meta property="og:title" content={meta.ogTitle ?? meta.title} />
+<meta property="og:description" content={meta.ogDescription ?? meta.description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={meta.ogTitle ?? meta.title} />
+<meta name="twitter:description" content={meta.ogDescription ?? meta.description} />
+<meta name="twitter:image" content={ogImage} />
+{meta.schema && (
+  <script type="application/ld+json" set:html={JSON.stringify(meta.schema)} />
+)}

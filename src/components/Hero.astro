@@ -1,0 +1,58 @@
+---
+export interface Props {
+  eyebrow?: string;
+  title: string;
+  description: string;
+  primaryLabel?: string;
+  primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+}
+
+const {
+  eyebrow = 'AI-native money',
+  title,
+  description,
+  primaryLabel,
+  primaryHref,
+  secondaryLabel,
+  secondaryHref,
+} = Astro.props;
+---
+
+<section class="section-pad overflow-hidden border-b border-slate-800">
+  <div class="container-page grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+    <div>
+      <p class="eyebrow">{eyebrow}</p>
+      <h1 class="mt-5 text-5xl font-bold tracking-tight text-white md:text-7xl">{title}</h1>
+      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">{description}</p>
+      {(primaryLabel || secondaryLabel) && (
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          {primaryLabel && primaryHref && <a class="btn-primary" href={primaryHref}>{primaryLabel}</a>}
+          {secondaryLabel && secondaryHref && <a class="btn-secondary" href={secondaryHref}>{secondaryLabel}</a>}
+        </div>
+      )}
+    </div>
+    <div class="code-panel">
+      <div class="mb-4 flex items-center gap-2 text-xs text-slate-500">
+        <span class="h-3 w-3 rounded-full bg-red-400"></span>
+        <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
+        <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
+        <span class="ml-2">mcp.trezzit.com</span>
+      </div>
+      <pre><code>{`POST /mcp
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "get_expenses",
+    "arguments": {
+      "from": "2026-05-01",
+      "category": "Food",
+      "group": "Cabin Trip"
+    }
+  }
+}`}</code></pre>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,282 @@
+<div class="receipt-demo" data-receipt-demo>
+  <div class="receipt-section">
+    <div class="receipt-container">
+      <div class="scan-grid"></div>
+      <div class="scan-line"></div>
+      <div class="receipt">
+        <div class="store-header">
+          <div class="store-name">TREZZIT MCP SERVER BILL</div>
+          <div class="store-address">Developer dinner - table 7</div>
+        </div>
+        <div class="items">
+          <div class="item"><span class="item-name">HANDMADE PASTA</span><span class="item-price">$18.00</span></div>
+          <div class="item"><span class="item-name">HOUSE SALAD</span><span class="item-price">$12.50</span></div>
+          <div class="item"><span class="item-name">SPARKLING WATER</span><span class="item-price">$6.00</span></div>
+          <div class="item"><span class="item-name">ESPRESSO</span><span class="item-price">$4.50</span></div>
+          <div class="separator"></div>
+          <div class="item"><span class="item-name">TAX</span><span class="item-price">$3.28</span></div>
+          <div class="item"><span class="item-name">TIP</span><span class="item-price">$8.20</span></div>
+        </div>
+        <div class="total-section">
+          <div class="total-line grand-total"><span>TOTAL</span><span>$52.48</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="parsed-section">
+    <div class="data-card metadata-card">
+      <div class="metadata-grid">
+        <div><span>Merchant</span><strong data-value="merchant"></strong></div>
+        <div><span>Date</span><strong data-value="date"></strong></div>
+        <div><span>Total</span><strong data-value="total"></strong></div>
+        <div><span>Tax</span><strong data-value="tax"></strong></div>
+      </div>
+    </div>
+    <div class="data-card items-card">
+      <div class="card-header">
+        <span class="card-dot"></span>
+        <strong>Structured items</strong>
+      </div>
+      <div class="items-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const receiptData = {
+    merchant: 'Trattoria Romano',
+    date: 'May 21, 2026',
+    total: '$52.48',
+    tax: '$3.28',
+    items: [
+      ['Handmade pasta', '$18.00', 'Food'],
+      ['House salad', '$12.50', 'Food'],
+      ['Sparkling water', '$6.00', 'Drinks'],
+      ['Espresso', '$4.50', 'Coffee'],
+      ['Tax', '$3.28', 'Tax'],
+      ['Tip', '$8.20', 'Tip']
+    ]
+  };
+
+  function runReceiptDemo(root) {
+    if (!root || root.dataset.played === 'true') return;
+    root.dataset.played = 'true';
+    const receiptSection = root.querySelector('.receipt-section');
+    const scanGrid = root.querySelector('.scan-grid');
+    const scanLine = root.querySelector('.scan-line');
+    const parsed = root.querySelector('.parsed-section');
+    const metadata = root.querySelector('.metadata-card');
+    const itemsCard = root.querySelector('.items-card');
+    const list = root.querySelector('.items-list');
+
+    setTimeout(() => {
+      receiptSection?.classList.add('scanning');
+      scanGrid?.classList.add('active');
+    }, 150);
+    setTimeout(() => scanLine?.classList.add('scanning'), 650);
+    setTimeout(() => {
+      receiptSection?.classList.add('shifted');
+      parsed?.classList.add('visible');
+    }, 2100);
+    setTimeout(() => metadata?.classList.add('visible'), 2450);
+    setTimeout(() => {
+      Object.entries(receiptData).forEach(([key, value]) => {
+        if (key === 'items') return;
+        const el = root.querySelector(`[data-value="${key}"]`);
+        if (el) el.textContent = value;
+      });
+    }, 2750);
+    setTimeout(() => {
+      itemsCard?.classList.add('visible');
+      receiptData.items.forEach(([name, price, category], index) => {
+        setTimeout(() => {
+          const row = document.createElement('div');
+          row.className = 'parsed-item';
+          row.innerHTML = `<span>${name}</span><em>${category}</em><strong>${price}</strong>`;
+          list?.appendChild(row);
+          requestAnimationFrame(() => row.classList.add('visible'));
+        }, index * 140);
+      });
+    }, 3100);
+  }
+
+  document.querySelectorAll('[data-receipt-demo]').forEach((root) => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) runReceiptDemo(root);
+    }, { threshold: 0.3 });
+    observer.observe(root);
+  });
+</script>
+
+<style>
+  .receipt-demo {
+    display: grid;
+    gap: 1rem;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .receipt-demo {
+      grid-template-columns: 0.9fr 1.1fr;
+    }
+  }
+  .receipt-section, .parsed-section {
+    position: relative;
+    transition: transform 700ms ease, opacity 700ms ease;
+  }
+  .receipt-section.shifted {
+    transform: translateX(-0.5rem) scale(0.96);
+  }
+  .receipt-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(30 41 59);
+    background: rgb(15 23 42);
+    padding: 1rem;
+  }
+  .receipt {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+    max-width: 18rem;
+    background: #f8fafc;
+    color: #0f172a;
+    padding: 1.25rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  }
+  .store-header {
+    border-bottom: 1px dashed #94a3b8;
+    padding-bottom: 0.75rem;
+    text-align: center;
+  }
+  .store-name {
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+  .store-address {
+    color: #64748b;
+    font-size: 0.7rem;
+  }
+  .items {
+    margin-top: 0.9rem;
+  }
+  .item, .total-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.76rem;
+    line-height: 1.8;
+  }
+  .separator {
+    border-top: 1px dashed #94a3b8;
+    margin: 0.6rem 0;
+  }
+  .grand-total {
+    border-top: 1px dashed #94a3b8;
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    font-weight: 800;
+  }
+  .scan-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background-image: linear-gradient(rgba(79,70,229,0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(79,70,229,0.25) 1px, transparent 1px);
+    background-size: 28px 28px;
+    transition: opacity 400ms ease;
+  }
+  .scan-grid.active {
+    opacity: 1;
+  }
+  .scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -10%;
+    z-index: 2;
+    height: 3px;
+    background: #4F46E5;
+    box-shadow: 0 0 24px #4F46E5;
+    opacity: 0;
+  }
+  .scan-line.scanning {
+    opacity: 1;
+    animation: scan 1.7s ease-in-out 2;
+  }
+  @keyframes scan {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(23rem); }
+  }
+  .parsed-section {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  .parsed-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .data-card {
+    border: 1px solid rgb(30 41 59);
+    border-radius: 0.75rem;
+    background: rgb(2 6 23);
+    padding: 1rem;
+    opacity: 0.35;
+    transition: opacity 500ms ease, transform 500ms ease;
+  }
+  .data-card.visible {
+    opacity: 1;
+  }
+  .metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .metadata-grid span {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.75rem;
+  }
+  .metadata-grid strong {
+    min-height: 1.25rem;
+    color: #a5b4fc;
+  }
+  .items-card {
+    margin-top: 1rem;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .card-dot {
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 999px;
+    background: #4F46E5;
+  }
+  .parsed-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 0.75rem;
+    align-items: center;
+    border-top: 1px solid rgb(30 41 59);
+    padding: 0.65rem 0;
+    opacity: 0;
+    transform: translateY(0.4rem);
+    transition: opacity 300ms ease, transform 300ms ease;
+  }
+  .parsed-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .parsed-item em {
+    border-radius: 999px;
+    background: rgba(79, 70, 229, 0.16);
+    color: #c7d2fe;
+    padding: 0.1rem 0.5rem;
+    font-style: normal;
+    font-size: 0.72rem;
+  }
+</style>

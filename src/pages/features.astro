@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+
+const meta = {
+  title: 'Trezzit Features - receipts, splits, groups, import',
+  description: 'Explore Trezzit features: receipt-to-ledger capture, per-item split methods, groups, settlements, Splitwise CSV import, PWA, and web push.',
+  canonical: '/features',
+  schema: { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: 'Trezzit', applicationCategory: 'FinanceApplication' },
+};
+
+const sections = [
+  ['Receipt to ledger', 'Receipt scans become bill items and item shares, with users reviewing extracted rows before saving.'],
+  ['Item splitting', 'Equal, percentage, exact, shares, and adjusted split methods apply per item, not just per bill.'],
+  ['Groups', 'Group pages cover Activity, Balance matrix, Members, settlements, invite links, QR invites, and placeholder transfers.'],
+  ['Personal finance', 'Personal finance is grounded in your item-share rows, categories, and tags. The current app should not be marketed as a full personal expense screen yet.'],
+  ['CSV import', 'Splitwise CSV exports move through Upload, Group, You, Map, Done, with placeholder members and balance verification.'],
+  ['PWA and web push', 'Trezzit is web-first with service-worker push. There are no native app-store apps today.'],
+  ['Currency', 'Each group locks one currency at creation. Trezzit does not claim exchange-rate conversion or cross-currency totals.'],
+];
+---
+
+<Base meta={meta}>
+  <Hero
+    eyebrow="Features"
+    title="The app under the MCP server."
+    description="Trezzit is still a group expense app: receipt review, itemized splitting, balances, settlements, invites, web push, and a Splitwise CSV migration path."
+    primaryLabel="Explore AI tools"
+    primaryHref="/ai"
+    secondaryLabel="Try receipt demo"
+    secondaryHref="https://app.trezzit.com/try-receipt"
+  />
+  <section class="section-pad">
+    <div class="container-page grid gap-4 md:grid-cols-2">
+      {sections.map(([title, body]) => (
+        <article class="surface p-6">
+          <h2 class="text-2xl font-semibold">{title}</h2>
+          <p class="mt-3 leading-relaxed text-slate-300">{body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</Base>

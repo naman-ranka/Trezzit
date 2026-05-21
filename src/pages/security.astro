@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+
+const meta = {
+  title: 'Trezzit Security - OAuth scopes and data boundaries',
+  description: 'Trezzit security boundaries for auth, sessions, MCP OAuth scopes, AI write attribution, group currency, placeholder users, and data limits.',
+  canonical: '/security',
+  schema: {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: 'Does Trezzit use MCP OAuth scopes?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Trezzit separates bills:read from bills:write over OAuth 2.1 with PKCE.' } },
+      { '@type': 'Question', name: 'Can AI delete old bills?', acceptedAnswer: { '@type': 'Answer', text: 'MCP deletion is limited to AI-created bills inside a 30-minute mutation window.' } },
+    ],
+  },
+};
+
+const sections = [
+  ['Auth and sessions', 'Trezzit supports email OTP, Google OAuth, and JWT sessions in cookies for the web app.'],
+  ['MCP OAuth 2.1 scopes', '`bills:read` and `bills:write` separate inspection from mutation, with PKCE in the OAuth flow.'],
+  ['Mutation attribution and audit', 'AIAction audit rows and MCPTokenMetadata attribution record MCP writes and the AI client involved.'],
+  ['Data boundaries', 'Groups lock one currency at creation. Placeholder users are isolated by the claim flow, and group data stays scoped to the group.'],
+  ['What we do not do', 'No bank sync. No SSN or credit information. No third-party data sales.'],
+];
+---
+
+<Base meta={meta}>
+  <Hero
+    eyebrow="Security"
+    title="Finance tools need explicit boundaries."
+    description="Trezzit treats MCP as a scoped write surface, not an unbounded assistant. OAuth scopes, audit rows, attribution, and mutation windows define what agents can do."
+    primaryLabel="Read AI docs"
+    primaryHref="/ai"
+    secondaryLabel="Try receipt demo"
+    secondaryHref="https://app.trezzit.com/try-receipt"
+  />
+  <section class="section-pad">
+    <div class="container-page grid gap-4 md:grid-cols-2">
+      {sections.map(([title, body]) => (
+        <article class="surface p-6">
+          <h2 class="text-2xl font-semibold">{title}</h2>
+          <p class="mt-3 leading-relaxed text-slate-300">{body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</Base>

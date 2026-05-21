@@ -1,0 +1,190 @@
+<div class="split-demo" data-split-demo>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Amount</th>
+          <th>Split</th>
+          <th>Naman</th>
+          <th>Chetan</th>
+          <th>Adi</th>
+          <th>Prachi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {[
+          ['pasta', 'Handmade pasta', '$18.00'],
+          ['salad', 'House salad', '$12.50'],
+          ['water', 'Sparkling water', '$6.00'],
+          ['espresso', 'Espresso', '$4.50'],
+          ['tax', 'Tax', '$3.28'],
+        ].map(([id, item, amount]) => (
+          <tr data-item={id}>
+            <td>{item}</td>
+            <td>{amount}</td>
+            <td><span class="split-pill">Equal</span></td>
+            {['naman', 'chetan', 'adi', 'prachi'].map((member) => (
+              <td><span class={`avatar ${member}`} data-item={id} data-member={member}>{member[0].toUpperCase()}</span></td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <div class="totals">
+    {[
+      ['naman', 'Naman'],
+      ['chetan', 'Chetan'],
+      ['adi', 'Adi'],
+      ['prachi', 'Prachi'],
+    ].map(([id, name]) => (
+      <div><span>{name}</span><strong id={`${id}-total`}>$0.00</strong></div>
+    ))}
+  </div>
+  <p class="status" data-status>Per-item shares write one row per person.</p>
+</div>
+
+<script>
+  const splitMembers = ['naman', 'chetan', 'adi', 'prachi'];
+  const splitItems = {
+    pasta: 18.00,
+    salad: 12.50,
+    water: 6.00,
+    espresso: 4.50,
+    tax: 3.28
+  };
+  const splitSequence = [
+    ['pasta', ['naman', 'chetan', 'prachi'], 'Dinner item: three people'],
+    ['salad', ['naman', 'chetan', 'adi', 'prachi'], 'Shared side: everyone'],
+    ['water', ['naman', 'adi'], 'Beverage: two shares'],
+    ['espresso', ['prachi'], 'Personal item: one share'],
+    ['tax', ['naman', 'chetan', 'adi', 'prachi'], 'Tax follows the ledger']
+  ];
+
+  function runSplitDemo(root) {
+    if (!root || root.dataset.played === 'true') return;
+    root.dataset.played = 'true';
+    const state = Object.fromEntries(Object.keys(splitItems).map((key) => [key, new Set()]));
+
+    function recalc() {
+      const totals = Object.fromEntries(splitMembers.map((m) => [m, 0]));
+      Object.entries(splitItems).forEach(([item, amount]) => {
+        const selected = state[item];
+        if (!selected.size) return;
+        selected.forEach((member) => totals[member] += amount / selected.size);
+      });
+      Object.entries(totals).forEach(([member, total]) => {
+        const el = root.querySelector(`#${member}-total`);
+        if (el) el.textContent = `$${total.toFixed(2)}`;
+      });
+    }
+
+    splitSequence.forEach(([item, members, status], rowIndex) => {
+      setTimeout(() => {
+        const statusEl = root.querySelector('[data-status]');
+        if (statusEl) statusEl.textContent = status;
+        members.forEach((member, memberIndex) => {
+          setTimeout(() => {
+            state[item].add(member);
+            const avatar = root.querySelector(`[data-item="${item}"][data-member="${member}"]`);
+            avatar?.classList.add('selected');
+            recalc();
+          }, memberIndex * 140);
+        });
+      }, rowIndex * 850);
+    });
+  }
+
+  document.querySelectorAll('[data-split-demo]').forEach((root) => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) runSplitDemo(root);
+    }, { threshold: 0.3 });
+    observer.observe(root);
+  });
+</script>
+
+<style>
+  .split-demo {
+    border: 1px solid rgb(30 41 59);
+    border-radius: 0.75rem;
+    background: rgb(2 6 23);
+    padding: 1rem;
+  }
+  .table-wrap {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    min-width: 680px;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+  th {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  th, td {
+    border-bottom: 1px solid rgb(30 41 59);
+    padding: 0.75rem;
+    text-align: left;
+  }
+  .split-pill {
+    border-radius: 999px;
+    background: rgba(79, 70, 229, 0.16);
+    color: #c7d2fe;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+  }
+  .avatar {
+    display: inline-flex;
+    width: 1.9rem;
+    height: 1.9rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid rgb(51 65 85);
+    color: #64748b;
+    transition: transform 220ms ease, background 220ms ease, color 220ms ease;
+  }
+  .avatar.selected {
+    transform: rotateY(360deg) scale(1.08);
+    color: white;
+    border-color: transparent;
+  }
+  .avatar.naman.selected { background: #4F46E5; }
+  .avatar.chetan.selected { background: #7c3aed; }
+  .avatar.adi.selected { background: #0891b2; }
+  .avatar.prachi.selected { background: #059669; }
+  .totals {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  @media (min-width: 760px) {
+    .totals {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .totals div {
+    border: 1px solid rgb(30 41 59);
+    border-radius: 0.6rem;
+    padding: 0.75rem;
+  }
+  .totals span {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.75rem;
+  }
+  .totals strong {
+    color: #f8fafc;
+  }
+  .status {
+    margin-top: 1rem;
+    color: #a5b4fc;
+    font-size: 0.9rem;
+  }
+</style>
