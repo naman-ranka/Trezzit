@@ -3,6 +3,10 @@ node_modules/
 __pycache__/
 *.py[cod]
 
+# Astro build output / cache
+dist/
+.astro/
+
 # Vercel
 .vercel
 
