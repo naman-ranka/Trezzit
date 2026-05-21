@@ -1,0 +1,30 @@
+---
+const links = [
+  { label: 'Try receipt demo', href: 'https://app.trezzit.com/try-receipt' },
+  { label: 'Bill calculator', href: 'https://app.trezzit.com/demo' },
+  { label: 'Roommates', href: '/features#invite' },
+  { label: 'Trips', href: '/features#split' },
+  { label: 'Import from Splitwise CSV', href: '/features#import' },
+  { label: 'AI', href: '/ai' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Changelog', href: '/changelog' },
+  { label: 'Login', href: 'https://app.trezzit.com/login' },
+  { label: 'Sign up', href: 'https://app.trezzit.com/signup' },
+];
+---
+
+<footer class="border-t border-white/10 bg-slate-950">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
+    <div>
+      <p class="text-sm font-semibold text-white">Trezzit</p>
+      <p class="mt-2 max-w-xl text-sm text-slate-400">
+        Split receipts, invite friends later, and keep shared balances honest.
+      </p>
+    </div>
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      {links.map((link) => (
+        <a class="text-sm text-slate-400 hover:text-white" href={link.href}>{link.label}</a>
+      ))}
+    </div>
+  </div>
+</footer>

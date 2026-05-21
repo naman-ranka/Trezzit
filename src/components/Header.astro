@@ -1,0 +1,77 @@
+---
+const demoItems = [
+  { label: 'Receipt demo', href: 'https://app.trezzit.com/try-receipt' },
+  { label: 'Bill calculator', href: 'https://app.trezzit.com/demo' },
+];
+
+const navItems = [
+  { label: 'Features', href: '/features' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'AI', href: '/ai' },
+  { label: 'Changelog', href: '/changelog' },
+];
+---
+
+<header class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/85 backdrop-blur">
+  <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8" aria-label="Primary">
+    <a href="/" class="flex items-center gap-3 text-sm font-semibold text-white">
+      <img src="/assets/icons/trezzit-icon-square.webp" alt="" class="h-8 w-8 rounded-lg" />
+      <span>Trezzit</span>
+    </a>
+
+    <div class="hidden items-center gap-1 lg:flex">
+      <details class="group relative">
+        <summary class="flex cursor-pointer list-none items-center rounded-md px-3 py-2 text-sm font-medium text-brand-100 hover:bg-white/10">
+          Try demo
+        </summary>
+        <div class="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-slate-950 p-2 shadow-2xl shadow-black/40">
+          {demoItems.map((item) => (
+            <a class="block rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-white/10 hover:text-white" href={item.href}>
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </details>
+      {navItems.map((item) => (
+        <a class="rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white" href={item.href}>
+          {item.label}
+        </a>
+      ))}
+      <a class="rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white" href="https://app.trezzit.com/login">
+        Login
+      </a>
+      <a class="ml-2 rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600" href="https://app.trezzit.com/signup">
+        Sign up free
+      </a>
+    </div>
+
+    <div class="flex items-center gap-2 lg:hidden">
+      <details class="relative">
+        <summary class="cursor-pointer list-none rounded-md bg-brand-500 px-3 py-2 text-sm font-semibold text-white">
+          Try demo
+        </summary>
+        <div class="absolute right-0 mt-2 w-56 rounded-lg border border-white/10 bg-slate-950 p-2 shadow-2xl shadow-black/40">
+          {demoItems.map((item) => (
+            <a class="block rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-white/10 hover:text-white" href={item.href}>
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </details>
+      <details class="relative">
+        <summary class="cursor-pointer list-none rounded-md border border-white/15 px-3 py-2 text-sm text-slate-100">
+          Menu
+        </summary>
+        <div class="absolute right-0 mt-2 w-56 rounded-lg border border-white/10 bg-slate-950 p-2 shadow-2xl shadow-black/40">
+          {navItems.map((item) => (
+            <a class="block rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-white/10 hover:text-white" href={item.href}>
+              {item.label}
+            </a>
+          ))}
+          <a class="block rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-white/10 hover:text-white" href="https://app.trezzit.com/login">Login</a>
+          <a class="mt-1 block rounded-md bg-brand-500 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-600" href="https://app.trezzit.com/signup">Sign up free</a>
+        </div>
+      </details>
+    </div>
+  </nav>
+</header>

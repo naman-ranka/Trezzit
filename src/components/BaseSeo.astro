@@ -1,0 +1,51 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  canonical?: string;
+}
+
+const {
+  title,
+  description,
+  ogImage = '/assets/icons/trezzit-icon-512.png',
+  canonical,
+} = Astro.props;
+const url = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'https://trezzit.com').toString();
+const imageUrl = new URL(ogImage, Astro.site ?? 'https://trezzit.com').toString();
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Trezzit',
+  url,
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Web',
+  description,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+};
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#4F46E5" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={url} />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/trezzit-icon-512.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/trezzit-icon-512.png" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:url" content={url} />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

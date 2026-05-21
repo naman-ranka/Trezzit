@@ -1,0 +1,19 @@
+---
+const steps = ['Upload', 'Group', 'Self-map', 'People-map', 'Result'];
+---
+
+<section class="border-t border-white/10 px-4 py-16 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <p class="text-sm font-semibold text-brand-300">Move From Splitwise Cleanly</p>
+    <h2 class="mt-3 text-3xl font-bold text-white">CSV in, verified Trezzit group out.</h2>
+    <p class="mt-4 max-w-3xl text-slate-300">Import a Splitwise CSV into a fresh Trezzit group, create placeholders during mapping, and check balances after import.</p>
+    <div class="mt-8 grid gap-3 md:grid-cols-5">
+      {steps.map((step) => (
+        <div class="rounded-lg border border-white/10 bg-slate-950 p-4 text-sm font-semibold text-white">{step}</div>
+      ))}
+    </div>
+    <div class="mt-6 rounded-lg border border-dashed border-white/20 bg-slate-950 p-6 text-sm text-slate-400">
+      [placeholder for screenshot: Splitwise CSV import Vaul sheet]
+    </div>
+  </div>
+</section>

@@ -1,0 +1,24 @@
+---
+const chips = ['No signup demo', 'Friends can join later', 'Free for now'];
+---
+
+<section class="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_0.9fr] lg:px-8">
+  <div class="flex flex-col justify-center">
+    <div class="mb-5 flex flex-wrap gap-2">
+      {chips.map((chip) => (
+        <span class="rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-100">{chip}</span>
+      ))}
+    </div>
+    <h1 class="max-w-3xl text-5xl font-bold tracking-normal text-white sm:text-6xl">Split the receipt now.</h1>
+    <p class="mt-5 max-w-2xl text-xl text-slate-300">Scan, tap items, send the link.</p>
+    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+      <a class="rounded-md bg-brand-500 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-brand-600" href="https://app.trezzit.com/try-receipt">Try receipt demo</a>
+      <a class="rounded-md border border-white/15 px-5 py-3 text-center text-sm font-semibold text-slate-100 hover:bg-white/10" href="https://app.trezzit.com/demo">Open bill calculator</a>
+    </div>
+  </div>
+  <div class="rounded-lg border border-dashed border-white/20 bg-slate-950/70 p-6">
+    <div class="aspect-[4/5] rounded-md border border-white/10 bg-slate-900/80 p-4 text-sm text-slate-400">
+      [placeholder for screenshot: receipt demo, item assignment, final balances]
+    </div>
+  </div>
+</section>

@@ -1,0 +1,24 @@
+---
+const notes = ['Maya joined', 'Aarav claimed 4 bills', 'Chetan owes $18.20'];
+---
+
+<section class="border-t border-white/10 px-4 py-16 sm:px-6 lg:px-8">
+  <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_0.9fr]">
+    <div>
+      <p class="text-sm font-semibold text-brand-300">Friends Can Join Later</p>
+      <h2 class="mt-3 text-3xl font-bold text-white">Group setup does not stall because one person refuses another app.</h2>
+      <ul class="mt-5 space-y-2 text-slate-300">
+        <li>Add friends as placeholders.</li>
+        <li>Invite by QR or magic link.</li>
+        <li>Their prior bills and payments transfer when they join.</li>
+      </ul>
+    </div>
+    <div class="grid gap-3">
+      {notes.map((note) => (
+        <div class="rounded-lg border border-white/10 bg-slate-950 p-4 text-sm text-slate-200">
+          <span class="mr-3 inline-flex h-2 w-2 rounded-full bg-brand-500"></span>{note}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

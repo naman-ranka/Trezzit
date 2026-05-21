@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+
+const tools = [
+  'create_bill',
+  'get_balances',
+  'get_context',
+  'search_bills',
+  'list_groups',
+  'get_group_details',
+  'resolve_participants',
+  'create_settlement',
+  'get_bill_details',
+  'delete_bill',
+  'get_expenses',
+  'get_person_info',
+  'get_receipt_upload_presigned_url',
+];
+---
+
+<Base
+  title="Trezzit AI - Receipt Scanning and Agent Tools"
+  description="Trezzit uses Gemini receipt scanning and offers MCP tools for compatible AI agents over itemized expense data."
+>
+  <main class="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+    <p class="text-sm font-semibold text-brand-300">AI</p>
+    <h1 class="mt-3 text-4xl font-bold text-white">AI helps with receipts and questions.</h1>
+    <p class="mt-4 text-lg text-slate-300">
+      Trezzit uses Gemini for authenticated receipt processing, then exposes itemized expense data to compatible AI agents through MCP.
+    </p>
+
+    <div class="mt-10 grid gap-4">
+      <details class="rounded-lg border border-white/10 bg-slate-950 p-5" open>
+        <summary class="cursor-pointer font-semibold text-white">13-tool inventory</summary>
+        <div class="mt-4 grid gap-2 sm:grid-cols-2">
+          {tools.map((tool) => <code class="rounded-md bg-slate-900 px-3 py-2 text-sm text-brand-100">{tool}</code>)}
+        </div>
+      </details>
+
+      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
+        <summary class="cursor-pointer font-semibold text-white">OAuth 2.1</summary>
+        <p class="mt-4 text-slate-300">Trezzit has real OAuth login, authorize, token, logout, dynamic client registration, and metadata endpoints for MCP clients.</p>
+      </details>
+
+      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
+        <summary class="cursor-pointer font-semibold text-white">JSON-RPC examples</summary>
+        <pre class="mt-4 overflow-auto rounded-md bg-slate-900 p-4 text-sm text-brand-100"><code>{`{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "get_balances",
+    "arguments": { "scope": "by_group" }
+  }
+}`}</code></pre>
+      </details>
+
+      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
+        <summary class="cursor-pointer font-semibold text-white">Rate limits</summary>
+        <p class="mt-4 text-slate-300">MCP writes are limited to 5 per minute and 30 per hour. Reads are limited to 60 per minute and 600 per hour.</p>
+      </details>
+
+      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
+        <summary class="cursor-pointer font-semibold text-white">Client compatibility</summary>
+        <p class="mt-4 text-slate-300">Trezzit recognizes Claude, Cursor, ChatGPT, and Gemini client families, and works with MCP-aware clients that support the auth flow.</p>
+        <div class="mt-4 flex flex-wrap gap-2 text-sm text-slate-200">
+          <span class="rounded-md border border-white/10 px-3 py-2">Claude</span>
+          <span class="rounded-md border border-white/10 px-3 py-2">Cursor</span>
+          <span class="rounded-md border border-white/10 px-3 py-2">ChatGPT</span>
+          <span class="rounded-md border border-white/10 px-3 py-2">Gemini</span>
+        </div>
+      </details>
+
+      <details class="rounded-lg border border-white/10 bg-slate-950 p-5">
+        <summary class="cursor-pointer font-semibold text-white">Split method note</summary>
+        <p class="mt-4 text-slate-300">The app exposes four split methods: Equal, Percent, Exact, and Shares. A fifth method, Adjusted, exists in the backend and is reachable via API/MCP paths.</p>
+      </details>
+    </div>
+  </main>
+</Base>

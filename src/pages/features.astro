@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+
+const jobs = [
+  {
+    id: 'try',
+    title: 'Try',
+    scenario: 'When you need proof before making an account.',
+    claim: 'The pre-scanned receipt demo and no-signup bill calculator are real public routes.',
+  },
+  {
+    id: 'scan',
+    title: 'Scan',
+    scenario: 'When a paper receipt needs to become line items.',
+    claim: 'Authenticated receipt scanning supports JPEG, PNG, WebP, and PDF uploads through a Gemini pipeline.',
+  },
+  {
+    id: 'split',
+    title: 'Split',
+    scenario: 'When everyone had different items.',
+    claim: 'The app exposes Equal, Percent, Exact, and Shares split methods.',
+  },
+  {
+    id: 'invite',
+    title: 'Invite',
+    scenario: 'When friends should not block the group by delaying signup.',
+    claim: 'Placeholder people can later claim their bills and payments through invite links.',
+  },
+  {
+    id: 'import',
+    title: 'Import',
+    scenario: 'When old Splitwise history needs a cleaner home.',
+    claim: 'Trezzit imports Splitwise CSVs into fresh groups through a five-step wizard.',
+  },
+  {
+    id: 'settle',
+    title: 'Settle',
+    scenario: 'When the group needs one clean balance.',
+    claim: 'Balances come from bill items, item shares, payments, and settlements.',
+  },
+  {
+    id: 'ask-ai',
+    title: 'Ask AI',
+    scenario: 'When you want a compatible agent to answer expense questions.',
+    claim: 'Trezzit exposes 13 MCP tools over JSON-RPC with OAuth 2.1.',
+  },
+];
+---
+
+<Base
+  title="Trezzit Features - Scan, Split, Invite, Settle"
+  description="Trezzit helps groups split receipts item by item, add friends without accounts, import Splitwise CSVs, and settle balances."
+>
+  <main class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <p class="text-sm font-semibold text-brand-300">Features</p>
+    <h1 class="mt-3 text-4xl font-bold text-white">Built around the jobs groups actually have.</h1>
+    <div class="mt-10 grid gap-6">
+      {jobs.map((job) => (
+        <section id={job.id} class="grid gap-6 rounded-lg border border-white/10 bg-slate-950 p-6 lg:grid-cols-[0.8fr_1fr]">
+          <div>
+            <h2 class="text-2xl font-semibold text-white">{job.title}</h2>
+            <p class="mt-3 text-slate-300">When you use it: {job.scenario}</p>
+            <p class="mt-3 text-sm text-slate-400">{job.claim}</p>
+          </div>
+          <div class="aspect-video rounded-md border border-dashed border-white/20 bg-slate-900 p-4 text-sm text-slate-400">[placeholder for screenshot]</div>
+        </section>
+      ))}
+    </div>
+  </main>
+</Base>

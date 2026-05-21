@@ -1,7 +1,20 @@
 {
+  "name": "trezzit-landing-page",
+  "type": "module",
   "scripts": {
-    "build": "tailwindcss -i ./input.css -o ./public/assets/css/styles.css --minify",
-    "dev": "tailwindcss -i ./input.css -o ./public/assets/css/styles.css --watch"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.6",
+    "@astrojs/sitemap": "^3.6.0",
+    "@astrojs/tailwind": "^6.0.2",
+    "@astrojs/vercel": "^8.2.7",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "astro": "^5.16.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.23",
