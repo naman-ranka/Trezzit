@@ -5,8 +5,6 @@ import { ClientRouter } from 'astro:transitions';
 import BaseSeo from './BaseSeo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { Analytics } from '@vercel/analytics/astro';
-import { SpeedInsights } from '@vercel/speed-insights/astro';
 
 export interface Props {
   meta: {
@@ -54,7 +52,11 @@ const { meta } = Astro.props;
       <slot />
     </main>
     <Footer />
-    <Analytics />
-    <SpeedInsights />
+    <script>
+      import { inject } from '@vercel/analytics';
+      import { injectSpeedInsights } from '@vercel/speed-insights';
+      inject();
+      injectSpeedInsights();
+    </script>
   </body>
 </html>
