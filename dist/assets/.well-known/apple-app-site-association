@@ -1,0 +1,31 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "*",
+        "paths": [
+          "/join/*",
+          "/groups/*", 
+          "/dashboard",
+          "/dashboard/*",
+          "/friends/*",
+          "/expenses/*",
+          "/profile",
+          "/profile/*",
+          "/settings",
+          "/settings/*",
+          "/auth",
+          "/auth/*",
+          "/"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["*"]
+  },
+  "activitycontinuation": {
+    "apps": ["*"]
+  }
+}
