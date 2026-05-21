@@ -1,0 +1,21 @@
+---
+const bullets = [
+  'Add placeholders for friends who have not signed up.',
+  'Send QR or magic-link invites.',
+  'When someone joins, their bills and payments move to their account.',
+  'Web push keeps changes visible without requiring constant check-ins.',
+];
+---
+
+<section id="groups" class="border-b border-white/10 bg-slate-900">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8">
+    <div>
+      <p class="font-mono text-sm text-brand-300">05 / Groups</p>
+      <h2 class="mt-3 text-3xl font-semibold text-white">Groups Without Account Pressure</h2>
+      <ul class="mt-6 list-inside list-disc space-y-3 text-slate-300">
+        {bullets.map((bullet) => <li>{bullet}</li>)}
+      </ul>
+    </div>
+    <div class="aspect-[16/10] rounded-xl border border-dashed border-brand-300/40 bg-slate-800 p-6 font-mono text-sm text-brand-300">[placeholder for screenshot]</div>
+  </div>
+</section>

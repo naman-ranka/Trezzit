@@ -1,0 +1,24 @@
+---
+const bullets = [
+  'Free, forever for now.',
+  'No shipped payment system or tier enforcement today.',
+  'Try a pre-scanned receipt demo or a no-signup bill calculator.',
+  'Paid features arrive only once payments ship.',
+];
+---
+
+<section class="bg-slate-900">
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <div class="rounded-xl border border-white/10 bg-slate-950 p-8">
+      <p class="font-mono text-sm text-brand-300">07 / Pricing</p>
+      <h2 class="mt-3 text-3xl font-semibold text-white">Free While the Product Grows</h2>
+      <ul class="mt-6 grid list-inside list-disc gap-3 text-slate-300 md:grid-cols-2">
+        {bullets.map((bullet) => <li>{bullet}</li>)}
+      </ul>
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <a href="https://app.trezzit.com/signup" class="rounded-lg bg-brand-500 px-5 py-3 text-center font-medium text-white hover:bg-brand-400">Sign up free</a>
+        <a href="https://app.trezzit.com/demo" class="rounded-lg border border-white/15 px-5 py-3 text-center font-medium text-slate-100 hover:border-brand-300 hover:text-brand-300">Bill calculator demo</a>
+      </div>
+    </div>
+  </div>
+</section>

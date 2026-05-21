@@ -1,0 +1,28 @@
+---
+const sections = [
+  { title: 'Product', links: [{ label: 'Ledger', href: '/#ledger' }, { label: 'Features', href: '/features' }, { label: 'Pricing', href: '/pricing' }] },
+  { title: 'AI & MCP', links: [{ label: 'AI page', href: '/ai' }, { label: '13 tools', href: '/ai#tools' }, { label: 'Rate limits', href: '/ai#rate-limits' }] },
+  { title: 'Resources', links: [{ label: 'Try receipt demo', href: 'https://app.trezzit.com/try-receipt' }, { label: 'Bill calculator demo', href: 'https://app.trezzit.com/demo' }, { label: 'Changelog', href: '/changelog' }] },
+  { title: 'Security', links: [{ label: 'OAuth 2.1', href: '/ai#oauth' }, { label: 'No bank connection', href: '/pricing' }] },
+  { title: 'Account', links: [{ label: 'Login', href: 'https://app.trezzit.com/login' }, { label: 'Sign up', href: 'https://app.trezzit.com/signup' }] },
+];
+---
+
+<footer class="border-t border-white/10 bg-slate-950">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-5 lg:px-8">
+    {sections.map((section) => (
+      <div>
+        <h2 class="text-sm font-semibold text-white">{section.title}</h2>
+        <ul class="mt-4 space-y-3 text-sm text-slate-400">
+          {section.links.map((link) => (
+            <li><a class="hover:text-brand-300" href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+  <div class="mx-auto flex max-w-7xl flex-col gap-3 border-t border-white/10 px-4 py-6 text-sm text-slate-500 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+    <p>(c) 2026 Trezzit. Itemized shared expenses.</p>
+    <p class="text-slate-400">Indigo accents only. No fake Pro wall.</p>
+  </div>
+</footer>

@@ -1,0 +1,30 @@
+---
+const trustItems = ['No account needed for friends', 'Free for students', 'Splitwise CSV import'];
+---
+
+<section class="border-b border-white/10 bg-slate-950">
+  <div class="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:py-28">
+    <div class="flex flex-col justify-center">
+      <p class="text-sm font-semibold uppercase tracking-wide text-brand-300">Ledger-first shared expenses</p>
+      <h1 class="mt-5 max-w-3xl text-5xl font-bold leading-tight text-white md:text-7xl">Every item has a ledger.</h1>
+      <p class="mt-6 max-w-2xl text-xl text-slate-300">Split bills by line, person, and proof.</p>
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <a href="https://app.trezzit.com/signup" class="rounded-lg bg-brand-500 px-5 py-3 text-center font-medium text-white hover:bg-brand-400">Sign up free</a>
+        <a href="https://app.trezzit.com/try-receipt" class="rounded-lg border border-white/15 px-5 py-3 text-center font-medium text-slate-100 hover:border-brand-300 hover:text-brand-300">Try receipt demo</a>
+      </div>
+      <div class="mt-8 flex flex-wrap gap-2 text-sm text-slate-400">
+        {trustItems.map((item) => <span class="rounded-full border border-white/10 px-3 py-1">{item}</span>)}
+      </div>
+    </div>
+    <div class="rounded-xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
+      <div class="aspect-[4/3] rounded-lg border border-dashed border-brand-300/40 bg-slate-800/70 p-6">
+        <p class="font-mono text-sm text-brand-300">[placeholder for screenshot]</p>
+        <div class="mt-8 grid gap-4 text-sm text-slate-300">
+          <div class="rounded-lg border border-white/10 p-4">Receipt -> BillItem rows</div>
+          <div class="rounded-lg border border-white/10 p-4">BillItem -> ItemShare rows</div>
+          <div class="rounded-lg border border-white/10 p-4">ItemShare -> auditable balance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

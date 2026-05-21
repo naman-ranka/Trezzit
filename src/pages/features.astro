@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+
+const features = [
+  ['Itemized Splitting', 'Split bills by item, with every item broken into person-level shares.', 'App exposes Equal, Percent, Exact, and Shares. Adjusted is API/MCP-only.'],
+  ['Receipt Scanning', 'Authenticated receipt scans support JPEG, PNG, WebP, and PDF uploads.', 'Two-pass Google Gemini pipeline; public receipt demo is pre-scanned mock data.'],
+  ['CSV Import', 'Import Splitwise CSV exports with a five-step mapping flow.', 'Fresh Trezzit group required; balances are verified within one cent.'],
+  ['Groups & Placeholders', 'Add friends before they create accounts, then transfer their history when they join.', 'Placeholders are real person rows with invitation and claim flows.'],
+  ['Balances & Settlements', 'Balances roll up from item shares, bills, payments, and settlements.', 'Auditable by person, group, and currency through app/API surfaces.'],
+  ['Notifications', 'In-app and web-push notification infrastructure keeps group changes visible.', 'Notification surfaces exist; landing copy avoids promising unread workflows not verified here.'],
+  ['Public Demos', 'Try a pre-scanned receipt demo or a no-signup bill calculator.', 'Calculator does not persist data; saved groups require signup.'],
+  ['API & AI', 'Trezzit exposes 13 MCP tools over JSON-RPC 2.0 with OAuth 2.1.', '9 read tools, 3 writes, and 1 receipt-upload helper with flat rate limits.'],
+];
+---
+
+<Base
+  title="Trezzit Features — Itemized Splits, Receipts, Imports"
+  description="Explore Trezzit's real expense features: item-level splits, Gemini receipt scanning, Splitwise CSV import, placeholder friends, web push, and public demos."
+>
+  <section class="border-b border-white/10 bg-slate-950 px-4 py-16 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl">
+      <p class="font-mono text-sm text-brand-300">Feature inventory</p>
+      <h1 class="mt-4 text-4xl font-bold text-white md:text-6xl">Built around the ledger.</h1>
+      <p class="mt-5 max-w-3xl text-lg text-slate-300">Each claim here is scoped to shipped product behavior from the feature-truth brief.</p>
+    </div>
+  </section>
+  <section class="bg-slate-900 px-4 py-16 sm:px-6 lg:px-8">
+    <div class="mx-auto grid max-w-7xl gap-6 md:grid-cols-2">
+      {features.map(([title, claim, status]) => (
+        <article class="rounded-xl border border-white/10 bg-slate-950 p-6">
+          <div class="aspect-[16/9] rounded-lg border border-dashed border-brand-300/40 bg-slate-800 p-4 font-mono text-sm text-brand-300">[placeholder for screenshot]</div>
+          <h2 class="mt-5 text-xl font-semibold text-white">{title}</h2>
+          <p class="mt-3 text-slate-300">{claim}</p>
+          <p class="mt-3 text-sm text-slate-500">{status}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</Base>

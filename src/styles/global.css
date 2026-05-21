@@ -1,0 +1,22 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-section-default: theme(colors.slate.900);
+    --bg-section-elevated: theme(colors.slate.800);
+  }
+
+  body {
+    @apply bg-slate-900 font-sans text-slate-50 antialiased;
+  }
+
+  code,
+  pre {
+    @apply font-mono;
+  }
+}

@@ -1,0 +1,21 @@
+---
+const bullets = [
+  'App UI exposes Equal, Percent, Exact, and Shares.',
+  'API/MCP can reach the fifth Adjusted split type.',
+  'Tax and tip distribute proportionally after the item split.',
+  'The result is a balance you can audit item by item.',
+];
+---
+
+<section class="border-b border-white/10 bg-slate-900">
+  <div class="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8">
+    <div>
+      <p class="font-mono text-sm text-brand-300">03 / Splits</p>
+      <h2 class="mt-3 text-3xl font-semibold text-white">Splits That Preserve Intent</h2>
+      <ul class="mt-6 list-inside list-disc space-y-3 text-slate-300">
+        {bullets.map((bullet) => <li>{bullet}</li>)}
+      </ul>
+    </div>
+    <div class="aspect-[16/10] rounded-xl border border-dashed border-brand-300/40 bg-slate-800 p-6 font-mono text-sm text-brand-300">[placeholder for screenshot]</div>
+  </div>
+</section>
