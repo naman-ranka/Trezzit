@@ -14,7 +14,8 @@
     "@astrojs/vercel": "^8.2.7",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
-    "astro": "^5.16.1"
+    "astro": "^5.16.1",
+    "motion": "^12.40.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.23",
