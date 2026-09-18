@@ -3,6 +3,23 @@
   "public": true,
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/split",
+      "destination": "https://app.trezzit.com/split",
+      "permanent": true
+    },
+    {
+      "source": "/demo",
+      "destination": "https://app.trezzit.com/split",
+      "permanent": true
+    },
+    {
+      "source": "/s/:token",
+      "destination": "https://app.trezzit.com/s/:token",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/manifest.json",
