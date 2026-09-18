@@ -31,7 +31,7 @@ Static HTML with Tailwind CSS and GSAP. Deployed on Vercel.
 
 ## SEO
 
-Includes meta tags, structured data, Open Graph, and Twitter Cards. See [SEO-CHECKLIST.md](SEO-CHECKLIST.md).
+Every page carries a title, description, canonical, Open Graph and Twitter tags, and JSON-LD (Organization and SoftwareApplication on the home page; FAQPage, BreadcrumbList and SoftwareApplication on `/split`). `public/sitemap.xml` lists the indexable pages and `public/robots.txt` keeps `/s/` and `/demo` out of the index.
 
 ---
 
