@@ -4,13 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trezzit - Smart Bill Splitting Made Easy | Free Expense Tracker</title>
+    <title>Trezzit — split bills item by item with friends</title>
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Split bills effortlessly with Trezzit. Track expenses item-by-item, manage roommate costs, and share bills with friends without requiring accounts. Free bill splitting app.">
-    <meta name="keywords"
-        content="bill splitting app, expense tracking, roommate expenses, split bills with friends, group expense tracker, shared bill calculator">
+        content="Trezzit splits bills item by item, so everyone pays for what they actually had. Scan a receipt, split each line, and share one link with the table.">
     <meta name="robots" content="index, follow">
     <meta name="author" content="Trezzit">
     <link rel="canonical" href="https://trezzit.com/">
@@ -40,6 +38,8 @@
     <meta property="og:description"
         content="Split bills effortlessly with item-wise tracking. Share expenses with roommates and friends without requiring accounts. Start splitting bills for free.">
     <meta property="og:image" content="https://trezzit.com/assets/images/social-preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:url" content="https://trezzit.com/">
     <meta property="og:site_name" content="Trezzit">
 
@@ -53,29 +53,28 @@
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Trezzit",
-        "description": "Smart bill splitting and expense tracking app for roommates and friends",
-        "url": "https://trezzit.com",
-        "applicationCategory": "FinanceApplication",
-        "operatingSystem": "Web, iOS, Android",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "author": {
-            "@type": "Organization",
-            "name": "Trezzit"
-        },
-        "featureList": [
-            "Item-wise bill splitting",
-            "Expense tracking",
-            "Group management",
-            "No account required for guests",
-            "Real-time collaboration"
-        ]
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Trezzit",
+      "url": "https://trezzit.com/",
+      "logo": "https://trezzit.com/assets/icons/trezzit-icon-512.png",
+      "sameAs": [
+        "https://instagram.com/trezzit_app",
+        "https://www.linkedin.com/in/namany"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Trezzit",
+      "url": "https://trezzit.com/",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any (web browser)",
+      "description": "Split bills item by item with friends and roommates, and track what everyone owes.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "Trezzit", "url": "https://trezzit.com/" }
     }
     </script>
 
@@ -3126,6 +3125,24 @@
             opacity: 1;
         }
 
+        .footer-page-links {
+            margin-bottom: 1rem;
+        }
+
+        .footer-page-links a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-page-links a:hover {
+            color: #34d399;
+        }
+
         .social-links {
             display: flex;
             align-items: center;
@@ -4059,6 +4076,7 @@
     <section class="page" id="page-0">
         <div class="animation-container">
             <div class="hero-buttons">
+                <a href="/split" class="hero-btn hero-btn-secondary">Split a bill</a>
                 <a href="https://app.trezzit.com/login" class="hero-btn hero-btn-secondary">Login</a>
                 <a href="https://app.trezzit.com/signup" class="hero-btn hero-btn-primary">Join Free</a>
             </div>
@@ -4066,8 +4084,8 @@
                 <div class="hero-glow"></div>
                 <img src="assets/icons/trezzit-icon-square.webp" alt="Trezzit Icon" class="hero-icon" width="120"
                     height="120">
-                <h1 class="hero-title">Trezzit</h1>
-                <h2 class="hero-tagline">The only money app you'll ever need</h2>
+                <p class="hero-title">Trezzit</p>
+                <h1 class="hero-tagline">Split bills item by item, not just down the middle</h1>
                 <p class="hero-subtitle">Item-wise splitting + Item-wise budgeting</p>
 
                 <div class="scroll-indicator">
@@ -5043,6 +5061,9 @@
 
                         <!-- Social Footer -->
                         <div class="social-footer">
+                            <div class="footer-page-links">
+                                <a href="/split">Split a bill</a>
+                            </div>
                             <div class="social-links">
                                 <a href="mailto:namanranka14@gmail.com" class="social-link" aria-label="Email Naman">
                                     <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -5097,6 +5118,9 @@
 
                         <!-- Social Footer -->
                         <div class="social-footer">
+                            <div class="footer-page-links">
+                                <a href="/split">Split a bill</a>
+                            </div>
                             <div class="social-links">
                                 <a href="mailto:namanranka14@gmail.com" class="social-link" aria-label="Email Naman">
                                     <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
