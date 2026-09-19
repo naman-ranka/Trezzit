@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split a bill with friends — no app, no account | Trezzit</title>
+    <meta name="description"
+        content="Split a restaurant bill in a minute. Scan the receipt, give each item to the people who had it, and send one link that shows everyone their share.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Trezzit">
+    <link rel="canonical" href="https://trezzit.com/split">
+    <meta name="theme-color" content="#4F46E5">
+
+    <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/trezzit-icon-512.png">
+    <link rel="apple-touch-icon" href="/assets/icons/trezzit-icon-512.png">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://trezzit.com/split">
+    <meta property="og:title" content="Split a bill with friends — no app, no account">
+    <meta property="og:description"
+        content="Scan a receipt, split it item by item, and send one link that shows everyone their share.">
+    <meta property="og:image" content="https://trezzit.com/assets/images/split-preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Two phone screens from Trezzit: a receipt split between four people, and the shared page showing what one person owes.">
+    <meta property="og:site_name" content="Trezzit">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Split a bill with friends — no app, no account">
+    <meta name="twitter:description"
+        content="Scan a receipt, split it item by item, and send one link that shows everyone their share.">
+    <meta name="twitter:image" content="https://trezzit.com/assets/images/split-preview.jpg">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I split a restaurant bill with friends?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Take a photo of the receipt. Trezzit reads the items and their prices, and you tap each person's name and then the items they had. It works out what everyone owes, including tax and tip, and gives you one link to send to the table."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I split a bill without downloading an app or making an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Splitting a bill on Trezzit runs in the browser and needs no account, on your phone or anyone else's. The people you send the link to do not need an account either — they open it, see their share, and mark it paid. You can sign in later to keep the bill."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you split a bill with tax and tip?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Tax is applied per item, so it follows whoever ordered that item rather than being shared out evenly. Tip is a separate line you can split equally or in proportion to what each person ordered. Everyone's total shows the item, the tax and the tip that make it up."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I split a receipt when everyone ordered something different?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "That is what Trezzit is for. The unit is the item, not the bill, so two people can share a starter while a third pays only for their own main. Any single item can also be split equally, by share, by percentage or by exact amount."
+          }
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Trezzit", "item": "https://trezzit.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Split a bill", "item": "https://trezzit.com/split" }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Trezzit",
+      "url": "https://trezzit.com/",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any (web browser)",
+      "description": "Split bills item by item with friends and roommates, and track what everyone owes.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "Trezzit", "url": "https://trezzit.com/" }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="/assets/css/styles.css" rel="stylesheet">
+
+    <style>
+        /* Same tokens as index.html */
+        :root {
+            --bg-color: #0F172A;
+            --glass-bg: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.25);
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --accent-primary: #4F46E5;
+            --accent-glow: rgba(79, 70, 229, 0.5);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --gutter: 1rem;
+            --measure: 34rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+        }
+
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        body::before {
+            background-image:
+                radial-gradient(at 20% 25%, hsla(243, 85%, 60%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 20%, hsla(262, 75%, 65%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 10% 90%, hsla(210, 80%, 60%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 75% 85%, hsla(280, 70%, 60%, 0.1) 0px, transparent 50%);
+        }
+
+        body::after {
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
+            opacity: 0.025;
+            z-index: -1;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        a:focus-visible,
+        summary:focus-visible {
+            outline: 3px solid #A5B4FC;
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-left: var(--gutter);
+            padding-right: var(--gutter);
+        }
+
+        /* ---------- Header: the home page's hero buttons, with the brand beside them ---------- */
+        .site-header {
+            position: relative;
+            z-index: 20;
+        }
+
+        .site-header .wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            min-height: 4.5rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 0 24px rgba(79, 70, 229, 0.2);
+        }
+
+        .site-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .nav-link {
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+            padding: 0.5rem 0.25rem;
+        }
+
+        .nav-link:hover,
+        .nav-link[aria-current="page"] {
+            color: var(--text-primary);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .hero-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-family: var(--font-family);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            letter-spacing: -0.025em;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+        }
+
+        .hero-btn-primary {
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn-primary:hover {
+            background: linear-gradient(135deg, #4338CA, #6D28D9);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        .hero-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ---------- Type ---------- */
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+            letter-spacing: -0.02em;
+            text-wrap: balance;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 7.5vw, 4.25rem);
+            font-weight: 900;
+            line-height: 1.02;
+            letter-spacing: -0.03em;
+        }
+
+        h2 {
+            font-size: clamp(1.9rem, 4.5vw, 2.75rem);
+            font-weight: 800;
+            line-height: 1.08;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .lede,
+        .muted {
+            color: var(--text-secondary);
+        }
+
+        .lede {
+            font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+            line-height: 1.45;
+            max-width: var(--measure);
+            text-wrap: pretty;
+        }
+
+        .section {
+            padding: clamp(3.5rem, 9vw, 7rem) 0;
+        }
+
+        .section-head {
+            max-width: var(--measure);
+            margin-bottom: clamp(2rem, 5vw, 3.5rem);
+        }
+
+        .section-head p {
+            margin-top: 0.9rem;
+            font-size: 1.1rem;
+            text-wrap: pretty;
+        }
+
+        /* ---------- Buttons ---------- */
+        .cta-primary-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #4F46E5, #6D28D9);
+            color: #ffffff;
+            font-size: 1.125rem;
+            font-weight: 600;
+            padding: 1rem 2.25rem;
+            border-radius: 12px;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);
+            min-height: 3.25rem;
+        }
+
+        .cta-primary-button:hover {
+            background: linear-gradient(135deg, #4338CA, #5B21B6);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(79, 70, 229, 0.35);
+        }
+
+        .cta-quiet {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            padding: 1rem 0.5rem;
+            min-height: 3.25rem;
+        }
+
+        .cta-quiet:hover {
+            color: var(--text-primary);
+        }
+
+        .cta-quiet svg {
+            transition: transform 0.3s ease;
+        }
+
+        .cta-quiet:hover svg {
+            transform: translateY(2px);
+        }
+
+        .cta-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem 1.5rem;
+            margin-top: 1.75rem;
+        }
+
+        /* ---------- Phone mockup, the home page's frame without the parallax ---------- */
+        .phone {
+            width: min(300px, 78vw);
+            padding: 10px;
+            border-radius: 40px;
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            border: 3px solid #2a2a2a;
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                0 0 40px rgba(79, 70, 229, 0.1);
+        }
+
+        .phone img {
+            width: 100%;
+            height: auto;
+            border-radius: 28px;
+            background: #f6f8f6;
+        }
+
+        .phone-sm {
+            width: min(240px, 70vw);
+            padding: 8px;
+            border-radius: 34px;
+        }
+
+        .phone-sm img {
+            border-radius: 24px;
+        }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            overflow: clip;
+        }
+
+        .hero .wrap {
+            display: grid;
+            gap: 2.5rem;
+            padding-top: clamp(1.5rem, 5vw, 4rem);
+            padding-bottom: clamp(3rem, 8vw, 6rem);
+        }
+
+        .hero-copy {
+            max-width: 38rem;
+        }
+
+        .hero-copy .lede {
+            margin-top: 1.25rem;
+        }
+
+        .hero-phone {
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-phone::before {
+            content: '';
+            position: absolute;
+            inset: -20% -10%;
+            background: radial-gradient(circle at 50% 45%, rgba(79, 70, 229, 0.22) 0%, rgba(139, 92, 246, 0.12) 35%, transparent 65%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ---------- Steps ---------- */
+        .steps {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 2.5rem;
+            counter-reset: step;
+        }
+
+        .step {
+            display: grid;
+            gap: 1.25rem;
+            align-items: start;
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .step-text {
+            max-width: 26rem;
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 999px;
+            background: rgba(79, 70, 229, 0.2);
+            border: 1px solid rgba(129, 140, 248, 0.4);
+            color: #C7D2FE;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.9rem;
+        }
+
+        .step-text p {
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            text-wrap: pretty;
+        }
+
+        .step .phone {
+            justify-self: center;
+        }
+
+        /* ---------- The shared page ---------- */
+        .shared-grid {
+            display: grid;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .shared-grid .phone {
+            justify-self: center;
+        }
+
+        .captions {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .caption {
+            padding: 1.1rem 1.25rem;
+            border-radius: 16px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+        }
+
+        .caption h3 {
+            font-size: 1.05rem;
+        }
+
+        .caption p {
+            margin-top: 0.35rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            text-wrap: pretty;
+        }
+
+        .link-card {
+            margin-top: 2.5rem;
+            display: grid;
+            gap: 1rem;
+            justify-items: start;
+        }
+
+        .link-card img {
+            width: min(480px, 100%);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .link-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 30rem;
+        }
+
+        /* ---------- Made for the table ---------- */
+        .table-strip {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 1px;
+            background: var(--glass-border);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .table-strip li {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 1.4rem;
+        }
+
+        .table-strip h3 {
+            font-size: 1.05rem;
+        }
+
+        .table-strip p {
+            margin-top: 0.4rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            text-wrap: pretty;
+        }
+
+        /* ---------- FAQ ---------- */
+        .faq-list {
+            max-width: 46rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .faq {
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .faq summary {
+            list-style: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 1.15rem 0.25rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .faq summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .faq summary::after {
+            content: '';
+            flex: none;
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid var(--text-secondary);
+            border-bottom: 2px solid var(--text-secondary);
+            transform: rotate(45deg);
+            transition: transform 0.25s ease;
+            margin-right: 0.35rem;
+        }
+
+        .faq[open] summary::after {
+            transform: rotate(-135deg);
+        }
+
+        .faq p {
+            padding: 0 0.25rem 1.35rem;
+            color: var(--text-secondary);
+            max-width: 40rem;
+            text-wrap: pretty;
+        }
+
+        /* ---------- Closing ---------- */
+        .closing .wrap {
+            text-align: center;
+            display: grid;
+            justify-items: center;
+            gap: 1.5rem;
+        }
+
+        .closing h2 {
+            max-width: 26rem;
+        }
+
+        .closing .cta-primary-button {
+            margin-top: 0.5rem;
+        }
+
+        .after-the-bill {
+            margin-top: 1.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 32rem;
+        }
+
+        .after-the-bill p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            text-wrap: pretty;
+        }
+
+        .after-the-bill a {
+            color: var(--text-primary);
+            font-weight: 600;
+            text-underline-offset: 3px;
+        }
+
+        .after-the-bill a:hover {
+            color: #A5B4FC;
+        }
+
+        /* ---------- Footer: the home page's social footer, with the site's links ---------- */
+        .site-footer {
+            padding: 2.5rem 0 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .site-footer .wrap {
+            display: grid;
+            gap: 1.25rem;
+            justify-items: center;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem 1.5rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-links a {
+            display: inline-block;
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .social-footer {
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-link {
+            display: inline-flex;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .social-link:hover {
+            color: #34d399;
+            background: rgba(52, 211, 153, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .social-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .footer-note {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* ---------- Layout above phones ---------- */
+        @media (min-width: 640px) {
+            :root {
+                --gutter: 2rem;
+            }
+
+            .nav-link {
+                display: inline-block;
+            }
+
+            .hero-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .hero-buttons {
+                gap: 1rem;
+            }
+
+            .social-links {
+                gap: 1.5rem;
+            }
+
+            .social-icon {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+
+            .table-strip {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .captions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 900px) {
+            .hero .wrap {
+                grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+                align-items: center;
+                gap: 3rem;
+            }
+
+            .hero-phone {
+                justify-content: center;
+            }
+
+            .steps {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 2rem;
+            }
+
+            .step {
+                grid-template-rows: auto 1fr;
+            }
+
+            .step .phone {
+                order: -1;
+                margin-bottom: 0.5rem;
+            }
+
+            .shared-grid {
+                grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+                gap: 4rem;
+            }
+
+            .table-strip {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="wrap">
+            <a href="/" class="brand" aria-label="Trezzit home">
+                <img src="/assets/icons/trezzit-icon-square.webp" alt="" width="32" height="32">
+                <span>Trezzit</span>
+            </a>
+            <nav class="site-nav" aria-label="Site">
+                <a href="/split" class="nav-link" aria-current="page">Split a bill</a>
+                <div class="hero-buttons">
+                    <a href="https://app.trezzit.com/login" class="hero-btn hero-btn-secondary">Login</a>
+                    <a href="https://app.trezzit.com/signup" class="hero-btn hero-btn-primary">Join Free</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="wrap">
+                <div class="hero-copy">
+                    <h1>Split the bill. Share one link.</h1>
+                    <p class="lede">Scan a receipt, split it item by item, and send everyone their share. Nothing to
+                        install, no account to make.</p>
+                    <div class="cta-row">
+                        <a href="https://app.trezzit.com/split" class="cta-primary-button">Start a split</a>
+                        <a href="#how-it-works" class="cta-quiet">See how it works
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 5v14M5 12l7 7 7-7" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-phone">
+                    <div class="phone">
+                        <img src="/assets/images/split/start.webp" width="640" height="1385" fetchpriority="high"
+                            alt="The first screen: a button to take a photo of the receipt, and a field asking who was at the table">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section class="section" id="how-it-works" aria-labelledby="how-title">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 id="how-title">How it works</h2>
+                    <p class="muted">Three screens between the receipt and everyone knowing what they owe.</p>
+                </div>
+                <ol class="steps">
+                    <li class="step">
+                        <div class="step-text">
+                            <span class="step-num" aria-hidden="true">1</span>
+                            <h3>Scan the receipt</h3>
+                            <p>Take a photo. Trezzit reads the items, the prices, the tax and the tip.</p>
+                        </div>
+                        <div class="phone phone-sm">
+                            <img src="/assets/images/split/review.webp" width="640" height="1385" loading="lazy"
+                                alt="The review screen, asking 'Does this look right?', with six items, the tax and the tip read from a receipt and a total of $128.84">
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-text">
+                            <span class="step-num" aria-hidden="true">2</span>
+                            <h3>Give each item to the people who had it</h3>
+                            <p>Tap a name, then tap what they ordered. Split anything equally, by share, by percent or
+                                by exact amount.</p>
+                        </div>
+                        <div class="phone phone-sm">
+                            <img src="/assets/images/split/split.webp" width="640" height="1385" loading="lazy"
+                                alt="The split screen, 'Who had what?', with a pizza shared equally by Maya, Leo, Sam and Nina and the split type set to Equal">
+                        </div>
+                    </li>
+                    <li class="step">
+                        <div class="step-text">
+                            <span class="step-num" aria-hidden="true">3</span>
+                            <h3>Send one link</h3>
+                            <p>Everyone opens it on their phone, sees their own share, and marks it paid when they
+                                have.</p>
+                        </div>
+                        <div class="phone phone-sm">
+                            <img src="/assets/images/split/settled.webp" width="640" height="1385" loading="lazy"
+                                alt="A shared bill after everyone has paid: 'Everyone is settled up', $0.00 owed, and each person's share listed as paid">
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- What the person who gets the link sees -->
+        <section class="section" id="the-link" aria-labelledby="link-title">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 id="link-title">What the table sees</h2>
+                    <p class="muted">The link opens in the browser on any phone. Nobody installs anything or signs up.
+                    </p>
+                </div>
+                <div class="shared-grid">
+                    <div class="phone">
+                        <img src="/assets/images/split/shared.webp" width="640" height="1385" loading="lazy"
+                            alt="The shared page as Leo sees it: 'You owe Maya $26.84', a Mark as paid button, and everyone's share for the four people at the table">
+                    </div>
+                    <div>
+                        <ul class="captions">
+                            <li class="caption">
+                                <h3>Your share</h3>
+                                <p>One number: what you owe, or what you are owed, with the items and the tax and tip
+                                    behind it.</p>
+                            </li>
+                            <li class="caption">
+                                <h3>Mark as paid</h3>
+                                <p>Tap it once you have paid. Part of it counts too, and anyone can undo a mistake.</p>
+                            </li>
+                            <li class="caption">
+                                <h3>Everyone's share</h3>
+                                <p>Who paid the bill, who has paid back and who has not, on one page for the whole
+                                    table.</p>
+                            </li>
+                        </ul>
+                        <div class="link-card">
+                            <img src="/assets/images/split/link-card.webp" width="960" height="504" loading="lazy"
+                                alt="The card a chat app shows for the link: The Blue Olive, Sep 17, 2 people, bill total $128.84, shared by Naman on Trezzit">
+                            <p>In the group chat, the link shows the place, the date and the total before anyone taps
+                                it.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Made for the table -->
+        <section class="section" id="for-the-table" aria-labelledby="table-title">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 id="table-title">Made for the table</h2>
+                </div>
+                <ul class="table-strip">
+                    <li>
+                        <h3>Tip, equally or in proportion</h3>
+                        <p>Split the tip evenly, or in proportion to what each person had.</p>
+                    </li>
+                    <li>
+                        <h3>Tax follows the item</h3>
+                        <p>Tax is applied per item, so it lands on whoever ordered it, not on the table.</p>
+                    </li>
+                    <li>
+                        <h3>Photos or a PDF</h3>
+                        <p>Scan a photo of the receipt, or the PDF the restaurant emailed.</p>
+                    </li>
+                    <li>
+                        <h3>Kept for 90 days, or for good</h3>
+                        <p>A shared bill stays up for 90 days after the last activity. Sign in and save it, and it
+                            stays for good.</p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="section" id="faq" aria-labelledby="faq-title">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 id="faq-title">Questions</h2>
+                </div>
+                <div class="faq-list">
+                    <details class="faq">
+                        <summary>How do I split a restaurant bill with friends?</summary>
+                        <p>Take a photo of the receipt. Trezzit reads the items and their prices, and you tap each
+                            person's name and then the items they had. It works out what everyone owes, including tax
+                            and tip, and gives you one link to send to the table.</p>
+                    </details>
+                    <details class="faq">
+                        <summary>Can I split a bill without downloading an app or making an account?</summary>
+                        <p>Yes. Splitting a bill on Trezzit runs in the browser and needs no account, on your phone or
+                            anyone else's. The people you send the link to do not need an account either — they open
+                            it, see their share, and mark it paid. You can sign in later to keep the bill.</p>
+                    </details>
+                    <details class="faq">
+                        <summary>How do you split a bill with tax and tip?</summary>
+                        <p>Tax is applied per item, so it follows whoever ordered that item rather than being shared
+                            out evenly. Tip is a separate line you can split equally or in proportion to what each
+                            person ordered. Everyone's total shows the item, the tax and the tip that make it up.</p>
+                    </details>
+                    <details class="faq">
+                        <summary>Can I split a receipt when everyone ordered something different?</summary>
+                        <p>That is what Trezzit is for. The unit is the item, not the bill, so two people can share a
+                            starter while a third pays only for their own main. Any single item can also be split
+                            equally, by share, by percentage or by exact amount.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- Closing -->
+        <section class="section closing" aria-labelledby="closing-title">
+            <div class="wrap">
+                <h2 id="closing-title">The next bill takes a minute</h2>
+                <a href="https://app.trezzit.com/split" class="cta-primary-button">Start a split</a>
+                <div class="after-the-bill">
+                    <p>Trezzit keeps the money after the bill. Sign in and every split is saved for good, with who
+                        owes whom across all your groups. <a href="/">More about Trezzit</a> · <a
+                            href="https://app.trezzit.com/signup">Create an account</a></p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap">
+            <ul class="footer-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/split">Split a bill</a></li>
+                <li><a href="https://app.trezzit.com/login">Login</a></li>
+                <li><a href="https://app.trezzit.com/signup">Sign up</a></li>
+            </ul>
+            <div class="social-footer">
+                <div class="social-links">
+                    <a href="mailto:namanranka14@gmail.com" class="social-link" aria-label="Email Naman">
+                        <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M2.25 5.25a3 3 0 013-3h13.5a3 3 0 013 3v10.5a3 3 0 01-3 3H5.25a3 3 0 01-3-3V5.25zM21 4.5H3a1.5 1.5 0 00-1.5 1.5v.233l9.25 5.25a1.5 1.5 0 001.5 0l9.25-5.25V6A1.5 1.5 0 0021 4.5zm-1.5 12.191l-7.25-4.114-7.25 4.114V7.099l7.5 4.219a.75.75 0 00.75-.001l7.5-4.218v9.592z" />
+                        </svg>
+                    </a>
+                    <a href="https://www.linkedin.com/in/namany" class="social-link" aria-label="LinkedIn Profile">
+                        <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.25 6.5 1.75 1.75 0 016.5 8.25zM19 19h-3v-4.75c0-1.4-1.1-2.5-2.5-2.5S11 12.85 11 14.25V19h-3v-9h3v1.35c.7-1.2 2-1.85 3.25-1.85 2.5 0 4.25 2.1 4.25 5.25V19z" />
+                        </svg>
+                    </a>
+                    <a href="https://instagram.com/trezzit_app" class="social-link" aria-label="Instagram Profile">
+                        <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 16a6 6 0 100-12 6 6 0 000 12zm0-8a2 2 0 100 4 2 2 0 000-4zm4.5-3.25a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <p class="footer-note">Trezzit · Split bills item by item</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
