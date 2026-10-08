@@ -2986,7 +2986,9 @@
         /* Desktop Layout */
         .desktop-pricing {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
+            grid-template-columns: 1fr 1fr;
+            max-width: 980px;
+            margin: 0 auto;
             gap: 1.5rem;
             width: 100%;
             height: 100%;
@@ -3148,6 +3150,12 @@
             align-items: center;
             justify-content: center;
             gap: 1.5rem;
+        }
+
+        .footer-note {
+            margin-top: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
         }
 
         .social-link {
@@ -4670,13 +4678,13 @@
                                 <span>Student Plan</span>
                             </div>
                             <h3 class="plan-title">Built for students, by students.</h3>
-                            <p class="plan-subtitle">All Pro features, completely free. No verification needed.</p>
+                            <p class="plan-subtitle">Completely free. No verification needed.</p>
 
                             <div class="pricing-display">
                                 <span class="price">$0</span>
                                 <span class="price-period">/forever</span>
                             </div>
-                            <p class="price-note">Free for the duration of your studies. Choose Pro when you earn :)</p>
+                            <p class="price-note">Free for the duration of your studies.</p>
 
                             <ul class="feature-list">
                                 <li>
@@ -4685,192 +4693,6 @@
                                             d="M5 13l4 4L19 7"></path>
                                     </svg>
                                     No verification needed
-                                </li>
-                                <li>
-                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    All Pro plan features included
-                                </li>
-                                <li>
-                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    Generous receipt scanning
-                                </li>
-                                <li>
-                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    Advanced expense analytics
-                                </li>
-                                <li>
-                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    Unlimited group members
-                                </li>
-                                <li>
-                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    Priority student support
-                                </li>
-                            </ul>
-
-                            <div class="mission-note">
-                                Our Mission: To build the best tool, not just another product.
-                            </div>
-
-                            <!-- <a href="https://app.trezzit.com/signup" class="cta-button student-cta">
-                                Get Started for Free
-                            </a> -->
-                        </div>
-                    </div>
-
-                    <!-- Free & Pro Plans Container -->
-                    <div class="plans-stack">
-                        <!-- Free Plan -->
-                        <div class="pricing-card free-card">
-                            <div class="pricing-card-inner">
-                                <div class="plan-header">
-                                    <div class="plan-info">
-                                        <h3 class="plan-title">Free</h3>
-                                        <p class="plan-subtitle">Perfect for getting started and occasional use.</p>
-                                    </div>
-                                    <div class="pricing-display">
-                                        <span class="price">$0</span>
-                                        <span class="price-period">/month</span>
-                                    </div>
-                                </div>
-
-                                <ul class="feature-list">
-                                    <li>
-                                        <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        All split features always free
-                                    </li>
-                                    <li>
-                                        <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        3 free receipt scans
-                                    </li>
-                                    <li>
-                                        <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Up to 10 group members
-                                    </li>
-                                    <li>
-                                        <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Community support
-                                    </li>
-                                </ul>
-
-                                <!-- <a href="https://app.trezzit.com/signup" class="cta-button free-cta">
-                                    Start for Free
-                                </a> -->
-                            </div>
-                        </div>
-
-                        <!-- Pro Plan -->
-                        <div class="pricing-card pro-card">
-                            <div class="pricing-card-inner">
-                                <div class="plan-header">
-                                    <div class="plan-info">
-                                        <h3 class="plan-title">Pro</h3>
-                                        <p class="plan-subtitle">Advanced features for power users and large groups.</p>
-                                    </div>
-                                    <div class="pricing-display">
-                                        <span class="price">$5</span>
-                                        <span class="price-period">/month</span>
-                                    </div>
-                                </div>
-                                <p class="price-note">Starting January 2026.</p>
-
-                                <ul class="feature-list">
-                                    <li>
-                                        <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Advanced analytics
-                                    </li>
-                                    <li>
-                                        <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        30 receipt scans/month
-                                    </li>
-                                    <li>
-                                        <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Unlimited members
-                                    </li>
-                                    <li>
-                                        <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        Priority support
-                                    </li>
-                                </ul>
-
-                                <!-- <a href="https://app.trezzit.com/upgrade" class="cta-button pro-cta">
-                                    Upgrade to Pro
-                                </a> -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mobile Layout -->
-                <div class="pricing-container mobile-pricing" id="mobilePricing">
-                    <!-- Student Plan -->
-                    <div class="pricing-card student-card">
-                        <div class="pricing-card-inner">
-                            <div class="plan-badge student-badge">
-                                <span>Student Plan</span>
-                            </div>
-                            <h3 class="plan-title">Built for students, by students.</h3>
-                            <p class="plan-subtitle">All Pro features, completely free. No verification needed.</p>
-
-                            <div class="pricing-display">
-                                <span class="price">$0</span>
-                                <span class="price-period">/forever</span>
-                            </div>
-                            <p class="price-note">Free for the duration of your studies. Choose Pro when you earn :)</p>
-
-                            <ul class="feature-list">
-                                <li>
-                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    No verification needed
-                                </li>
-                                <li>
-                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    All Pro plan features included
                                 </li>
                                 <li>
                                     <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4962,21 +4784,24 @@
                             </a> -->
                         </div>
                     </div>
+                </div>
 
-                    <!-- Pro Plan -->
-                    <div class="pricing-card pro-card">
+                <!-- Mobile Layout -->
+                <div class="pricing-container mobile-pricing" id="mobilePricing">
+                    <!-- Student Plan -->
+                    <div class="pricing-card student-card">
                         <div class="pricing-card-inner">
-                            <div class="plan-header">
-                                <div class="plan-info">
-                                    <h3 class="plan-title">Pro</h3>
-                                    <p class="plan-subtitle">Advanced features for power users and large groups.</p>
-                                </div>
-                                <div class="pricing-display">
-                                    <span class="price">$5</span>
-                                    <span class="price-period">/month</span>
-                                </div>
+                            <div class="plan-badge student-badge">
+                                <span>Student Plan</span>
                             </div>
-                            <p class="price-note">Starting January 2026.</p>
+                            <h3 class="plan-title">Built for students, by students.</h3>
+                            <p class="plan-subtitle">Completely free. No verification needed.</p>
+
+                            <div class="pricing-display">
+                                <span class="price">$0</span>
+                                <span class="price-period">/forever</span>
+                            </div>
+                            <p class="price-note">Free for the duration of your studies.</p>
 
                             <ul class="feature-list">
                                 <li>
@@ -4984,33 +4809,95 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7"></path>
                                     </svg>
-                                    Advanced analytics
+                                    No verification needed
                                 </li>
                                 <li>
                                     <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7"></path>
                                     </svg>
-                                    30 receipt scans/month
+                                    Generous receipt scanning
                                 </li>
                                 <li>
                                     <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7"></path>
                                     </svg>
-                                    Unlimited members
+                                    Advanced expense analytics
                                 </li>
                                 <li>
                                     <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7"></path>
                                     </svg>
-                                    Priority support
+                                    Unlimited group members
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Priority student support
                                 </li>
                             </ul>
 
-                            <!-- <a href="https://app.trezzit.com/upgrade" class="cta-button pro-cta">
-                                Upgrade to Pro
+                            <div class="mission-note">
+                                Our Mission: To build the best tool, not just another product.
+                            </div>
+
+                            <!-- <a href="https://app.trezzit.com/signup" class="cta-button student-cta">
+                                Get Started for Free
+                            </a> -->
+                        </div>
+                    </div>
+
+                    <!-- Free Plan -->
+                    <div class="pricing-card free-card">
+                        <div class="pricing-card-inner">
+                            <div class="plan-header">
+                                <div class="plan-info">
+                                    <h3 class="plan-title">Free</h3>
+                                    <p class="plan-subtitle">Perfect for getting started and occasional use.</p>
+                                </div>
+                                <div class="pricing-display">
+                                    <span class="price">$0</span>
+                                    <span class="price-period">/month</span>
+                                </div>
+                            </div>
+
+                            <ul class="feature-list">
+                                <li>
+                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    All split features always free
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    3 free receipt scans
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Up to 10 group members
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Community support
+                                </li>
+                            </ul>
+
+                            <!-- <a href="https://app.trezzit.com/signup" class="cta-button free-cta">
+                                Start for Free
                             </a> -->
                         </div>
                     </div>
@@ -5020,7 +4907,6 @@
                 <div class="mobile-scroll-indicators" id="mobileScrollIndicators">
                     <div class="scroll-dot active" data-index="0"></div>
                     <div class="scroll-dot" data-index="1"></div>
-                    <div class="scroll-dot" data-index="2"></div>
                 </div>
             </div>
         </div>
@@ -5063,9 +4949,11 @@
                         <div class="social-footer">
                             <div class="footer-page-links">
                                 <a href="/split">Split a bill</a>
+                                <a href="/privacy">Privacy</a>
+                                <a href="/terms">Terms</a>
                             </div>
                             <div class="social-links">
-                                <a href="mailto:namanranka14@gmail.com" class="social-link" aria-label="Email Naman">
+                                <a href="mailto:support@trezzit.com" class="social-link" aria-label="Email Trezzit support">
                                     <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path
                                             d="M2.25 5.25a3 3 0 013-3h13.5a3 3 0 013 3v10.5a3 3 0 01-3 3H5.25a3 3 0 01-3-3V5.25zM21 4.5H3a1.5 1.5 0 00-1.5 1.5v.233l9.25 5.25a1.5 1.5 0 001.5 0l9.25-5.25V6A1.5 1.5 0 0021 4.5zm-1.5 12.191l-7.25-4.114-7.25 4.114V7.099l7.5 4.219a.75.75 0 00.75-.001l7.5-4.218v9.592z" />
@@ -5087,6 +4975,7 @@
                                     </svg>
                                 </a>
                             </div>
+                            <p class="footer-note">Trezzit LLC · Split bills item by item</p>
                         </div>
                     </div>
                 </div>
@@ -5120,9 +5009,11 @@
                         <div class="social-footer">
                             <div class="footer-page-links">
                                 <a href="/split">Split a bill</a>
+                                <a href="/privacy">Privacy</a>
+                                <a href="/terms">Terms</a>
                             </div>
                             <div class="social-links">
-                                <a href="mailto:namanranka14@gmail.com" class="social-link" aria-label="Email Naman">
+                                <a href="mailto:support@trezzit.com" class="social-link" aria-label="Email Trezzit support">
                                     <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path
                                             d="M2.25 5.25a3 3 0 013-3h13.5a3 3 0 013 3v10.5a3 3 0 01-3 3H5.25a3 3 0 01-3-3V5.25zM21 4.5H3a1.5 1.5 0 00-1.5 1.5v.233l9.25 5.25a1.5 1.5 0 001.5 0l9.25-5.25V6A1.5 1.5 0 0021 4.5zm-1.5 12.191l-7.25-4.114-7.25 4.114V7.099l7.5 4.219a.75.75 0 00.75-.001l7.5-4.218v9.592z" />
@@ -5144,6 +5035,7 @@
                                     </svg>
                                 </a>
                             </div>
+                            <p class="footer-note">Trezzit LLC · Split bills item by item</p>
                         </div>
                     </div>
                 </div>
