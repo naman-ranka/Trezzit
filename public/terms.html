@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | Trezzit</title>
+    <meta name="description" content="The terms for using Trezzit: who can use it, your account and content, acceptable use, connected AI apps, prices and ending your account.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Trezzit">
+    <link rel="canonical" href="https://trezzit.com/terms">
+    <meta name="theme-color" content="#4F46E5">
+
+    <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/trezzit-icon-512.png">
+    <link rel="apple-touch-icon" href="/assets/icons/trezzit-icon-512.png">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://trezzit.com/terms">
+    <meta property="og:title" content="Trezzit Terms of Service">
+    <meta property="og:description" content="The terms for using Trezzit: who can use it, your account and content, acceptable use, connected AI apps, prices and ending your account.">
+    <meta property="og:image" content="https://trezzit.com/assets/images/social-preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Trezzit">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Trezzit Terms of Service">
+    <meta name="twitter:description" content="The terms for using Trezzit: who can use it, your account and content, acceptable use, connected AI apps, prices and ending your account.">
+    <meta name="twitter:image" content="https://trezzit.com/assets/images/social-preview.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="/assets/css/styles.css" rel="stylesheet">
+
+    <style>
+        /* Same tokens as index.html and split.html */
+        :root {
+            --bg-color: #0F172A;
+            --glass-bg: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.25);
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --accent-primary: #4F46E5;
+            --accent-glow: rgba(79, 70, 229, 0.5);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --gutter: 1rem;
+            --measure: 34rem;
+            --doc-measure: 44rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -2;
+            background-image:
+                radial-gradient(at 20% 25%, hsla(243, 85%, 60%, 0.12) 0px, transparent 50%),
+                radial-gradient(at 80% 20%, hsla(262, 75%, 65%, 0.12) 0px, transparent 50%),
+                radial-gradient(at 10% 90%, hsla(210, 80%, 60%, 0.08) 0px, transparent 50%);
+        }
+
+        a {
+            color: inherit;
+        }
+
+        a:focus-visible,
+        .table-scroll:focus-visible {
+            outline: 3px solid #A5B4FC;
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-left: var(--gutter);
+            padding-right: var(--gutter);
+        }
+
+        /* ---------- Header (as split.html) ---------- */
+        .site-header {
+            position: relative;
+            z-index: 20;
+        }
+
+        .site-header .wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            min-height: 4.5rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 0 24px rgba(79, 70, 229, 0.2);
+        }
+
+        .site-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .nav-link {
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+            padding: 0.5rem 0.25rem;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .hero-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-family: var(--font-family);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            letter-spacing: -0.025em;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+        }
+
+        .hero-btn-primary {
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn-primary:hover {
+            background: linear-gradient(135deg, #4338CA, #6D28D9);
+        }
+
+        .hero-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ---------- Document ---------- */
+        .doc {
+            max-width: var(--doc-measure);
+            padding: clamp(1.5rem, 5vw, 3.5rem) 0 clamp(3rem, 8vw, 5rem);
+            font-size: 1rem;
+            line-height: 1.65;
+            color: #CBD5E1;
+        }
+
+        .doc h1,
+        .doc h2 {
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            text-wrap: balance;
+            scroll-margin-top: 1.5rem;
+        }
+
+        .doc h1 {
+            margin: 0;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 900;
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+        }
+
+        .doc h2 {
+            margin: 2.75rem 0 0.75rem;
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .doc .anchor {
+            margin-left: 0.25rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-decoration: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .doc h2:hover .anchor,
+        .doc .anchor:focus-visible {
+            opacity: 1;
+        }
+
+        .doc p,
+        .doc ul,
+        .doc ol {
+            margin: 0 0 1rem;
+            text-wrap: pretty;
+        }
+
+        .doc p[id] {
+            scroll-margin-top: 1.5rem;
+        }
+
+        .doc ul,
+        .doc ol {
+            padding-left: 1.4rem;
+        }
+
+        .doc ul {
+            list-style: disc;
+        }
+
+        .doc ol {
+            list-style: decimal;
+        }
+
+        .doc li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.2rem;
+        }
+
+        .doc li::marker {
+            color: var(--text-secondary);
+        }
+
+        .doc strong {
+            color: var(--text-primary);
+            font-weight: 650;
+        }
+
+        .doc a {
+            color: #C7D2FE;
+            text-decoration: underline;
+            text-decoration-color: rgba(165, 180, 252, 0.45);
+            text-underline-offset: 3px;
+            overflow-wrap: anywhere;
+        }
+
+        .doc a:hover {
+            color: #E0E7FF;
+            text-decoration-color: currentColor;
+        }
+
+        .doc code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.9em;
+            padding: 0.1em 0.35em;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-primary);
+        }
+
+        .doc .doc-meta {
+            margin: 0.9rem 0 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .doc .doc-meta .effective-date {
+            color: #FCD34D;
+        }
+
+        .doc-toc {
+            margin: 0 0 2.5rem;
+            padding: 1.1rem 1.25rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            background: var(--glass-bg);
+        }
+
+        .doc-toc h2 {
+            margin: 0 0 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+        }
+
+        .doc .doc-toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            columns: 1;
+        }
+
+        .doc .doc-toc li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .doc .doc-toc a {
+            display: inline-block;
+            padding: 0.25rem 0;
+            color: #CBD5E1;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc .doc-toc a:hover {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+
+        .table-scroll {
+            max-width: 100%;
+            overflow-x: auto;
+            margin: 0 0 1.5rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: var(--glass-bg);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .doc table {
+            width: 100%;
+            min-width: 32rem;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .doc table[data-cols="2"] {
+            min-width: 0;
+        }
+
+        .doc h1 + p {
+            margin-top: 0.9rem;
+        }
+
+        .doc th,
+        .doc td {
+            padding: 0.7rem 0.9rem;
+            text-align: left;
+            vertical-align: top;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .doc th {
+            color: var(--text-primary);
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .doc tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .doc td:first-child {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* ---------- Footer (as split.html) ---------- */
+        .site-footer {
+            padding: 2.5rem 0 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .site-footer .wrap {
+            display: grid;
+            gap: 1rem;
+            justify-items: center;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem 1.5rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-links a {
+            display: inline-block;
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover,
+        .footer-links a[aria-current="page"] {
+            color: var(--text-primary);
+        }
+
+        .footer-note {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        @media (min-width: 640px) {
+            :root {
+                --gutter: 2rem;
+            }
+
+            .nav-link {
+                display: inline-block;
+            }
+
+            .hero-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .hero-buttons {
+                gap: 1rem;
+            }
+
+            .doc .doc-toc ol {
+                columns: 2;
+                column-gap: 2rem;
+            }
+
+            .doc .doc-toc li {
+                break-inside: avoid;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="wrap">
+            <a href="/" class="brand" aria-label="Trezzit home">
+                <img src="/assets/icons/trezzit-icon-square.webp" alt="" width="32" height="32">
+                <span>Trezzit</span>
+            </a>
+            <nav class="site-nav" aria-label="Site">
+                <a href="/split" class="nav-link">Split a bill</a>
+                <div class="hero-buttons">
+                    <a href="https://app.trezzit.com/login" class="hero-btn hero-btn-secondary">Login</a>
+                    <a href="https://app.trezzit.com/signup" class="hero-btn hero-btn-primary">Join Free</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="wrap">
+            <article class="doc">
+                <h1>Trezzit Terms of Service</h1>
+                <p class="doc-meta">Effective: <strong class="effective-date">Draft — not yet in effect</strong> · Version 2026-10</p>
+                <nav class="doc-toc" aria-labelledby="toc-title">
+                    <h2 id="toc-title">On this page</h2>
+                    <ol>
+                        <li><a href="#who-can-use-trezzit">1. Who can use Trezzit</a></li>
+                        <li><a href="#your-account">2. Your account</a></li>
+                        <li><a href="#what-trezzit-is-and-isnt">3. What Trezzit is, and isn't</a></li>
+                        <li><a href="#your-content">4. Your content</a></li>
+                        <li><a href="#acceptable-use">5. Acceptable use</a></li>
+                        <li><a href="#connected-ai-apps">6. Connected AI apps</a></li>
+                        <li><a href="#prices">7. Prices</a></li>
+                        <li><a href="#ending-your-account">8. Ending your account</a></li>
+                        <li><a href="#disclaimers">9. Disclaimers</a></li>
+                        <li><a href="#limitation-of-liability">10. Limitation of liability</a></li>
+                        <li><a href="#changes">11. Changes</a></li>
+                        <li><a href="#law">12. Law</a></li>
+                        <li><a href="#apple-app-store">13. Apple App Store</a></li>
+                        <li><a href="#contact">14. Contact</a></li>
+                    </ol>
+                </nav>
+                <p>These terms are an agreement between you and Trezzit LLC ("Trezzit", "we"), an Arizona limited liability company. By creating an account or using Trezzit you agree to them and to our <a href="/privacy">Privacy Policy</a>.</p>
+                <h2 id="who-can-use-trezzit">1. Who can use Trezzit <a class="anchor" href="#who-can-use-trezzit" aria-label="Link to this section">#</a></h2>
+                <p>You must be at least 13 years old, and old enough to agree to these terms where you live. If you're under 18, a parent or guardian must agree to them for you.</p>
+                <h2 id="your-account">2. Your account <a class="anchor" href="#your-account" aria-label="Link to this section">#</a></h2>
+                <p>Keep your sign-in details to yourself and tell us at <a href="mailto:support@trezzit.com">support@trezzit.com</a> if you think someone else has used your account. You're responsible for what happens under your account.</p>
+                <h2 id="what-trezzit-is-and-isnt">3. What Trezzit is, and isn't <a class="anchor" href="#what-trezzit-is-and-isnt" aria-label="Link to this section">#</a></h2>
+                <p>Trezzit records shared expenses and works out who owes whom. <strong>It doesn't hold, send or receive money</strong>, and it isn't a bank, payment service or financial adviser. A settlement in Trezzit is a record of a payment you made elsewhere. Balances are only as accurate as the bills people enter, so check them before you pay. AI receipt reading and expense sorting can make mistakes; review what they produce.</p>
+                <h2 id="your-content">4. Your content <a class="anchor" href="#your-content" aria-label="Link to this section">#</a></h2>
+                <p>What you put into Trezzit (bills, notes, receipts, names) stays yours. You give us permission to store, process and show it as needed to run Trezzit for you and the people you share it with, including through the providers in our Privacy Policy. When you add a bill to a group, its members can see it, and it stays in the group for them even if you leave or delete your account.</p>
+                <p>Only add other people's details that you're entitled to share, and only for splitting expenses with them.</p>
+                <h2 id="acceptable-use">5. Acceptable use <a class="anchor" href="#acceptable-use" aria-label="Link to this section">#</a></h2>
+                <p>Don't use Trezzit to harass anyone, to post illegal content or other people's private information, to send spam or unwanted invitations, to break the law, to get into accounts or data that aren't yours, to probe or overload our systems, or to resell or copy the service. Connected AI apps act for you, so these rules apply to what they do too. We may remove content or suspend accounts that break these rules. You can report a problem to <a href="mailto:support@trezzit.com">support@trezzit.com</a>; we aim to act on reports within 24 hours.</p>
+                <h2 id="connected-ai-apps">6. Connected AI apps <a class="anchor" href="#connected-ai-apps" aria-label="Link to this section">#</a></h2>
+                <p>If you connect an AI app (such as Claude or ChatGPT), it can read and change your Trezzit data within the access you approve. That app's own terms and privacy policy apply to what it does with the data. You can disconnect it any time.</p>
+                <h2 id="prices">7. Prices <a class="anchor" href="#prices" aria-label="Link to this section">#</a></h2>
+                <p>Trezzit is free today. If we add paid features, we'll show the price before you pay, and paid features in our mobile apps will be sold through the app store.</p>
+                <h2 id="ending-your-account">8. Ending your account <a class="anchor" href="#ending-your-account" aria-label="Link to this section">#</a></h2>
+                <p>You can delete your account at any time in the app (see the Privacy Policy for what that does). We may suspend or close an account that breaks these terms, or if we stop offering Trezzit, with notice where we reasonably can.</p>
+                <h2 id="disclaimers">9. Disclaimers <a class="anchor" href="#disclaimers" aria-label="Link to this section">#</a></h2>
+                <p>Trezzit is provided "as is". To the extent the law allows, we make no promises that it will always be available, error-free or fit for a particular purpose, and we're not responsible for payments between users or for decisions made using its balances.</p>
+                <h2 id="limitation-of-liability">10. Limitation of liability <a class="anchor" href="#limitation-of-liability" aria-label="Link to this section">#</a></h2>
+                <p>To the extent the law allows, Trezzit LLC isn't liable for indirect, incidental or consequential losses, or for lost profits or data, and our total liability for any claim is limited to the greater of what you paid us in the 12 months before the claim and US$50. Nothing in these terms limits liability that can't be limited by law, or your rights as a consumer where you live.</p>
+                <h2 id="changes">11. Changes <a class="anchor" href="#changes" aria-label="Link to this section">#</a></h2>
+                <p>We may update these terms. We'll post the new version here with its effective date and tell you in the app about significant changes. If you keep using Trezzit after a change takes effect, the new terms apply.</p>
+                <h2 id="law">12. Law <a class="anchor" href="#law" aria-label="Link to this section">#</a></h2>
+                <p>These terms are governed by the laws of the State of Arizona, USA, except where the law of the country you live in gives you consumer protections that can't be waived.</p>
+                <h2 id="apple-app-store">13. Apple App Store <a class="anchor" href="#apple-app-store" aria-label="Link to this section">#</a></h2>
+                <p>If you got Trezzit from the Apple App Store: these terms are between you and Trezzit LLC, not Apple; Apple has no obligation to support the app or responsibility for claims about it; and Apple and its subsidiaries are third-party beneficiaries of these terms and may enforce them.</p>
+                <h2 id="contact">14. Contact <a class="anchor" href="#contact" aria-label="Link to this section">#</a></h2>
+                <p>Trezzit LLC, Tempe, Arizona, United States · <a href="mailto:support@trezzit.com">support@trezzit.com</a></p>
+            </article>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap">
+            <ul class="footer-links">
+                <li><a href="/privacy">Privacy</a></li>
+                <li><a href="/terms" aria-current="page">Terms</a></li>
+                <li><a href="/your-data">Your data</a></li>
+                <li><a href="/delete-account">Delete account</a></li>
+                <li><a href="mailto:support@trezzit.com">support@trezzit.com</a></li>
+            </ul>
+            <p class="footer-note">Trezzit LLC · Split bills item by item</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
