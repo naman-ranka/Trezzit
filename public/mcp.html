@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trezzit for Claude and ChatGPT | Trezzit</title>
+    <meta name="description" content="Connect Trezzit to Claude, ChatGPT and other AI apps: what it can do, example prompts, how to connect and disconnect, and what is kept.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Trezzit">
+    <link rel="canonical" href="https://trezzit.com/mcp">
+    <meta name="theme-color" content="#4F46E5">
+
+    <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/trezzit-icon-512.png">
+    <link rel="apple-touch-icon" href="/assets/icons/trezzit-icon-512.png">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://trezzit.com/mcp">
+    <meta property="og:title" content="Trezzit for Claude and ChatGPT">
+    <meta property="og:description" content="Connect Trezzit to Claude, ChatGPT and other AI apps: what it can do, example prompts, how to connect and disconnect, and what is kept.">
+    <meta property="og:image" content="https://trezzit.com/assets/images/social-preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Trezzit">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Trezzit for Claude and ChatGPT">
+    <meta name="twitter:description" content="Connect Trezzit to Claude, ChatGPT and other AI apps: what it can do, example prompts, how to connect and disconnect, and what is kept.">
+    <meta name="twitter:image" content="https://trezzit.com/assets/images/social-preview.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="/assets/css/styles.css" rel="stylesheet">
+
+    <style>
+        /* Same tokens as index.html and split.html */
+        :root {
+            --bg-color: #0F172A;
+            --glass-bg: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.25);
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --accent-primary: #4F46E5;
+            --accent-glow: rgba(79, 70, 229, 0.5);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --gutter: 1rem;
+            --measure: 34rem;
+            --doc-measure: 44rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -2;
+            background-image:
+                radial-gradient(at 20% 25%, hsla(243, 85%, 60%, 0.12) 0px, transparent 50%),
+                radial-gradient(at 80% 20%, hsla(262, 75%, 65%, 0.12) 0px, transparent 50%),
+                radial-gradient(at 10% 90%, hsla(210, 80%, 60%, 0.08) 0px, transparent 50%);
+        }
+
+        a {
+            color: inherit;
+        }
+
+        a:focus-visible,
+        .table-scroll:focus-visible {
+            outline: 3px solid #A5B4FC;
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-left: var(--gutter);
+            padding-right: var(--gutter);
+        }
+
+        /* ---------- Header (as split.html) ---------- */
+        .site-header {
+            position: relative;
+            z-index: 20;
+        }
+
+        .site-header .wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            min-height: 4.5rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 0 24px rgba(79, 70, 229, 0.2);
+        }
+
+        .site-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .nav-link {
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+            padding: 0.5rem 0.25rem;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .hero-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-family: var(--font-family);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            letter-spacing: -0.025em;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+        }
+
+        .hero-btn-primary {
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn-primary:hover {
+            background: linear-gradient(135deg, #4338CA, #6D28D9);
+        }
+
+        .hero-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ---------- Document ---------- */
+        .doc {
+            max-width: var(--doc-measure);
+            padding: clamp(1.5rem, 5vw, 3.5rem) 0 clamp(3rem, 8vw, 5rem);
+            font-size: 1rem;
+            line-height: 1.65;
+            color: #CBD5E1;
+        }
+
+        .doc h1,
+        .doc h2 {
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            text-wrap: balance;
+            scroll-margin-top: 1.5rem;
+        }
+
+        .doc h1 {
+            margin: 0;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 900;
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+        }
+
+        .doc h2 {
+            margin: 2.75rem 0 0.75rem;
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .doc .anchor {
+            margin-left: 0.25rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-decoration: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .doc h2:hover .anchor,
+        .doc .anchor:focus-visible {
+            opacity: 1;
+        }
+
+        .doc p,
+        .doc ul,
+        .doc ol {
+            margin: 0 0 1rem;
+            text-wrap: pretty;
+        }
+
+        .doc p[id] {
+            scroll-margin-top: 1.5rem;
+        }
+
+        .doc ul,
+        .doc ol {
+            padding-left: 1.4rem;
+        }
+
+        .doc ul {
+            list-style: disc;
+        }
+
+        .doc ol {
+            list-style: decimal;
+        }
+
+        .doc li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.2rem;
+        }
+
+        .doc li::marker {
+            color: var(--text-secondary);
+        }
+
+        .doc strong {
+            color: var(--text-primary);
+            font-weight: 650;
+        }
+
+        .doc a {
+            color: #C7D2FE;
+            text-decoration: underline;
+            text-decoration-color: rgba(165, 180, 252, 0.45);
+            text-underline-offset: 3px;
+            overflow-wrap: anywhere;
+        }
+
+        .doc a:hover {
+            color: #E0E7FF;
+            text-decoration-color: currentColor;
+        }
+
+        .doc code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.9em;
+            padding: 0.1em 0.35em;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-primary);
+        }
+
+        .doc .doc-meta {
+            margin: 0.9rem 0 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .doc .doc-meta .effective-date {
+            color: #FCD34D;
+        }
+
+        .doc-toc {
+            margin: 0 0 2.5rem;
+            padding: 1.1rem 1.25rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            background: var(--glass-bg);
+        }
+
+        .doc-toc h2 {
+            margin: 0 0 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+        }
+
+        .doc .doc-toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            columns: 1;
+        }
+
+        .doc .doc-toc li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .doc .doc-toc a {
+            display: inline-block;
+            padding: 0.25rem 0;
+            color: #CBD5E1;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc .doc-toc a:hover {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+
+        .table-scroll {
+            max-width: 100%;
+            overflow-x: auto;
+            margin: 0 0 1.5rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: var(--glass-bg);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .doc table {
+            width: 100%;
+            min-width: 32rem;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .doc table[data-cols="2"] {
+            min-width: 0;
+        }
+
+        .doc h1 + p {
+            margin-top: 0.9rem;
+        }
+
+        .doc th,
+        .doc td {
+            padding: 0.7rem 0.9rem;
+            text-align: left;
+            vertical-align: top;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .doc th {
+            color: var(--text-primary);
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .doc tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .doc td:first-child {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+
+        /* ---------- MCP page ---------- */
+        .doc .lede {
+            font-size: 1.1rem;
+            color: #CBD5E1;
+        }
+
+        .server-url {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem 0.75rem;
+            margin: 1.5rem 0 2rem;
+            padding: 0.9rem 1rem;
+            border: 1px solid rgba(165, 180, 252, 0.35);
+            border-radius: 14px;
+            background: rgba(79, 70, 229, 0.12);
+        }
+
+        .server-url-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+        }
+
+        .doc .server-url code {
+            flex: 1 1 16rem;
+            font-size: 0.95rem;
+            background: transparent;
+            padding: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .copy-btn {
+            font-family: var(--font-family);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 0.45rem 0.9rem;
+            min-height: 2.25rem;
+            cursor: pointer;
+        }
+
+        .copy-btn:focus-visible {
+            outline: 3px solid #A5B4FC;
+            outline-offset: 3px;
+        }
+
+        .doc ul.prompts {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            gap: 0.6rem;
+        }
+
+        .doc ul.prompts li {
+            margin: 0;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: var(--glass-bg);
+            color: var(--text-primary);
+        }
+
+        .doc pre {
+            margin: 0 0 1rem;
+            padding: 0.9rem 1rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+        }
+
+        .doc pre code {
+            background: transparent;
+            padding: 0;
+            white-space: pre;
+        }
+
+        .doc tr.tool-group td {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* ---------- Footer (as split.html) ---------- */
+        .site-footer {
+            padding: 2.5rem 0 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .site-footer .wrap {
+            display: grid;
+            gap: 1rem;
+            justify-items: center;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem 1.5rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-links a {
+            display: inline-block;
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover,
+        .footer-links a[aria-current="page"] {
+            color: var(--text-primary);
+        }
+
+        .footer-note {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        @media (min-width: 640px) {
+            :root {
+                --gutter: 2rem;
+            }
+
+            .nav-link {
+                display: inline-block;
+            }
+
+            .hero-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .hero-buttons {
+                gap: 1rem;
+            }
+
+            .doc .doc-toc ol {
+                columns: 2;
+                column-gap: 2rem;
+            }
+
+            .doc .doc-toc li {
+                break-inside: avoid;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="wrap">
+            <a href="/" class="brand" aria-label="Trezzit home">
+                <img src="/assets/icons/trezzit-icon-square.webp" alt="" width="32" height="32">
+                <span>Trezzit</span>
+            </a>
+            <nav class="site-nav" aria-label="Site">
+                <a href="/split" class="nav-link">Split a bill</a>
+                <div class="hero-buttons">
+                    <a href="https://app.trezzit.com/login" class="hero-btn hero-btn-secondary">Login</a>
+                    <a href="https://app.trezzit.com/signup" class="hero-btn hero-btn-primary">Join Free</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="wrap">
+            <article class="doc">
+                <h1>Trezzit in Claude and ChatGPT</h1>
+                <p class="lede">Connect Trezzit to an AI assistant and ask it to add a bill, tell you who owes what, or sum up last month's spending. It works with your own Trezzit account, only after you allow it, and it never moves money.</p>
+
+                <div class="server-url">
+                    <span class="server-url-label">Server URL</span>
+                    <code id="server-url">https://api.trezzit.com/api/mcp</code>
+                    <button type="button" class="copy-btn" data-copy="https://api.trezzit.com/api/mcp" aria-describedby="server-url">Copy</button>
+                </div>
+
+                <nav class="doc-toc" aria-label="On this page">
+                    <h2>On this page</h2>
+                    <ol>
+                        <li><a href="#what-you-can-do">What you can do</a></li>
+                        <li><a href="#example-prompts">Example prompts</a></li>
+                        <li><a href="#connect-claude">Connect in Claude</a></li>
+                        <li><a href="#connect-chatgpt">Connect in ChatGPT</a></li>
+                        <li><a href="#other-apps">Other AI apps</a></li>
+                        <li><a href="#access">What the AI can see and do</a></li>
+                        <li><a href="#money">Trezzit never moves money</a></li>
+                        <li><a href="#good-to-know">Good to know</a></li>
+                        <li><a href="#privacy">Privacy and the action log</a></li>
+                        <li><a href="#disconnect">Disconnect</a></li>
+                        <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        <li><a href="#tools">All tools</a></li>
+                    </ol>
+                </nav>
+
+                <h2 id="what-you-can-do">What you can do <a class="anchor" href="#what-you-can-do" aria-label="Link to this section">#</a></h2>
+                <ul>
+                    <li><strong>Add bills by talking.</strong> Split equally, by percentage, by custom amounts, or line by line from a receipt.</li>
+                    <li><strong>Check balances.</strong> Who owes whom, in each group and overall.</li>
+                    <li><strong>Find and total spending.</strong> Search bills, see your share by category or month, export a group's ledger.</li>
+                    <li><strong>Record a settle-up.</strong> Note that you paid someone back outside Trezzit.</li>
+                    <li><strong>Manage recurring bills.</strong> Rent, subscriptions and utilities: add this month's, skip one, change or end the series.</li>
+                </ul>
+
+                <h2 id="example-prompts">Example prompts <a class="anchor" href="#example-prompts" aria-label="Link to this section">#</a></h2>
+                <ul class="prompts">
+                    <li>"Add a $84.20 dinner to Thursday Dinner Club, I paid, split equally between everyone."</li>
+                    <li>"Who owes me money in Apartment 3B, and how much?"</li>
+                    <li>"How much did I spend on groceries last month across all my groups?"</li>
+                    <li>"I paid Priya back $45 for the electric bill. Record it."</li>
+                    <li>"Add this month's internet bill to the apartment, same as last time."</li>
+                </ul>
+                <p>The assistant shows you what it is about to save. Writes can also be previewed first: ask it to "draft" a bill before saving.</p>
+
+                <h2 id="connect-claude">Connect in Claude <a class="anchor" href="#connect-claude" aria-label="Link to this section">#</a></h2>
+                <ol>
+                    <li>In Claude, open <strong>Settings → Connectors</strong>.</li>
+                    <li>Find <strong>Trezzit</strong> in the directory and select <strong>Connect</strong>. Or choose <strong>Add custom connector</strong>, name it Trezzit and paste the server URL above.</li>
+                    <li>Sign in to Trezzit if asked, check what Claude is asking for, and select <strong>Allow access</strong>.</li>
+                    <li>In a chat, turn Trezzit on from the tools menu and ask away.</li>
+                </ol>
+                <p>Claude usually asks before running an action that changes data, unless you tell it to always allow that action.</p>
+
+                <h2 id="connect-chatgpt">Connect in ChatGPT <a class="anchor" href="#connect-chatgpt" aria-label="Link to this section">#</a></h2>
+                <ol>
+                    <li>In ChatGPT, open the apps directory and search for <strong>Trezzit</strong>. Until Trezzit is listed there, add it in developer mode with the server URL above.</li>
+                    <li>Select <strong>Connect</strong>, sign in to Trezzit, and select <strong>Allow access</strong>.</li>
+                    <li>Mention Trezzit in a chat, or pick it from the tools menu, and ask your question.</li>
+                </ol>
+
+                <h2 id="other-apps">Other AI apps <a class="anchor" href="#other-apps" aria-label="Link to this section">#</a></h2>
+                <p>Any app that supports remote MCP servers with OAuth sign-in can connect with the server URL. In Claude Code, for example:</p>
+                <pre><code>claude mcp add --transport http trezzit https://api.trezzit.com/api/mcp</code></pre>
+
+                <h2 id="access">What the AI can see and do <a class="anchor" href="#access" aria-label="Link to this section">#</a></h2>
+                <p>When you connect, Trezzit shows you exactly what the app is asking for. You can say no.</p>
+                <div class="table-scroll" tabindex="0">
+                    <table data-cols="2">
+                        <thead><tr><th scope="col">Permission</th><th scope="col">What it allows</th></tr></thead>
+                        <tbody>
+                            <tr><td>View your expenses</td><td>Your groups, their members' names, bills, items and receipts you can already see in Trezzit.</td></tr>
+                            <tr><td>See who owes whom</td><td>Balances across your groups.</td></tr>
+                            <tr><td>Create and edit expenses</td><td>Add bills and settle-ups, manage recurring bills, and delete a bill it added in the last 30 minutes. Group members are notified as usual.</td></tr>
+                            <tr><td>View your basic profile</td><td>Your name and email.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>The AI only ever sees your own data: the same bills and people you see in the app. Other members' email addresses are never shared with it.</p>
+
+                <h2 id="money">Trezzit never moves money <a class="anchor" href="#money" aria-label="Link to this section">#</a></h2>
+                <p>Trezzit keeps track of shared expenses. It has no access to bank accounts or cards, and no tool sends, requests or holds money. "Record settlement" writes down that you paid someone back by cash, bank transfer or a payment app; the payment itself happens outside Trezzit.</p>
+
+                <h2 id="good-to-know">Good to know <a class="anchor" href="#good-to-know" aria-label="Link to this section">#</a></h2>
+                <ul>
+                    <li><strong>Deleting.</strong> The AI can delete only a bill it added in the last 30 minutes, and only before anyone else recorded a payment on it. Everything else is deleted in the app.</li>
+                    <li><strong>Split links are public.</strong> "Create public split link" makes a web page anyone with the link can open, for people who aren't on Trezzit. It can't be revoked from the AI app.</li>
+                    <li><strong>Receipts.</strong> Uploading a receipt photo through the AI needs an assistant that can run code with internet access. Otherwise, scan the receipt in the Trezzit app.</li>
+                    <li><strong>Limits.</strong> Write actions are rate limited. If the AI hits the limit, it's told when it can try again.</li>
+                    <li><strong>Currencies.</strong> Amounts are in each group's currency. Currencies without cents (such as JPY) are added in the app.</li>
+                </ul>
+
+                <h2 id="privacy">Privacy and the action log <a class="anchor" href="#privacy" aria-label="Link to this section">#</a></h2>
+                <p>Trezzit never sees your conversation with the AI, only the requests it sends to Trezzit. For each one we keep a short record: which action ran, when, whether it worked, and which bill or group it touched. We don't keep the words in the request. You can see this log, and clear it, in <strong>Profile → Connected AI apps</strong>. What the AI app does with the data it receives is covered by that app's own privacy policy. Full details are in our <a href="/privacy#connected-ai-apps">Privacy Policy</a>.</p>
+
+                <h2 id="disconnect">Disconnect <a class="anchor" href="#disconnect" aria-label="Link to this section">#</a></h2>
+                <ul>
+                    <li>In Trezzit: <strong>Profile → Connected AI apps</strong>, then <strong>Disconnect</strong>. The app loses access right away.</li>
+                    <li>In the AI app: remove or disconnect Trezzit in its connector settings.</li>
+                    <li>Resetting your password or deleting your Trezzit account disconnects every AI app.</li>
+                </ul>
+
+                <h2 id="troubleshooting">Troubleshooting <a class="anchor" href="#troubleshooting" aria-label="Link to this section">#</a></h2>
+                <p><strong>"Insufficient scope" when adding a bill.</strong> The app was allowed to view only. Disconnect it and connect again, allowing "Create and edit expenses".</p>
+                <p><strong>The AI says it isn't connected, or sign-in loops.</strong> Disconnect Trezzit in the AI app and connect again. Make sure you sign in to the same Trezzit account you use in the app.</p>
+                <p><strong>It picked the wrong person or group.</strong> Ask it to use the full name or the group's name, or to list your groups first.</p>
+                <p><strong>Something else?</strong> Email <a href="mailto:support@trezzit.com">support@trezzit.com</a> with the AI app's name and what you asked.</p>
+
+                <h2 id="tools">All tools <a class="anchor" href="#tools" aria-label="Link to this section">#</a></h2>
+                <div class="table-scroll" tabindex="0">
+                    <table data-cols="2">
+                        <thead><tr><th scope="col">Tool</th><th scope="col">What it does</th></tr></thead>
+                        <tbody>
+                            <tr class="tool-group"><td colspan="2">Reads</td></tr>
+                            <tr><td>Get account overview</td><td>Your groups, members and recent bills.</td></tr>
+                            <tr><td>List groups · Get group details</td><td>Your groups and who's in them.</td></tr>
+                            <tr><td>Find people by name</td><td>Matches names you mention to group members.</td></tr>
+                            <tr><td>Get balances</td><td>Who owes whom.</td></tr>
+                            <tr><td>Search bills · Get bill details</td><td>Finds bills and shows their items, shares and receipt.</td></tr>
+                            <tr><td>Get my expenses · Analyse expenses</td><td>Your own share of each bill, and totals.</td></tr>
+                            <tr><td>Get payments</td><td>What you paid and received.</td></tr>
+                            <tr><td>Get person</td><td>A group member's name and shared groups.</td></tr>
+                            <tr><td>Export group ledger</td><td>A group's history as a table.</td></tr>
+                            <tr><td>Get upcoming recurring expenses · List / Get recurring schedule</td><td>Recurring bills and when they're due.</td></tr>
+                            <tr class="tool-group"><td colspan="2">Writes</td></tr>
+                            <tr><td>Create bill</td><td>Adds a bill; group members are notified.</td></tr>
+                            <tr><td>Record settlement</td><td>Notes a payment made outside Trezzit. Moves no money.</td></tr>
+                            <tr><td>Delete bill</td><td>Deletes a bill the AI added in the last 30 minutes.</td></tr>
+                            <tr><td>Get receipt upload URL · Scan receipt</td><td>Uploads a receipt photo and reads its items.</td></tr>
+                            <tr><td>Create public split link</td><td>A public page for splitting with people not on Trezzit.</td></tr>
+                            <tr><td>Create / Update / End / Delete recurring schedule</td><td>Sets up and manages a recurring bill.</td></tr>
+                            <tr><td>Add recurring expense now · Skip recurring period</td><td>Adds or skips one period of a recurring bill.</td></tr>
+                            <tr><td>Link / Unlink bills and recurring schedule</td><td>Connects existing bills to a recurring series.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap">
+            <ul class="footer-links">
+                <li><a href="/privacy">Privacy</a></li>
+                <li><a href="/terms">Terms</a></li>
+                <li><a href="/your-data">Your data</a></li>
+                <li><a href="/delete-account">Delete account</a></li>
+                <li><a href="/mcp" aria-current="page">AI apps</a></li>
+                <li><a href="/support">Support</a></li>
+                <li><a href="mailto:support@trezzit.com">support@trezzit.com</a></li>
+            </ul>
+            <p class="footer-note">Trezzit LLC · Split bills item by item</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.copy-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var text = btn.getAttribute('data-copy');
+                var done = function () {
+                    btn.textContent = 'Copied';
+                    setTimeout(function () { btn.textContent = 'Copy'; }, 1800);
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(done, function () {});
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
