@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Trezzit</title>
+    <meta name="description" content="What Trezzit collects, why, who helps us run the service, how long we keep it, and how to see, export or delete your data.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Trezzit">
+    <link rel="canonical" href="https://trezzit.com/privacy">
+    <meta name="theme-color" content="#4F46E5">
+
+    <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/trezzit-icon-512.png">
+    <link rel="apple-touch-icon" href="/assets/icons/trezzit-icon-512.png">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://trezzit.com/privacy">
+    <meta property="og:title" content="Trezzit Privacy Policy">
+    <meta property="og:description" content="What Trezzit collects, why, who helps us run the service, how long we keep it, and how to see, export or delete your data.">
+    <meta property="og:image" content="https://trezzit.com/assets/images/social-preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Trezzit">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Trezzit Privacy Policy">
+    <meta name="twitter:description" content="What Trezzit collects, why, who helps us run the service, how long we keep it, and how to see, export or delete your data.">
+    <meta name="twitter:image" content="https://trezzit.com/assets/images/social-preview.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="/assets/css/styles.css" rel="stylesheet">
+
+    <style>
+        /* Same tokens as index.html and split.html */
+        :root {
+            --bg-color: #0F172A;
+            --glass-bg: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.25);
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --accent-primary: #4F46E5;
+            --accent-glow: rgba(79, 70, 229, 0.5);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --gutter: 1rem;
+            --measure: 34rem;
+            --doc-measure: 44rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -2;
+            background-image:
+                radial-gradient(at 20% 25%, hsla(243, 85%, 60%, 0.12) 0px, transparent 50%),
+                radial-gradient(at 80% 20%, hsla(262, 75%, 65%, 0.12) 0px, transparent 50%),
+                radial-gradient(at 10% 90%, hsla(210, 80%, 60%, 0.08) 0px, transparent 50%);
+        }
+
+        a {
+            color: inherit;
+        }
+
+        a:focus-visible,
+        .table-scroll:focus-visible {
+            outline: 3px solid #A5B4FC;
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-left: var(--gutter);
+            padding-right: var(--gutter);
+        }
+
+        /* ---------- Header (as split.html) ---------- */
+        .site-header {
+            position: relative;
+            z-index: 20;
+        }
+
+        .site-header .wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            min-height: 4.5rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 0 24px rgba(79, 70, 229, 0.2);
+        }
+
+        .site-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .nav-link {
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+            padding: 0.5rem 0.25rem;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .hero-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-family: var(--font-family);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            letter-spacing: -0.025em;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+        }
+
+        .hero-btn-primary {
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn-primary:hover {
+            background: linear-gradient(135deg, #4338CA, #6D28D9);
+        }
+
+        .hero-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ---------- Document ---------- */
+        .doc {
+            max-width: var(--doc-measure);
+            padding: clamp(1.5rem, 5vw, 3.5rem) 0 clamp(3rem, 8vw, 5rem);
+            font-size: 1rem;
+            line-height: 1.65;
+            color: #CBD5E1;
+        }
+
+        .doc h1,
+        .doc h2 {
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            text-wrap: balance;
+            scroll-margin-top: 1.5rem;
+        }
+
+        .doc h1 {
+            margin: 0;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 900;
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+        }
+
+        .doc h2 {
+            margin: 2.75rem 0 0.75rem;
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .doc .anchor {
+            margin-left: 0.25rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-decoration: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .doc h2:hover .anchor,
+        .doc .anchor:focus-visible {
+            opacity: 1;
+        }
+
+        .doc p,
+        .doc ul,
+        .doc ol {
+            margin: 0 0 1rem;
+            text-wrap: pretty;
+        }
+
+        .doc p[id] {
+            scroll-margin-top: 1.5rem;
+        }
+
+        .doc ul,
+        .doc ol {
+            padding-left: 1.4rem;
+        }
+
+        .doc ul {
+            list-style: disc;
+        }
+
+        .doc ol {
+            list-style: decimal;
+        }
+
+        .doc li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.2rem;
+        }
+
+        .doc li::marker {
+            color: var(--text-secondary);
+        }
+
+        .doc strong {
+            color: var(--text-primary);
+            font-weight: 650;
+        }
+
+        .doc a {
+            color: #C7D2FE;
+            text-decoration: underline;
+            text-decoration-color: rgba(165, 180, 252, 0.45);
+            text-underline-offset: 3px;
+            overflow-wrap: anywhere;
+        }
+
+        .doc a:hover {
+            color: #E0E7FF;
+            text-decoration-color: currentColor;
+        }
+
+        .doc code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.9em;
+            padding: 0.1em 0.35em;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-primary);
+        }
+
+        .doc .doc-meta {
+            margin: 0.9rem 0 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .doc .doc-meta .effective-date {
+            color: #FCD34D;
+        }
+
+        .doc-toc {
+            margin: 0 0 2.5rem;
+            padding: 1.1rem 1.25rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            background: var(--glass-bg);
+        }
+
+        .doc-toc h2 {
+            margin: 0 0 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+        }
+
+        .doc .doc-toc ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            columns: 1;
+        }
+
+        .doc .doc-toc li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .doc .doc-toc a {
+            display: inline-block;
+            padding: 0.25rem 0;
+            color: #CBD5E1;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc .doc-toc a:hover {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+
+        .table-scroll {
+            max-width: 100%;
+            overflow-x: auto;
+            margin: 0 0 1.5rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: var(--glass-bg);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .doc table {
+            width: 100%;
+            min-width: 32rem;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .doc table[data-cols="2"] {
+            min-width: 0;
+        }
+
+        .doc h1 + p {
+            margin-top: 0.9rem;
+        }
+
+        .doc th,
+        .doc td {
+            padding: 0.7rem 0.9rem;
+            text-align: left;
+            vertical-align: top;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .doc th {
+            color: var(--text-primary);
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .doc tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .doc td:first-child {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* ---------- Footer (as split.html) ---------- */
+        .site-footer {
+            padding: 2.5rem 0 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .site-footer .wrap {
+            display: grid;
+            gap: 1rem;
+            justify-items: center;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem 1.5rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-links a {
+            display: inline-block;
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover,
+        .footer-links a[aria-current="page"] {
+            color: var(--text-primary);
+        }
+
+        .footer-note {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        @media (min-width: 640px) {
+            :root {
+                --gutter: 2rem;
+            }
+
+            .nav-link {
+                display: inline-block;
+            }
+
+            .hero-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .hero-buttons {
+                gap: 1rem;
+            }
+
+            .doc .doc-toc ol {
+                columns: 2;
+                column-gap: 2rem;
+            }
+
+            .doc .doc-toc li {
+                break-inside: avoid;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="wrap">
+            <a href="/" class="brand" aria-label="Trezzit home">
+                <img src="/assets/icons/trezzit-icon-square.webp" alt="" width="32" height="32">
+                <span>Trezzit</span>
+            </a>
+            <nav class="site-nav" aria-label="Site">
+                <a href="/split" class="nav-link">Split a bill</a>
+                <div class="hero-buttons">
+                    <a href="https://app.trezzit.com/login" class="hero-btn hero-btn-secondary">Login</a>
+                    <a href="https://app.trezzit.com/signup" class="hero-btn hero-btn-primary">Join Free</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="wrap">
+            <article class="doc">
+                <h1>Trezzit Privacy Policy</h1>
+                <p class="doc-meta">Effective: <strong class="effective-date">October 9, 2026</strong> · Version 2026-10</p>
+                <nav class="doc-toc" aria-labelledby="toc-title">
+                    <h2 id="toc-title">On this page</h2>
+                    <ol>
+                        <li><a href="#the-short-version">The short version</a></li>
+                        <li><a href="#what-we-collect">1. What we collect</a></li>
+                        <li><a href="#how-we-use-it">2. How we use it</a></li>
+                        <li><a href="#what-other-people-see">3. What other people see</a></li>
+                        <li><a href="#who-helps-us-run-trezzit">4. Who helps us run Trezzit</a></li>
+                        <li><a href="#where-your-data-is">5. Where your data is</a></li>
+                        <li><a href="#how-long-we-keep-it">6. How long we keep it</a></li>
+                        <li><a href="#security">7. Security</a></li>
+                        <li><a href="#your-choices-and-rights">8. Your choices and rights</a></li>
+                        <li><a href="#children">9. Children</a></li>
+                        <li><a href="#changes">10. Changes</a></li>
+                        <li><a href="#contact">11. Contact</a></li>
+                    </ol>
+                </nav>
+                <p>Trezzit helps you split bills with friends, track what you spend and settle up. This policy explains what we collect, why, who helps us run the service, how long we keep things and what you can do about it. A one-page summary is at <a href="/your-data">Your data at Trezzit</a>.</p>
+                <p id="who-we-are"><strong>Who we are.</strong> Trezzit is run by Trezzit LLC, an Arizona limited liability company in Tempe, Arizona, United States ("Trezzit", "we"). Questions about privacy: <strong><a href="mailto:privacy@trezzit.com">privacy@trezzit.com</a></strong>. Everything else: <strong><a href="mailto:support@trezzit.com">support@trezzit.com</a></strong>.</p>
+                <h2 id="the-short-version">The short version <a class="anchor" href="#the-short-version" aria-label="Link to this section">#</a></h2>
+                <ul>
+                    <li>We never sell your data, show you ads, or track you across other apps and sites.</li>
+                    <li>AI reads your receipts and sorts your expenses only if you turn on AI features. The AI providers that work for us process data on our behalf and don't use it to train their models.</li>
+                    <li>People in your groups see what they need to split with you. They see your email address masked, not in full.</li>
+                    <li>You can delete your account from the app at any time. Your personal data is deleted, shared bills stay for the other people in them under "Removed User", and backups roll off within 93 days.</li>
+                </ul>
+                <h2 id="what-we-collect">1. What we collect <a class="anchor" href="#what-we-collect" aria-label="Link to this section">#</a></h2>
+                <p id="account"><strong>Account.</strong> Your name, email address, a password (stored only as a one-way hash), and optionally a phone number, profile photo, time zone and default currency. If you sign in with Google or Apple, we receive your name, email address, profile picture link and a stable account ID from them; we never receive your Google or Apple password.</p>
+                <p id="what-you-put-into-trezzit"><strong>What you put into Trezzit.</strong> Bills, items and prices, who paid and who owes what, settlements you record, groups, group notes and checklists, recurring expenses, categories and tags, messages you add to invitations, and receipt images or PDFs you upload, scan or share to Trezzit from another app (including an email you share as a receipt).</p>
+                <p id="people-who-arent-trezzit-users"><strong>People who aren't Trezzit users.</strong> When you add someone to a bill or group who doesn't have an account, we store the name you type for them (and an email address if you invite them). We use it only to show the bill to you and the people you share it with, and to send the invitation you asked us to send. That person can ask us to remove it at <a href="mailto:privacy@trezzit.com">privacy@trezzit.com</a>.</p>
+                <p id="split-a-bill-without-an-account"><strong>Split a bill without an account.</strong> If you use the public "Split a bill" page, we store the bill you create, the names typed into it, receipt images you scan, the IP address it was created from, and any feedback you send (with an email address only if you give one).</p>
+                <p id="connected-ai-apps"><strong>Connected AI apps.</strong> If you connect an AI assistant such as Claude or ChatGPT to Trezzit, we store the app's name, when it was connected and last used, and a log of each action it took on your behalf, so you can see what it did. Access tokens are stored only in hashed form.</p>
+                <p id="notifications"><strong>Notifications.</strong> Your notification settings, the activity feed of what happened in your groups, and, if you turn on push notifications, a push token or subscription for each device along with the device's browser or app description.</p>
+                <p id="technical-data"><strong>Technical data.</strong> When you use Trezzit our servers record technical logs: the address requested, time, response, your IP address and browser or app description. We use them to keep the service working and secure. When you join a group through an invite link we record when, and the IP address and browser used, to protect invite links from abuse; other members can't see the IP address. If something breaks, an error report goes to our error tracker with email addresses and credentials removed. On our web app we use Vercel Web Analytics, which counts page views without cookies and without identifying you (we remove share and invite codes from addresses before they are counted), and Vercel Speed Insights, which measures how fast pages load. Announcement emails we send about Trezzit record whether they were opened or a link was clicked; you can unsubscribe from them at any time.</p>
+                <p id="on-your-device"><strong>On your device.</strong> We use first-party cookies only to keep you signed in. The app keeps your settings (such as your theme) and a copy of recently loaded data on your device so it opens quickly; the copy is cleared when you sign out. We use no advertising or cross-site tracking cookies.</p>
+                <p id="in-our-iphone-and-android-apps"><strong>In our iPhone and Android apps.</strong> The app uses your camera or photo library only when you choose to scan or attach a receipt, and only the photos you pick leave your phone. If you turn on the app lock, Face ID, Touch ID or your fingerprint is checked by your phone's operating system; Trezzit only learns whether the check passed and never receives biometric data. Links to other websites open in an in-app browser, where that website's own privacy policy applies.</p>
+                <p>We don't ask for or store bank account or card numbers. Trezzit doesn't move money: a settlement records a payment you made somewhere else.</p>
+                <h2 id="how-we-use-it">2. How we use it <a class="anchor" href="#how-we-use-it" aria-label="Link to this section">#</a></h2>
+                <ul>
+                    <li><strong>To run Trezzit:</strong> show your bills and balances, split costs, keep group members' shared bills in sync, send the notifications and emails you've chosen, and let you sign in. (Legal basis in the EU and UK: performing our contract with you.)</li>
+                    <li><strong>AI features, only if you turn them on:</strong> reading receipt images into items and prices, and sorting expenses into categories. Sorting sends the bill's title, date, total, item names and prices. (Basis: your consent, which you can withdraw at any time in Profile → Privacy &amp; data.) If someone you share bills with turns on AI features or connects an AI app, the bills you share with them can be included when it works for them.</li>
+                    <li><strong>To improve receipt reading:</strong> we review a small sample of recent receipt scans, only from people who turned on AI features, to find and fix reading errors. (Basis: our legitimate interest in making scanning accurate; you can object at <a href="mailto:privacy@trezzit.com">privacy@trezzit.com</a> or by turning AI features off.)</li>
+                    <li><strong>To keep Trezzit secure and working:</strong> detecting abuse, preventing fraud, fixing bugs. (Basis: legitimate interests.)</li>
+                    <li><strong>To tell you about Trezzit:</strong> occasional announcement emails, which you can turn off. (Basis: legitimate interests.)</li>
+                    <li><strong>To meet legal obligations.</strong></li>
+                </ul>
+                <p>We don't use your data for advertising, we don't sell or rent it, and we don't build profiles of you for anyone else.</p>
+                <h2 id="what-other-people-see">3. What other people see <a class="anchor" href="#what-other-people-see" aria-label="Link to this section">#</a></h2>
+                <ul>
+                    <li><strong>People in your groups</strong> see your name and photo, the bills and settlements you share with them, and your balances with them. They see your email address masked (for example <code>n***n@gmail.com</code>), not in full.</li>
+                    <li><strong>A bill shared by public link</strong> (Split a bill) shows its items, amounts, receipt images and the names typed into it to anyone with the link, including in the link previews chat apps show. Don't put anything in a shared link you wouldn't want its recipients to see.</li>
+                    <li><strong>An invite link</strong> shows the group's name, description and icon, and who invited you, to anyone with the link.</li>
+                    <li><strong>AI apps you connect</strong> receive the Trezzit data their actions need, including other members' names on bills you share, under that app's own privacy policy and settings. You can disconnect them any time in Profile → Connected AI apps.</li>
+                </ul>
+                <h2 id="who-helps-us-run-trezzit">4. Who helps us run Trezzit <a class="anchor" href="#who-helps-us-run-trezzit" aria-label="Link to this section">#</a></h2>
+                <p>These companies process data on our behalf, under terms that limit them to doing so for us. None of them may use your data for their own purposes, including training AI models. The AI services that read receipts and sort expenses can change as we improve Trezzit; this table always lists the ones we use now, and each one works under paid API terms that don't allow training on your data.</p>
+                <div class="table-scroll" role="region" tabindex="0" aria-label="Who helps us run Trezzit">
+                <table data-cols="3">
+                <thead><tr>
+                <th scope="col">Provider</th>
+                <th scope="col">What for</th>
+                <th scope="col">What they receive</th>
+                </tr></thead><tbody>
+                    <tr><td>Google (Gemini API)</td><td>Reading receipts and sorting expenses, only with your consent</td><td>Receipt images, and bill titles, dates, item names and prices</td></tr>
+                    <tr><td>Anthropic (Claude)</td><td>Reviewing a sample of receipt scans to improve accuracy (only from people who turned on AI features); analysing our error logs; the AI tool our team uses to build and test Trezzit</td><td>Those receipt images and what was read from them; error logs with contact details and credentials masked; our test copy (see §7) and the owner's own account</td></tr>
+                    <tr><td>DigitalOcean</td><td>Hosting our servers, database and file storage (United States)</td><td>Everything stored in Trezzit</td></tr>
+                    <tr><td>Supabase (on Amazon Web Services)</td><td>Hosting our test environment's database (United States)</td><td>A pseudonymised copy of the database (see §7)</td></tr>
+                    <tr><td>Vercel</td><td>Hosting our website and web app; page-view counts and page speed</td><td>Web requests and IP addresses</td></tr>
+                    <tr><td>ZeptoMail (Zoho)</td><td>Sending email</td><td>Your email address and the email's content</td></tr>
+                    <tr><td>Google Firebase Cloud Messaging, and browser push services (Apple, Google, Mozilla)</td><td>Delivering push notifications you turned on</td><td>A device push token and the notification (web push notifications are encrypted so the push service can't read them)</td></tr>
+                    <tr><td>Google Identity Services</td><td>Offering "Sign in with Google" on our sign-in pages and app</td><td>Your IP address and browser details when its button loads; your Google account details if you use it</td></tr>
+                    <tr><td>Apple</td><td>"Sign in with Apple", if you choose it</td><td>Covered by Apple's own policy</td></tr>
+                    <tr><td>Sentry</td><td>Error reports</td><td>Technical details of the error, with email addresses and credentials removed</td></tr>
+                    <tr><td>GitHub</td><td>Our code and internal reports</td><td>Internal reports with contact details and credentials masked; review samples are deleted after 7 days</td></tr>
+                    <tr><td>Google Fonts, cdnjs, unpkg</td><td>Fonts and code libraries for our website and some app screens</td><td>Your IP address and browser details when they load</td></tr>
+                </tbody></table></div>
+                <p>We may also disclose data if the law requires it, to protect someone's safety, or as part of a merger or sale of the business (and we'd tell you first).</p>
+                <h2 id="where-your-data-is">5. Where your data is <a class="anchor" href="#where-your-data-is" aria-label="Link to this section">#</a></h2>
+                <p>Trezzit is run from the United States and our data is stored mainly there. Some providers (for example AI and content-delivery services) may process data in other countries under the same safeguards. If you use Trezzit from elsewhere, your data is transferred to the United States. Where the law requires it (for example from the EU or UK), we rely on our providers' standard contractual clauses for these transfers.</p>
+                <h2 id="how-long-we-keep-it">6. How long we keep it <a class="anchor" href="#how-long-we-keep-it" aria-label="Link to this section">#</a></h2>
+                <div class="table-scroll" role="region" tabindex="0" aria-label="How long we keep it">
+                <table data-cols="2">
+                <thead><tr>
+                <th scope="col">Data</th>
+                <th scope="col">Kept</th>
+                </tr></thead><tbody>
+                    <tr><td>Your account and what you put in</td><td>Until you delete it or your account</td></tr>
+                    <tr><td>Receipt images on a bill</td><td>Until that bill is deleted</td></tr>
+                    <tr><td>Receipt images from scans you didn't save, and AI-app uploads not attached to a bill</td><td>90 days</td></tr>
+                    <tr><td>Raw output of AI receipt reading, and AI usage logs</td><td>90 days</td></tr>
+                    <tr><td>Connected AI apps' action log</td><td>Until you delete your account</td></tr>
+                    <tr><td>Shared bills in groups you left, or that were deleted</td><td>Kept for the remaining members, with you shown as "Removed User"</td></tr>
+                    <tr><td>Technical request logs and server log files</td><td>30 days</td></tr>
+                    <tr><td>Invite-link join records (time, IP address, browser)</td><td>As long as the group exists</td></tr>
+                    <tr><td>Records of emails and pushes sent</td><td>90 days</td></tr>
+                    <tr><td>Announcement email open and click records</td><td>90 days</td></tr>
+                    <tr><td>Public split bills nobody claimed (including the creator's IP address)</td><td>90 days</td></tr>
+                    <tr><td>Backups</td><td>Up to 93 days, then deleted automatically</td></tr>
+                    <tr><td>Our test copy</td><td>Until it is next refreshed from the live database</td></tr>
+                </tbody></table></div>
+                <h2 id="security">7. Security <a class="anchor" href="#security" aria-label="Link to this section">#</a></h2>
+                <p>All traffic to Trezzit is encrypted (HTTPS only, with HSTS). Receipt images are kept in private storage and shown through links that expire within an hour. Passwords and AI-app tokens are stored only as hashes. Backups are encrypted. Profile photos and group icons are stored as public files at unguessable addresses, so anyone given the address can see them.</p>
+                <p>Our test environment uses a pseudonymised copy of the database: everyone's name and contact details are replaced with made-up ones, except the owner's own account. Bills and notes in groups the owner belongs to stay as they are; other bills lose their titles, notes and receipts.</p>
+                <p>No system is perfectly secure. If a breach affects your data, we'll tell you and the authorities as the law requires.</p>
+                <h2 id="your-choices-and-rights">8. Your choices and rights <a class="anchor" href="#your-choices-and-rights" aria-label="Link to this section">#</a></h2>
+                <ul>
+                    <li><strong>See and change</strong> your profile and data in the app at any time.</li>
+                    <li><strong>Turn AI features on or off</strong> in Profile → Privacy &amp; data. Turning them off stops new receipt reading and sorting; everything else keeps working.</li>
+                    <li><strong>Notifications and emails:</strong> choose what you get in Profile, under Notifications, and unsubscribe from announcement emails from any of them.</li>
+                    <li><strong>Get a copy</strong> of your data: export a group's transactions from the app, or email <a href="mailto:privacy@trezzit.com">privacy@trezzit.com</a> for everything we hold about you.</li>
+                    <li><strong>Delete your account</strong> in Profile → Delete account, or see <a href="/delete-account">trezzit.com/delete-account</a>. Deletion is scheduled for 14 days later so you can change your mind; sign in before then and choose "Keep my account".</li>
+                    <li>Depending on where you live (for example the EU, UK, India or California), you may also have rights to access, correct, delete, restrict or object to our use of your data, to data portability, and to complain to your data protection authority. We'll answer any request within 30 days; email <a href="mailto:privacy@trezzit.com">privacy@trezzit.com</a>. We don't sell or "share" personal information as California law defines those terms, and we don't discriminate against anyone for using their rights.</li>
+                </ul>
+                <p id="what-deleting-your-account-does"><strong>What deleting your account does.</strong> Before your account is deleted, any balance you still have with someone is closed with a note: (for example "Closed when Alex deleted their account. No money moved.") The people affected are told. Bills you shared with others stay for them, with their receipts, shown as "Removed User". Your personal bills, the bills only you were part of, their receipts, your profile, sign-ins, connected AI apps and their action log, notifications and settings are deleted. Other members' own activity history may still show your name as it was when the activity happened. We keep a minimal record that the deletion happened (no name or email), and, if you had unsubscribed from emails, your address on our do-not-email list. Your email address is otherwise kept only until we've sent you a confirmation that the account is deleted, and never more than 7 days. Backups roll off within 93 days, and our test copy at its next refresh. You can sign up again later with the same email as a new account.</p>
+                <h2 id="children">9. Children <a class="anchor" href="#children" aria-label="Link to this section">#</a></h2>
+                <p>Trezzit is not for children under 13, and we don't knowingly collect data from them. If you think a child under 13 has an account, email <a href="mailto:privacy@trezzit.com">privacy@trezzit.com</a> and we'll delete it.</p>
+                <h2 id="changes">10. Changes <a class="anchor" href="#changes" aria-label="Link to this section">#</a></h2>
+                <p>We'll post any change here with a new effective date. If a change is significant (for example using AI for something new), we'll tell you in the app first, and ask for your consent again where it's needed.</p>
+                <h2 id="contact">11. Contact <a class="anchor" href="#contact" aria-label="Link to this section">#</a></h2>
+                <p>Trezzit LLC, Tempe, Arizona, United States · <a href="mailto:privacy@trezzit.com">privacy@trezzit.com</a></p>
+            </article>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap">
+            <ul class="footer-links">
+                <li><a href="/privacy" aria-current="page">Privacy</a></li>
+                <li><a href="/terms">Terms</a></li>
+                <li><a href="/your-data">Your data</a></li>
+                <li><a href="/delete-account">Delete account</a></li>
+                <li><a href="/support">Support</a></li>
+                <li><a href="mailto:support@trezzit.com">support@trezzit.com</a></li>
+            </ul>
+            <p class="footer-note">Trezzit LLC · Split bills item by item</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
