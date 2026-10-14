@@ -607,7 +607,7 @@
         <div class="wrap">
             <article class="doc">
                 <h1>Trezzit in Claude and ChatGPT</h1>
-                <p class="lede">Connect Trezzit to an AI assistant and ask it to add a bill, tell you who owes what, or sum up last month's spending. It works with your own Trezzit account, only after you allow it, and it never moves money.</p>
+                <p class="lede">Connect Trezzit to an AI assistant to track what you actually spent, across personal and shared expenses and down to each item. Ask it to add an expense, split a receipt, check who owes what, or total last month's spending. It works with your own Trezzit account, only after you allow it, and it never moves money.</p>
 
                 <div class="server-url">
                     <span class="server-url-label">Server URL</span>
@@ -635,18 +635,22 @@
 
                 <h2 id="what-you-can-do">What you can do <a class="anchor" href="#what-you-can-do" aria-label="Link to this section">#</a></h2>
                 <ul>
-                    <li><strong>Add bills by talking.</strong> Split equally, by percentage, by custom amounts, or line by line from a receipt.</li>
+                    <li><strong>Add expenses by talking.</strong> Save a personal expense, or split a group bill equally, by percentage, by custom amounts, or item by item from a receipt.</li>
                     <li><strong>Check balances.</strong> Who owes whom, in each group and overall.</li>
-                    <li><strong>Find and total spending.</strong> Search bills, see your share by category or month, export a group's ledger.</li>
+                    <li><strong>See what you actually spent.</strong> Your personal expenses plus your share of every shared bill, searchable down to item names and totalled by category or month. Export a group's history as a table.</li>
+                    <li><strong>Match your bank statement.</strong> List what you paid and what was settled, so the AI can match it line by line.</li>
                     <li><strong>Record a settle-up.</strong> Note that you paid someone back outside Trezzit.</li>
                     <li><strong>Manage recurring bills.</strong> Rent, subscriptions and utilities: add this month's, skip one, change or end the series.</li>
                 </ul>
 
                 <h2 id="example-prompts">Example prompts <a class="anchor" href="#example-prompts" aria-label="Link to this section">#</a></h2>
                 <ul class="prompts">
+                    <li>"Add a $23.40 pharmacy run to my personal expenses."</li>
                     <li>"Add a $84.20 dinner to Thursday Dinner Club, I paid, split equally between everyone."</li>
                     <li>"Who owes me money in Apartment 3B, and how much?"</li>
-                    <li>"How much did I spend on groceries last month across all my groups?"</li>
+                    <li>"How much did I actually spend on groceries last month, personal and shared?"</li>
+                    <li>"Find every coffee I bought this year and show what each one cost me."</li>
+                    <li>"List what I paid this month so I can match my bank statement."</li>
                     <li>"I paid Priya back $45 for the electric bill. Record it."</li>
                     <li>"Add this month's internet bill to the apartment, same as last time."</li>
                 </ul>
@@ -678,9 +682,9 @@
                     <table data-cols="2">
                         <thead><tr><th scope="col">Permission</th><th scope="col">What it allows</th></tr></thead>
                         <tbody>
-                            <tr><td>View your expenses</td><td>Your groups, their members' names, bills, items and receipts you can already see in Trezzit.</td></tr>
+                            <tr><td>View your expenses</td><td>Your personal and group expenses with their items and receipts, and your groups' member names: what you can already see in Trezzit.</td></tr>
                             <tr><td>See who owes whom</td><td>Balances across your groups.</td></tr>
-                            <tr><td>Create and edit expenses</td><td>Add bills and settle-ups, manage recurring bills, and delete a bill it added in the last 30 minutes. Group members are notified as usual.</td></tr>
+                            <tr><td>Create and edit expenses</td><td>Add expenses and settle-ups, manage recurring bills, and delete a bill it added in the last 30 minutes. Group members are notified as usual.</td></tr>
                             <tr><td>View your basic profile</td><td>Your name and email.</td></tr>
                         </tbody>
                     </table>
@@ -688,7 +692,7 @@
                 <p>The AI only ever sees your own data: the same bills and people you see in the app. Other members' email addresses are never shared with it.</p>
 
                 <h2 id="money">Trezzit never moves money <a class="anchor" href="#money" aria-label="Link to this section">#</a></h2>
-                <p>Trezzit keeps track of shared expenses. It has no access to bank accounts or cards, and no tool sends, requests or holds money. "Record settlement" writes down that you paid someone back by cash, bank transfer or a payment app; the payment itself happens outside Trezzit.</p>
+                <p>Trezzit is a record of your personal and shared spending. It has no access to bank accounts or cards, and no tool sends, requests or holds money. "Record settlement" writes down that you paid someone back by cash, bank transfer or a payment app; the payment itself happens outside Trezzit.</p>
 
                 <h2 id="good-to-know">Good to know <a class="anchor" href="#good-to-know" aria-label="Link to this section">#</a></h2>
                 <ul>
@@ -712,6 +716,7 @@
                 <h2 id="troubleshooting">Troubleshooting <a class="anchor" href="#troubleshooting" aria-label="Link to this section">#</a></h2>
                 <p><strong>"Insufficient scope" when adding a bill.</strong> The app was allowed to view only. Disconnect it and connect again, allowing "Create and edit expenses".</p>
                 <p><strong>The AI says it isn't connected, or sign-in loops.</strong> Disconnect Trezzit in the AI app and connect again. Make sure you sign in to the same Trezzit account you use in the app.</p>
+                <p><strong>"AI features are off" when scanning a receipt.</strong> Reading receipts uses AI, which you turn on yourself. In the Trezzit app, open <strong>Profile → Privacy &amp; data</strong>, turn AI features on, and try again.</p>
                 <p><strong>It picked the wrong person or group.</strong> Ask it to use the full name or the group's name, or to list your groups first.</p>
                 <p><strong>Something else?</strong> Email <a href="mailto:support@trezzit.com">support@trezzit.com</a> with the AI app's name and what you asked.</p>
 
@@ -726,13 +731,13 @@
                             <tr><td>Find people by name</td><td>Matches names you mention to group members.</td></tr>
                             <tr><td>Get balances</td><td>Who owes whom.</td></tr>
                             <tr><td>Search bills · Get bill details</td><td>Finds bills and shows their items, shares and receipt.</td></tr>
-                            <tr><td>Get my expenses · Analyse expenses</td><td>Your own share of each bill, and totals.</td></tr>
-                            <tr><td>Get payments</td><td>What you paid and received.</td></tr>
+                            <tr><td>Get my expenses · Analyze expenses</td><td>Your personal expenses and your share of shared bills, item by item, with totals by category or month.</td></tr>
+                            <tr><td>Get payments</td><td>What you paid, and settle-ups you made or received, for matching a bank statement.</td></tr>
                             <tr><td>Get person</td><td>A group member's name and shared groups.</td></tr>
                             <tr><td>Export group ledger</td><td>A group's history as a table.</td></tr>
                             <tr><td>Get upcoming recurring expenses · List / Get recurring schedule</td><td>Recurring bills and when they're due.</td></tr>
                             <tr class="tool-group"><td colspan="2">Writes</td></tr>
-                            <tr><td>Create bill</td><td>Adds a bill; group members are notified.</td></tr>
+                            <tr><td>Create bill</td><td>Adds a personal expense or a group bill; group members are notified.</td></tr>
                             <tr><td>Record settlement</td><td>Notes a payment made outside Trezzit. Moves no money.</td></tr>
                             <tr><td>Delete bill</td><td>Deletes a bill the AI added in the last 30 minutes.</td></tr>
                             <tr><td>Get receipt upload URL · Scan receipt</td><td>Uploads a receipt photo and reads its items.</td></tr>
@@ -758,7 +763,7 @@
                 <li><a href="/support">Support</a></li>
                 <li><a href="mailto:support@trezzit.com">support@trezzit.com</a></li>
             </ul>
-            <p class="footer-note">Trezzit LLC · Split bills item by item</p>
+            <p class="footer-note">Trezzit LLC · Track and split expenses item by item</p>
         </div>
     </footer>
 
