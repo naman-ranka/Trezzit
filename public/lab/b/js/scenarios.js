@@ -18,8 +18,8 @@ function oweHTML(sc, s) {
   return 'Nobody owes anybody.';
 }
 
-/* Examples page order: the charges the home page shows least come first. */
-const ORDER = ['order', 'pharmacy', 'dinner', 'trip', 'streaming', 'rent', 'groceries'];
+/* Examples page order: a shared charge first, so "Tap a face" matches what is on screen. */
+const ORDER = ['groceries', 'rent', 'trip', 'streaming', 'dinner', 'pharmacy', 'order'];
 
 function card(sc) {
   const s = sc.sum;
@@ -96,8 +96,8 @@ loadScenarios({ extras: true }).then((loaded) => {
     const b = e.target.closest('[data-pick]');
     if (b) show(b.dataset.pick, { focus: true });
   });
-  show(location.hash.slice(1));
-  addEventListener('hashchange', () => show(location.hash.slice(1)));
+  show(location.hash.slice(1) || ORDER[0]);
+  addEventListener('hashchange', () => show(location.hash.slice(1) || ORDER[0]));
   document.body.classList.add('is-ready');
   initReveal();
 });

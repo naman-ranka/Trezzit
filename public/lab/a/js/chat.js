@@ -83,7 +83,8 @@ export async function initChat() {
     }
     if (tk !== token) throw new Error('stop');
   };
-  const scrollDown = () => {};
+  // a longer exchange scrolls inside the log, kept at its newest message, like a real chat
+  const scrollDown = () => { log.scrollTop = log.scrollHeight; };
 
   function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
 
@@ -156,19 +157,19 @@ export async function initChat() {
     start(active || keys[0]);
   });
 
-  // Reserve the height of the longest finished exchange, so playing one never moves the page.
+  // The log is exactly as tall as the opening exchange (the read), so it never shows an empty band; playing the
+  // longer split scrolls inside it instead of moving the page.
   async function fit() {
     const keep = active;
-    log.style.minHeight = '';
-    let max = 0;
-    for (const k of keys) { await play(k, { instant: true }); max = Math.max(max, log.scrollHeight); }
-    log.style.minHeight = `${max}px`;
-    if (keep) await play(keep, { instant: true });
+    log.style.height = '';
+    await play(keys[0], { instant: true });
+    log.style.height = `${log.scrollHeight}px`;
+    if (keep && keep !== keys[0]) await play(keep, { instant: true });
+    scrollDown();
   }
-  await fit();
   // Never an empty or half-played panel: it opens on the first exchange, finished, at every width (nothing plays on
   // its own, so a fast scroll never passes a spinner in a tall empty box). A chip or Replay plays one, animated.
-  await play(keys[0], { instant: true });
+  await fit();
   let w = innerWidth;
   addEventListener('resize', () => { if (innerWidth !== w && !running) { w = innerWidth; fit(); } }, { passive: true });
   if ('IntersectionObserver' in window) {

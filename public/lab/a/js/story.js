@@ -39,20 +39,20 @@ export async function initStory() {
         <span class="nm">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">tax in</small>' : ''}</span><span class="money">${money(res.items[i].totalCents)}</span>
         ${dots(l.pretty)}
       </div>`;
-  const grpLabel = 'Shared groceries';
+  const grpLabel = `${fold.length} shared groceries`;
   stage.innerHTML = `
     <p class="st-cap" aria-hidden="true"><b></b><span></span></p>
-    <div class="st-people"><span class="st-sp" aria-hidden="true"></span><div class="st-pp">${people.map((id) => `
+    <div class="st-people"><span class="st-sp" aria-hidden="true"><strong>${esc(model.merchant)}</strong><small>${model.lines.length} items · ${money(model.totalCents)}</small></span><div class="st-pp">${people.map((id) => `
       <div class="st-p" data-p="${id}">${avatar(PEOPLE[id])}<span class="nm">${esc(PEOPLE[id].name)}</span><span class="amt money">$0.00</span></div>`).join('')}
     </div></div>
     <div class="st-items">${folded.length ? `
       <div class="st-row st-grp" data-lines="${folded.join(',')}" data-g="1" style="--r:0">
-        <span class="nm"><button type="button" class="st-exp" aria-expanded="false" aria-controls="st-sub"><span class="gl">${grpLabel}</span> <small>${folded.length} items</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span><span class="money">${money(sumOf(folded))}</span>
+        <span class="nm"><button type="button" class="st-exp" aria-expanded="false" aria-controls="st-sub"><span class="gl">Groceries</span> <small>${folded.length} shared</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span><span class="money">${money(sumOf(folded))}</span>
         ${dots(grpLabel)}
       </div>
       <div class="st-sub" id="st-sub" hidden>${folded.map((i) => lineRow(model.lines[i], i, true)).join('')}</div>` : ''}
       ${model.lines.map((l, i) => (folded.includes(i) ? '' : lineRow(l, i))).join('')}</div>
-    <div class="st-foot"><p class="ss-owe">You spent <strong class="money ss-you"></strong> <span class="ss-them">· roommates owe you <b class="money"></b></span></p><span class="ss-check"></span><button type="button" class="st-reset" tabindex="-1" aria-label="Reset the split" title="Reset">${ICON.replay}</button></div>
+    <div class="st-foot"><p class="ss-owe">You spent <strong class="money ss-you"></strong> <span class="ss-them">roommates owe you <b class="money"></b></span></p><span class="ss-check"></span><button type="button" class="st-reset" tabindex="-1" aria-label="Reset the split" title="Reset">${ICON.replay}</button></div>
     <p class="visually-hidden" aria-live="polite" data-live></p>`;
 
   const allRows = $$('.st-row', stage);

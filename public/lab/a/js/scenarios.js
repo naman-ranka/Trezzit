@@ -34,11 +34,11 @@ async function search() {
     <div class="sd-results" aria-live="polite" aria-atomic="true"></div>`;
   const input = $('input', el);
   const out = $('.sd-results', el);
-  // always three rows tall (results are capped at three), so typing never moves the page under the card
-  const newest = index.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.i - b.i).slice(0, 3);
+  // always two rows tall (results are capped at two), so typing never moves the page under the card
+  const newest = index.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.i - b.i).slice(0, 2);
   const show = (q) => {
     const t = q.trim().toLowerCase();
-    const hits = t ? index.filter((x) => `${x.name} ${x.merchant} ${CATEGORIES[x.cat]?.label}`.toLowerCase().includes(t)).slice(0, 3) : newest;
+    const hits = t ? index.filter((x) => `${x.name} ${x.merchant} ${CATEGORIES[x.cat]?.label}`.toLowerCase().includes(t)).slice(0, 2) : newest;
     out.innerHTML = hits.length ? hits.map((x) => `<div class="sd-r"><span class="dot" style="--c:${CATEGORIES[x.cat]?.color}"></span>
       <span class="nm">${esc(x.name)}</span><span class="meta">${esc(x.merchant)} · ${dateLabel(x.date).replace(/, \d{4}$/, '')}</span>
       <span class="amt"><strong class="money">${money(x.mine)}</strong>${x.shared ? `<small class="money">of ${money(x.total)}</small>` : '<small>yours</small>'}</span></div>`).join('')

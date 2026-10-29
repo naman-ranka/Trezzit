@@ -113,12 +113,11 @@ h2 { font-size: clamp(32px, 3.7vw, 52px); line-height: 1.05; letter-spacing: -0.
 .cats li > span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cats li small { color: var(--text-secondary); margin-left: 6px; }
 .cats li .money { font-weight: 600; color: var(--ink); }
-.pt-owe { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--divider); display: flex; align-items: center; gap: 10px; font-size: 16px; color: var(--text-secondary); }
+.pt-owe { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--divider); display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-secondary); }
 .pt-owe > span:nth-child(2) { white-space: nowrap; }
 .pt-owe b { margin-left: auto; font-size: 18px; }
 /* the AI angle, shown inside the product: who added this expense, from what */
-.pt-ai { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 14px; color: var(--text-secondary); }
-.pt-ai svg { width: 16px; height: 16px; flex: none; color: var(--text-tertiary); }
+.pt-ai { margin-top: 12px; font-size: 14px; color: var(--text-secondary); white-space: nowrap; }
 .pt-file { font-family: var(--mono); font-size: 12px; color: var(--bank-strong); background: var(--bank-bg); padding: 2px 6px; border-radius: 6px; }
 .avs { display: inline-flex; }
 .avs .av + .av { margin-left: -6px; }
@@ -350,7 +349,11 @@ button.av.nope { animation: nope .35s; }
 }
 
 /* ---------- split it by the item ---------- */
-.snap-top { display: flex; justify-content: flex-end; margin: -12px 0 8px; }
+/* one receipt, no tabs: the link to scan your own sits under the editor on every width */
+.snap { display: flex; flex-direction: column; }
+.snap-top { display: contents; }
+.snap-grid { order: 1; }
+.snap-own { order: 2; align-self: flex-end; margin-top: 12px; }
 .snap-own { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .snap-own svg { width: 18px; height: 18px; }
 .snap-own:hover { text-decoration: underline; }
@@ -431,10 +434,7 @@ button.av.nope { animation: nope .35s; }
 }
 @media (max-width: 639px) {
   /* phones: no second copy of the receipt; the link to scan your own sits under the editor */
-  .snap { display: flex; flex-direction: column; }
-  .snap-top { display: contents; }
-  .snap-grid { order: 1; }
-  .snap-own { order: 2; align-self: center; margin-top: 10px; }
+  .snap-own { align-self: center; margin-top: 10px; }
   .snap-paper { display: none; }
   .mini-tz { justify-content: space-between; min-height: 44px; padding: 0 12px; }
   .mini-tz b { font-size: 24px; }
