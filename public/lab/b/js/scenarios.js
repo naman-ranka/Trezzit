@@ -1,4 +1,4 @@
-/* scenarios.js: the gallery page. Every scenario as a full Bank | Trezzit pair, each split playable. */
+/* scenarios.js: one playable Bank | Trezzit pair; the rail switches which charge it shows. */
 
 import { loadScenarios, PEOPLE, KINDS } from './data.js';
 import { createSplitEditor, catBar, catList } from './split-editor.js';
@@ -18,7 +18,7 @@ function card(sc) {
     ? `${esc(listNames(others))} owe${others.length === 1 ? 's' : ''} you <b class="money money-in" data-owe>${money(s.owedToYou)}</b>`
     : (s.youOwe ? `You owe ${esc(PEOPLE[sc.payer].name)} <b class="money" data-owe>${money(s.youOwe)}</b>` : 'Nobody owes anybody.');
   return `
-  <article class="scn reveal" id="${sc.id}" data-kind="${sc.kind}" aria-labelledby="t-${sc.id}">
+  <article class="scn" id="scn-${sc.id}" data-kind="${sc.kind}" aria-labelledby="t-${sc.id}">
     <header class="scn-h">
       <span class="kind kind-${sc.kind}" aria-hidden="true"></span>
       <div>
@@ -33,7 +33,7 @@ function card(sc) {
         <div class="scn-line${b ? '' : ' is-none'}">
           ${b ? `<span>${esc(b.date)}</span><span>${esc(b.merchant)}</span><span>${bankAmt(s.total)}</span>` : '<span class="none-msg">No charge on your statement</span>'}
         </div>
-        <p class="scn-says">${b ? `${esc(b.cat)}. One line. That&rsquo;s everything your bank knows.` : `Your bank never sees it. ${esc(PEOPLE[sc.payer].name)}&rsquo;s bank sees all of it.`}</p>
+        <p class="scn-says">${b ? `${esc(b.cat)} · 1 line` : `${esc(PEOPLE[sc.payer].name)} paid`}</p>
       </div>
       <div class="pane-tz">
         <p class="pane-label tz"><span>Trezzit</span><span>${esc(sc.merchant)}</span></p>
@@ -63,10 +63,14 @@ function card(sc) {
 }
 
 loadScenarios({ extras: true }).then((all) => {
-  rail.innerHTML = all.map((sc) => `<a href="#${sc.id}" class="chip"><span class="kind-dot kind-${sc.kind}" aria-hidden="true"></span>${esc(sc.short || sc.title)}</a>`).join('');
-  list.innerHTML = all.map(card).join('');
-  all.forEach((sc) => {
-    const art = document.getElementById(sc.id);
+  const byId = Object.fromEntries(all.map((sc) => [sc.id, sc]));
+  rail.innerHTML = all.map((sc) => `<button type="button" class="chip" data-pick="${sc.id}" aria-pressed="false"><span class="kind-dot kind-${sc.kind}" aria-hidden="true"></span>${esc(sc.short || sc.title)}</button>`).join('');
+
+  function show(id, { focus = false } = {}) {
+    const sc = byId[id] || all[0];
+    rail.querySelectorAll('[data-pick]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pick === sc.id)));
+    list.innerHTML = card(sc);
+    const art = list.firstElementChild;
     const ed = createSplitEditor(art.querySelector('[data-editor]'), {
       compact: true,
       onChange(sum) {
@@ -80,8 +84,16 @@ loadScenarios({ extras: true }).then((all) => {
       },
     });
     ed.load(sc);
+    if (history.replaceState) history.replaceState(null, '', `#${sc.id}`);
+    if (focus) art.querySelector('h2')?.focus?.({ preventScroll: true });
+  }
+
+  rail.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-pick]');
+    if (b) show(b.dataset.pick);
   });
+  show(location.hash.slice(1));
+  addEventListener('hashchange', () => show(location.hash.slice(1)));
   document.body.classList.add('is-ready');
   initReveal();
-  if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
 });

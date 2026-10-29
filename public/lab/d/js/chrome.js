@@ -8,8 +8,9 @@ export function initChrome() {
   const onScroll = () => {
     top?.classList.toggle('is-scrolled', scrollY > 8);
     if (night && top) {
-      const r = night.getBoundingClientRect();
-      top.classList.toggle('on-dark', r.top < 30 && r.bottom > 30);
+      // Theme the header by what sits under its bottom edge, so it never stays navy over a white section.
+      const r = night.getBoundingClientRect(); const y = top.offsetHeight - 1;
+      top.classList.toggle('on-dark', r.top <= y && r.bottom > y);
     }
   };
   addEventListener('scroll', onScroll, { passive: true }); onScroll();

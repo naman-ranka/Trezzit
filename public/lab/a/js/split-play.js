@@ -19,12 +19,12 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
     </div>
     <div class="play-grid">
       <div class="panel p-list"><div class="p-rows"></div><div class="p-more" hidden><button type="button" class="btn btn-quiet more-btn"></button></div></div>
-      <aside class="panel p-sum" aria-label="Who spent what">
+      <div class="panel p-sum" role="group" aria-label="Who spent what">
         <h3>Who spent what</h3>
         <div class="p-people"></div>
         <div class="p-check"></div>
         <div class="p-you"></div>
-      </aside>
+      </div>
     </div>
     <p class="visually-hidden" aria-live="polite" data-live></p>`;
 
@@ -153,8 +153,8 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
   let lastNarrow = innerWidth < 960;
   addEventListener('resize', () => { const n = innerWidth < 960; if (n !== lastNarrow) { lastNarrow = n; if (model) render(); } }, { passive: true });
 
-  load(initial);
-  return { load };
+  const ready = load(initial);
+  return { load, ready };
 }
 
 export { toCents };

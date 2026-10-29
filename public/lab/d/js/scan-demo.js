@@ -1,15 +1,11 @@
 // "Scan this receipt": the kit's recorded scans (and a real scan on trezzit.com).
-import { scan, isLive } from '../../_kit/scan-client.js';
-import { renderReceipt, getSample, loadScan } from '../../_kit/receipts.js';
+import { scan } from '../../_kit/scan-client.js';
+import { renderReceipt } from '../../_kit/receipts.js';
 import { toCents } from '../../_kit/split-engine.js';
 import { $, $$, esc, money, icon, reducedMotion, onVisible, announce } from './ui.js';
-import { itemName, getWorld } from './world.js';
+import { itemName, getWorld, getSample, loadScan } from './world.js';
 
-const CHECK_LABEL = {
-  items_total_check: 'Items add up to the subtotal',
-  grand_total_check: 'Everything adds up to the total',
-  tax_distribution_check: 'Tax lands on the right items',
-};
+const CHECKS = ['items_total_check', 'grand_total_check', 'tax_distribution_check'];
 const NEXT = {
   'green-basket': ['Split it', '#split', 'green-basket'],
   'taqueria-sol': ['Split it', '#split', 'taqueria-sol'],
@@ -26,7 +22,7 @@ export function initScan(onSplitRequest) {
   const R = {
     title: $('[data-r-title]', root), sub: $('[data-r-sub]', root), status: $('[data-r-status]', root),
     steps: $$('[data-r-steps] li', root), items: $('[data-r-items]', root), sums: $('[data-r-sums]', root),
-    checks: $('[data-r-checks]', root), foot: $('[data-r-foot]', root),
+    foot: $('[data-r-foot]', root),
   };
   const picker = $$('[data-sample]', root);
   let ctrl = null; let photoUrl = null; let expanded = false;
@@ -60,11 +56,14 @@ export function initScan(onSplitRequest) {
     if (!lastItems) seen = R.items.querySelectorAll('li:not(.more)').length;
     expanded = true; renderItems(items);
   });
-  function renderItems(items) {
+  const skel = (n, cls = '') => Array.from({ length: Math.max(0, n) }, () => `<li class="sk${cls}" aria-hidden="true"><i></i><i></i></li>`).join('');
+  function renderItems(items, reading = false) {
     const list = expanded ? items : items.slice(0, SHOW());
     const was = seen; seen = list.length;
+    // While reading, the rows still to come are placeholders, so the card is never an empty box.
+    const pad = reading ? skel(SHOW() - list.length) : '';
     R.items.innerHTML = list.map((it, i) => `<li${i < was ? ' class="seen"' : ` style="animation-delay:${Math.min(i - was, 3) * 20}ms"`}><span class="n">${esc(itemName(it.name))}</span>${Number(it.quantity) > 1 && Number.isInteger(Number(it.quantity)) ? `<span class="q">×${Number(it.quantity)}</span>` : ''}<span class="a money">${money(toCents(it.amount))}</span></li>`).join('')
-      + (items.length > list.length ? `<li class="more seen"><button type="button" class="link-arrow" data-more>+ ${items.length - list.length} more items</button></li>` : '');
+      + pad + (items.length > list.length && !reading ? `<li class="more seen"><button type="button" class="link-arrow" data-more>+ ${items.length - list.length} more item${items.length - list.length === 1 ? '' : 's'}</button></li>` : '');
     lastItems = items;
   }
 
@@ -78,7 +77,8 @@ export function initScan(onSplitRequest) {
     R.title.textContent = label;
     R.sub.textContent = 'Reading…';
     setStatus('Reading', false);
-    R.items.innerHTML = ''; R.sums.innerHTML = ''; R.checks.innerHTML = ''; R.foot.innerHTML = '';
+    panel.classList.remove('is-done');
+    R.items.innerHTML = skel(SHOW()); R.sums.innerHTML = '<div class="sk" aria-hidden="true"><i></i><i></i></div>'.repeat(3); R.foot.innerHTML = '';
   }
 
   function finish(result) {
@@ -95,11 +95,10 @@ export function initScan(onSplitRequest) {
       + (toCents(bill.tax) ? `<div><span>Tax</span><span class="money">${money(toCents(bill.tax))}</span></div>` : '')
       + (tip ? `<div><span>Tip</span><span class="money">${money(tip)}</span></div>` : '')
       + `<div class="tot"><span>Total</span><span class="money">${money(toCents(bill.total))}</span></div>`;
-    const checks = (raw.backend_validations || r.backend_validations || []).filter((c) => c.passed && CHECK_LABEL[c.check]);
-    const hadChecks = R.checks.children.length;
-    R.checks.innerHTML = checks.map((c, i) => `<li${hadChecks ? ' class="seen"' : ` style="animation-delay:${i * 90}ms"`}>${icon('check')}${CHECK_LABEL[c.check]}</li>`).join('');
+    const checks = (raw.backend_validations || r.backend_validations || []).filter((c) => c.passed && CHECKS.includes(c.check));
     setStatus(checks.length ? 'Checked' : 'Read', true);
     setStep('done');
+    panel.classList.add('is-done');
     const next = NEXT[sampleId];
     R.foot.innerHTML = (notice ? `<p class="notice">${esc(notice)}</p>` : '')
       + (next ? `<a class="link-arrow" href="${next[1]}" data-next>${next[0]} ${icon('down')}</a>` : '<a class="link-arrow" href="https://app.trezzit.com/signup">Save it in Trezzit ' + icon('arrow') + '</a>');
@@ -132,7 +131,7 @@ export function initScan(onSplitRequest) {
             if (!isSample && !items.length) R.sub.textContent = 'Reading… this can take up to a minute';
             if (items.length > shown) {
               shown = items.length;
-              renderItems(items);
+              renderItems(items, true);
               const lines = $$('.tz-r-line', paper);
               lines.forEach((l, i) => l.classList.toggle('is-read', i < shown));
             }
@@ -158,29 +157,10 @@ export function initScan(onSplitRequest) {
   };
   picker.forEach((b) => b.addEventListener('click', () => pick(b.dataset.sample)));
 
-  // Your own receipt: disclosure first.
-  const dlg = $('[data-scan-dialog]', root);
-  const fileIn = $('[data-own-file]', root);
-  if (!isLive()) {
-    $('[data-own-copy]', root).innerHTML = 'Real scanning runs on trezzit.com, where your photo is sent to Google Gemini to read it. In this preview your photo stays on your device and a sample receipt plays instead.';
-  }
-  $('[data-scan-own]', root).addEventListener('click', () => {
-    if (dlg.showModal) dlg.showModal(); else fileIn.click();
-  });
-  fileIn.addEventListener('change', () => {
-    const f = fileIn.files?.[0];
-    if (!f) return;
-    dlg.close?.();
-    picker.forEach((b) => b.setAttribute('aria-pressed', 'false'));
-    if (photoUrl) URL.revokeObjectURL(photoUrl);
-    photoUrl = /^image\//.test(f.type) ? URL.createObjectURL(f) : null;
-    run(f, 'Your receipt');
-    fileIn.value = '';
-  });
-
   // First run: the canonical grocery receipt, when the stage comes into view.
   // The finished result is already on the page; the replay keeps every row in place.
+  // It starts just before the stage scrolls into view, so nobody sees a finished result reset to "Reading".
   const stage = $('.stage', root);
   const start = () => pick('green-basket');
-  if (!reducedMotion()) onVisible(stage, start, 0.3);
+  if (!reducedMotion()) onVisible(stage, start, 0, '0px 0px 160px 0px');
 }

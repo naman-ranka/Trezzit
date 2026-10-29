@@ -12,6 +12,7 @@ const andList = { format: (a) => (a.length < 3 ? a.join(' and ') : `${a.slice(0,
 
 export function mountSplit(root, opts = {}) {
   root.classList.add('split');
+  if (opts.yours === false) root.classList.add('no-yours');
   const st = {
     sampleId: null, title: '', bill: null, people: [], lines: [], original: [], featured: null,
     expanded: !!opts.expanded, tipMode: 'proportional', result: null, payer: opts.payer || 'you',
@@ -38,7 +39,7 @@ export function mountSplit(root, opts = {}) {
       <p class="sp-check">${icon.check}<span></span></p>
       <button type="button" class="c-btn c-btn-sm c-btn-quiet sp-reset">${icon.replay} Reset</button>
     </div>
-    <p class="visually-hidden sp-say" aria-live="assertive"></p>
+    <p class="visually-hidden sp-say" aria-live="polite"></p>
     ${opts.balances ? '<div class="sp-bal"><p class="sp-bal-t">Who owes whom</p><ul role="list"></ul></div>' : ''}`;
   const id = uid; uid += 1;
 
@@ -111,7 +112,8 @@ export function mountSplit(root, opts = {}) {
     const it = st.bill.items[i];
     const item = st.result.items.find((x) => x.index === i);
     const cat = CATEGORIES[line.category] || null;
-    const tax = item.taxCents ? ` + ${money(item.taxCents)} tax` : '';
+    // the line price already includes its tax, so say "incl.", never "+"
+    const tax = item.taxCents ? `incl. ${money(item.taxCents)} tax` : '';
     return `<li class="sp-row" data-i="${i}">
       <div class="sp-line">
         <span class="sp-name">${esc(itemName(it.name))}</span>
@@ -119,7 +121,7 @@ export function mountSplit(root, opts = {}) {
         <span class="sp-meta">${cat ? `<i style="--c:${cat.color}"></i>${cat.label} · ` : ''}<span class="sp-method">${esc(method(line))}</span>${tax ? `<span class="sp-tax">${tax}</span>` : ''}</span>
       </div>
       <div class="sp-who" role="group" aria-label="Who shares ${esc(itemName(it.name))}" style="--n:${st.people.length}">
-        ${st.people.map((p) => `<button type="button" class="who" data-p="${p}" aria-pressed="false" style="--av-c:${PEOPLE[p].color}">
+        ${st.people.map((p, k) => `<button type="button" class="who" data-p="${p}" aria-pressed="false" tabindex="${k === 0 ? 0 : -1}" style="--av-c:${PEOPLE[p].color}">
           <span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span>
           <span class="who-n">${PEOPLE[p].name}</span><span class="money who-a"></span></button>`).join('')}
       </div></li>`;
@@ -221,6 +223,7 @@ export function mountSplit(root, opts = {}) {
       st.people = [...s.people];
       st.lines = bill.items.map((_, i) => ({ ...(s.lines[i] || { split: eq(s.people), category: 'other' }) }));
       st.title = SAMPLE_META[sampleId]?.label || s.title;
+      st.payer = opts.payer || SAMPLE_META[sampleId]?.payer || 'you';
       st.featured = opts.expanded ? null : SAMPLE_META[sampleId]?.featured || null;
       if (st.people.length === 1) st.featured = null;
     } else {
@@ -229,6 +232,7 @@ export function mountSplit(root, opts = {}) {
       st.people = [...ROOMIES];
       st.lines = scanBill.items.map(() => ({ split: eq(ROOMIES), category: 'other' }));
       st.title = storeName(scanBill.merchant) || 'Your receipt';
+      st.payer = opts.payer || 'you';
       st.featured = scanBill.items.length > 6 ? scanBill.items.slice(0, 4).map((_, i) => i) : null;
     }
     st.original = st.lines.map((l) => ({ ...l }));
@@ -256,8 +260,30 @@ export function mountSplit(root, opts = {}) {
     const ordered = st.people.filter((x) => next.includes(x));
     st.lines[i] = { ...st.lines[i], split: eq(ordered) };
     update();
-    say.textContent = `${name}: ${method(st.lines[i])}. You now owe ${money(st.result.people.you?.cents || 0)}.`;
+    const mine = st.result.items.find((x) => x.index === i)?.shares?.you || 0;
+    say.textContent = `${name}: ${method(st.lines[i])}${mine ? `, your part ${money(mine)}` : ''}.`;
   });
+  // one tab stop per row: arrows move between people, Space or Enter toggles
+  itemsEl.addEventListener('keydown', (e) => {
+    const b = e.target.closest('.who');
+    if (!b) return;
+    const all = [...b.parentElement.querySelectorAll('.who')];
+    const k = all.indexOf(b);
+    const to = { ArrowRight: k + 1, ArrowDown: k + 1, ArrowLeft: k - 1, ArrowUp: k - 1, Home: 0, End: all.length - 1 }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    const next = all[(to + all.length) % all.length];
+    all.forEach((x) => { x.tabIndex = x === next ? 0 : -1; });
+    next.focus();
+  });
+  itemsEl.addEventListener('focusin', (e) => {
+    const b = e.target.closest('.who');
+    if (b) b.parentElement.querySelectorAll('.who').forEach((x) => { x.tabIndex = x === b ? 0 : -1; });
+  });
+  // phones: the sticky totals bar must never cover the focused chip
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(() => root.style.setProperty('--sp-people-h', `${peopleEl.offsetHeight}px`)).observe(peopleEl);
+  }
   more.addEventListener('click', () => {
     st.expanded = !st.expanded;
     renderRows();

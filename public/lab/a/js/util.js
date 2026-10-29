@@ -26,16 +26,19 @@ export function prettyName(raw) {
     const l = w.toLowerCase();
     return i === 0 ? l.charAt(0).toUpperCase() + l.slice(1) : l;
   });
-  return out.join(' ').replace(/\b(\d+)l\b/, '$1 L');
+  // a statement line like "RENT NOVEMBER" reads as just "Rent" (the month is the bill's date)
+  return out.join(' ').replace(/\b(\d+)l\b/, '$1 L').replace(/ (january|february|march|april|may|june|july|august|september|october|november|december)$/i, '');
 }
 
 /** Animate a money figure. Returns a promise. */
 export function countTo(el, from, to, { dur = 700, cur = 'USD' } = {}) {
   if (!el) return Promise.resolve();
+  const tok = (el.__count = (el.__count || 0) + 1); // a newer count on the same element wins
   if (reduced() || dur <= 0 || from === to) { el.textContent = money(to, cur); return Promise.resolve(); }
   const t0 = performance.now();
   return new Promise((resolve) => {
     const tick = (t) => {
+      if (el.__count !== tok) { resolve(); return; }
       const k = Math.min(1, (t - t0) / dur);
       const e = 1 - Math.pow(1 - k, 3);
       el.textContent = money(Math.round(from + (to - from) * e), cur);

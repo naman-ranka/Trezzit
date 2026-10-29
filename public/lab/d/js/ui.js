@@ -21,14 +21,14 @@ export function sentence(raw) {
 export const icon = (id, cls = 'i') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
 export const tmark = () => '<span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt=""></span>';
 
-/** Run cb once when el is at least `ratio` visible. */
-export function onVisible(el, cb, ratio = 0.35) {
+/** Run cb once when el is at least `ratio` visible (rootMargin can start it early). */
+export function onVisible(el, cb, ratio = 0.35, rootMargin = '0px') {
   if (!('IntersectionObserver' in window)) { cb(); return; }
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (e.isIntersecting && e.intersectionRatio >= ratio) { io.disconnect(); cb(); }
     });
-  }, { threshold: [0, ratio, 1] });
+  }, { threshold: [0, ratio, 1], rootMargin });
   io.observe(el);
 }
 

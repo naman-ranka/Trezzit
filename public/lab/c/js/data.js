@@ -16,10 +16,10 @@ export { SAMPLES, getSample };
 
 /** Per-sample presentation used by the scan picker and split demo. */
 export const SAMPLE_META = {
-  'green-basket': { label: 'Green Basket Market', short: 'Green Basket', kind: 'Shared groceries', group: 'Apartment 3B', featured: [13, 0, 9, 11] },
+  'green-basket': { label: 'Green Basket Market', short: 'Green Basket', kind: 'Shared groceries', group: 'Apartment 3B', featured: [13, 9, 11] },
   'taqueria-sol': { label: 'Taqueria Sol', short: 'Taqueria Sol', kind: 'Dinner for three', group: 'Friday dinner', featured: null },
   'corner-pharmacy': { label: 'Corner Pharmacy', short: 'Pharmacy', kind: 'Just yours', group: 'Personal', featured: null },
-  'monthly-rent': { label: 'Monthly rent', short: 'Rent', kind: 'Every month', group: 'Apartment 3B', featured: null },
+  'monthly-rent': { label: 'Monthly rent', short: 'Rent', kind: 'Every month', group: 'Apartment 3B', featured: null, payer: 'maya' },
 };
 
 const scans = new Map();
@@ -77,7 +77,7 @@ export function octoberLedger() {
       sampleEntry('monthly-rent', { title: 'Monthly rent', group: 'Apartment 3B', date: 'Oct 1', payer: 'Maya', kind: 'recurring' }),
     ]).then((entries) => {
       entries.forEach((e) => {
-        e.lines.forEach((l) => { if (/^Rent november/i.test(l.name)) l.name = 'Rent, October'; });
+        e.lines.forEach((l) => { if (/^November rent/i.test(l.name)) l.name = 'October rent'; });
       });
       const byCat = {};
       entries.forEach((e) => e.lines.forEach((l) => { byCat[l.cat] = (byCat[l.cat] || 0) + l.cents; }));

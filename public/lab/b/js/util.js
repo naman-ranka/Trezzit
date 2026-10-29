@@ -70,8 +70,9 @@ export const ICON = {
   image: '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="7.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M3.5 14l4-4 3 3 2-2 4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>',
 };
 
-export function avatar(p, { size = '', pressed = null, label = '' } = {}) {
-  const attrs = pressed === null ? 'aria-hidden="true"' : `aria-pressed="${pressed}" aria-label="${esc(label || p.name)}"`;
+/** A face. `speak` keeps a static avatar in the accessibility tree (used for "You", where the avatar is the name). */
+export function avatar(p, { size = '', pressed = null, label = '', speak = false } = {}) {
+  const attrs = pressed === null ? (speak ? '' : 'aria-hidden="true"') : `aria-pressed="${pressed}" aria-label="${esc(label || p.name)}"`;
   const tag = pressed === null ? 'span' : 'button type="button"';
   const close = pressed === null ? 'span' : 'button';
   return `<${tag} class="av ${size}" data-id="${p.id}" style="--c:${p.color}" ${attrs}>${p.id === 'you' ? 'You' : esc(p.initials)}</${close}>`;

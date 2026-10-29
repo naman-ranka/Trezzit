@@ -24,7 +24,6 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     </div>
     <div class="scan-stage">
       <div class="viewer" aria-hidden="true">
-        <span class="viewer-tag">The paper</span>
         <div class="viewer-paper"></div>
         <div class="beam"></div>
       </div>
@@ -35,9 +34,10 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
         </div>
         <div class="status" role="status" aria-live="polite"><span class="spin" hidden></span><span class="ok-ico">${ICON.check}</span><span class="status-t">Waiting for a receipt</span></div>
         <div class="progress" aria-hidden="true"><i></i></div>
-        <ul class="items" role="list"></ul>
-        <div class="sums" hidden></div>
-        <div class="result-cta" hidden><button type="button" class="btn btn-primary split-btn">${esc(splitLabel)}</button></div>
+        <ul class="items" role="list" tabindex="0" aria-label="Receipt items"></ul>
+        <button type="button" class="more-items is-off" tabindex="-1"></button>
+        <div class="sums is-off">${SUMS_PLACEHOLDER}</div>
+        <div class="result-cta is-off"><button type="button" class="btn btn-primary split-btn" tabindex="-1">${esc(splitLabel)}</button></div>
       </div>
     </div>
     <dialog class="consent">
@@ -62,6 +62,28 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   const list = $('.items', root);
   const sums = $('.sums', root);
   const cta = $('.result-cta', root);
+  const splitBtn = $('.split-btn', root);
+  const more = $('.more-items', root);
+  // phones: the parsed list stays a fixed 5 rows (no layout shift); the rest folds behind "+N more"
+  const FOLD = 5;
+  const compact = () => innerWidth < 900;
+  const showCta = (on) => { cta.classList.toggle('is-off', !on); splitBtn.tabIndex = on ? 0 : -1; };
+  function fold(open) {
+    const rows = $$('li', list);
+    // exactly one row past the fold takes the button's slot instead of a "+1 more" button (same height)
+    const six = compact() && !open && rows.length === FOLD + 1;
+    const folding = compact() && !open && rows.length > FOLD + 1;
+    rows.forEach((li, i) => { li.hidden = folding && i >= FOLD; });
+    list.classList.toggle('is-open', !!open);
+    list.classList.toggle('is-six', six);
+    // the button's slot is always there on phones (visibility only), so showing it moves nothing
+    more.classList.toggle('is-off', !folding);
+    more.hidden = !!open;
+    more.tabIndex = folding ? 0 : -1;
+    const n = rows.length - FOLD;
+    if (folding) more.textContent = `+${n} more item${n === 1 ? '' : 's'}`;
+  }
+  more.addEventListener('click', () => fold(true));
   const fileIn = $('.file-in', root);
   const dialog = $('.consent', root);
   let ctrl = null;
@@ -106,7 +128,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     return li;
   }
 
-  async function run(input, { notice } = {}) {
+  async function run(input, { notice, instant = false } = {}) {
     if (typeof input !== 'string' && !isLive()) {
       // Off trezzit.com the API refuses this origin: say so up front and play the closest sample.
       return run(closestSample(input), { notice: 'Live scanning runs on trezzit.com, so here is a sample receipt instead.' });
@@ -117,7 +139,9 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     const isFile = typeof input !== 'string';
     press(isFile ? 'file' : input);
     list.innerHTML = '';
-    sums.hidden = true; cta.hidden = true;
+    list.classList.remove('is-open', 'is-six');
+    more.hidden = false; more.classList.add('is-off'); more.tabIndex = -1;
+    sums.classList.add('is-off'); sums.innerHTML = SUMS_PLACEHOLDER; showCta(false);
     bar.style.width = '4%';
     viewer.classList.remove('is-scanning');
     paper.style.transform = ''; follow = 0;
@@ -144,6 +168,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     try {
       const result = await scan(input, {
         signal,
+        instant: instant || undefined,
         onStage(stage, detail) {
           if (signal.aborted) return;
           if (stage === 'uploading') { setStatus('Uploading the photo'); bar.style.width = '12%'; }
@@ -152,9 +177,9 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
             if (!items.length) { setStatus('Reading the receipt'); bar.style.width = '18%'; return; }
             for (; shown < items.length; shown += 1) {
               list.appendChild(itemRow(items[shown], shown, sample));
-              if (sample) place(shown);
+              if (sample && !instant) place(shown);
             }
-            list.scrollTop = list.scrollHeight;
+            if (!instant) list.scrollTop = list.scrollHeight;
             const n = total || items.length;
             setStatus(`Reading items: ${items.length} of ${n}`);
             bar.style.width = `${18 + 70 * (items.length / n)}%`;
@@ -181,8 +206,11 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
       list.innerHTML = '';
       result.bill.items.forEach((it, i) => list.appendChild(itemRow(it, i, getSample(result.sampleId))));
     }
-    $$('.tz-r-line', paper).forEach((l) => l.classList.add('is-read'));
+    if (!list.children.length) result.bill.items.forEach((it, i) => list.appendChild(itemRow(it, i, result.sampleId ? getSample(result.sampleId) : null)));
+    // the read-line tint fades out once the scan is done (it marks progress, not a result)
+    $$('.tz-r-line', paper).forEach((l) => l.classList.remove('is-read'));
     paper.style.transform = ''; list.scrollTop = 0;
+    fold(false);
     header(model, result.sampleId);
     const b = result.bill;
     const lineSum = b.items.reduce((a, it) => a + toCents(it.amount), 0) + toCents(b.tax) + (b.items.some((i) => i.itemType === 'Tip') ? 0 : toCents(b.tip)) - Math.round((b.discountAmount || 0) * 100);
@@ -192,8 +220,8 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
       ${toCents(b.tax) ? `<div><span>Tax</span><span class="money">${money(toCents(b.tax))}</span></div>` : ''}
       ${toCents(b.tip) ? `<div><span>Tip</span><span class="money">${money(toCents(b.tip))}</span></div>` : ''}
       <div class="tot"><span>Total</span><span class="money">${money(toCents(b.total))}</span></div>`;
-    sums.hidden = false;
-    cta.hidden = !onSplit;
+    sums.classList.remove('is-off');
+    showCta(!!onSplit);
     bar.style.width = '100%';
     onResult?.(model);
     if (result.notice) setStatus(result.notice, 'note');
@@ -222,9 +250,13 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   });
   $('.split-btn', root).addEventListener('click', () => current && onSplit?.(current));
 
-  if (autoStart) onceVisible(root, () => run('green-basket'), { threshold: 0.3 });
+  // watch the stage, not the root: the landing lays the root out with display: contents (no box to observe)
+  if (autoStart) onceVisible($('.scan-stage', root), () => run('green-basket'), { threshold: 0.3 });
   return { run, get model() { return current; } };
 }
+
+// keeps the totals block at its final height while it is hidden (phones show only the Total row)
+const SUMS_PLACEHOLDER = '<div class="tot"><span>Total</span><span class="money">$0.00</span></div>';
 
 function titleCaseStore(t) {
   return String(t || '').toLowerCase().replace(/(^|\s)([a-z])/g, (m, a, b) => a + b.toUpperCase());

@@ -1,34 +1,49 @@
 /* story.js: the split story. One receipt, four roommates.
+ * Three beats: 1 shared items four ways (towels included), 2 personal items, 3 the playground.
  * Desktop: a sticky stage; the step nearest the reading line sets its state (native scroll).
- * Phones: the stage sits still and plays steps 1-4 once it is in view; tap a step to jump to it.
- * At step 4 the stage becomes the playground: tap a dot to add or remove someone from an item,
- * and the kit's engine (integer cents) re-splits; the summary card in step 4 follows live. */
+ * Phones: the stage sits still and plays steps 1-3 once it is in view; a one-line caption at the top of
+ * the stage says which step is showing, and the people row sticks while you scroll the rows.
+ * The stage footer carries the "Adds up to" check + Reset at every width.
+ * At step 3 the stage becomes the playground: tap a dot to add or remove someone from an item,
+ * and the kit's engine (integer cents) re-splits. A light balance block follows live: what this
+ * receipt says roommates owe you, and the running balance for the month (sample bills), which you
+ * can mark as paid (a recorded note; nothing moves money).
+ * Keyboard: the dots are one tab stop (roving tabindex); arrows move between people and rows. */
 import { PEOPLE, CATEGORIES } from '../../_kit/receipts.js';
 import { $, $$, esc, money, countTo, reduced, avatar, onceVisible, ICON } from './util.js';
 import { loadModel, compute, lineMembers } from './data.js';
 
-const GROUP = (i) => (i <= 8 ? 1 : i <= 12 ? 2 : 3);
+const LAST = 3; // the playground step
 const compact = () => innerWidth < 900;
+// the month's other sample bills (rent, Sunday bagels, farmers market): what each roommate already owes you
+const MONTH_BASE = { maya: 8240, jordan: 4410, sam: 3875 };
 
 export async function initStory() {
   const root = $('#story-root');
   const stage = $('#story-stage');
-  const sumEl = $('#story-sum');
+  const sumEls = ['#story-sum', '#story-sum-m'].map((s) => $(s)).filter(Boolean);
   if (!root || !stage) return;
   const model = await loadModel('green-basket');
   const original = JSON.parse(JSON.stringify(model.lines));
   let res = compute(model);
   const people = model.people;
+  // beat 1 = lines everyone shares (the taxed towels too), beat 2 = lines that are someone's own
+  const groups = original.map((l) => (lineMembers(l).length === people.length ? 1 : 2));
+  const GROUP = (i) => groups[i];
+  let settled = false;
 
+  const CAPTION = { 0: `${model.lines.length} items · ${money(model.totalCents)}`, [LAST]: 'Tap a dot to change who had what.' };
   stage.innerHTML = `
+    <p class="st-cap" aria-hidden="true"><b></b><span></span></p>
     <div class="st-people">${people.map((id) => `
       <div class="st-p" data-p="${id}">${avatar(PEOPLE[id])}<span class="nm">${esc(PEOPLE[id].name)}</span><span class="amt money">$0.00</span></div>`).join('')}
     </div>
     <div class="st-items">${model.lines.map((l, i) => `
       <div class="st-row" data-i="${i}" data-g="${GROUP(i)}" style="--c:${CATEGORIES[l.category].color}">
         <span class="nm">${esc(l.pretty)}</span><span class="money">${money(res.items[i].totalCents)}</span>
-        <span class="who" role="group" aria-label="Who had ${esc(l.pretty)}">${people.map((p) => `<button type="button" class="dot-b" data-p="${p}" aria-label="${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button>`).join('')}</span>
+        <span class="who" role="group" aria-label="Who had ${esc(l.pretty)}">${people.map((p) => `<button type="button" class="dot-b" data-p="${p}" aria-label="${esc(l.pretty)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button>`).join('')}</span>
       </div>`).join('')}</div>
+    <div class="st-foot"><span class="ss-check"></span><button type="button" class="st-reset" hidden>${ICON.replay}Reset</button></div>
     <p class="visually-hidden" aria-live="polite" data-live></p>`;
 
   const rows = $$('.st-row', stage);
@@ -39,62 +54,88 @@ export async function initStory() {
   const steps = $$('.step', root);
   let current = -1;
   let edited = false;
+  let fr = 0; // roving focus: row
+  let fc = 0; // roving focus: person
+  const capN = $('.st-cap b', stage);
+  const capT = $('.st-cap span', stage);
+  const footCheck = $('.st-foot .ss-check', stage);
+  const footReset = $('.st-foot .st-reset', stage);
+  footReset.addEventListener('click', () => reset());
+  function caption(step) {
+    capN.textContent = step ? String(step) : '';
+    capT.textContent = step === LAST || step === 0 ? CAPTION[step] : $('h3', steps[step - 1]).textContent;
+  }
+  function renderFoot() {
+    footCheck.className = `ss-check${res.check.ok ? '' : ' bad'}`;
+    footCheck.innerHTML = res.check.ok ? `${ICON.check}Adds up to ${money(res.check.sumCents)}.` : `Shares add up to ${money(res.check.sumCents)}, not ${money(res.check.expectedCents)}.`;
+    footReset.hidden = !edited;
+  }
 
   const totalsAt = (step) => {
     const t = Object.fromEntries(people.map((p) => [p, 0]));
     res.items.forEach((it, i) => {
-      if (GROUP(i) <= Math.min(step, 3)) Object.entries(it.shares).forEach(([p, c]) => { t[p] += c; });
+      if (GROUP(i) <= Math.min(step, 2)) Object.entries(it.shares).forEach(([p, c]) => { t[p] += c; });
     });
     return t;
   };
 
-  /* ---------- the summary card (step 4) ---------- */
+  /* ---------- the balance block (step 3): this receipt, then the month ---------- */
   function renderSum() {
-    if (!sumEl) return;
-    const you = res.people.you || { cents: 0, byCategory: {} };
-    const cats = Object.entries(you.byCategory).filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
     const others = people.filter((p) => p !== 'you');
     const owed = others.reduce((a, p) => a + (res.people[p]?.cents || 0), 0);
-    sumEl.innerHTML = `
-      <div class="ss-row"><span>Your bank</span><span class="money ss-bank">&minus;${money(res.totalCents)}</span></div>
-      <div class="ss-row ss-you"><span>You spent</span><strong class="money">${money(you.cents)}</strong></div>
-      <div class="hv-bar" role="img" aria-label="${esc(cats.map(([c, v]) => `${CATEGORIES[c].label} ${money(v)}`).join(', '))}">${cats.map(([c, v]) => `<span class="seg" style="--w:${(100 * v) / Math.max(1, you.cents)}%;background:${CATEGORIES[c].color}"></span>`).join('')}</div>
-      <ul class="hv-legend" role="list">${cats.map(([c, v]) => `<li><span class="dot" style="--c:${CATEGORIES[c].color}"></span>${esc(CATEGORIES[c].label)}<span class="money">${money(v)}</span></li>`).join('')}</ul>
-      <div class="ss-owe">
-        <p>Roommates owe you <strong class="money">${money(owed)}</strong></p>
-        <ul role="list">${others.map((p) => `<li>${avatar(PEOPLE[p])}<span class="money">${money(res.people[p]?.cents || 0)}</span></li>`).join('')}</ul>
-      </div>
-      <div class="ss-foot"><span class="ss-check${res.check.ok ? '' : ' bad'}">${res.check.ok ? `${ICON.check}Adds up to ${money(res.check.sumCents)}.` : `Shares add up to ${money(res.check.sumCents)}, not ${money(res.check.expectedCents)}.`}</span>
-        <button type="button" class="ss-reset"${edited ? '' : ' hidden'}>${ICON.replay}Reset</button></div>`;
-    $('.ss-reset', sumEl)?.addEventListener('click', reset);
+    const month = others.map((p) => [p, (MONTH_BASE[p] || 0) + (res.people[p]?.cents || 0)]);
+    const html = `
+      <p class="ss-owe">Roommates owe you <strong class="money">${money(settled ? 0 : owed)}</strong></p>
+      <div class="ss-month${settled ? ' is-settled' : ''}">
+        <span class="ss-k">This month, all bills</span>
+        <ul role="list">${month.map(([p, c]) => `<li>${avatar(PEOPLE[p])}<span class="visually-hidden">${esc(PEOPLE[p].name)}</span><span class="money">${settled ? '$0.00' : money(c)}</span></li>`).join('')}</ul>
+        <button type="button" class="ss-paid" aria-pressed="${settled}">${settled ? `${ICON.check}Marked as paid` : 'Mark as paid'}</button>
+      </div>`;
+    sumEls.forEach((el) => { el.innerHTML = html; });
   }
+  sumEls.forEach((el) => el.addEventListener('click', (e) => {
+    if (!e.target.closest('.ss-paid')) return;
+    settled = !settled;
+    renderSum();
+    renderFoot();
+    $('.ss-paid', el)?.focus({ preventScroll: true });
+    live.textContent = settled ? 'Marked as paid. A note for your records; no money moved.' : 'Balances restored.';
+  }));
 
   /* ---------- dots + totals ---------- */
   function paintDots(step) {
     rows.forEach((row) => {
       const i = +row.dataset.i;
-      const assigned = step >= 4 || GROUP(i) <= step;
+      const assigned = step >= LAST || GROUP(i) <= step;
       const shares = res.items[i].shares;
       row.classList.toggle('mine', (shares.you || 0) > 0);
-      $$('.dot-b', row).forEach((b) => {
+      $$('.dot-b', row).forEach((b, c) => {
         const has = (shares[b.dataset.p] || 0) > 0;
         b.classList.toggle('on', assigned && has);
         b.setAttribute('aria-pressed', String(has));
-        b.tabIndex = step === 4 ? 0 : -1;
+        b.tabIndex = step === LAST && i === fr && c === fc ? 0 : -1;
       });
     });
   }
+  // one pending repaint at a time, computed when it runs: a delayed step-2 paint can never land on top of a later edit
+  let totT = 0;
   function paintTotals(step, delay = 0) {
-    const t = totalsAt(step);
-    setTimeout(() => {
+    clearTimeout(totT);
+    const run = () => {
+      const t = totalsAt(step);
       people.forEach((p) => {
         if (shown[p] !== t[p]) { countTo(amts[p], shown[p], t[p], { dur: 600 }); shown[p] = t[p]; }
       });
-    }, delay);
+    };
+    if (delay) totT = setTimeout(run, delay); else run();
   }
 
+  // flyers are viewport-fixed: never start one during a fast scroll (a nav jump), and drop any in flight once the stage leaves view
+  let lastY = scrollY;
+  let fast = false;
+  const dropFlyers = () => $$('.flyer').forEach((f) => f.getAnimations().forEach((a) => a.cancel()));
   function fly(rowsToFly) {
-    if (reduced()) return;
+    if (reduced() || fast) return;
     const sr = stage.getBoundingClientRect();
     if (sr.top < -40 || sr.bottom > innerHeight + 80) return;
     let k = 0;
@@ -134,36 +175,60 @@ export async function initStory() {
     const forward = step > current;
     current = step;
     stage.dataset.step = String(step);
-    stage.classList.toggle('is-play', step === 4);
+    stage.classList.toggle('is-play', step === LAST);
+    root.classList.toggle('is-play', step === LAST);
     steps.forEach((s) => s.classList.toggle('is-active', +s.dataset.step === step));
+    caption(step);
     rows.forEach((row) => {
       const g = +row.dataset.g;
-      row.classList.toggle('is-hot', step < 4 && g === step);
-      row.classList.toggle('is-dim', step < 4 && g > step && step > 0);
+      row.classList.toggle('is-hot', step < LAST && g === step);
+      row.classList.toggle('is-dim', step < LAST && g > step && step > 0);
     });
     paintDots(step);
-    if (forward && step >= 1 && step <= 3) fly(rows.filter((r) => +r.dataset.g === step));
-    paintTotals(step, forward && !reduced() && step <= 3 ? 520 : 0);
+    if (forward && step >= 1 && step < LAST) fly(rows.filter((r) => +r.dataset.g === step));
+    paintTotals(step, forward && !reduced() && step < LAST ? 520 : 0);
   }
 
   /* ---------- playing with it ---------- */
   function resplit() {
     res = compute(model);
-    paintDots(4);
-    paintTotals(4);
+    paintDots(LAST);
+    paintTotals(LAST);
     renderSum();
+    renderFoot();
     live.textContent = people.map((p) => `${PEOPLE[p].name} ${money(res.people[p]?.cents || 0)}`).join(', ') + (res.check.ok ? '. Adds up exactly.' : '.');
   }
   function reset() {
     model.lines = JSON.parse(JSON.stringify(original));
     edited = false;
+    settled = false;
     resplit();
   }
+  stage.addEventListener('keydown', (e) => {
+    const btn = e.target.closest?.('.dot-b');
+    if (!btn) return;
+    const mv = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] }[e.key];
+    let r = fr; let c = fc;
+    if (mv) { r = Math.max(0, Math.min(rows.length - 1, fr + mv[0])); c = Math.max(0, Math.min(people.length - 1, fc + mv[1])); }
+    else if (e.key === 'Home') c = 0;
+    else if (e.key === 'End') c = people.length - 1;
+    else return;
+    e.preventDefault();
+    fr = r; fc = c;
+    paintDots(current);
+    $$('.dot-b', rows[fr])[fc]?.focus();
+  });
   stage.addEventListener('click', (e) => {
     const btn = e.target.closest('.dot-b');
     if (!btn) return;
-    if (current !== 4) { stopAuto(); apply(4); return; }
     const i = +btn.closest('.st-row').dataset.i;
+    fr = i; fc = people.indexOf(btn.dataset.p);
+    if (current !== LAST) {
+      // a tap mid-play stops the play and keeps the change, if the tapped row already shows its people
+      const shown = current >= GROUP(i);
+      stopAuto(); apply(LAST);
+      if (!shown) return;
+    }
     const line = model.lines[i];
     const p = btn.dataset.p;
     let members = lineMembers(line);
@@ -185,14 +250,14 @@ export async function initStory() {
   let autoOn = false;
   function stopAuto() { autoOn = false; clearTimeout(autoT); }
   function autoplay() {
-    if (!compact() || current === 4) return;
+    if (!compact() || current === LAST) return;
     autoOn = true;
     const next = () => {
       if (!autoOn) return;
-      apply(Math.min(4, current + 1));
-      if (current < 4) autoT = setTimeout(next, 1700);
+      apply(Math.min(LAST, current + 1));
+      if (current < LAST) autoT = setTimeout(next, 1900);
     };
-    if (reduced()) { apply(4); return; }
+    if (reduced()) { apply(LAST); return; }
     autoT = setTimeout(next, 400);
   }
   steps.forEach((s) => {
@@ -216,6 +281,10 @@ export async function initStory() {
   let ticking = false;
   function measure() {
     ticking = false;
+    fast = Math.abs(scrollY - lastY) > 120;
+    lastY = scrollY;
+    const sr = stage.getBoundingClientRect();
+    if (sr.bottom < innerHeight * 0.15 || sr.top > innerHeight * 0.85) dropFlyers();
     if (compact()) return;
     const line = innerHeight * 0.62;
     let step = 0;
@@ -230,9 +299,9 @@ export async function initStory() {
       });
     }
     const rr = root.getBoundingClientRect();
-    if (rr.bottom < innerHeight * 0.3) step = 4;
+    if (rr.bottom < innerHeight * 0.3) step = LAST;
     // once played with, keep the playground state while it is in view
-    if (edited && step < 4 && rr.bottom > 0 && rr.top < innerHeight) step = 4;
+    if (edited && step < LAST && rr.bottom > 0 && rr.top < innerHeight) step = LAST;
     apply(step);
   }
   const setH = () => root.style.setProperty('--stage-h', `${stage.offsetHeight}px`);
@@ -247,5 +316,6 @@ export async function initStory() {
   }, { passive: true });
 
   renderSum();
+  renderFoot();
   if (compact()) apply(0); else measure();
 }

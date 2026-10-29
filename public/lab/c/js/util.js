@@ -54,6 +54,9 @@ export function countMoney(el, from, to, dur = 700, cur = 'USD') {
 export function itemName(raw) {
   const s = String(raw || '').trim();
   if (/[a-z]/.test(s)) return s;
+  // "RENT NOVEMBER" reads as "November rent", not "Rent november"
+  const month = /^RENT (JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)$/i.exec(s);
+  if (month) return `${month[1].charAt(0)}${month[1].slice(1).toLowerCase()} rent`;
   const UNIT = { oz: 'oz', lb: 'lb', ct: 'ct', pk: 'pk', l: 'L', gal: 'gal', iu: 'IU' };
   const words = s.split(/\s+/).map((w) => {
     const u = /^(\d+)(oz|lb|ct|pk|l|gal|iu)$/i.exec(w);

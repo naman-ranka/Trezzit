@@ -36,10 +36,10 @@
     <a class="brand" href="./" aria-label="Trezzit home"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="26" height="26"><span>Trezzit</span></a>
     <nav class="nav-links" aria-label="Main">
       <a href="#how">How it works</a>
-      <a href="#scenarios">For you</a>
       <a href="ai/">With AI</a>
     </nav>
     <div class="nav-cta">
+      <a class="nav-ai" href="ai/">With AI</a>
       <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
       <a class="c-btn c-btn-sm c-btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
     </div>
@@ -52,12 +52,12 @@
 <section class="hero" aria-labelledby="hero-t">
   <div class="wrap">
     <h1 id="hero-t" class="display">See what you <span class="ink-mark">actually<svg class="ink-line" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 12 C 60 4, 120 4, 170 9 S 260 15, 296 6" /></svg></span> spent.</h1>
-    <p class="lede">Your bank shows what you paid. Trezzit shows what you spent.</p>
+    <p class="lede">Your bank shows what you paid. Trezzit shows what you spent: every&nbsp;item, alone or shared.</p>
     <div class="cta-row">
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
-      <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
+      <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no sign-up</a>
     </div>
-    <p class="micro">No bank login needed. <a class="micro-ai" href="#ai">Or ask Claude or ChatGPT <span aria-hidden="true">→</span></a></p>
+    <p class="micro"><span class="micro-nb">No bank login needed.</span> <a class="micro-ai" href="#ai">Works with Claude and ChatGPT <span aria-hidden="true">→</span></a></p>
 
     <div class="hero-viz" data-hero>
       <figure class="bank">
@@ -91,22 +91,18 @@
         <p class="tzc-owe"><span>Maya, Jordan and Sam owe you</span><b class="money">$70.00</b></p>
       </figure>
     </div>
-    <p class="thesis">All your spending. One place. <span>Every item.</span></p>
   </div>
 </section>
 
 <!-- ============ THREE VERBS ============ -->
 <section class="verbs" id="how" aria-labelledby="how-t">
   <div class="wrap">
-    <header class="sec-head rv">
-      <h2 id="how-t">Capture. Split. Understand.</h2>
-    </header>
+    <h2 id="how-t" class="visually-hidden">How it works</h2>
 
     <article class="verb" id="capture" aria-labelledby="capture-t">
       <div class="verb-copy rv">
         <p class="verb-k"><span class="verb-n">1</span>Capture</p>
         <h3 id="capture-t">Every item, from one photo.</h3>
-        <p>Snap a receipt. Every line read, then checked.</p>
       </div>
       <div class="verb-demo rv">
         <div class="demo-frame" id="scan-demo">
@@ -119,7 +115,6 @@
       <div class="verb-copy rv">
         <p class="verb-k"><span class="verb-n">2</span>Split</p>
         <h3 id="split-t">Split by item, exact to the cent.</h3>
-        <p>Tap who shared what. Tax follows each item.</p>
       </div>
       <div class="verb-demo rv">
         <div class="demo-frame" id="split-demo">
@@ -132,11 +127,11 @@
       <div class="verb-copy rv">
         <p class="verb-k"><span class="verb-n">3</span>Understand</p>
         <h3 id="understand-t">Your share, sorted by what it was.</h3>
-        <p>Only your share counts, even when a roommate paid.</p>
+        <p>Jordan paid for pizza. Your $9.50 still lands in Dining&nbsp;out.</p>
       </div>
       <div class="verb-demo rv">
         <div class="demo-frame" id="ledger-demo">
-          <noscript><p class="nojs">Spent in October, your share only: $760.35. You paid $258.08.</p></noscript>
+          <noscript><p class="nojs">Spent in October, your share only: $760.35.</p></noscript>
         </div>
       </div>
     </article>
@@ -146,59 +141,52 @@
 <!-- ============ SCENARIOS ============ -->
 <section class="scenes" id="scenarios" aria-labelledby="scenes-t">
   <div class="wrap">
-    <header class="sec-head rv">
-      <p class="eyebrow">For you</p>
-      <h2 id="scenes-t">However you spend.</h2>
+    <header class="sh rv">
+      <h2 id="scenes-t">Shared or just yours. All in one place.</h2>
     </header>
     <ul class="bento" role="list">
       <li class="tile t-wide rv">
         <a href="roommates/">
-          <span class="tile-k" style="--c:#2461bd">Shared</span>
+          <span class="tile-k" style="--c:#2461bd">Roommates <span class="arr" aria-hidden="true">→</span></span>
           <span class="tile-t">Groceries for four, fair to the cent.</span>
-          <span class="tile-s">Add roommates by name. They join when they’re ready.</span>
           <span class="mini mini-bal" aria-hidden="true">
-            <span class="mb-h"><span>Apartment 3B</span><b>Owed to you <em>$70.00</em></b></span>
+            <span class="mb-h"><span>Green Basket</span><b>Owed to you <em>$70.00</em></b></span>
             <span class="mb-row"><i style="--av:#0d9488">M</i><span>Maya owes you</span><b>$30.00</b></span>
             <span class="mb-row"><i style="--av:#b45309">J</i><span>Jordan owes you</span><b>$20.00</b></span>
             <span class="mb-row"><i style="--av:#7c3aed">S</i><span>Sam owes you</span><b>$20.00</b></span>
-            <span class="mb-pay">Record a payment</span>
           </span>
-          <span class="tile-go">Roommates <span class="arr">→</span></span>
         </a>
       </li>
       <li class="tile rv">
         <a href="just-me/">
-          <span class="tile-k" style="--c:#059669">Personal</span>
+          <span class="tile-k" style="--c:#059669">Just me <span class="arr" aria-hidden="true">→</span></span>
           <span class="tile-t">Just yours, still item by item.</span>
           <span class="mini mini-cats" aria-hidden="true">
             <span class="mc-total"><small>Corner Pharmacy</small><b>$48.22</b></span>
             <span class="mc-bar"><i style="--c:#dc2626;--w:48.1"></i><i style="--c:#7c3aed;--w:38"></i><i style="--c:#db2777;--w:11.2"></i><i style="--c:#059669;--w:2.7"></i></span>
-            <span class="mc-legend"><span><i style="--c:#dc2626"></i>Health $23.20</span><span><i style="--c:#7c3aed"></i>Personal care $18.34</span><span><i style="--c:#db2777"></i>Gifts $5.39</span></span>
+            <span class="mc-legend"><span><i style="--c:#dc2626"></i>Health <b>$23.20</b></span><span><i style="--c:#7c3aed"></i>Personal care <b>$18.34</b></span><span><i style="--c:#db2777"></i>Gifts <b>$5.39</b></span><span><i style="--c:#059669"></i>Groceries <b>$1.29</b></span></span>
           </span>
-          <span class="tile-go">Just me <span class="arr">→</span></span>
         </a>
       </li>
       <li class="tile rv">
         <a href="recurring/">
-          <span class="tile-k" style="--c:#0d9488">Recurring</span>
+          <span class="tile-k" style="--c:#0d9488">Every month <span class="arr" aria-hidden="true">→</span></span>
           <span class="tile-t">Rent and Netflix, added every month.</span>
           <span class="mini mini-rec" aria-hidden="true">
-            <span class="mr-row"><span class="mr-d"><small>Dec</small>1</span><span><b>Monthly rent</b><small>4 people · by item</small></span><b>$639.35</b></span>
+            <span class="mr-row"><span class="mr-d"><small>Dec</small>1</span><span><b>Monthly rent</b><small>Your share</small></span><b>$639.35</b></span>
             <span class="mr-row"><span class="mr-d"><small>Dec</small>5</span><span><b>Netflix</b><small>Split 4 ways</small></span><b>$6.25</b></span>
           </span>
-          <span class="tile-go">Every month <span class="arr">→</span></span>
         </a>
       </li>
       <li class="tile t-wide rv">
         <a href="trips/">
-          <span class="tile-k" style="--c:#ea580c">Trips and dinners</span>
+          <span class="tile-k" style="--c:#ea580c">Trips <span class="arr" aria-hidden="true">→</span></span>
           <span class="tile-t">Tax and tip in proportion, not just divided.</span>
           <span class="mini mini-trip" aria-hidden="true">
-            <span class="mt-col"><i style="--av:#162d59">You</i><b>$27.03</b><small>burrito, half the horchata</small></span>
-            <span class="mt-col"><i style="--av:#be185d">A</i><b>$29.88</b><small>tacos, half the horchata</small></span>
-            <span class="mt-col"><i style="--av:#2461bd">P</i><b>$27.96</b><small>quesadilla, agua fresca</small></span>
+            <span class="mt-col"><span class="mt-who"><i style="--av:#162d59">Y</i>You</span><b>$27.03</b><small>burrito, half the horchata</small></span>
+            <span class="mt-col"><span class="mt-who"><i style="--av:#be185d">A</i>Alex</span><b>$29.88</b><small>tacos, half the horchata</small></span>
+            <span class="mt-col"><span class="mt-who"><i style="--av:#2461bd">P</i>Priya</span><b>$27.96</b><small>quesadilla, agua fresca</small></span>
           </span>
-          <span class="tile-go">Trips <span class="arr">→</span></span>
         </a>
       </li>
     </ul>
@@ -210,12 +198,11 @@
   <div class="wrap">
     <div class="ai-grid">
       <header class="ai-copy rv">
-        <p class="eyebrow">With your AI</p>
         <h2 id="ai-t">Or just ask your AI.</h2>
-        <p class="ai-lede">Connect Trezzit to Claude or ChatGPT.</p>
+        <p class="ai-lede">Claude or ChatGPT can read your spending and add receipts.</p>
         <ul class="trust" role="list">
-          <li>Shows you before it saves</li>
-          <li>Disconnect any time</li>
+          <li>Asks before it saves</li>
+          <li>Never moves money</li>
         </ul>
         <p class="ai-links"><a class="c-btn c-btn-primary" href="ai/#connect">Connect your AI</a></p>
       </header>
@@ -229,11 +216,10 @@
 <!-- ============ VISION CLOSE ============ -->
 <section class="close" aria-labelledby="close-t">
   <div class="wrap">
-    <h2 id="close-t" class="close-t rv">Your spending, <span>item by item.</span></h2>
-    <p class="close-sub rv">Ready for you, your roommates and your AI.</p>
+    <h2 id="close-t" class="close-t rv">All your spending. One place. <span>Every item.</span></h2>
     <div class="cta-row rv">
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
-      <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
+      <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no sign-up</a>
     </div>
   </div>
 </section>
@@ -249,7 +235,7 @@
           <li><a href="roommates/">Roommates</a></li><li><a href="trips/">Trips</a></li><li><a href="just-me/">Just me</a></li><li><a href="recurring/">Every month</a></li><li><a href="ai/">With AI</a></li>
         </ul>
         <ul role="list">
-          <li><a href="https://app.trezzit.com/split">Split a bill</a></li><li><a href="/mcp">AI apps</a></li><li><a href="https://app.trezzit.com/login">Log in</a></li><li><a href="https://app.trezzit.com/signup">Sign up</a></li>
+          <li><a href="https://app.trezzit.com/split">Split a bill</a></li><li><a href="https://app.trezzit.com/login">Log in</a></li>
         </ul>
         <ul role="list">
           <li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="/your-data">Your data</a></li><li><a href="/delete-account">Delete account</a></li><li><a href="/support">Support</a></li>

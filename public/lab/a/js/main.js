@@ -29,6 +29,23 @@ safe(() => mountScan($('#scan-demo'), {
 safe(initStory);
 safe(initScenarios);
 safe(initChat);
+copyMcp();
+
+function copyMcp() {
+  const btn = $('#mcp-copy');
+  const url = $('#mcp-url');
+  if (!btn || !url) return;
+  btn.addEventListener('click', async () => {
+    let ok = false;
+    try { await navigator.clipboard.writeText(url.textContent.trim()); ok = true; } catch {
+      // fallback: select the text so a keyboard copy works
+      const r = document.createRange(); r.selectNodeContents(url);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    }
+    btn.textContent = ok ? 'Copied' : 'Selected';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
+  });
+}
 
 function nav() {
   const navEl = $('#nav');

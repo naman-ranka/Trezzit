@@ -7,11 +7,17 @@ import { SAMPLE_META, getSample, sampleBill } from './data.js';
 import { h, esc, money, reduced, onVisible, itemName, storeName, prettyDate, icon, bus } from './util.js';
 
 const STAGE_LABEL = { idle: 'Ready', uploading: 'Uploading', reading: 'Reading items', checking: 'Checking the math', done: 'Done' };
+// one line of compact chips: the list's label says what they mean
 const CHECK_LABEL = {
-  items_total_check: 'Items add up to the subtotal',
-  grand_total_check: 'Total matches the receipt',
-  tax_distribution_check: 'Tax is matched to the taxed items',
+  items_total_check: 'Subtotal',
+  grand_total_check: 'Total',
+  tax_distribution_check: 'Tax',
 };
+
+/** The checks worth showing: no tax check on a receipt without tax. */
+const checksFor = (bill) => (bill?.backendValidations || [])
+  .filter((c) => c.check !== 'tax_distribution_check' || Number(bill.tax) > 0);
+const checkLI = (c, i, pending) => `<li class="${c.passed ? 'ok' : 'warn'}${pending ? ' pending' : ''}" style="--i:${i}">${icon.check}<span>${esc(CHECK_LABEL[c.check] || c.message)}</span></li>`;
 
 /**
  * mountScan(root, { samples, initial, autoplay, splitTarget, compact })
@@ -44,10 +50,10 @@ export function mountScan(root, opts = {}) {
         </div>
         <ol class="so-items" aria-label="Items read from the receipt"></ol>
         <button type="button" class="c-link-btn so-more" hidden></button>
-        <ul class="so-checks" aria-label="Checks"></ul>
+        <ul class="so-checks" aria-label="Checked against the receipt"></ul>
         <div class="so-foot">
           <p class="so-total"><span>Total</span><b class="money"></b></p>
-          ${opts.splitTarget ? `<button type="button" class="c-btn c-btn-sm c-btn-primary so-split" hidden>Split this receipt ${icon.arrow}</button>` : ''}
+          ${opts.splitTarget ? `<button type="button" class="c-btn c-btn-sm c-btn-primary so-split">Split this receipt ${icon.arrow}</button>` : ''}
         </div>
         <p class="so-notice" hidden></p>
       </div>
@@ -73,7 +79,7 @@ export function mountScan(root, opts = {}) {
   const moreBtn = root.querySelector('.so-more');
   const syncMore = () => {
     const n = list.children.length;
-    moreBtn.hidden = n <= 6;
+    moreBtn.hidden = n <= (matchMedia('(max-width: 719px)').matches ? 4 : 6);
     moreBtn.textContent = root.classList.contains('short') ? `Show all ${n} items` : 'Show fewer items';
   };
   root.classList.add('short');
@@ -119,15 +125,24 @@ export function mountScan(root, opts = {}) {
     totalEl.textContent = '';
     storeEl.innerHTML = store || '';
     notice.hidden = true;
-    if (splitBtn) splitBtn.hidden = true;
     root.classList.remove('is-done');
     root.classList.add('short');
     moreBtn.hidden = true;
   }
 
+  const itemLI = (it, i, pending) => `<li class="so-item${pending ? ' pending' : ''}" style="--i:${i}"><span>${esc(itemName(it.name))}${Number(it.quantity) > 1 && Number.isInteger(+it.quantity) ? ` <small>×${+it.quantity}</small>` : ''}</span><span class="money">${money(toCents(it.amount))}</span></li>`;
   function addItem(it, i) {
-    const li = h(`<li class="so-item" style="--i:${i}"><span>${esc(itemName(it.name))}${Number(it.quantity) > 1 && Number.isInteger(+it.quantity) ? ` <small>×${+it.quantity}</small>` : ''}</span><span class="money">${money(toCents(it.amount))}</span></li>`);
-    list.appendChild(li);
+    const row = list.children[i];
+    if (row?.classList.contains('pending')) { row.classList.remove('pending'); return; }
+    list.appendChild(h(itemLI(it, i, false)));
+  }
+  /* A known receipt is laid out at its final size first (rows as quiet placeholders),
+     then revealed in place, so nothing below the demo moves while it scans. */
+  function layout(bill) {
+    list.innerHTML = bill.items.map((it, i) => itemLI(it, i, true)).join('');
+    checks.innerHTML = checksFor(bill).map((c, i) => checkLI(c, i, true)).join('');
+    totalEl.textContent = money(toCents(bill.total), bill.currency || 'USD');
+    syncMore();
   }
 
   async function run(input, { instant = false } = {}) {
@@ -137,9 +152,11 @@ export function mountScan(root, opts = {}) {
     const isFile = typeof input !== 'string';
     if (!isFile) {
       press(input);
-      const { raw } = await sampleBill(input);
+      const { raw, bill } = await sampleBill(input);
       showPaper(receiptHTML(raw, { sample: getSample(input), shadow: false }));
       reset(storeLine(raw.receipt));
+      layout(bill);
+      opts.onStart?.(input);
     } else {
       press(null);
       if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -161,8 +178,11 @@ export function mountScan(root, opts = {}) {
           }
           if (stage === 'checking') {
             settlePaper();
-            const v = detail.validations || [];
-            checks.innerHTML = v.map((c, i) => `<li class="${c.passed ? 'ok' : 'warn'}" style="--i:${i}">${icon.check}<span>${esc(CHECK_LABEL[c.check] || c.message)}</span></li>`).join('');
+            if (checks.querySelector('.pending')) checks.querySelectorAll('.pending').forEach((li) => li.classList.remove('pending'));
+            else {
+              const bill = { backendValidations: detail.validations || [], tax: detail.tax ?? 1 };
+              checks.innerHTML = checksFor(bill).map((c, i) => checkLI(c, i, false)).join('');
+            }
           }
         },
       });
@@ -178,7 +198,10 @@ export function mountScan(root, opts = {}) {
       if (result.source === 'live') storeEl.innerHTML = storeLine(result.raw.receipt);
       totalEl.textContent = money(toCents(result.bill.total), result.bill.currency || 'USD');
       if (result.notice) { notice.textContent = result.notice; notice.hidden = false; }
-      if (splitBtn) splitBtn.hidden = false;
+      if (isFile) {
+        const v = checksFor(result.bill);
+        checks.innerHTML = v.map((c, i) => checkLI(c, i, false)).join('');
+      }
       root.classList.add('is-done');
       paper.querySelectorAll('.tz-r-line.is-active').forEach((l) => l.classList.remove('is-active'));
       paper.style.transform = 'translateY(0)';
@@ -218,11 +241,12 @@ export function mountScan(root, opts = {}) {
 
   // First state: the canonical receipt, read when it comes into view (instantly with reduced motion).
   const first = opts.initial || ids[0];
-  sampleBill(first).then(({ raw }) => {
+  sampleBill(first).then(({ raw, bill }) => {
     if (root.dataset.stage) return;
     press(first);
     showPaper(receiptHTML(raw, { sample: getSample(first), shadow: false }));
     reset(storeLine(raw.receipt));
+    layout(bill);
     setStage('idle');
     statusEl.querySelector('.txt').textContent = 'Tap a receipt to scan it';
     if (opts.autoplay !== false) onVisible(root, () => { if (root.dataset.stage === 'idle') run(first); }, { threshold: 0.45 });

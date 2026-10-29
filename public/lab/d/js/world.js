@@ -1,11 +1,27 @@
 // One made-up October for "you": every number on the page is computed here
 // with the kit's split engine from the kit's recorded scans.
-import { SAMPLES, PEOPLE as KIT_PEOPLE, CATEGORIES, getSample, loadScan, splitSample } from '../../_kit/receipts.js';
+import { SAMPLES, PEOPLE as KIT_PEOPLE, CATEGORIES, getSample, loadScan as kitLoadScan, splitSample } from '../../_kit/receipts.js';
 import { normalizeScan } from '../../_kit/scan-client.js';
 import { splitBill, toCents } from '../../_kit/split-engine.js';
 import { sentence } from './ui.js';
 
 export { SAMPLES, getSample };
+
+/* The kit's rent statement is dated November; this page's example is October, so
+   the rent sample is re-dated here (a local patch, the kit file is untouched). */
+const rent = getSample('monthly-rent');
+if (rent) rent.print = { ...rent.print, register: 'STATEMENT  OCT 2026', footer: ['PAID IN FULL — THANK YOU', 'NEXT STATEMENT NOV 1'] };
+const patched = new WeakSet();
+export async function loadScan(id) {
+  const raw = await kitLoadScan(id);
+  if (id === 'monthly-rent' && !patched.has(raw)) {
+    patched.add(raw);
+    const r = raw.receipt || raw;
+    if (r.storeInformation) r.storeInformation.dateTimeOfPurchase = '2026-10-01';
+    (r.items || []).forEach((it) => { if (it.name === 'RENT NOVEMBER') it.name = 'RENT OCTOBER'; });
+  }
+  return raw;
+}
 // Maya's kit teal fails AA behind white initials (3.7:1); teal-700 passes (5.5:1).
 export const PEOPLE = { ...KIT_PEOPLE, maya: { ...KIT_PEOPLE.maya, color: '#0f766e' } };
 export const CATS = {
@@ -14,7 +30,7 @@ export const CATS = {
 };
 export const catOf = (id) => CATS[id] || CATS.other;
 
-const NAME_FIX = { 'RENT NOVEMBER': 'Rent', 'INTERNET 1 GIG': 'Internet', 'PARKING SPACE 12': 'Parking space' };
+const NAME_FIX = { 'RENT OCTOBER': 'Rent', 'RENT NOVEMBER': 'Rent', 'INTERNET 1 GIG': 'Internet', 'PARKING SPACE 12': 'Parking space' };
 export const itemName = (raw) => NAME_FIX[raw] || sentence(raw);
 
 let worldP;
@@ -53,19 +69,27 @@ async function build() {
   bills.forEach((b) => Object.entries(b.split.people.you?.byCategory || {}).forEach(([k, v]) => { byCat[k] = (byCat[k] || 0) + v; }));
   const cats = Object.entries(byCat).map(([id, cents]) => ({ id, cents, ...catOf(id) })).sort((a, b) => b.cents - a.cents);
 
-  // Every item you have a share of, for item search.
-  const items = [];
+  // Every line on every receipt (lines), and the ones you have a share of (items).
+  const lines = [];
   bills.forEach((b) => b.split.items.forEach((it) => {
     const mine = it.shares?.you || 0;
-    if (!mine) return;
-    const n = Object.values(it.shares).filter((c) => c).length;
-    items.push({
+    const owners = Object.keys(it.shares || {}).filter((k) => it.shares[k]);
+    lines.push({
       name: it.itemType === 'Tip' ? 'Tip' : itemName(it.name), bill: b.title, date: b.date,
-      cents: mine, totalCents: it.totalCents, n, category: it.category || 'other',
+      cents: mine, totalCents: it.totalCents, n: owners.length, owners, category: it.category || 'other',
     });
   }));
+  const items = lines.filter((l) => l.cents > 0);
 
-  return { scans, bills, bank, paidCents, spentCents, cats, items };
+  // Who owes whom across October: positive means they owe you.
+  const net = {};
+  bills.forEach((b) => Object.entries(b.split.people).forEach(([p, v]) => {
+    if (p === b.payer || !v.cents) return;
+    if (b.payer === 'you') net[p] = (net[p] || 0) + v.cents;
+    else if (p === 'you') net[b.payer] = (net[b.payer] || 0) - v.cents;
+  }));
+
+  return { scans, bills, bank, paidCents, spentCents, cats, items, lines, net };
 }
 
 /** A split of one sample with custom per-line people (Sets), for the playground. */

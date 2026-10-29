@@ -1,21 +1,29 @@
 /* shared.js: pieces used by both pages (index and scenarios). */
 
 import { PEOPLE, CATEGORIES } from './data.js';
-import { money, bankAmt, esc, ICON, reduced, watchVisible, avatar } from './util.js';
+import { money, bankAmt, esc, ICON, avatar, listNames, reduced } from './util.js';
 
 export { money, bankAmt };
 
-/* Which kit receipt each statement row comes from (rows without one have no receipt). */
-export const SAMPLE_OF = { groceries: 'green-basket', dinner: 'taqueria-sol', pharmacy: 'corner-pharmacy', rent: 'monthly-rent' };
+/* Rows whose receipt is one of the "Snap it. Split it." tabs. */
+export const SPLITTABLE = { groceries: 'green-basket', dinner: 'taqueria-sol' };
 
 /* ---------- Bank | Trezzit (scoped to one element, e.g. the hero figure) ---------- */
 export function initViewToggle(scope, { onChange } = {}) {
   const group = scope.querySelector('[data-vt]');
   const buttons = [...group.querySelectorAll('[data-set-view]')];
+  // In Bank view the Trezzit pane is covered by "That's all your bank knows.": take it out of the
+  // accessibility tree and expose the message instead, so screen readers hear the same switch.
+  const pane = scope.querySelector('.pane-tz');
+  const knows = scope.querySelector('.bank-knows');
+  const covered = pane ? [...pane.children].filter((c) => c !== knows && !c.classList.contains('seam')) : [];
   const set = (view) => {
     if (scope.dataset.view === view) return;
     scope.dataset.view = view;
     buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setView === view)));
+    const bank = view === 'bank';
+    covered.forEach((c) => { c.inert = bank; if (bank) c.setAttribute('aria-hidden', 'true'); else c.removeAttribute('aria-hidden'); });
+    if (knows) { if (bank) knows.removeAttribute('aria-hidden'); else knows.setAttribute('aria-hidden', 'true'); }
     onChange?.(view);
   };
   buttons.forEach((b) => b.addEventListener('click', () => set(b.dataset.setView)));
@@ -55,44 +63,24 @@ export function initCopy() {
   }));
 }
 
-/* ---------- video: plays only on screen, never under reduced motion, with a pause button ---------- */
-export function initVideo(video, btn) {
-  if (!video || !btn) return;
-  let userPaused = reduced();
-  const draw = () => {
-    const playing = !video.paused;
-    btn.innerHTML = playing ? ICON.pause : ICON.play;
-    btn.setAttribute('aria-label', playing ? 'Pause the video' : 'Play the video');
-  };
-  draw();
-  btn.addEventListener('click', () => {
-    if (video.paused) { userPaused = false; video.play().catch(() => {}); } else { userPaused = true; video.pause(); }
-  });
-  video.addEventListener('play', draw);
-  video.addEventListener('pause', draw);
-  watchVisible(video, (v) => {
-    if (v && !userPaused) { video.preload = 'auto'; video.play().catch(() => {}); }
-    if (!v && !video.paused) video.pause();
-  }, { threshold: 0.25 });
-}
-
 /* ---------- statement row, opened: a short read-only summary ---------- */
 export function summaryHTML(sc, { base = 'scenarios/' } = {}) {
   const s = sc.sum;
   const res = s.result;
-  const b = sc.bank;
   const payerName = PEOPLE[sc.payer]?.name || '';
-  const bank = `<div class="sd-bank"><p>${b
-    ? `${esc(b.merchant)} ${bankAmt(s.total)} · ${esc(b.cat)}.<br>That&rsquo;s everything your bank knows.`
-    : `Not on your statement.<br>${esc(payerName)}&rsquo;s bank has the whole ${money(s.total)}.`}</p></div>`;
-
   let chips;
+  let paidLine = '';
   if (sc.people.length > 1) {
     chips = sc.people.map((id) => {
       const p = PEOPLE[id];
-      const paid = sc.payer === id ? '<small>paid</small>' : '';
-      return `<li class="${id === 'you' ? 'is-you' : ''}">${avatar(p, { size: 'sm' })}<span>${id === 'you' ? 'You' : esc(p.name)}${paid}</span><b class="money">${money(res.people[id]?.cents || 0)}</b></li>`;
+      const name = id === 'you' ? '' : `<span>${esc(p.name)}</span>`;
+      return `<li class="${id === 'you' ? 'is-you' : ''}">${avatar(p, { size: 'sm', speak: id === 'you' })}${name}<b class="money">${money(res.people[id]?.cents || 0)}</b></li>`;
     }).join('');
+    const others = sc.people.filter((id) => id !== 'you').map((id) => PEOPLE[id].name);
+    paidLine = sc.payer === 'you'
+      ? `You paid ${money(s.total)} · ${esc(listNames(others))} owe${others.length === 1 ? 's' : ''} you <b class="money money-in">${money(s.owedToYou)}</b>`
+      : `${esc(payerName)} paid ${money(s.total)} · You owe ${esc(payerName)} <b class="money">${money(s.youOwe)}</b>`;
+    paidLine = `<p class="sd-paid">${paidLine}</p>`;
   } else {
     chips = Object.entries(s.byCategory).sort((x, y) => y[1] - x[1]).map(([k, v]) => {
       const c = CATEGORIES[k] || CATEGORIES.other;
@@ -100,13 +88,16 @@ export function summaryHTML(sc, { base = 'scenarios/' } = {}) {
     }).join('');
   }
   const next = sc.next ? `<p class="sd-next">${ICON.repeat}<span>Adds itself ${esc(sc.next.join(' · '))}</span></p>` : '';
-  const split = SAMPLE_OF[sc.id] ? `<a class="sd-link" href="#snap" data-split-it="${SAMPLE_OF[sc.id]}">Split it yourself<span aria-hidden="true">&darr;</span></a>` : '';
-  const tz = `<div class="sd-tz">
+  // One way on from here: split it yourself if it is a Snap tab, otherwise play with it on the scenarios page.
+  const link = SPLITTABLE[sc.id]
+    ? `<a class="sd-link" href="#snap" data-split-it="${SPLITTABLE[sc.id]}">Split it yourself<span aria-hidden="true">&darr;</span></a>`
+    : `<a class="sd-link" href="${base}#${sc.id}">Change who had what<span aria-hidden="true">&rarr;</span></a>`;
+  return `<div class="sd-tz">
       <p class="sd-lesson">${esc(sc.lesson || '')}</p>
       <ul class="sd-chips" role="list">${chips}</ul>
+      ${paidLine}
       <p class="sd-check">${ICON.check}<span>Adds up to <b class="money">${money(res.totalCents)}</b>, to the cent.</span></p>
       ${next}
-      <p class="sd-links">${split}<a class="sd-link" href="${base}#${sc.id}">See it full size<span aria-hidden="true">&rarr;</span></a></p>
+      <p class="sd-links">${link}</p>
     </div>`;
-  return bank + tz;
 }

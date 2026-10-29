@@ -3,4 +3,4 @@ import { initPage } from './page.js';
 import { mountChat } from './chat-demo.js';
 
 initPage();
-mountChat(document.getElementById('chat-demo'), { scripts: ['split', 'groceries', 'statement', 'rent', 'owe', 'settle'] });
+mountChat(document.getElementById('chat-demo'), { scripts: ['statement', 'split', 'groceries', 'rent', 'owe', 'settle'] });

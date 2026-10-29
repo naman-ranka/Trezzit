@@ -6,6 +6,19 @@ import { prettyName } from './util.js';
 
 export { SAMPLES, PEOPLE, CATEGORIES, getSample };
 
+/* One quiet palette: people and categories are ink/slate shades (names and labels carry the meaning);
+ * brand blue is the one accent and green is kept for money owed to you and "Adds up to".
+ * The kit's objects are shared, so this restyles every module on the page without editing the kit. */
+const PEOPLE_TONE = { you: '#0f1f3d', maya: '#2f3f5c', jordan: '#4a5a75', sam: '#5f6b82', alex: '#3d4e6c', priya: '#5f6b82' };
+const CAT_TONE = {
+  groceries: '#0f1f3d', household: '#8590a6', health: '#0f1f3d', 'personal-care': '#4a5a75', gifts: '#8590a6',
+  dining: '#0f1f3d', rent: '#0f1f3d', utilities: '#4a5a75', internet: '#8590a6', parking: '#b8c0cd', other: '#b8c0cd',
+};
+Object.entries(PEOPLE_TONE).forEach(([id, c]) => { if (PEOPLE[id]) PEOPLE[id].color = c; });
+Object.entries(CAT_TONE).forEach(([id, c]) => { if (CATEGORIES[id]) CATEGORIES[id].color = c; });
+/** Bar segments: an ink-to-slate ramp by rank, so neighbours always differ. */
+export const RAMP = ['#0f1f3d', '#4a5a75', '#8590a6', '#b8c0cd'];
+
 export const SHORT = {
   'green-basket': { label: 'Groceries', icon: 'basket' },
   'corner-pharmacy': { label: 'Pharmacy', icon: 'cross' },

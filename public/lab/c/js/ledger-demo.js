@@ -26,16 +26,19 @@ const MAIN_CAT = (e) => {
 
 export async function mountLedger(root, opts = {}) {
   const data = await octoberLedger();
-  const { entries, byCat, spent, paid, last } = data;
+  const { entries, byCat, spent, last } = data;
   const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
   const max = cats[0][1];
   const delta = spent - last;
   root.classList.add('ledger');
+  // compact (home): fewer categories and rows on phones, so the demo stays one screen tall
+  if (opts.compact) root.classList.add('compact');
+  const chips = ['towels', 'cold brew', 'Taqueria'];
   root.innerHTML = `
     <div class="lg-sum">
       <p class="lg-label">Spent in October <span class="lg-tag">Your share only</span></p>
       <p class="lg-total money" aria-live="off">${money(spent)}</p>
-      <p class="lg-sub">You paid ${money(paid)} <span aria-hidden="true">·</span> <span class="${delta < 0 ? 'down' : 'up'}">${money(Math.abs(delta))} ${delta < 0 ? 'less' : 'more'} than September</span></p>
+      <p class="lg-sub"><span class="${delta < 0 ? 'down' : 'up'}">${money(Math.abs(delta))} ${delta < 0 ? 'less' : 'more'} than September</span></p>
       <div class="lg-bar" aria-hidden="true">${cats.map(([k, c]) => `<i style="--c:${cat(k).color};--w:${(c / spent) * 100}%"></i>`).join('')}</div>
       <ul class="lg-cats short" role="list" aria-label="By category">
         ${cats.map(([k, c]) => {
@@ -54,14 +57,14 @@ export async function mountLedger(root, opts = {}) {
       <button type="button" class="c-link-btn lg-more">Show all ${cats.length} categories</button>
     </div>
     <div class="lg-find">
-      <label class="lg-search">${icon.search}<span class="visually-hidden">Search your spending</span>
+      ${opts.compact ? '' : `<label class="lg-search">${icon.search}<span class="visually-hidden">Search your spending</span>
         <input type="search" placeholder="Search items, stores, categories" autocomplete="off" spellcheck="false"></label>
-      <p class="lg-try"><span>Try</span>${['towels', 'cold brew', 'Taqueria', 'rent'].map((q) => `<button type="button" class="chip-q" data-q="${q}">${q}</button>`).join('')}</p>
+      <p class="lg-try"><span>Try</span>${chips.map((q) => `<button type="button" class="chip-q" data-q="${q}" aria-pressed="false">${q}</button>`).join('')}</p>`}
       <p class="lg-count" aria-live="polite"></p>
       <ul class="lg-list" role="list"></ul>
     </div>`;
 
-  const input = root.querySelector('input');
+  const input = root.querySelector('input') || { value: '', addEventListener() {}, focus() {} };
   const listEl = root.querySelector('.lg-list');
   const countEl = root.querySelector('.lg-count');
   let filterCat = null;
@@ -71,9 +74,13 @@ export async function mountLedger(root, opts = {}) {
   function entryRow(e) {
     const k = MAIN_CAT(e);
     const who = e.payer === 'you' ? 'you paid' : `${e.payer} paid`;
+    // say what a row is in the words a visitor already has: just you, who paid, what the rent covers
+    const sub = e.kind === 'personal' ? `Just you · ${e.date}`
+      : e.id === 'monthly-rent' ? `${e.date} · ${who} · rent, utilities, internet`
+        : `${e.group} · ${e.date} · ${who}`;
     return `<li class="lg-row">
       <span class="lg-ri" style="--c:${cat(k).color}">${e.kind === 'recurring' ? `<span class="lg-rec" title="Recurring">${icon.repeat}</span>` : ''}${catIcon(k)}</span>
-      <span class="lg-rt"><b>${esc(e.title)}</b><small>${esc(e.group)} · ${e.date} · ${who}</small></span>
+      <span class="lg-rt"><b>${esc(e.title)}</b><small>${esc(sub)}</small></span>
       <span class="lg-ra"><b class="money">${money(e.youCents)}</b>${e.totalCents !== e.youCents ? `<small class="money">of ${money(e.totalCents)}</small>` : ''}</span></li>`;
   }
   function lineRow(l, q) {
@@ -88,16 +95,18 @@ export async function mountLedger(root, opts = {}) {
     const q = input.value.trim();
     const ql = q.toLowerCase();
     root.querySelectorAll('.lg-cat').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cat === filterCat)));
+    root.querySelectorAll('.chip-q').forEach((b) => b.setAttribute('aria-pressed', String(!!q && b.dataset.q === q)));
     if (!q && !filterCat) {
-      listEl.innerHTML = entries.slice(0, opts.rows || 6).map(entryRow).join('');
-      countEl.textContent = `${entries.length} expenses this month`;
+      listEl.innerHTML = entries.map(entryRow).join('');
+      countEl.textContent = opts.compact ? 'Latest' : `${entries.length} expenses this month`;
       return;
     }
     const hits = allLines.filter((l) => (!filterCat || l.cat === filterCat)
       && (!ql || l.name.toLowerCase().includes(ql) || l.entry.title.toLowerCase().includes(ql) || cat(l.cat).label.toLowerCase().includes(ql)));
     const sum = hits.reduce((a, l) => a + l.cents, 0);
+    const cap = opts.compact ? 5 : 8;
     listEl.innerHTML = hits.length
-      ? hits.slice(0, 8).map((l) => lineRow(l, q)).join('') + (hits.length > 8 ? `<li class="lg-moreline">and ${hits.length - 8} more items</li>` : '')
+      ? hits.slice(0, cap).map((l) => lineRow(l, q)).join('') + (hits.length > cap ? `<li class="lg-moreline">and ${hits.length - cap} more items</li>` : '')
       : `<li class="lg-empty">No items match “${esc(q)}”.</li>`;
     countEl.innerHTML = hits.length
       ? `${hits.length} ${hits.length === 1 ? 'item' : 'items'}${filterCat ? ` in ${cat(filterCat).label}` : ''} <span aria-hidden="true">·</span> your share <b class="money">${money(sum)}</b>`
@@ -111,7 +120,12 @@ export async function mountLedger(root, opts = {}) {
     moreCats.textContent = ul.classList.contains('short') ? `Show all ${cats.length} categories` : 'Show fewer';
   });
   input.addEventListener('input', render);
-  root.querySelectorAll('.chip-q').forEach((b) => b.addEventListener('click', () => { input.value = b.dataset.q; filterCat = null; render(); input.focus({ preventScroll: true }); }));
+  // a tapped chip shows its results; only keyboard or mouse users get the caret (no soft keyboard over the results)
+  const finePointer = matchMedia('(pointer: fine)');
+  root.querySelectorAll('.chip-q').forEach((b) => b.addEventListener('click', (e) => {
+    input.value = b.dataset.q; filterCat = null; render();
+    if (e.detail === 0 || finePointer.matches) input.focus({ preventScroll: true });
+  }));
   root.querySelectorAll('.lg-cat').forEach((b) => b.addEventListener('click', () => {
     filterCat = filterCat === b.dataset.cat ? null : b.dataset.cat;
     if (filterCat) input.value = '';
@@ -120,11 +134,18 @@ export async function mountLedger(root, opts = {}) {
   render();
 
   // count up the headline figure the first time it is seen
+  // never shows $0.00: starts at 60% of the total, as soon as the figure itself is on screen
   const totalEl = root.querySelector('.lg-total');
   if (!reduced()) {
-    totalEl.textContent = money(0);
+    const from = Math.round(spent * 0.6);
+    totalEl.textContent = money(from);
     root.classList.add('pre');
-    onVisible(root, () => { root.classList.remove('pre'); countMoney(totalEl, 0, spent, 900); }, { threshold: 0.4 });
+    onVisible(totalEl, async () => {
+      root.classList.add('counting');
+      root.classList.remove('pre');
+      await countMoney(totalEl, from, spent, 800);
+      root.classList.remove('counting');
+    }, { threshold: 0, rootMargin: '0px 0px -20% 0px' });
   }
   return { data };
 }

@@ -35,7 +35,7 @@ async function buildScripts() {
         { t: 'tool', name: 'Read the receipt' },
         { t: 'tool', name: 'Draft the bill' },
         { t: 'card', html: splitCard(false) },
-        { t: 'ai', text: 'Here it is before I save it. The rest is shared by all four of you, and the tax stays with the towels. Save it to Apartment 3B?' },
+        { t: 'ai', text: 'Here it is before I save it. The rest is shared by all four of you, and the tax stays with the towels. Save it to Apartment 3B? Maya, Jordan and Sam will be notified.' },
         { t: 'user', text: 'Save it.', wait: 900 },
         { t: 'tool', name: 'Save the bill' },
         { t: 'card', html: splitCard(true), replace: true },
@@ -92,7 +92,7 @@ async function buildScripts() {
             <li>${av('jordan')}<span>Jordan owes you</span><b class="money pos">$16.75</b></li>
             <li>${av('maya')}<span>You owe Maya</span><b class="money neg">$603.10</b></li>
           </ul></div>` },
-        { t: 'ai', html: 'Four people owe you <b class="money">$100.83</b> in total, from Friday dinner and the apartment. You owe Maya <b class="money">$603.10</b>, mostly October rent.' },
+        { t: 'ai', html: 'Four people owe you <b class="money">$100.83</b>, from Friday dinner and the apartment. You owe Maya <b class="money">$603.10</b>: your <b class="money">$639.35</b> of October rent, less the <b class="money">$36.25</b> she owes you.' },
       ],
     },
     statement: {
@@ -127,7 +127,7 @@ async function buildScripts() {
 
 export async function mountChat(root, opts = {}) {
   const S = await buildScripts();
-  const keys = opts.scripts || ['split', 'groceries', 'rent', 'owe'];
+  const keys = opts.scripts || ['statement', 'groceries', 'split', 'owe'];
   root.classList.add('chat');
   // One fixed-height panel: the conversation scrolls inside it, so the page never jumps
   // and the panel is never an empty box. Suggestions sit where the composer would be.
@@ -137,10 +137,10 @@ export async function mountChat(root, opts = {}) {
         <span class="chat-id"><span class="chat-glyph" aria-hidden="true">${icon.sparkle}</span><span><b>Your AI assistant</b><small>Claude or ChatGPT, with Trezzit</small></span></span>
         <button type="button" class="chat-ctl" aria-label="Pause">${icon.pause}</button>
       </div>
-      <ol class="chat-log" aria-live="polite" tabindex="0" aria-label="Conversation"></ol>
+      <ol class="chat-log" aria-live="off" tabindex="0" aria-label="Conversation"></ol>
       <div class="chat-try">
-        <span class="chat-try-l" id="chat-try-${uid}">Try</span>
         <div class="chat-prompts" role="group" aria-labelledby="chat-try-${uid}">
+          <span class="chat-try-l" id="chat-try-${uid}">Try</span>
           ${keys.map((k, i) => `<button type="button" class="prompt" data-k="${k}" aria-pressed="${i === 0}">${esc(S[k].chip)}</button>`).join('')}
         </div>
       </div>
@@ -161,6 +161,7 @@ export async function mountChat(root, opts = {}) {
     ctl.dataset.mode = mode;
   };
 
+  const toEl = (el) => log.scrollTo({ top: Math.max(0, el.offsetTop), behavior: reduced() ? 'auto' : 'smooth' });
   const toEnd = (smooth = true) => log.scrollTo({ top: log.scrollHeight, behavior: smooth && !reduced() ? 'smooth' : 'auto' });
 
   async function wait(ms, my) {
@@ -181,7 +182,9 @@ export async function mountChat(root, opts = {}) {
       const att = step.attach ? (step.attach.doc
         ? `<span class="att doc"><span class="doc-i" aria-hidden="true">PDF</span>${esc(step.attach.label)}</span>`
         : `<span class="att"><img src="${thumb(step.attach.id)}" alt="" width="28" height="40">${esc(step.attach.label)}</span>`) : '';
-      el = h(`<li class="msg u"><div class="bub">${att}<p>${esc(step.text)}</p></div></li>`);
+      // the newest request stays pinned to the top of the panel while its answer plays below it
+      log.querySelectorAll('.msg.u.pin').forEach((x) => x.classList.remove('pin'));
+      el = h(`<li class="msg u pin"><div class="bub">${att}<p>${esc(step.text)}</p></div></li>`);
     } else if (step.t === 'tool') {
       el = h(`<li class="msg tool${instant ? ' done' : ''}"><span class="tl-i">${icon.tool}</span><span>Trezzit <span aria-hidden="true">·</span> ${esc(step.name)}</span><span class="tl-s" aria-hidden="true">${icon.check}</span></li>`);
     } else if (step.t === 'card') {
@@ -220,12 +223,13 @@ export async function mountChat(root, opts = {}) {
     try {
       for (const s of steps.slice(from)) {
         if (s.t === 'user') await wait(s.wait || 250, my);
-        if (s.t === 'tool') await wait(420, my);
-        if (s.t === 'card') await wait(380, my);
-        if (s.t === 'ai') await wait(420, my);
+        if (s.t === 'tool') await wait(220, my);
+        if (s.t === 'card') await wait(160, my);
+        if (s.t === 'ai') await wait(320, my);
         const el = add(s, false);
-        toEnd();
-        if (s.t === 'tool') { await wait(520, my); el.classList.add('done'); }
+        // a new request scrolls to the top of the panel; answers grow below it
+        if (s.t === 'user') toEl(el); else toEnd();
+        if (s.t === 'tool') { await wait(280, my); el.classList.add('done'); }
       }
       state = 'done'; setCtl();
     } catch { /* superseded */ }
@@ -233,6 +237,8 @@ export async function mountChat(root, opts = {}) {
   }
 
   root.querySelectorAll('.prompt').forEach((b) => b.addEventListener('click', () => {
+    // the autoplay stays quiet for screen readers; conversations the visitor starts are announced
+    log.setAttribute('aria-live', 'polite');
     b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduced() ? 'auto' : 'smooth' });
     play(b.dataset.k);
   }));

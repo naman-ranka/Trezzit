@@ -53,19 +53,19 @@ const DEFS = [
     id: 'groceries', kind: 'shared', title: 'Groceries with roommates', short: 'Groceries',
     sample: 'green-basket', payer: 'you', group: 'Flatmates',
     bank: { date: 'OCT 24', merchant: 'GREEN BASKET MKT', cat: 'Shopping' },
-    lesson: 'One charge. Four people. Your share is $30.00, not $100.00.',
+    lesson: 'One charge, four people.',
   },
   {
     id: 'dinner', kind: 'shared', title: 'Dinner a friend paid', short: 'Dinner',
     sample: 'taqueria-sol', payer: 'alex', group: 'Taco Thursday',
     bank: null,
-    lesson: 'Alex paid. It never touches your statement, but you still ate it.',
+    lesson: 'Not on your statement. Still your dinner.',
   },
   {
     id: 'pharmacy', kind: 'personal', title: 'A pharmacy run, just yours', short: 'Pharmacy',
     sample: 'corner-pharmacy', payer: 'you', group: null,
     bank: { date: 'OCT 20', merchant: 'CORNER PHARMACY', cat: 'Health' },
-    lesson: 'All yours, and still four kinds of spending in one charge.',
+    lesson: 'All yours. Four kinds of spending.',
   },
   {
     id: 'rent', kind: 'recurring', title: 'Rent and bills', short: 'Rent',
@@ -80,7 +80,7 @@ const DEFS = [
       { name: 'Parking space 12', amount: '75.00', category: 'parking', split: { type: 'exact', amounts: { jordan: '75.00' } } },
     ],
     total: '2632.40',
-    lesson: 'One transfer, five lines, four people. Added for you every month.',
+    lesson: 'One transfer, five lines, every month.',
     next: ['Nov 1', 'Dec 1', 'Jan 1'],
   },
   {
@@ -90,20 +90,20 @@ const DEFS = [
     people: ROOMIES,
     items: [{ name: 'Premium plan', amount: '22.99', category: 'subscriptions', split: eq(ROOMIES) }],
     total: '22.99',
-    lesson: '$22.99 leaves your account. $5.75 of it is yours.',
+    lesson: 'A quarter of it is yours.',
     next: ['Nov 3', 'Dec 3', 'Jan 3'],
   },
   {
     id: 'trip', kind: 'shared', title: 'A weekend away', short: 'Trip',
     payer: 'you', group: 'Lake weekend',
-    bank: { date: 'OCT 11', merchant: 'PINES CABIN RENTALS', cat: 'Travel' },
+    bank: { date: 'OCT 11', merchant: 'PINES CABIN', cat: 'Travel' },
     people: ROOMIES,
     items: [
       { name: 'Cabin, 2 nights', amount: '480.00', category: 'travel', split: eq(ROOMIES) },
       { name: 'Cleaning fee', amount: '60.00', category: 'travel', split: eq(ROOMIES) },
     ],
     total: '540.00',
-    lesson: 'You booked it for four. You spent $135.00 on it.',
+    lesson: 'You booked it for four.',
   },
 ];
 
@@ -123,7 +123,7 @@ const EXTRA = [
     ],
     tax: '5.03',
     total: '67.96',
-    lesson: 'Your bank calls it "Shopping". It was five different things.',
+    lesson: 'One order, five different things.',
   },
 ];
 

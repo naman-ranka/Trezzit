@@ -20,12 +20,12 @@ export async function initLedger() {
           <button type="button" aria-pressed="false" data-v="bank">Your bank</button>
         </div>
       </div>
-      <label class="search">${icon('search')}<span class="visually-hidden">Search items, stores, categories</span><input type="search" placeholder="Search any item or store" data-q autocomplete="off"></label>
-      <div class="sugg" data-sugg><span class="visually-hidden">Try:</span>${['towels', 'avocados', 'sunscreen', 'groceries'].map((q) => `<button type="button" data-try="${q}">${q}</button>`).join('')}</div>
+      <label class="search" data-find>${icon('search')}<span class="visually-hidden">Search items, stores, categories</span><input type="search" placeholder="Search any item or store" data-q autocomplete="off"></label>
+      <div class="sugg" data-find><span class="visually-hidden">Try:</span>${['towels', 'avocados', 'sunscreen', 'groceries'].map((q) => `<button type="button" data-try="${q}">${q}</button>`).join('')}</div>
       <div data-list aria-live="polite"></div>
     </div>
     <div class="panel sum-card">
-      <div class="kicker">October · your share only</div>
+      <div class="kicker">October</div>
       <div class="paidspent"><div><span>You paid</span><b class="money">${money(w.paidCents)}</b></div><div class="sp"><span>You spent</span><b class="money">${money(w.spentCents)}</b></div></div>
       <div class="cats">${top.map((c) => `<div class="cat"><div class="l"><span>${esc(c.label)}</span><b class="money">${money(c.cents)}</b></div><div class="hbar"><i style="width:${Math.max(2, (c.cents / max) * 100)}%;background:${c.color}"></i></div></div>`).join('')}
         <div class="cat"><div class="l"><span>Everything else</span><b class="money">${money(rest)}</b></div><div class="hbar"><i style="width:${Math.max(2, (rest / max) * 100)}%;background:#94a3b8"></i></div></div></div>
@@ -52,8 +52,7 @@ export async function initLedger() {
         + `<div class="led-foot"><span>Left your account</span><b class="money">${money(w.paidCents)}</b></div>`;
       return;
     }
-    list.innerHTML = w.bills.map((b) => `<div class="lrow"><span class="ic" style="background:${ICON_BG[b.id]}">${b.recurring ? icon('repeat') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.date} · ${b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('')
-      + `<div class="led-foot"><span>You spent</span><b class="money">${money(w.spentCents)}</b></div>`;
+    list.innerHTML = w.bills.map((b) => `<div class="lrow"><span class="ic" style="background:${ICON_BG[b.id]}">${b.recurring ? icon('repeat') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.recurring ? '<i class="tag">Monthly</i>' : ''}${b.date} · ${b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('');
   }
   render();
 
@@ -62,6 +61,8 @@ export async function initLedger() {
     if (v) {
       view = v.dataset.v; q.value = '';
       $$('button[data-v]', host).forEach((b) => b.setAttribute('aria-pressed', String(b === v)));
+      // Search only means something in the Trezzit view; the bank has no items to find.
+      $$('[data-find]', host).forEach((el) => { el.hidden = view === 'bank'; });
       render();
     }
     const t = e.target.closest('button[data-try]');
