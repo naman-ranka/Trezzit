@@ -16,9 +16,9 @@ export function initChrome() {
   addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
   $$('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
-    const label = b.querySelector('span') || b;
+    const label = b.querySelector('.does') || b.querySelector('span') || b;
     const was = label.textContent;
-    try { await navigator.clipboard.writeText(b.dataset.copy); label.textContent = 'Copied'; }
+    try { await navigator.clipboard.writeText(b.dataset.copy); label.textContent = 'Copied'; b.classList.add('copied'); }
     catch {
       // No clipboard access: select the URL instead and say how to copy it, without changing the button's width.
       const code = b.parentElement.querySelector('code');
@@ -26,7 +26,7 @@ export function initChrome() {
       b.title = 'Selected. Press Ctrl+C or ⌘C to copy.';
       return;
     }
-    setTimeout(() => { label.textContent = was; }, 1800);
+    setTimeout(() => { label.textContent = was; b.classList.remove('copied'); }, 1800);
   }));
 
   $$('[data-tabs]').forEach((list) => {

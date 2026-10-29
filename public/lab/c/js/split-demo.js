@@ -21,7 +21,7 @@ export function mountSplit(root, opts = {}) {
   root.innerHTML = `
     <div class="sp-head">
       <p class="sp-bill"><b class="sp-title"></b><span class="sp-sub"></span></p>
-      <ul class="sp-people" role="list" aria-live="polite" aria-atomic="false"></ul>
+      <ul class="sp-people" role="list"></ul>
       <p class="sp-yours"></p>
     </div>
     <div class="sp-tip" hidden>
@@ -33,8 +33,8 @@ export function mountSplit(root, opts = {}) {
     </div>
     <p class="sp-hint">Tap a person on any line</p>
     <ul class="sp-items" role="list"></ul>
-    <div class="sp-extra" hidden></div>
     <button type="button" class="sp-more c-link-btn" hidden></button>
+    <div class="sp-extra" hidden></div>
     <div class="sp-foot">
       <p class="sp-check">${icon.check}<span></span></p>
       <button type="button" class="c-btn c-btn-sm c-btn-quiet sp-reset">${icon.replay} Reset</button>
@@ -274,8 +274,9 @@ export function mountSplit(root, opts = {}) {
     const same = origPeople && origPeople.length === ordered.length && ordered.every((x) => origPeople.includes(x));
     st.lines[i] = { ...st.lines[i], split: same ? orig : eq(ordered) };
     update();
-    const mine = st.result.items.find((x) => x.index === i)?.shares?.you || 0;
-    say.textContent = `${name}: ${method(st.lines[i])}${mine ? `, your part ${money(mine)}` : ''}.`;
+    // the one announcer: what changed on the line, then your new total
+    const you = st.result.people.you?.cents;
+    say.textContent = `${name}: ${method(st.lines[i])}.${you != null ? ` You ${money(you)}.` : ''}`;
   });
   // one tab stop per row: arrows move between people, Space or Enter toggles
   itemsEl.addEventListener('keydown', (e) => {
@@ -314,6 +315,8 @@ export function mountSplit(root, opts = {}) {
     st.tipMode = b.dataset.tip;
     root.querySelectorAll('.sp-tip [data-tip]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
     update();
+    const you = st.result.people.you?.cents;
+    say.textContent = `Tax and tip ${st.tipMode === 'equal' ? 'equally' : 'in proportion'}.${you != null ? ` You ${money(you)}.` : ''}`;
   }));
 
   if (opts.listen) {

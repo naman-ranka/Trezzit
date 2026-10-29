@@ -33,7 +33,7 @@ function octoberCard(w) {
 
 function rentCard(w) {
   const r = w.scans['monthly-rent'].split;
-  return `<div class="tcard"><div class="tcard-head"><span class="rec-icon" style="width:28px;height:28px;border-radius:8px">${icon('repeat')}</span><span class="t"><b>Rent &amp; bills</b><span>Monthly on the 1st · parking is Jordan\u2019s</span></span></div>
+  return `<div class="tcard"><div class="tcard-head"><span class="rec-icon" style="width:28px;height:28px;border-radius:8px">${icon('repeat')}</span><span class="t"><b>Rent &amp; bills</b><span>Monthly on the 1st</span></span></div>
     <div class="versus" style="margin-bottom:0"><div class="bank plain"><span class="lbl">Each month</span><span class="v money">${money(r.totalCents)}</span></div><div class="mine"><span class="lbl">Your share</span><span class="v money">${money(r.people.you.cents)}</span></div></div></div>`;
 }
 
@@ -143,7 +143,7 @@ export function scripts(w) {
       { t: 'user', text: 'Add our rent every month: by room, bills four ways, parking is Jordan’s.' },
       { t: 'tool', run: 'Setting up the schedule', done: 'Monthly on the 1st', ms: 1000 },
       { t: 'card', html: rentCard },
-      { t: 'ai', text: 'Done. It asks you each month before adding it.' },
+      { t: 'ai', text: 'Done. It asks you each month first.' },
     ],
     towels: [
       { t: 'user', text: 'What did the hand towels cost me?' },

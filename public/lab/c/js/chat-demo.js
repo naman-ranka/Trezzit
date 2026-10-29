@@ -28,24 +28,26 @@ async function buildScripts() {
     <div class="tc-h"><span class="tc-k">${saved ? `${icon.check} Saved` : 'Draft, not saved yet'}</span><span>Apartment 3B</span></div>
     <p class="tc-t">Green Basket Market <b class="money">${money(r.totalCents)}</b></p>
     <p class="tc-s">14 items · you paid · hand towels split 4 ways</p>
-    <ul class="tc-people tc-grid" role="list">${gb.people.map((p) => `<li>${av(p)}<span>${PEOPLE[p].name}</span><b class="money">${money(r.people[p].cents)}</b></li>`).join('')}</ul>
+    <ul class="tc-people tc-grid" role="list">${gb.people.map((p) => `<li>${av(p)}<span class="tc-pn">${PEOPLE[p].name}</span><b class="money">${money(r.people[p].cents)}</b></li>`).join('')}</ul>
   </div>`;
 
   // 6 charges: 4 matched, 2 missing. Phones show 2 matched + the 2 missing and a "+2 more" line.
-  const charges = [['GREEN BASKET MARKET', '100.00', 1], ['CORNER PHARMACY', '48.22', 1], ['TAQUERIA SOL', '84.87', 1, 1], ['NETFLIX.COM', '24.99', 1, 1], ['HARBOR HARDWARE', '37.15', 0], ['CITY PARKING', '12.00', 0]];
+  // (narrow phones: 1 matched + the 2 missing and "+3 more")
+  const charges = [['GREEN BASKET MARKET', '100.00', 1], ['CORNER PHARMACY', '48.22', 1, 0, 1], ['TAQUERIA SOL', '84.87', 1, 1], ['NETFLIX.COM', '24.99', 1, 1], ['HARBOR HARDWARE', '37.15', 0], ['CITY PARKING', '12.00', 0]];
 
   return {
     statement: {
       chip: 'Check my statement',
       steps: [
-        { t: 'user', attach: { label: 'october-statement.pdf', doc: true }, text: 'Here’s my October card statement. What’s missing from Trezzit?' },
-        { t: 'tool', name: 'Read your payments' },
-        { t: 'tool', name: 'Match charges to bills' },
+        { t: 'user', attach: { label: 'october-statement.pdf', doc: true }, text: 'Here’s my October card statement. What’s missing from Trezzit?', narrow: { text: 'What’s missing from Trezzit?' } },
+        { t: 'tool', name: 'Read your payments', narrow: { name: 'Match your payments' } },
+        { t: 'tool', name: 'Match charges to bills', wide: true },
         { t: 'card', html: `<div class="tc">
           <div class="tc-h"><span class="tc-k">Statement vs Trezzit</span><span>6 charges</span></div>
           <ul class="tc-rows tight mono" role="list">
-            ${charges.map(([n, a, ok, extra]) => `<li class="${ok ? '' : 'miss'}${extra ? ' extra' : ''}"><span>${n}${ok ? '' : '<em class="no">Not in Trezzit</em>'}</span><span class="r">−$${a} <em class="${ok ? 'ok' : 'nx'}">${ok ? icon.check : ''}</em></span></li>`).join('')}
+            ${charges.map(([n, a, ok, extra, xs]) => `<li class="${ok ? '' : 'miss'}${extra ? ' extra' : ''}${xs ? ' extra-xs' : ''}"><span>${n}${ok ? '' : '<em class="no">Not in Trezzit</em>'}</span><span class="r">−$${a} <em class="${ok ? 'ok' : 'nx'}">${ok ? icon.check : ''}</em></span></li>`).join('')}
             <li class="more-ok"><span>+2 more matched</span></li>
+            <li class="more-ok-xs"><span>+3 more matched</span></li>
           </ul></div>` },
         { t: 'ai', text: 'Two charges aren’t in Trezzit yet. Got the hardware receipt?' },
       ],
@@ -53,13 +55,13 @@ async function buildScripts() {
     split: {
       chip: 'Split a receipt',
       steps: [
-        { t: 'user', attach: { id: 'green-basket', label: 'receipt.jpg' }, text: 'Split this with my roommates. Oat milk and kale chips are Maya’s; avocados and cold brew are mine.' },
-        { t: 'tool', name: 'Read the receipt' },
-        { t: 'tool', name: 'Draft the bill' },
+        { t: 'user', attach: { id: 'green-basket', label: 'receipt.jpg' }, text: 'Split this with my roommates. Oat milk and kale chips are Maya’s; avocados and cold brew are mine.', narrow: { text: 'Split this with my roommates. Oat milk and kale chips are Maya’s; avocados and cold brew, mine.' } },
+        { t: 'tool', name: 'Read the receipt', narrow: { name: 'Read and draft the bill' } },
+        { t: 'tool', name: 'Draft the bill', wide: true },
         { t: 'card', html: splitCard(false) },
-        { t: 'ai', text: 'Here’s the draft. Save it to Apartment 3B?' },
-        { t: 'user', text: 'Save it.', wait: 900 },
-        { t: 'tool', name: 'Save the bill' },
+        { t: 'ai', text: 'Here’s the draft. Save it to Apartment 3B?', wide: true },
+        { t: 'user', text: 'Save it.', wait: 900, wide: true },
+        { t: 'tool', name: 'Save the bill', wide: true },
         // the draft card turns into the saved one in place: the end state shows card and answer together
         { t: 'card', html: splitCard(true), replace: true },
         { t: 'ai', html: `Saved. Maya, Jordan and Sam owe you <b class="money">${money(owed)}</b>.` },
@@ -69,7 +71,7 @@ async function buildScripts() {
       chip: 'Grocery spending',
       steps: [
         { t: 'user', text: 'What did I actually spend on groceries in October?' },
-        { t: 'tool', name: 'Read your expenses' },
+        { t: 'tool', name: 'Read your expenses', wide: true },
         { t: 'tool', name: 'Add up your share' },
         { t: 'card', html: `<div class="tc">
           <div class="tc-h"><span class="tc-k"><i class="dot" style="--c:${CATEGORIES.groceries.color}"></i>Groceries · October</span><span>Your share only</span></div>
@@ -93,7 +95,7 @@ async function buildScripts() {
             <li>${av('jordan')}<span>Jordan owes you</span><b class="money pos">$16.75</b></li>
             <li>${av('maya')}<span>You owe Maya</span><b class="money neg">$603.10</b></li>
           </ul></div>` },
-        { t: 'ai', html: 'Four people owe you <b class="money">$100.83</b>. You owe Maya <b class="money">$603.10</b>, your rent less the <b class="money">$36.25</b> she owes you. Pay her your usual way and I’ll record it; Trezzit doesn’t move money.' },
+        { t: 'ai', html: 'Four people owe you <b class="money">$100.83</b>; you owe Maya <b class="money">$603.10</b>.' },
       ],
     },
   };
@@ -101,7 +103,10 @@ async function buildScripts() {
 
 export async function mountChat(root, opts = {}) {
   const S = await buildScripts();
-  const keys = opts.scripts || ['statement', 'groceries', 'owe'];
+  const keys = opts.scripts || ['statement', 'split', 'groceries'];
+  // phones: the panel must fit one screen under the nav, so long exchanges drop their optional turns
+  const narrowMQ = matchMedia('(max-width: 479px)');
+  const stepsOf = (k) => S[k].steps.filter((st) => !(st.wide && narrowMQ.matches)).map((st) => (narrowMQ.matches && st.narrow ? { ...st, ...st.narrow } : st));
   root.classList.add('chat');
   root.innerHTML = `
     <div class="chat-win">
@@ -171,7 +176,7 @@ export async function mountChat(root, opts = {}) {
     let max = 0;
     keys.forEach((k) => {
       probe.innerHTML = '';
-      S[k].steps.forEach((s) => add(s, true, probe));
+      stepsOf(k).forEach((s) => add(s, true, probe));
       max = Math.max(max, probe.scrollHeight);
     });
     probe.innerHTML = '';
@@ -179,6 +184,7 @@ export async function mountChat(root, opts = {}) {
   }
   fit();
   if ('ResizeObserver' in window) new ResizeObserver(() => fit()).observe(win);
+  narrowMQ.addEventListener?.('change', () => { lastW = 0; fit(); if (state === 'done') play(current, { instant: true }); });
   document.fonts?.ready.then(() => { lastW = 0; fit(); });
 
   async function wait(ms, my) {
@@ -200,7 +206,7 @@ export async function mountChat(root, opts = {}) {
     paused = false;
     gate?.();
     root.querySelectorAll('.prompt').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
-    const steps = S[k].steps;
+    const steps = stepsOf(k);
     log.setAttribute('aria-busy', 'true');
     if (instant) {
       log.innerHTML = '';
@@ -234,7 +240,9 @@ export async function mountChat(root, opts = {}) {
     touched = true;
     // the autoplay stays quiet for screen readers; conversations the visitor starts are announced
     log.setAttribute('aria-live', 'polite');
-    b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduced() ? 'auto' : 'smooth' });
+    // the whole exchange must be on screen: if the panel is cut off, bring its top just under the nav first
+    const rect = win.getBoundingClientRect();
+    if (rect.top < 64 || rect.bottom > innerHeight) win.scrollIntoView({ block: 'start', behavior: reduced() ? 'auto' : 'smooth' });
     play(b.dataset.k);
   }));
   ctl.addEventListener('click', () => {

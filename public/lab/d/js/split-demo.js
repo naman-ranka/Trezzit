@@ -1,13 +1,13 @@
 // "Split it with my roommates": a playable itemized split, exact to the cent (kit split engine).
 import { $, $$, esc, money, icon, tweenMoney, announce } from './ui.js';
-import { getWorld, getSample, PEOPLE, catOf, itemName, splitWith, cents, tone } from './world.js';
+import { getWorld, getSample, PEOPLE, itemName, splitWith, cents } from './world.js';
 
 const BILLS = {
-  'green-basket': { payer: 'you', group: 'Flat 3B', order: [13, 9, 10, 11, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8], visible: 5, moreLabel: (n) => `${n} more items` },
+  'green-basket': { payer: 'you', group: 'Flat 3B', order: [13, 9, 10, 11, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8], visible: 4, moreLabel: (n) => `${n} more items` },
   'taqueria-sol': { payer: 'alex', group: 'Thursday dinners', order: [0, 1, 2, 3, 4, 5, 6], visible: 7, moreLabel: (n) => `${n} more items` },
 };
-// Phones show fewer rows up front; the rest is one tap away.
-const visibleRows = (cfg) => (matchMedia('(max-width: 520px)').matches ? Math.min(4, cfg.visible) : cfg.visible);
+// The same rows up front at every width (so "10 more items" never changes with the screen).
+const visibleRows = (cfg) => cfg.visible;
 
 export async function initSplit() {
   const host = document.querySelector('[data-split]');
@@ -23,7 +23,7 @@ export async function initSplit() {
 
   function load(id) {
     const s = getSample(id);
-    state = { id, s, cfg: BILLS[id], scan: w.scans[id].bill, sets: defaults(id), open: false };
+    state = { id, s, cfg: BILLS[id], scan: w.scans[id].bill, sets: defaults(id), open: false, settled: 0 };
     tabs.forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.bill === id)));
     render();
   }
@@ -62,52 +62,45 @@ export async function initSplit() {
     }).join('');
     const tip = r.items.find((x) => x.itemType === 'Tip');
     const tipRow = tip ? `<div class="sitem extra"><span class="nm">Tip</span><span class="pr money">${money(tip.totalCents)}</span><span class="meta" data-meta="tip">${esc(tipMeta(tip))}</span></div>` : '';
-    const more = hidden ? `<button class="show-more" type="button" data-more>${esc(cfg.moreLabel(hidden))}</button>` : '';
+    const more = hidden ? `<button class="show-more" type="button" data-more>${esc(cfg.moreLabel(hidden))}</button>` : '<span></span>';
 
     const payer = cfg.payer;
-    const people = s.people.map((p) => {
+    // "Owes you" is said once, as a label over the people who owe the payer.
+    const row = (p) => {
       const P = PEOPLE[p]; const c = r.people[p].cents;
       let sub = '';
       if (p === 'you') sub = payer === 'you' ? `Paid ${money(r.totalCents)}` : `You owe ${PEOPLE[payer].name}`;
       else if (p === payer) sub = `Paid ${money(r.totalCents)}`;
-      else sub = payer === 'you' ? 'Owes you' : `Owes ${PEOPLE[payer].name}`;
-      const cls = p === 'you' ? (payer === 'you' ? '' : 'out') : (payer === 'you' ? 'in' : '');
-      return `<div class="prow${p === 'you' ? ' you' : ''}"><span class="av" style="--c:${P.color}">${p === 'you' ? 'You' : P.initials}</span><span class="nm">${p === 'you' ? 'Your share' : esc(P.name)}<small class="${cls}">${sub}</small></span><span class="amt money" data-amt="${p}" data-cents="${c}">${money(c)}</span></div>`;
-    }).join('');
+      return `<div class="prow${p === 'you' ? ' you' : ''}"><span class="av" style="--c:${P.color}">${p === 'you' ? 'You' : P.initials}</span><span class="nm">${p === 'you' ? 'Your share' : esc(P.name)}${sub ? `<small>${sub}</small>` : ''}</span><span class="amt money" data-amt="${p}" data-cents="${c}">${money(c)}</span></div>`;
+    };
+    const owers = s.people.filter((p) => p !== payer);
+    const people = `<div class="prows">${row(payer === 'you' ? 'you' : payer)}${payer === 'you' ? '' : row('you')}
+      <div class="plabel">${payer === 'you' ? 'Owes you' : `Owes ${esc(PEOPLE[payer].name)}`}</div>${owers.filter((p) => p !== 'you').map(row).join('')}</div>`;
 
-    // Phones: one slim line of shares sticks to the bottom while you tap, so every cent moves where you look.
+    // Phones: one slim line of shares heads the list, so every cent moves right above where you tap.
     const bar = `<div class="sbar" aria-hidden="true"><span class="sbar-row">${s.people.map((p) => `<span class="sp" data-sp="${p}"><span class="av" style="--c:${PEOPLE[p].color}">${p === 'you' ? 'You' : PEOPLE[p].initials}</span><b class="money" data-samt="${p}" data-cents="${r.people[p].cents}">${money(r.people[p].cents)}</b></span>`).join('')}</span></div>`;
-    host.innerHTML = `<div class="panel split-items"><div data-rows>${rows}${tipRow}</div>${more}${bar}</div>
+    host.innerHTML = `<div class="panel split-items">${bar}<div data-rows>${rows}${tipRow}</div>
+        <div class="split-foot">${more}<button class="reset-link" type="button" data-split-reset>Reset</button></div></div>
       <div class="panel totals" aria-live="off"><h3>${esc(s.title)} · ${esc(cfg.group)}</h3>${people}
-        <div class="youcats" data-youcats>${youCats(r)}</div>
-        <div class="check-line" data-check>${checkText(r)}</div></div>`;
-    watchBar();
+        <div class="check-line" data-check>${checkText(r)}</div>
+        <div class="settle" data-settle>${settleHtml(r)}</div></div>`;
     $('[data-more]', host)?.addEventListener('click', () => { state.open = true; render(); $(`[data-row="${cfg.order[vis]}"] button`, host)?.focus(); });
   }
 
-  // Phones: the totals bar fades in only once the item list is well into view.
-  let io;
-  function watchBar() {
-    io?.disconnect();
-    const list = $('.split-items', host);
-    if (!list || !('IntersectionObserver' in window)) { list?.classList.add('bar-on'); return; }
-    io = new IntersectionObserver(([e]) => {
-      const vis = e.intersectionRect.height / Math.min(e.boundingClientRect.height, innerHeight);
-      list.classList.toggle('bar-on', e.isIntersecting && vis >= 0.3);
-    }, { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1] });
-    io.observe(list);
+  /* The flat's running balance with Maya: this receipt plus the rest of Flat 3B (she paid Netflix).
+     Settling up records that she paid you back; Trezzit never moves money. */
+  const flatBase = () => (w.net.maya || 0) - (w.scans['green-basket'].split.people.maya?.cents || 0);
+  function settleHtml(r) {
+    if (state.id !== 'green-basket') return '';
+    const owed = flatBase() + r.people.maya.cents;
+    if (state.settled) return `<span class="done">${icon('check')}Maya paid you ${money(state.settled)} · recorded</span>`;
+    if (owed <= 0) return `<span>Flat 3B: you owe Maya ${money(-owed)}</span>`;
+    return `<span>Flat 3B balance: Maya owes you <b class="money">${money(owed)}</b></span><button type="button" class="settle-btn" data-settle-up data-owed="${owed}">Settle up</button>`;
   }
 
   function tipMeta(tip) {
     const parts = Object.entries(tip.shares).filter(([, c]) => c).map(([k, c]) => `${k === 'you' ? 'You' : PEOPLE[k].name} ${money(c)}`);
     return `By what each person ordered · ${parts.join(' · ')}`;
-  }
-  function youCats(r) {
-    const cats = Object.entries(r.people.you.byCategory).filter(([, c]) => c > 0).map(([id, cents]) => ({ cents, ...catOf(id) }))
-      .sort((a, b) => b.cents - a.cents).map((c, i) => ({ ...c, color: tone(i) }));
-    if (!cats.length) return '';
-    return `<div class="catbar" aria-hidden="true">${cats.map((c) => `<i style="flex-grow:${c.cents};background:${c.color}"></i>`).join('')}</div>
-      <div class="legend">${cats.map((c) => `<span><i style="background:${c.color}"></i>${esc(c.label)} <b class="money">${money(c.cents)}</b></span>`).join('')}</div>`;
   }
   function checkText(r) {
     return r.check.ok ? `${icon('check')}Adds up to ${money(r.totalCents)}` : `Adds up to ${money(r.check.sumCents)}, not ${money(r.totalCents)}`;
@@ -127,13 +120,22 @@ export async function initSplit() {
       }
       tweenMoney(b, r.people[p].cents);
     });
-    $('[data-youcats]', host).innerHTML = youCats(r);
+    state.settled = 0;
+    const st = $('[data-settle]', host); if (st) st.innerHTML = settleHtml(r);
     const ch = $('[data-check]', host);
     ch.innerHTML = checkText(r); ch.classList.toggle('bad', !r.check.ok);
     announce(state.s.people.map((p) => `${p === 'you' ? 'You' : PEOPLE[p].name} ${money(r.people[p].cents)}`).join(', ') + `. Adds up to ${money(r.check.sumCents)}.`);
   }
 
   host.addEventListener('click', (e) => {
+    if (e.target.closest('[data-split-reset]')) { load(state.id); $('[data-split-reset]', host)?.focus(); return; }
+    const su = e.target.closest('[data-settle-up]');
+    if (su) {
+      state.settled = Number(su.dataset.owed);
+      $('[data-settle]', host).innerHTML = settleHtml(compute());
+      announce(`Recorded: Maya paid you ${money(state.settled)}.`);
+      return;
+    }
     const b = e.target.closest('button[data-p]');
     if (!b) return;
     $$('button', b.parentElement).forEach((x) => { x.tabIndex = x === b ? 0 : -1; });
@@ -165,7 +167,6 @@ export async function initSplit() {
     n.focus();
   });
   tabs.forEach((t) => t.addEventListener('click', () => load(t.dataset.bill)));
-  $('[data-split-reset]')?.addEventListener('click', () => load(state.id));
 
   load('green-basket');
   // From the scan's "Split it": load that bill and put keyboard focus on its first row, where the tapping starts.

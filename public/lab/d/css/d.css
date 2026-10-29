@@ -408,19 +408,14 @@ dialog.sheet .acts { display: flex; gap: 10px; justify-content: flex-end; flex-w
 .youcats { margin-top: 8px; }
 .sbar { display: none; }
 @media (max-width: 899px) {
-  /* the totals panel stays in the accessibility tree (heading outline, totals); the bar below is its visual */
-  .split-grid > .totals { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; padding: 0; border: 0; }
-  .split-grid { position: relative; }
-  html { scroll-padding-bottom: 96px; }
-  .split-items button { scroll-margin-bottom: 96px; }
-  .split-items { padding-bottom: 0; }
+  /* phones: the shares head the list (static, never over the rows); the totals card below keeps
+     its heading, check and balance, and its per-person rows stay for screen readers only */
+  .totals .prows { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  .split-items { padding-top: 0; }
   .sbar {
-    display: block; position: sticky; bottom: 12px; z-index: 2; margin: 8px; padding: 8px 10px;
-    opacity: 0; transform: translateY(10px); transition: opacity 0.25s, transform 0.25s var(--ease-out); pointer-events: none;
-    border-radius: 18px; background: rgba(255, 255, 255, 0.94); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-    box-shadow: 0 0 0 1px var(--line), 0 10px 30px -10px rgba(15, 31, 61, 0.35);
+    display: block; margin: 8px 8px 2px; padding: 8px 10px;
+    border-radius: 16px; background: var(--surface-subtle); box-shadow: inset 0 0 0 1px var(--divider);
   }
-  .bar-on .sbar { opacity: 1; transform: none; }
   .sbar-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; }
   .sbar .sp { display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 0; transform-origin: 50% 50%; }
   .sbar .av { flex: none; width: 26px; height: 26px; font-size: 11px; }
@@ -676,11 +671,6 @@ button.prompt:hover { background: #ebeff6; }
 .chapter .cap { font-size: 14px; color: var(--text-secondary); margin-top: 10px; }
 
 /* ---------- round 5 ---------- */
-/* split: the reset sits beside its heading instead of taking a row of its own */
-#split .ask { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: 16px; }
-#split .ask .where { grid-column: 1 / -1; }
-#split .ask .reset { min-height: 44px; padding: 0 16px; font-size: 15px; }
-@media (max-width: 520px) { #split .ask .reset { width: 44px; padding: 0; justify-content: center; } }
 /* phones: the hero chat is shorter, so its chips sit inside the first screen */
 @media (max-width: 520px) {
   .hero { padding-top: 16px; }
@@ -709,3 +699,59 @@ button.prompt:hover { background: #ebeff6; }
 /* connect/: tinted panels keep fine print at AA; the URL breaks only after the domain */
 .setup .muted { color: var(--text-secondary-on-tint); }
 @media (max-width: 420px) { .urlbox.light code { white-space: normal; overflow: visible; font-size: 13px; } }
+
+/* ---------- round 6 ---------- */
+/* the demos sit straight on the page: one card level, no grey tray (the receipt paper keeps its grey) */
+.turn .stage { background: none; padding: 0; border-radius: 0; }
+.turn .panel { box-shadow: 0 1px 2px rgba(15, 31, 61, 0.04), 0 8px 24px -12px rgba(15, 31, 61, 0.12); }
+.hero + .night { margin-top: 0; }
+.night + .turn { padding-top: 56px; }
+@media (min-width: 1040px) { .night + .turn { padding-top: 96px; } }
+/* split: "10 more items" and Reset share the card's bottom row */
+.split-foot { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--divider); padding: 0 8px 0 0; }
+.split-foot .show-more { width: auto; flex: 1; border-top: 0; text-align: left; padding: 0 16px; }
+.reset-link { min-height: 44px; padding: 0 12px; border-radius: 10px; font-size: 15px; font-weight: 600; color: var(--text-secondary); }
+.reset-link:hover { color: var(--ink); background: var(--surface-subtle); }
+.plabel { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: none; padding: 10px 0 0; border-top: 1px solid var(--divider); margin-top: 6px; }
+.prow small { color: var(--text-secondary); }
+.settle { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 8px; font-size: 14px; color: var(--text-secondary); min-height: 44px; }
+.settle:empty { display: none; }
+.settle b { color: var(--ink); font-weight: 700; }
+.settle-btn { min-height: 40px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); background: #fff; }
+.settle-btn:hover { background: var(--surface-subtle); }
+.settle .done { display: inline-flex; align-items: center; gap: 8px; color: var(--positive-text); font-weight: 600; animation: msg-in 0.35s var(--ease-out) both; }
+.settle .done svg { width: 18px; height: 18px; stroke-width: 2.4; }
+@media (max-width: 899px) { .totals { padding: 14px 16px; } .totals .check-line { margin-top: 6px; } }
+/* October: the bank's lines, then the one caption */
+.bank-cap { padding: 14px 16px 6px; font-size: 16px; line-height: 1.45; color: var(--ink); font-weight: 500; text-align: center; text-wrap: balance; }
+/* the hero chat: an older line scrolled up fades out instead of being sliced */
+.chat.is-fixed .chat-log { -webkit-mask-image: linear-gradient(transparent 0, #000 22px); mask-image: linear-gradient(transparent 0, #000 22px); }
+/* app/: the play/pause control sits in the tile's corner, outside the recording */
+.chapter .stage { position: relative; padding-bottom: 76px; }
+@media (min-width: 900px) { .chapter .stage { padding-bottom: 80px; } }
+.chapter .stage .media-btn { top: auto; bottom: 16px; right: 16px; background: var(--ink); box-shadow: none; }
+/* connect/: each prompt card says it copies */
+.prompt .pfoot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.prompt .pfoot svg { width: 18px; height: 18px; color: var(--text-secondary-on-tint); }
+.prompt .does { color: var(--text); font-weight: 500; }
+.perm-note { margin-top: 14px; max-width: 46em; }
+/* phones: the hero's composer sits inside the first screen (844px) */
+@media (max-width: 520px) {
+  .hero .wrap { gap: 16px; }
+  .chat.is-fixed { height: 492px; }
+}
+/* October: the panel keeps the Trezzit view's height; in the bank view the caption sits in the room left over */
+.led-list { display: flex; flex-direction: column; }
+.led-list [data-list] { flex: 1; display: flex; flex-direction: column; }
+.led-list .bank-cap { margin-block: auto; padding-block: 16px; }
+/* connect/ on phones: the URL keeps one line; Copy becomes an icon button that turns green when copied */
+@media (max-width: 420px) {
+  .urlbox.light code { white-space: nowrap; overflow: visible; font-size: 13px; }
+  .urlbox.light button { width: 44px; padding: 0; justify-content: center; flex: none; }
+  .urlbox.light button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .urlbox.light button.copied { background: var(--positive); }
+}
+@media (max-width: 370px) { .urlbox.light code { font-size: 12.5px; } }
+@media (max-width: 400px) { .hero .ctas .btn-lg { padding: 0 12px; font-size: 15px; } }
+@media (max-width: 520px) { #hero-chat .tcard > .catbar, #hero-chat .tcard > .legend { display: none; } #hero-chat .versus { margin-bottom: 0; } }
+@media (max-width: 370px) { .chat.is-fixed { height: 520px; } }

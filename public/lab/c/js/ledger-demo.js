@@ -43,10 +43,18 @@ export async function mountLedger(root, opts = {}) {
   // compact (home): fewer categories and rows on phones, so the demo stays one screen tall
   if (opts.compact) root.classList.add('compact');
   const chips = ['towels', 'cold brew', 'Taqueria'];
-  root.innerHTML = `
+  const findHTML = `
+    <div class="lg-find">
+      <label class="lg-search">${icon.search}<span class="visually-hidden">Search every item</span>
+        <input type="search" placeholder="${opts.compact ? 'Search any item, like “towels”' : 'Search items, stores, categories'}" autocomplete="off" spellcheck="false"></label>
+      ${opts.compact ? '' : `<p class="lg-try"><span>Try</span>${chips.map((q) => `<button type="button" class="chip-q" data-q="${q}" aria-pressed="false">${q}</button>`).join('')}</p>`}
+      <p class="lg-count" aria-live="polite"></p>
+      <ul class="lg-list" role="list"></ul>
+    </div>`;
+  root.innerHTML = `${findHTML}
     <div class="lg-sum">
       <p class="lg-label">Spent in October <span class="lg-tag">Your share only</span></p>
-      <p class="lg-total money" aria-live="off">${money(spent)}</p>
+      <p class="lg-total money"><span class="visually-hidden">${money(spent)}</span><span class="lg-n" aria-hidden="true">${money(spent)}</span></p>
       <p class="lg-sub"><span class="${delta < 0 ? 'down' : 'up'}">${money(Math.abs(delta))} ${delta < 0 ? 'less' : 'more'} than September</span></p>
       <div class="lg-bar" aria-hidden="true">${cats.map(([k, c]) => `<i style="--c:${cat(k).color};--w:${(c / spent) * 100}%"></i>`).join('')}</div>
       <ul class="lg-cats short" role="list" aria-label="By category">
@@ -66,15 +74,8 @@ export async function mountLedger(root, opts = {}) {
       <button type="button" class="c-link-btn lg-more">Show all ${cats.length} categories</button>
       ${fixed ? `<a class="lg-fixed" href="${esc(opts.fixedHref || '../recurring/')}">
         <span class="lg-ci" style="--c:${cat('rent').color}">${catIcon('rent')}</span>
-        <span class="lg-cn">Plus rent and bills <span class="lg-fx">every month</span></span>
+        <span class="lg-cn">Rent and bills, monthly</span>
         <b class="money">${money(fixed.youCents)}</b><span class="lg-fgo" aria-hidden="true">→</span></a>` : ''}
-    </div>
-    <div class="lg-find">
-      <label class="lg-search">${icon.search}<span class="visually-hidden">Search every item</span>
-        <input type="search" placeholder="${opts.compact ? 'Search any item, like “towels”' : 'Search items, stores, categories'}" autocomplete="off" spellcheck="false"></label>
-      ${opts.compact ? '' : `<p class="lg-try"><span>Try</span>${chips.map((q) => `<button type="button" class="chip-q" data-q="${q}" aria-pressed="false">${q}</button>`).join('')}</p>`}
-      <p class="lg-count" aria-live="polite"></p>
-      <ul class="lg-list" role="list"></ul>
     </div>`;
 
   const input = root.querySelector('input') || { value: '', addEventListener() {}, focus() {} };
@@ -88,12 +89,12 @@ export async function mountLedger(root, opts = {}) {
     const k = MAIN_CAT(e);
     const who = e.payer === 'you' ? 'you paid' : `${e.payer} paid`;
     // say what a row is in the words a visitor already has: just you, who paid, what the rent covers
-    const sub = e.kind === 'personal' ? `Just you · ${e.date}`
-      : e.id === 'monthly-rent' ? `${e.date} · ${who} · rent, utilities, internet`
-        : `${e.group} · ${e.date} · ${who}`;
-    return `<li class="lg-row">
+    const sub = e.kind === 'personal' ? `Just you · ${esc(e.date)}`
+      : e.id === 'monthly-rent' ? `${esc(e.date)} · ${esc(who)} · rent, utilities, internet`
+        : `${esc(e.group)} · ${esc(e.date)} · <span class="lg-who">${esc(who)}</span>`;
+    return `<li class="lg-row" data-id="${esc(e.id)}">
       <span class="lg-ri" style="--c:${cat(k).color}">${e.kind === 'recurring' ? `<span class="lg-rec" title="Recurring">${icon.repeat}</span>` : ''}${catIcon(k)}</span>
-      <span class="lg-rt"><b>${esc(e.title)}</b><small>${esc(sub)}</small></span>
+      <span class="lg-rt"><b>${esc(e.title)}</b><small>${sub}</small></span>
       <span class="lg-ra"><b class="money">${money(e.youCents)}</b>${e.totalCents !== e.youCents ? `<small class="money">of ${money(e.totalCents)}</small>` : ''}</span></li>`;
   }
   function lineRow(l, q) {
@@ -132,7 +133,7 @@ export async function mountLedger(root, opts = {}) {
     ul.classList.toggle('short');
     moreCats.textContent = ul.classList.contains('short') ? `Show all ${cats.length} categories` : 'Show fewer';
   });
-  input.addEventListener('input', render);
+  input.addEventListener('input', () => { if (input.value.trim()) filterCat = null; render(); });
   // a tapped chip shows its results; only keyboard or mouse users get the caret (no soft keyboard over the results)
   const finePointer = matchMedia('(pointer: fine)');
   root.querySelectorAll('.chip-q').forEach((b) => b.addEventListener('click', (e) => {
@@ -146,19 +147,26 @@ export async function mountLedger(root, opts = {}) {
   }));
   render();
 
+  // home: the row that proves the step's heading ("Your $9.50, even when Jordan paid.") is pointed out once seen
+  if (opts.highlight) {
+    onVisible(root, () => root.classList.add('point'), { threshold: 0.3 });
+  }
+
   // count up the headline figure the first time it is seen
   // never shows $0.00: starts at 60% of the total, as soon as the figure itself is on screen
-  const totalEl = root.querySelector('.lg-total');
+  // the real figure is always in the DOM (screen readers, find-in-page); only an aria-hidden copy counts,
+  // and it starts as soon as any part of the card is on screen (not the 40px figure itself)
+  const totalEl = root.querySelector('.lg-n');
   if (!reduced()) {
     const from = Math.round(spent * 0.6);
     totalEl.textContent = money(from);
     root.classList.add('pre');
-    onVisible(totalEl, async () => {
+    onVisible(root, async () => {
       root.classList.add('counting');
       root.classList.remove('pre');
       await countMoney(totalEl, from, spent, 800);
       root.classList.remove('counting');
-    }, { threshold: 0, rootMargin: '0px 0px -20% 0px' });
+    }, { threshold: 0 });
   }
   return { data };
 }

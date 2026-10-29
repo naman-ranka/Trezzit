@@ -3,7 +3,7 @@ import { $$, icon, reducedMotion } from './ui.js';
 
 export function initMedia(root = document) {
   $$('video[data-src]', root).forEach((v) => {
-    const btn = v.parentElement.querySelector('[data-media-btn]');
+    const btn = (v.closest('.stage') || v.parentElement).querySelector('[data-media-btn]');
     let userPaused = reducedMotion();
     let visible = false;
     // H.264 where the browser has it, VP9 WebM where it doesn't; the poster stays if neither loads.

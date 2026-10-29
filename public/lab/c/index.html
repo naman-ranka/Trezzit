@@ -24,15 +24,10 @@
 <link rel="apple-touch-icon" href="../_kit/brand/apple-touch-icon.png">
 <link rel="preload" href="../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../_kit/tokens.css">
-<link rel="stylesheet" href="../_kit/receipts/receipt.css" data-tz-receipt>
 <link rel="stylesheet" href="css/c.css">
 <link rel="modulepreload" href="js/util.js">
-<link rel="modulepreload" href="js/data.js">
+<link rel="modulepreload" href="js/hero.js">
 <link rel="modulepreload" href="js/page.js">
-<link rel="modulepreload" href="../_kit/split-engine.js">
-<link rel="modulepreload" href="../_kit/scan-client.js">
-<link rel="modulepreload" href="../_kit/receipts.js">
-<link rel="preload" href="../_kit/receipts/green-basket.json" as="fetch" crossorigin>
 <script type="module" src="js/home.js"></script>
 </head>
 <body>
@@ -109,7 +104,7 @@
     <article class="verb" id="capture" aria-labelledby="capture-t">
       <div class="verb-copy rv">
         <p class="verb-k"><span class="verb-n">1</span>Capture</p>
-        <h3 id="capture-t">Every item, from one photo.</h3>
+        <h3 id="capture-t">Scan it. Every item, listed.</h3>
       </div>
       <div class="verb-demo rv">
         <div class="demo-frame" id="scan-demo">
@@ -141,22 +136,8 @@
           <noscript><p class="nojs">Spent in October, your share only: $121.00, plus $639.35 of rent and bills.</p></noscript>
         </div>
       </div>
+      <nav class="uses rv" aria-label="Use cases"><a href="roommates/">Roommates</a><span aria-hidden="true">·</span><a href="just-me/">Just me</a><span aria-hidden="true">·</span><a href="recurring/">Every month</a><span aria-hidden="true">·</span><a href="trips/">Trips <span aria-hidden="true">→</span></a></nav>
     </article>
-  </div>
-</section>
-
-<!-- ============ SCENARIOS ============ -->
-<section class="scenes" id="scenarios" aria-labelledby="scenes-t">
-  <div class="wrap">
-    <header class="sh rv">
-      <h2 id="scenes-t">Every kind of spending.</h2>
-    </header>
-    <ul class="ways rv" role="list">
-      <li><a href="roommates/" style="--c:#2461bd"><span class="way-k">Roommates</span><span class="way-t">Groceries and rent.</span><span class="way-go" aria-hidden="true">→</span></a></li>
-      <li><a href="just-me/" style="--c:#059669"><span class="way-k">Just me</span><span class="way-t">Your own receipts.</span><span class="way-go" aria-hidden="true">→</span></a></li>
-      <li><a href="recurring/" style="--c:#0d9488"><span class="way-k">Every month</span><span class="way-t">Rent and Netflix, automatic.</span><span class="way-go" aria-hidden="true">→</span></a></li>
-      <li><a href="trips/" style="--c:#ea580c"><span class="way-k">Trips</span><span class="way-t">Tip by what you ordered.</span><span class="way-go" aria-hidden="true">→</span></a></li>
-    </ul>
   </div>
 </section>
 
@@ -165,7 +146,7 @@
   <div class="wrap">
     <div class="ai-grid">
       <header class="ai-copy rv">
-        <h2 id="ai-t">Ask Claude or&nbsp;ChatGPT.</h2>
+        <h2 id="ai-t">Claude or ChatGPT can read it and add&nbsp;to&nbsp;it.</h2>
         <ul class="trust" role="list">
           <li>Everything it adds shows in your activity</li>
           <li>Never moves money</li>

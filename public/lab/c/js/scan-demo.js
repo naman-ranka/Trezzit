@@ -55,6 +55,7 @@ export function mountScan(root, opts = {}) {
         </div>
         <ol class="so-items" aria-label="Items read from the receipt"></ol>
         <button type="button" class="c-link-btn so-more" hidden></button>
+        <p class="so-sum"></p>
         <ul class="so-checks" aria-label="Checked against the receipt"></ul>
         <div class="so-foot">
           <p class="so-total"><span>Total</span><b class="money"></b></p>
@@ -80,6 +81,15 @@ export function mountScan(root, opts = {}) {
   const list = root.querySelector('.so-items');
   const checks = root.querySelector('.so-checks');
   const totalEl = root.querySelector('.so-total b');
+  const sumEl = root.querySelector('.so-sum');
+  // the receipt-level amounts between the items and the total, so "adds up" is visibly true
+  const setSum = (bill) => {
+    const cur = bill?.currency || 'USD';
+    const parts = [['Subtotal', bill?.subtotal], ['Tax', bill?.tax], ['Tip', bill?.tip]]
+      .filter(([, v]) => v != null && toCents(v) > 0)
+      .map(([k, v]) => `${k} <span class="money">${money(toCents(v), cur)}</span>`);
+    sumEl.innerHTML = parts.join(' <span aria-hidden="true">·</span> ');
+  };
   const splitBtn = root.querySelector('button.so-split');
   const soloLink = root.querySelector('.so-solo');
   // a receipt that is just yours has nothing to split: offer where it lands instead
@@ -137,6 +147,7 @@ export function mountScan(root, opts = {}) {
     list.innerHTML = '';
     checks.innerHTML = '';
     totalEl.textContent = '';
+    sumEl.innerHTML = '';
     storeEl.innerHTML = store || '';
     notice.hidden = true;
     root.classList.remove('is-done');
@@ -156,6 +167,7 @@ export function mountScan(root, opts = {}) {
     list.innerHTML = bill.items.map((it, i) => itemLI(it, i, true)).join('');
     checks.innerHTML = checksFor(bill).map((c, i) => checkLI(c, i, true)).join('');
     totalEl.textContent = money(toCents(bill.total), bill.currency || 'USD');
+    setSum(bill);
     syncMore();
   }
 
@@ -214,6 +226,7 @@ export function mountScan(root, opts = {}) {
       }
       if (result.source === 'live') storeEl.innerHTML = storeLine(result.raw.receipt);
       totalEl.textContent = money(toCents(result.bill.total), result.bill.currency || 'USD');
+      setSum(result.bill);
       if (result.notice) { notice.textContent = result.notice; notice.hidden = false; }
       if (isFile) {
         const v = checksFor(result.bill);

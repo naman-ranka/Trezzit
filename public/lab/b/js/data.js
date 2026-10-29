@@ -8,7 +8,6 @@
  */
 
 import { PEOPLE as KIT_PEOPLE, CATEGORIES as KIT_CATEGORIES, SAMPLES, loadScan, getSample } from '../../_kit/receipts.js';
-import { normalizeScan, titleCase } from '../../_kit/scan-client.js';
 import { splitBill, billFromScan, toCents } from '../../_kit/split-engine.js';
 
 /* Maya's teal is darkened to #0f766e so a white initial on it passes AA (5.5:1). */
@@ -22,6 +21,59 @@ export const CATEGORIES = {
   books: { label: 'Books', color: '#a16207' },
   clothing: { label: 'Clothing', color: '#9333ea' },
 };
+
+/* normalizeScan: copied from ../../_kit/scan-client.js so the landing page doesn't download the
+   whole scan client (nothing on it scans; "Scan your own receipt" links to /split). */
+const has = (v) => v !== null && v !== undefined && v !== '';
+const fix2 = (v, fb = '0.00') => (!has(v) ? fb : (Number.isNaN(Number(v)) ? String(v) : Number(v).toFixed(2)));
+const rate = (v, fb = '0') => (!has(v) ? fb : (Number.isFinite(Number(v)) ? String(Number(v)) : String(v)));
+const quantity = (v) => { const n = Number(v); return has(v) && Number.isFinite(n) && n > 0 ? String(n) : '1'; };
+function titleCase(raw) {
+  const text = String(raw ?? '').trim();
+  if (!text || !/[A-Z]/.test(text) || /[a-z]/.test(text)) return text;
+  return text.toLowerCase().replace(/(^|[\s\-(/])([a-z])/g, (m, b, l) => `${b}${l.toUpperCase()}`);
+}
+function pickReceipt(res) {
+  if (!res || typeof res !== 'object') return null;
+  if (res.receipt && Array.isArray(res.receipt.items)) return res.receipt;
+  if (res.result && Array.isArray(res.result.items)) return res.result;
+  if (Array.isArray(res.items)) return res;
+  return null;
+}
+
+/** Scan body -> { items:[{name, amount, quantity, taxPercent, isExtraCharge, itemType, taxAmount?}],
+ *  merchant, date, currency, subtotal, tax, total, tip, discounts, discountAmount, warnings, backendValidations }. */
+function normalizeScan(res) {
+  const r = pickReceipt(res) || {};
+  const env = res && typeof res === 'object' ? res : {};
+  const store = r.storeInformation || {};
+  const discounts = (Array.isArray(r.discounts) ? r.discounts : []).filter((d) => d && typeof d === 'object')
+    .map((d) => ({ ...d, amount: fix2(d.amount) }));
+  const tip = Number(r.tip?.amount || 0);
+  const iso = typeof store.dateTimeOfPurchase === 'string' && /^(\d{4}-\d{2}-\d{2})/.exec(store.dateTimeOfPurchase.trim());
+  const cur = typeof store.currency === 'string' && /^[A-Za-z]{3}$/.test(store.currency.trim()) ? store.currency.trim().toUpperCase() : null;
+  return {
+    items: (r.items || []).map((it = {}) => {
+      const extra = it.itemType === 'Fee' || it.itemType === 'Tip';
+      return {
+        name: it.name || 'Unknown Item', amount: fix2(it.totalPrice), quantity: quantity(it.quantity),
+        taxPercent: extra ? '0' : rate(it.tax), isExtraCharge: extra, itemType: it.itemType || 'Item',
+        ...(has(it.taxAmount) ? { taxAmount: fix2(it.taxAmount) } : {}),
+      };
+    }),
+    merchant: titleCase(store.title || ''),
+    date: iso ? iso[1] : null,
+    currency: cur,
+    subtotal: fix2(r.subtotalBeforeChargesAndTaxes),
+    tax: fix2(r.taxSummary?.totalTaxAmount),
+    total: fix2(r.grandTotal),
+    tip: tip > 0 ? fix2(tip) : null,
+    discounts,
+    discountAmount: Number(discounts.reduce((a, d) => a + (Number(d.amount) || 0), 0).toFixed(2)),
+    warnings: [...new Set([env.warnings, r.warnings].flatMap((w) => (Array.isArray(w) ? w.filter((x) => typeof x === 'string') : [])))],
+    backendValidations: [r.backend_validations, env.backend_validations].find(Array.isArray) || [],
+  };
+}
 
 export const ROOMIES = ['you', 'maya', 'jordan', 'sam'];
 const eq = (people) => ({ type: 'equal', people });
@@ -102,7 +154,7 @@ const DEFS = [
   },
   {
     id: 'trip', kind: 'shared', title: 'A weekend away', short: 'Trip',
-    payer: 'you', group: 'Lake weekend',
+    payer: 'you', group: 'Cabin trip',
     bank: { date: 'OCT 11', merchant: 'PINES CABIN', cat: 'Travel' }, day: 'Oct 11', store: 'Pines Cabin',
     people: ROOMIES,
     items: [

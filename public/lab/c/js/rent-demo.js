@@ -8,7 +8,10 @@ import { money, countMoney, icon, esc } from './util.js';
 const ROOM = ['you', 'maya', 'jordan', 'sam'];
 const PCT = { you: 25, maya: 25, jordan: 28, sam: 22 };
 const eq = { type: 'equal', people: ROOM };
-const MONTHS = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+// the site's "now" is late October: Jun to Oct are history, Nov is next
+const MONTHS = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
+const NEXT = 'Nov';
+const MIN = 10000; // $100.00: a rent below that is a typo, not a rent
 const HIST = 63935; // your share each month so far
 
 export function mountRent(root, opts = {}) {
@@ -28,20 +31,21 @@ function compute() {
 }
 
 const flix = distributeEqually(2499, 4);
-const SIDE = `<div class="rec-side">
-    <div class="rec-mode"><span id="mode-l">On the 1st</span>
+// the mode toggle sits under the one row it changes (the next rent), not above the list
+const MODE = `<li class="rec-mode"><span id="mode-l">Rent on the 1st</span>
       <div class="seg" role="radiogroup" aria-labelledby="mode-l">
         <button type="button" role="radio" aria-checked="true" data-mode="auto">Add automatically</button>
         <button type="button" role="radio" aria-checked="false" data-mode="review">Ask me first</button>
-      </div>
-    </div>
+      </div></li>`;
+const SIDE = `<div class="rec-side">
     <p class="rec-sub">Coming up</p>
     <ul class="upcoming" role="list"></ul>
     <div class="hist">
-      <div class="hist-top"><span>Your rent share since July</span><b class="money" data-k="hist"></b></div>
+      <div class="hist-top"><span>Your rent share since June</span><b class="money" data-k="hist"></b></div>
       <div class="hist-bars" aria-hidden="true"></div>
-      <div class="hist-lbl" aria-hidden="true">${MONTHS.map((m) => `<span>${m}</span>`).join('')}<span class="nx">Dec</span></div>
+      <div class="hist-lbl" aria-hidden="true">${MONTHS.map((m) => `<span>${m}</span>`).join('')}<span class="nx">${NEXT}</span></div>
     </div>
+    ${opts.moreHref ? `<a class="rec-more" href="${esc(opts.moreHref)}">Split rent by room size <span aria-hidden="true">→</span> Roommates</a>` : ''}
   </div>`;
 root.innerHTML = `<div class="rec${opts.compact || opts.sideRoot ? ' rec-compact' : ''}">
   <div class="rec-sched">
@@ -86,24 +90,41 @@ function render() {
   // one status pill (the next rent); the rows after it just say how they arrive
   const st = mode === 'auto' ? '<span class="up-status auto">Adds automatically</span>' : '<span class="up-status review">You review it</span>';
   const quiet = (m) => `<span class="up-how">${m === 'auto' ? 'Auto' : 'Review'}</span>`;
-  upEl.innerHTML = [
-    ['Dec', 1, 'Monthly rent', 'Rent + utilities · your share', money(you), st],
-    ['Dec', 5, 'Netflix', 'Split 4 ways: $6.25, $6.25, $6.25, $6.24', money(flix[0]), quiet('auto')],
-    ['Dec', 15, 'Gym membership', 'Just you', '$39.00', quiet('auto')],
-    ['Jan', 1, 'Monthly rent', 'Same split', money(you), quiet(mode)],
-  ].map(([m, d, t, s, a, status]) => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b><small>${s}</small></span><span class="up-r"><b class="money">${a}</b>${status}</span></li>`).join('');
+  const rows = [
+    ['Nov', 1, 'Monthly rent', 'Rent + utilities · your share', money(you), st],
+    ['Nov', 5, 'Netflix', 'Split 4 ways', money(flix[0]), quiet('auto')],
+    ['Nov', 15, 'Gym membership', 'Just you', '$39.00', quiet('auto')],
+    ['Dec', 1, 'Monthly rent', 'Same split', money(you), quiet(mode)],
+  ].map(([m, d, t, s, a, status]) => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b><small>${s}</small></span><span class="up-r"><b class="money">${a}</b>${status}</span></li>`);
+  // the toggle is drawn once, then kept (re-rendering it would drop keyboard focus)
+  if (!upEl.querySelector('.rec-mode')) {
+    upEl.innerHTML = rows[0] + MODE + rows.slice(1).join('');
+    bindMode();
+  } else {
+    const live = [...upEl.querySelectorAll('.up-row')];
+    rows.forEach((html, i) => { live[i].outerHTML = html; });
+  }
   const vals = [...MONTHS.map(() => HIST), you];
   const max = Math.max(...vals) * 1.08;
   bars.innerHTML = vals.map((v, i) => `<i class="${i === vals.length - 1 ? 'nx' : i === vals.length - 2 ? 'now' : ''}" style="--h:${(v / max) * 100}%"></i>`).join('');
-  // history only: Jul to Nov is what you spent; Dec is the next one, drawn as an outline
+  // history only: Jun to Oct is what you spent; Nov is the next one, drawn as an outline
   const total = vals.slice(0, -1).reduce((a, b) => a + b, 0);
   countMoney(histEl, prev ? Number(histEl.dataset.c) : total, total, prev ? 380 : 0);
   histEl.dataset.c = total;
   prev = r;
 }
 
+const help = root.querySelector('#rent-help');
+const HELP = help.textContent;
+let helpT = 0;
+function flashHelp(msg) {
+  help.textContent = msg;
+  help.classList.add('warn');
+  clearTimeout(helpT);
+  helpT = setTimeout(() => { help.textContent = HELP; help.classList.remove('warn'); }, 1800);
+}
 function setRent(cents, fromInput = false) {
-  rent = Math.max(0, Math.min(1000000, Math.round(cents)));
+  rent = Math.max(MIN, Math.min(1000000, Math.round(cents)));
   if (!fromInput) { input.value = (rent / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); lastText = input.value; }
   render();
 }
@@ -121,17 +142,30 @@ input.addEventListener('input', () => {
   lastText = raw;
   const v = Math.round(Number(raw.replace(/,/g, '')) * 100);
   if (!Number.isFinite(v)) return;
-  if (v > 1000000) { setRent(1000000); return; }
+  if (v > 1000000) { setRent(1000000); flashHelp('Up to $10,000.00'); return; }
+  if (v < MIN) return; // "2" on the way to "2600": the math waits; leaving the field snaps it to the minimum
   setRent(v, true);
 });
-input.addEventListener('blur', () => setRent(rent));
-input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); setRent(rent); } });
-root.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => setRent(rent + Number(b.dataset.step))));
-side.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
-  mode = b.dataset.mode;
-  side.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
-  render();
+// leaving the field (or Enter) formats it; a rent under $100.00 snaps to $100.00 and says why
+function commit() {
+  const v = Math.round(Number(input.value.trim().replace(/,/g, '')) * 100);
+  if (input.value.trim() && Number.isFinite(v) && v < MIN) { setRent(MIN); flashHelp('At least $100.00'); return; }
+  setRent(rent);
+}
+input.addEventListener('blur', commit);
+input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
+root.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => {
+  const next = rent + Number(b.dataset.step);
+  if (next < MIN) flashHelp('At least $100.00');
+  setRent(next);
 }));
+function bindMode() {
+  side.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
+    mode = b.dataset.mode;
+    side.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+    render();
+  }));
+}
 render();
 return { compute };
 }

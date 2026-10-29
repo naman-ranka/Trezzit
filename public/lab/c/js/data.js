@@ -1,5 +1,5 @@
 /* data.js: the one fictional world every lab C demo shares.
- * Apartment 3B: you, Maya, Jordan and Sam. Friday dinner: you, Alex, Priya.
+ * Apartment 3B: you, Maya, Jordan and Sam. Weekend at the lake: you, Alex, Priya.
  * Every amount is computed by the kit's split engine from the kit's recorded
  * scans, so the ledger, the split playground and the AI answers agree to the cent. */
 import { PEOPLE as KIT_PEOPLE, CATEGORIES as KIT_CATS, SAMPLES, getSample, loadScan, splitSample } from '../../_kit/receipts.js';
@@ -7,7 +7,8 @@ import { normalizeScan } from '../../_kit/scan-client.js';
 import { distributeEqually } from '../../_kit/split-engine.js';
 import { itemName, storeName } from './util.js';
 
-export const PEOPLE = KIT_PEOPLE;
+// Maya's teal darkened (#0d9488 -> #0f766e) so white initials pass WCAG AA (5.5:1); the others already pass
+export const PEOPLE = { ...KIT_PEOPLE, maya: { ...KIT_PEOPLE.maya, color: '#0f766e' } };
 export const CATEGORIES = {
   ...KIT_CATS,
   subscriptions: { label: 'Subscriptions', color: '#9333ea' },
@@ -17,7 +18,7 @@ export { SAMPLES, getSample };
 /** Per-sample presentation used by the scan picker and split demo. */
 export const SAMPLE_META = {
   'green-basket': { label: 'Green Basket Market', short: 'Green Basket', kind: 'Shared groceries', group: 'Apartment 3B', featured: [13, 9, 11] },
-  'taqueria-sol': { label: 'Taqueria Sol', short: 'Taqueria Sol', kind: 'Dinner for three', group: 'Friday dinner', featured: null },
+  'taqueria-sol': { label: 'Taqueria Sol', short: 'Taqueria Sol', kind: 'Dinner for three', group: 'Weekend at the lake', featured: [0, 1, 3] },
   'corner-pharmacy': { label: 'Corner Pharmacy', short: 'Pharmacy', kind: 'Just yours', group: 'Personal', featured: null },
   'monthly-rent': { label: 'Monthly rent', short: 'Rent', kind: 'Every month', group: 'Apartment 3B', featured: null, payer: 'maya' },
 };
@@ -71,7 +72,7 @@ export function octoberLedger() {
         items: [{ name: 'Large margherita', cents: 1600, cat: 'dining' }, { name: 'Large mushroom', cents: 1600, cat: 'dining' }, { name: 'Garlic knots', cents: 600, cat: 'dining' }] }),
       sampleEntry('green-basket', { title: 'Green Basket Market', group: 'Apartment 3B', date: 'Oct 24', payer: 'you', kind: 'shared' }),
       sampleEntry('corner-pharmacy', { title: 'Corner Pharmacy', group: 'Personal', date: 'Oct 20', payer: 'you', kind: 'personal' }),
-      sampleEntry('taqueria-sol', { title: 'Taqueria Sol', group: 'Friday dinner', date: 'Oct 18', payer: 'you', kind: 'shared' }),
+      sampleEntry('taqueria-sol', { title: 'Taqueria Sol', group: 'Weekend at the lake', date: 'Oct 18', payer: 'you', kind: 'shared' }),
       manualEntry({ id: 'netflix', title: 'Netflix', group: 'Apartment 3B', date: 'Oct 5', payer: 'you', kind: 'recurring', people: ['you', 'maya', 'jordan', 'sam'],
         items: [{ name: 'Netflix Premium', cents: 2499, cat: 'subscriptions' }] }),
       sampleEntry('monthly-rent', { title: 'Monthly rent', group: 'Apartment 3B', date: 'Oct 1', payer: 'Maya', kind: 'recurring' }),
