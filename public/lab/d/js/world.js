@@ -61,7 +61,8 @@ async function build() {
     { id: 'corner-pharmacy', title: 'Corner Pharmacy', date: 'Oct 20', group: null, payer: 'you', split: scans['corner-pharmacy'].split },
     { id: 'taqueria-sol', title: 'Taqueria Sol', date: 'Oct 18', group: 'Thursday dinners', payer: 'alex', split: scans['taqueria-sol'].split },
     { id: 'netflix', title: 'Netflix', date: 'Oct 12', group: 'Flat 3B', payer: 'maya', recurring: true, split: netflix },
-    { id: 'monthly-rent', title: 'Rent & bills', date: 'Oct 1', group: 'Flat 3B', payer: 'you', recurring: true, split: scans['monthly-rent'].split },
+    // Rent is settled: Maya, Jordan and Sam paid you back their rooms on Oct 1, so it's in no balance.
+    { id: 'monthly-rent', title: 'Rent & bills', date: 'Oct 1', group: 'Flat 3B', payer: 'you', recurring: true, settled: true, split: scans['monthly-rent'].split },
   ].map((b) => ({ ...b, totalCents: b.split.totalCents, youCents: b.split.people.you?.cents || 0 }));
 
   const bank = [
@@ -91,9 +92,9 @@ async function build() {
   }));
   const items = lines.filter((l) => l.cents > 0);
 
-  // Who owes whom across October: positive means they owe you.
+  // Who owes whom across October: positive means they owe you. Settled bills (rent) are in no balance.
   const net = {};
-  bills.forEach((b) => Object.entries(b.split.people).forEach(([p, v]) => {
+  bills.filter((b) => !b.settled).forEach((b) => Object.entries(b.split.people).forEach(([p, v]) => {
     if (p === b.payer || !v.cents) return;
     if (b.payer === 'you') net[p] = (net[p] || 0) + v.cents;
     else if (p === 'you') net[b.payer] = (net[b.payer] || 0) - v.cents;

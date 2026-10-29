@@ -1,6 +1,6 @@
 // Scripted AI conversations: a user message, Trezzit tool calls, a Trezzit card, the answer.
 import { $, $$, esc, money, icon, tmark, reducedMotion, Clock, announce } from './ui.js';
-import { getWorld, getSample, splitWith, catOf, PEOPLE, tone, OTHER_TONE } from './world.js';
+import { getWorld, catOf, PEOPLE, tone, OTHER_TONE } from './world.js';
 
 const okIcon = `<span class="st ok">${icon('check')}</span>`;
 // Nothing found is not a success: a neutral dot, not a green check.
@@ -34,12 +34,7 @@ function octoberCard(w) {
 function rentCard(w) {
   const r = w.scans['monthly-rent'].split;
   return `<div class="tcard"><div class="tcard-head"><span class="rec-icon" style="width:28px;height:28px;border-radius:8px">${icon('repeat')}</span><span class="t"><b>Rent &amp; bills</b><span>Monthly on the 1st · parking is Jordan\u2019s</span></span></div>
-    <div class="rows">
-      <div class="row"><span class="n">Rent</span><span class="m">by room</span></div>
-      <div class="row"><span class="n">Water, trash, internet</span><span class="m">4 ways</span></div>
-      <div class="row"><span class="n">Parking</span><span class="m">Jordan</span></div>
-    </div>
-    <div class="versus"><div class="bank plain"><span class="lbl">Each month</span><span class="v money">${money(r.totalCents)}</span></div><div class="mine"><span class="lbl">Your share</span><span class="v money">${money(r.people.you.cents)}</span></div></div></div>`;
+    <div class="versus" style="margin-bottom:0"><div class="bank plain"><span class="lbl">Each month</span><span class="v money">${money(r.totalCents)}</span></div><div class="mine"><span class="lbl">Your share</span><span class="v money">${money(r.people.you.cents)}</span></div></div></div>`;
 }
 
 function towelsCard(w) {
@@ -49,27 +44,16 @@ function towelsCard(w) {
     <div class="legend"><span><i style="background:${tone(0)}"></i>${catOf(t.category).label}</span><span>Split ${t.n} ways</span></div></div>`;
 }
 
+const dinnerOf = (w) => w.bills.find((x) => x.id === 'taqueria-sol');
+/** "4 items + tip", the same count the typed answers use. */
+const dinnerCount = (w) => countOf(dinnerOf(w).split.items.map((it) => ({ name: it.itemType === 'Tip' ? 'Tip' : it.name })));
 function dinnerCard(w) {
-  const b = w.bills.find((x) => x.id === 'taqueria-sol');
+  const b = dinnerOf(w);
   const you = b.split.people.you;
   const cats = Object.entries(you.byCategory).map(([id, cents]) => ({ cents, ...catOf(id) })).sort((a, b) => b.cents - a.cents);
   return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Taqueria Sol</b><span>${b.date} · ${esc(PEOPLE[b.payer].name)} paid ${money(b.totalCents)}</span></span></div>
     <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v money">${money(0)}</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">${money(you.cents)}</span></div></div>
     ${legend(cats)}</div>`;
-}
-
-/** The receipt split the way the chip asks: Sam skips the towels. Computed by the kit's split engine. */
-function chipSplit(w) {
-  const s = getSample('green-basket');
-  const sets = s.lines.map((l) => new Set(l.split.people));
-  sets[13] = new Set(['you', 'maya', 'jordan']); // hand towels: Sam skips them
-  return splitWith('green-basket', w.scans['green-basket'].bill, s.people, sets);
-}
-function chipSplitCard(w) {
-  const r = chipSplit(w);
-  return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Green Basket Market</b><span>Saved · 14 items · Flat 3B</span></span></div>
-    <div class="shares">${Object.keys(r.people).map((p) => `<div class="sh${p === 'you' ? ' you' : ''}"><span class="av" style="--c:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].initials}</span><span class="visually-hidden">${esc(PEOPLE[p].name)}</span><b class="money">${money(r.people[p].cents)}</b></div>`).join('')}</div>
-    <div class="row tot"><span class="n">${r.check.ok ? 'Adds up to' : 'Off by a cent:'} ${money(r.check.sumCents)}</span><span class="a">${r.check.ok ? `<span class="st ok">${icon('check')}</span>` : ''}</span></div></div>`;
 }
 
 function activityCard(label, cents) {
@@ -80,7 +64,7 @@ function activityCard(label, cents) {
 
 function balanceCard(w, names) {
   const ids = Object.keys(w.net).filter((k) => w.net[k]);
-  return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Balances</b><span>October · all groups</span></span></div>
+  return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Balances</b><span>October · rent settled</span></span></div>
     <div class="rows">${ids.map((k) => {
       const c = w.net[k]; const hi = names.includes(k);
       return `<div class="row"><span class="n">${hi ? `<b style="color:var(--ink)">${esc(PEOPLE[k].name)}</b>` : esc(PEOPLE[k].name)} <span class="m">· ${c > 0 ? 'owes you' : 'you owe'}</span></span><span class="a money">${money(Math.abs(c))}</span></div>`;
@@ -117,7 +101,6 @@ const who = (ids) => {
 export function scripts(w) {
   const gb = gbOf(w);
   const owed = money(gb.totalCents - gb.youCents);
-  const cs = chipSplit(w);
   const deli = w.bills.find((b) => b.byAI);
   return {
     // The page opens on this one (static HTML in index.html): a read question that always works.
@@ -127,26 +110,26 @@ export function scripts(w) {
       { t: 'card', html: splitCard },
       { t: 'ai', text: `Maya, Jordan and Sam owe you ${owed}.` },
     ],
-    // The chip: a different split from the opening card, so the tap visibly does something.
+    // The chip: a different receipt from the opening card (a dinner a friend paid), so no total is contradicted.
     split: [
-      { t: 'user', thumb: 'assets/thumb-green-basket.webp', text: 'Split this with Maya, Jordan and Sam. Avocados and cold brew are mine. Sam skips the towels.' },
-      { t: 'tool', run: 'Reading the receipt', done: 'Read 14 items, $100.00', ms: 1100,
-        then: { run: 'Saving the split', done: 'Read 14 items and saved the split', ms: 800 } },
-      { t: 'card', html: chipSplitCard },
-      { t: 'ai', text: `Saved. Maya, Jordan and Sam owe you ${money(cs.totalCents - cs.people.you.cents)}.` },
+      { t: 'user', thumb: 'assets/thumb-taqueria.webp', text: 'Split my dinner with Alex and Priya. Alex paid.' },
+      { t: 'tool', run: 'Reading the receipt', done: `Read ${dinnerCount(w)}, ${money(dinnerOf(w).totalCents)}`, ms: 1100,
+        then: { run: 'Saving the split', done: 'Saved the split', ms: 800 } },
+      { t: 'card', html: dinnerCard },
+      { t: 'ai', text: `Saved. You owe Alex ${money(dinnerOf(w).youCents)}.` },
     ],
     // A typed "split my receipt": the receipt's own split (the opening card).
     splitTyped: [
       { t: 'user', thumb: 'assets/thumb-green-basket.webp', text: '' },
       { t: 'tool', run: 'Reading the receipt', done: 'Read 14 items, $100.00', ms: 1100,
-        then: { run: 'Saving the split', done: 'Read 14 items and saved the split', ms: 800 } },
+        then: { run: 'Saving the split', done: 'Saved the split', ms: 800 } },
       { t: 'card', html: splitCard },
       { t: 'ai', text: `Saved. Maya, Jordan and Sam owe you ${owed}.` },
     ],
     dinner: [
-      { t: 'user', text: 'Split my dinner receipt. Alex paid.' },
-      { t: 'tool', run: 'Reading the receipt', done: 'Read 7 items, $84.87', ms: 1000,
-        then: { run: 'Saving the split', done: 'Read 7 items and saved the split', ms: 800 } },
+      { t: 'user', thumb: 'assets/thumb-taqueria.webp', text: 'Split my dinner receipt. Alex paid.' },
+      { t: 'tool', run: 'Reading the receipt', done: `Read ${dinnerCount(w)}, ${money(dinnerOf(w).totalCents)}`, ms: 1000,
+        then: { run: 'Saving the split', done: 'Saved the split', ms: 800 } },
       { t: 'card', html: dinnerCard },
       { t: 'ai', text: `Saved. You owe Alex ${money(w.bills.find((x) => x.id === 'taqueria-sol').youCents)}.` },
     ],
@@ -206,6 +189,7 @@ export function answer(q, w) {
   const s = q.toLowerCase();
   const say = (text, tool, card) => [{ t: 'user', text: q }, ...(tool ? [tool] : []), ...(card ? [{ t: 'card', html: card }] : []), { t: 'ai', text }];
   const named = NAMES.filter((n) => new RegExp(`\\b${n}\\b`).test(s));
+  if (/^\s*(hi|hello|hey|yo|hiya|thanks|thank you|ok|okay|cool|test)\b[\s!.?]*$/.test(s)) return say('Ask me about anything you spent, like avocados or dining out.');
   if (/\b(send|transfer|venmo|zelle|paypal|wire)\b|\bpay\s+(back|him|her|them|maya|jordan|sam|alex|priya|my|a\s+friend)\b/.test(s)) {
     return say('Trezzit never moves money. When you pay someone back elsewhere, I can record it, so your balances stay right.');
   }
@@ -217,28 +201,33 @@ export function answer(q, w) {
   // Who owes whom, or what a friend paid: answered from the balances, never from item names.
   if (/\b(owe|owes|owed|owing|balance|balances|settle|even)\b/.test(s) || (named.length && /\b(pay|paid|pays)\b/.test(s))) {
     const tool = { t: 'tool', run: 'Checking balances', done: 'Balances across your groups', ms: 800 };
+    // Say the direction the way it was asked: "do I owe Maya?" gets "You don't owe Maya." first.
+    const asksIOwe = /\b(i|do i|did i|should i|we)\s+owe\b|\bowe\s+(maya|jordan|sam|alex|priya)\b/.test(s);
+    const asksOweMe = /\bowes?\s+(me|us)\b/.test(s);
     const line = (k) => {
-      const c = w.net[k] || 0;
-      if (!c) return `You and ${PEOPLE[k].name} are even.`;
-      return c > 0 ? `${PEOPLE[k].name} owes you ${money(c)}.` : `You owe ${PEOPLE[k].name} ${money(-c)}.`;
+      const c = w.net[k] || 0; const n = PEOPLE[k].name;
+      if (!c) return `You and ${n} are even.`;
+      if (c > 0) return `${asksIOwe ? `You don’t owe ${n}. ` : ''}${n} owes you ${money(c)}.`;
+      return `${asksOweMe ? `${n} doesn’t owe you. ` : ''}You owe ${n} ${money(-c)}.`;
     };
+    const rentNote = /\brent\b/.test(s) ? 'Rent is settled. ' : '';
     const paidBy = (k) => {
       const bs = w.bills.filter((b) => b.payer === k);
       return bs.length ? `${PEOPLE[k].name} paid for ${bs.map((b) => `${b.title} (${money(b.totalCents)})`).join(' and ')}.` : `${PEOPLE[k].name} didn’t pay any of your October bills.`;
     };
     const asksPaid = /\b(pay|paid|pays)\b/.test(s) && !/\b(owe|owes|owed|owing|balance|balances|settle|even)\b/.test(s);
-    const text = named.length ? named.map((k) => (asksPaid ? `${paidBy(k)} ${line(k)}` : line(k))).join(' ')
+    const text = rentNote + (named.length ? named.map((k) => (asksPaid ? `${paidBy(k)} ${line(k)}` : line(k))).join(' ')
       : (() => {
         const in_ = Object.keys(w.net).filter((k) => w.net[k] > 0);
         const out = Object.keys(w.net).filter((k) => w.net[k] < 0);
         return [in_.length ? `${who(in_)} owe you ${money(in_.reduce((a, k) => a + w.net[k], 0))}.` : '',
           out.map((k) => `You owe ${PEOPLE[k].name} ${money(-w.net[k])}.`).join(' ')].filter(Boolean).join(' ');
-      })();
+      })());
     return say(text, tool, () => balanceCard(w, named));
   }
 
   // Only clear intents play a scripted answer; questions about things are searched instead.
-  const reuse = (id) => scripts(w)[id].map((st, i) => (i === 0 ? { ...st, text: q, thumb: id === 'splitTyped' ? st.thumb : undefined } : st));
+  const reuse = (id) => scripts(w)[id].map((st, i) => (i === 0 ? { ...st, text: q, thumb: id === 'splitTyped' || id === 'dinner' ? st.thumb : undefined } : st));
   if (/\b(categor|breakdown|break\s+down|summar|overview)/.test(s)) return reuse('october');
   if (/\brent\b/.test(s) && /\b(add|every|monthly|recurr|repeat|schedule)/.test(s)) return reuse('rent');
   if (/\bsplit\b|\breceipt\b|\broommates?\b/.test(s)) {
