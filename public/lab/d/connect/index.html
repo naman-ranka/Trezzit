@@ -44,11 +44,12 @@
 <header class="top" id="top">
   <div class="wrap">
     <a class="brand" href="../" aria-label="Trezzit home"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
-    <a class="nav-link" href="../#scan">How it works</a>
-    <a class="nav-link" href="../app/">The app</a>
-    <a class="nav-link" href="../connect/" aria-current="page">AI apps</a>
-    <a class="nav-link show-sm" href="https://app.trezzit.com/login">Log in</a>
-    <a class="btn btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+    <nav class="main-nav" aria-label="Main">
+      <a class="nav-link" href="../app/">Tour</a>
+      <a class="nav-link show-sm" href="../connect/" aria-current="page">Use with AI</a>
+      <a class="nav-link hide-xs" href="https://app.trezzit.com/login">Log in</a>
+      <a class="btn btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+    </nav>
   </div>
 </header>
 <main id="main" tabindex="-1">
@@ -69,7 +70,6 @@
       </div>
       <div class="tabpanel" role="tabpanel" id="p-claude" aria-labelledby="b-claude">
         <ol class="steps-light">
-          <li><span>Need an account? <a href="https://app.trezzit.com/signup">Sign up free</a></span></li>
           <li><span>In Claude, open <strong>Settings → Connectors</strong>.</span></li>
           <li><span>Choose <strong>Add custom connector</strong>, name it Trezzit and paste the server URL.</span></li>
           <li><span>Sign in to Trezzit, check what Claude is asking for, and select <strong>Allow access</strong>.</span></li>
@@ -78,22 +78,23 @@
       </div>
       <div class="tabpanel" role="tabpanel" id="p-chatgpt" aria-labelledby="b-chatgpt" hidden>
         <ol class="steps-light">
-          <li><span>Need an account? <a href="https://app.trezzit.com/signup">Sign up free</a></span></li>
           <li><span>In ChatGPT, open <strong>Settings → Apps</strong> and turn on <strong>Developer mode</strong>.</span></li>
           <li><span>Choose <strong>Create app</strong>, name it Trezzit and paste the server URL.</span></li>
           <li><span>Select Connect, sign in to Trezzit, and select <strong>Allow access</strong>.</span></li>
           <li><span>Mention Trezzit in a chat, or pick it from the tools menu, and ask.</span></li>
         </ol>
+        <p class="muted small tab-note">ChatGPT lists custom apps under Developer mode for now. Photo scanning needs code execution turned on.</p>
       </div>
       <div class="tabpanel" role="tabpanel" id="p-other" aria-labelledby="b-other" hidden>
         <ol class="steps-light">
-          <li><span>Need an account? <a href="https://app.trezzit.com/signup">Sign up free</a></span></li>
           <li><span>Any app that supports remote MCP servers with OAuth sign-in can connect with the server URL.</span></li>
           <li><span>In Claude Code, for example:</span></li>
         </ol>
         <pre class="cmd"><code>claude mcp add --transport http trezzit https://api.trezzit.com/api/mcp</code></pre>
+        <p class="muted small tab-note">Photo scanning needs an app that can run code.</p>
       </div>
-      <p class="muted small" style="margin-top:18px">Custom connectors may need a paid plan in the AI app. Photo scanning needs one that can run code.</p>
+      <p class="acct">Need a Trezzit account? <a href="https://app.trezzit.com/signup">Sign up</a></p>
+      <p class="muted small" style="margin-top:4px">Some AI apps need a paid plan for custom connectors.</p>
     </div>
   </div>
 </section>
@@ -115,11 +116,11 @@
     <div class="block-body">
       <ul class="perm one">
         <li><svg class="i" aria-hidden="true"><use href="#i-shield"/></svg><span>Never moves money.</span></li>
-        <li><svg class="i" aria-hidden="true"><use href="#i-eye"/></svg><span>Reads your expenses, groups and balances. <em>Never other members’ emails.</em></span></li>
-        <li><svg class="i" aria-hidden="true"><use href="#i-list"/></svg><span>Adds expenses, settle-ups and recurring bills. <em>Each one shows in your activity log.</em></span></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-eye"/></svg><span>Reads your expenses, groups and balances.</span></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-list"/></svg><span>Adds expenses, settle-ups and recurring bills.</span></li>
         <li><svg class="i" aria-hidden="true"><use href="#i-unplug"/></svg><span>Disconnect any time. <em>Profile → Connected AI apps.</em></span></li>
       </ul>
-      <p class="muted small perm-note">It can’t edit bills yet, and deletes only what it added in the last 30 minutes. Trezzit never sees your chats.</p>
+      <p class="muted small perm-note">Can’t edit bills yet. Trezzit never sees your chats.</p>
     </div>
   </div>
 </section>
@@ -132,8 +133,9 @@
       <span>Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></span>
     </div>
     <nav aria-label="Footer">
-      <a href="../connect/">AI apps</a>
-      <a href="../app/">The app</a>
+      <a href="../app/">Tour</a>
+      <a href="../connect/">Use with AI</a>
+      <a href="https://app.trezzit.com/login">Log in</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="/your-data">Your data</a>

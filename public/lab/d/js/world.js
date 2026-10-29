@@ -59,7 +59,7 @@ async function build() {
     { id: 'juniper-deli', title: 'Juniper Deli', date: 'Oct 27', group: null, payer: 'you', byAI: true, split: deli },
     { id: 'green-basket', title: 'Green Basket Market', date: 'Oct 24', group: 'Flat 3B', payer: 'you', split: scans['green-basket'].split },
     { id: 'corner-pharmacy', title: 'Corner Pharmacy', date: 'Oct 20', group: null, payer: 'you', split: scans['corner-pharmacy'].split },
-    { id: 'taqueria-sol', title: 'Taqueria Sol', date: 'Oct 18', group: 'Thursday dinners', payer: 'alex', split: scans['taqueria-sol'].split },
+    { id: 'taqueria-sol', title: 'Taqueria Sol', date: 'Oct 18', group: 'Dinner crew', payer: 'alex', split: scans['taqueria-sol'].split },
     { id: 'netflix', title: 'Netflix', date: 'Oct 12', group: 'Flat 3B', payer: 'maya', recurring: true, split: netflix },
     // Rent is settled: Maya, Jordan and Sam paid you back their rooms on Oct 1, so it's in no balance.
     { id: 'monthly-rent', title: 'Rent & bills', date: 'Oct 1', group: 'Flat 3B', payer: 'you', recurring: true, settled: true, split: scans['monthly-rent'].split },
@@ -72,6 +72,22 @@ async function build() {
     { date: 'Oct 1', text: 'ONLINE TRANSFER RENT', cents: -263240 },
   ];
   const paidCents = -bank.reduce((a, b) => a + b.cents, 0);
+  const derived = derive(bills);
+
+  // Who owes whom across October: positive means they owe you. Settled bills (rent) are in no balance.
+  const net = {};
+  bills.filter((b) => !b.settled).forEach((b) => Object.entries(b.split.people).forEach(([p, v]) => {
+    if (p === b.payer || !v.cents) return;
+    if (b.payer === 'you') net[p] = (net[p] || 0) + v.cents;
+    else if (p === 'you') net[b.payer] = (net[b.payer] || 0) - v.cents;
+  }));
+
+  return { scans, bills, bank, paidCents, ...derived, net };
+}
+
+/** Everything that follows from the bills: your total, categories, and every receipt line.
+    Re-run when a split changes, so the October list always agrees with the split above it. */
+export function derive(bills) {
   const spentCents = bills.reduce((a, b) => a + b.youCents, 0);
 
   const byCat = {};
@@ -88,19 +104,12 @@ async function build() {
     lines.push({
       name: it.itemType === 'Tip' ? 'Tip' : itemName(it.name), bill: b.title, date: b.date,
       cents: mine, totalCents: it.totalCents, n: owners.length, how, owners, category: it.category || 'other',
+      payer: b.payer, group: b.group || '', billId: b.id,
     });
   }));
   const items = lines.filter((l) => l.cents > 0);
 
-  // Who owes whom across October: positive means they owe you. Settled bills (rent) are in no balance.
-  const net = {};
-  bills.filter((b) => !b.settled).forEach((b) => Object.entries(b.split.people).forEach(([p, v]) => {
-    if (p === b.payer || !v.cents) return;
-    if (b.payer === 'you') net[p] = (net[p] || 0) + v.cents;
-    else if (p === 'you') net[b.payer] = (net[b.payer] || 0) - v.cents;
-  }));
-
-  return { scans, bills, bank, paidCents, spentCents, cats, items, lines, net };
+  return { spentCents, cats, lines, items };
 }
 
 /** A split of one sample with custom per-line people (Sets), for the playground. */

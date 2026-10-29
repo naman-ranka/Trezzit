@@ -1,10 +1,11 @@
 /* main.js: wires prototype A together. */
-import { $, $$, ICON, reveals } from './util.js';
+import { $, $$, reveals } from './util.js';
 import { initHero } from './hero.js';
 import { mountScan } from './scan-demo.js';
 import { initStory } from './story.js';
 import { initScenarios } from './scenarios.js';
 import { initChat } from './chat.js';
+import { initLedger } from './ledger.js';
 
 document.documentElement.classList.add('reveals-on');
 
@@ -13,7 +14,6 @@ const safe = (fn) => Promise.resolve().then(fn).catch((e) => console.error('[lab
 safe(initHero);
 reveals();
 nav();
-trustIcons();
 
 // "Split it": the story right below already splits this receipt, so the button goes there; any other
 // sample, or your own photo, opens the full playground with that receipt.
@@ -40,6 +40,7 @@ safe(() => mountScan($('#scan-demo'), {
 safe(initStory);
 safe(initScenarios);
 safe(initChat);
+safe(initLedger);
 
 function nav() {
   const navEl = $('#nav');
@@ -57,7 +58,4 @@ function nav() {
   update();
 }
 
-function trustIcons() {
-  $$('.ti[data-icon]').forEach((el) => { el.innerHTML = ICON[el.dataset.icon] || ''; });
-}
 

@@ -5,11 +5,11 @@
  */
 
 import { PEOPLE } from './data.js';
-import { money, esc, ICON, avatar, reduced, watchVisible, bankAmt } from './util.js';
+import { money, esc, ICON, avatar, reduced, watchVisible, whenVisible, bankAmt } from './util.js';
 
 function card(title, sub, rows, foot = '', note = '') {
   return `<div class="tzcard">
-    <div class="tzcard-h"><span class="tzcard-mark" aria-hidden="true"></span><span><b>${title}</b><small>${sub}</small></span></div>${note ? `<p class="tzcard-note">${note}</p>` : ''}
+    <div class="tzcard-h"><span class="tzcard-mark" aria-hidden="true"></span><span><b>${title}</b>${sub ? `<small>${sub}</small>` : ''}</span></div>${note ? `<p class="tzcard-note">${note}</p>` : ''}
     <ul role="list">${rows}</ul>${foot}
   </div>`;
 }
@@ -17,7 +17,6 @@ const row = (left, right, extra = '') => `<li><span>${left}</span><span class="m
 
 export function scripts(sc) {
   const byId = Object.fromEntries(sc.map((s) => [s.id, s]));
-  const g = byId.groceries.sum;
   // Two November charges that are not in Trezzit yet. October stays exactly as the statement table shows it.
   const parking = { total: 600, mine: 600 };
   const cafe = { total: 970, mine: 485 };
@@ -30,39 +29,26 @@ export function scripts(sc) {
 
   return {
     match: {
-      chip: "What's missing from Trezzit?",
       steps: [
-        { user: "Here's my latest statement. Add what's not in Trezzit yet. The café was with Maya.", attach: { icon: 'doc', name: 'nov-statement.pdf' } },
+        { user: "Add what's missing from my statement. The café was with Maya.", attach: { icon: 'doc', name: 'nov-statement.pdf' } },
         { tools: ['Added 2 expenses'] },
-        { html: card('Added from your statement', '2 charges that weren’t in Trezzit',
+        { html: card('Added from your statement', '',
           row(`${line('NOV 03', 'CITY PARKING', parking.total)}<small>Just you</small>`, money(parking.mine))
           + row(`${line('NOV 06', 'CORNER CAFE', cafe.total)}<small>You and Maya</small>`, money(cafe.mine)),
-          `<p class="tzcard-f">You spent <b class="money">${money(parking.mine + cafe.mine)}</b> of the <span class="money">${money(parking.total + cafe.total)}</span> you paid.</p>`) },
-        { ai: `Saved. Maya owes you ${money(cafe.total - cafe.mine)}. Both show in your activity log.` },
-      ],
-    },
-    split: {
-      chip: 'Split this receipt with my roommates',
-      steps: [
-        { user: 'Split this with Maya, Jordan and Sam. Avocados and cold brew are mine, oat milk and kale chips are Maya\'s.', attach: { icon: 'image', name: 'green-basket.jpg' } },
-        { tools: ['Read the receipt', 'Saved to Roommates'] },
-        { html: card('Green Basket Market', `${byId.groceries.itemCount} items · ${money(g.total)} · Roommates`,
-          ['you', 'maya', 'jordan', 'sam'].map((id) => row(who(id), money(g.result.people[id].cents))).join(''),
-          '', 'Avocados, cold brew &rarr; you · Oat milk, kale chips &rarr; Maya · the rest split 4 ways') },
-        { ai: `Saved. You spent ${money(g.mine)}: ${money(g.byCategory.groceries)} on groceries, ${money(g.byCategory.household)} on household.` },
+          '<p class="tzcard-by">Added by Claude · in your activity log</p>') },
+        { ai: `Saved. Maya owes you ${money(cafe.total - cafe.mine)}.` },
       ],
     },
     house: {
-      chip: 'Who owes who in the house?',
       steps: [
-        { user: 'Who owes who in the house? Sam just paid me back for October.' },
-        { tools: ['Checked Roommates balances', 'Recorded Sam’s payment'] },
-        { html: card('Roommates', 'Who owes you · October',
+        { user: 'Who owes who? Sam paid me back for October.' },
+        { tools: ['Noted that Sam paid you'] },
+        { html: card('Roommates', 'Rent, bills and groceries · October',
           row(who('maya'), money(maya))
           + row(who('jordan'), money(jordan))
-          + row(`${who('sam')}<small class="paid">Paid you ${money(sam)} · settled</small>`, money(0)),
-          `<p class="tzcard-f">Owed to you <b class="money">${money(maya + jordan)}</b></p>`) },
-        { ai: `Recorded Sam's ${money(sam)}. Sam is settled. Trezzit only records it; the money moved outside Trezzit.` },
+          + row(`${who('sam')}<small class="paid">Paid ${money(sam)}</small>`, money(0)),
+          `<p class="tzcard-f">Still owed to you <b class="money">${money(maya + jordan)}</b></p>`) },
+        { ai: 'Noted. Sam paid you back outside Trezzit, so Sam is settled.' },
       ],
     },
   };
@@ -144,6 +130,9 @@ export function initChatDemo(section, scenarios) {
     log.scrollTop = log.scrollHeight;
   }
 
+  /* Playing reveals the finished conversation in place: every message already has its final
+     size and position, so nothing reflows, and the box is full within about 1.2 s
+     (question at once, then each step, then the card, then the answer). */
   async function play(key) {
     const id = ++run;
     current = key;
@@ -152,43 +141,22 @@ export function initChatDemo(section, scenarios) {
     if (reduced()) { setCtl('replay'); ctl.hidden = true; return; }
     paused = false; wake?.();
     playing = true; setCtl('pause');
+    const msgs = [...log.children];
     log.classList.add('is-playing');
-    log.innerHTML = '';
     log.scrollTop = 0;
     stick = true;
     try {
-      for (const step of S[key].steps) {
+      for (const m of msgs) {
         await gate(id);
-        const node = document.createElement('div');
-        node.innerHTML = bubble(step);
-        const m = node.firstElementChild;
-        log.appendChild(m);
+        m.classList.add('in');
         toEnd();
-        requestAnimationFrame(() => m.classList.add('in'));
-        if (step.user !== undefined || step.ai !== undefined) {
-          const p = m.querySelector('p');
-          const text = step.user ?? step.ai;
-          const words = text.split(' ');
-          const per = step.user !== undefined ? 34 : 46;
-          for (let w = 0; w < words.length; w += 1) {
-            p.textContent = words.slice(0, w + 1).join(' ');
-            toEnd();
-            await wait(per, id);
-          }
-          await wait(step.user !== undefined ? 380 : 520, id);
-        } else if (step.tools) {
-          const chips = [...m.querySelectorAll('.tool')];
-          chips.forEach((c) => { c.hidden = true; });
-          for (const c of chips) {
-            c.hidden = false;
-            toEnd();
-            await wait(520, id);
-            c.classList.add('is-done');
-            await wait(120, id);
-          }
+        if (m.classList.contains('msg-tool')) {
+          const tools = [...m.querySelectorAll('.tool')];
+          tools.forEach((t) => t.classList.remove('is-done'));
+          for (const t of tools) { await wait(260, id); t.classList.add('is-done'); }
+          await wait(120, id);
         } else {
-          toEnd();
-          await wait(900, id);
+          await wait(m.classList.contains('msg-user') ? 200 : 320, id);
         }
       }
       playing = false; setCtl('replay');
@@ -212,10 +180,12 @@ export function initChatDemo(section, scenarios) {
     if (!paused) wake?.();
   });
 
-  // Opens finished: the first question and its answer. A prompt (or Replay) plays a conversation.
+  // Opens finished (so nothing is ever half-drawn); the first time it comes into view it
+  // plays once. A prompt (or Replay) plays a conversation.
   fit('match');
   setCtl('replay');
   if (reduced()) ctl.hidden = true;
+  else whenVisible(log, () => { if (!playing && run === 0) play('match'); }, { threshold: 0.5 });
   let lastW = innerWidth;
   addEventListener('resize', () => { if (innerWidth !== lastW && !playing) { lastW = innerWidth; tallest = 0; fit(current); } }, { passive: true });
   document.fonts?.ready.then(() => { if (!playing) { tallest = 0; fit(current); } });

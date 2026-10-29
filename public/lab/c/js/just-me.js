@@ -38,7 +38,7 @@ function renderCats(result, pending = false) {
   }).join('');
   cats.innerHTML = `<div class="cats-in${pending ? ' pending' : reduced() ? '' : ' enter'}">
     <div class="cats-chart">${donut(parts, you.cents)}<p><small>${shared ? 'Your share' : 'You spent'}</small><b class="money">${money(you.cents)}</b>${shared ? `<small class="money">of ${money(r.totalCents)}</small>` : ''}</p></div>
-    <div><p class="cats-t">${esc(SAMPLE_META[result.sampleId].label)}, sorted${shared ? ' (your share only)' : ''}</p><ul class="cat-list" role="list">${groups}</ul></div>
+    <div><p class="cats-t">By category${shared ? ' (your share only)' : ''}</p><ul class="cat-list" role="list">${groups}</ul></div>
   </div>`;
 }
 

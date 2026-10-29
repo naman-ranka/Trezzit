@@ -3,7 +3,7 @@
  * sideRoot (recurring page) takes the 'Coming up' column, so it can lead the page; onChange(result) after every change. */
 import { splitBill, distributeEqually } from '../../_kit/split-engine.js';
 import { PEOPLE } from './data.js';
-import { money, countMoney, icon, esc } from './util.js';
+import { money, countMoney, icon, esc, YOU_GLYPH } from './util.js';
 
 const ROOM = ['you', 'maya', 'jordan', 'sam'];
 const PCT = { you: 25, maya: 25, jordan: 28, sam: 22 };
@@ -59,7 +59,7 @@ root.innerHTML = `<div class="rec${opts.compact || opts.sideRoot ? ' rec-compact
       <span id="rent-help" class="muted small">By room size · 25 · 25 · 28 · 22%</span>
     </div>
     <ul class="rec-lines" role="list"></ul>
-    <ul class="sp-people rec-shares" role="list" aria-live="polite">${ROOM.map((p) => `<li class="sp-person" data-p="${p}"><span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span><span class="sp-pn">${PEOPLE[p].name}</span><b class="money sp-pa"></b></li>`).join('')}</ul>
+    <ul class="sp-people rec-shares" role="list" aria-live="polite">${ROOM.map((p) => `<li class="sp-person" data-p="${p}"><span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span><span class="sp-pn">${PEOPLE[p].name}</span><b class="money sp-pa"></b></li>`).join('')}</ul>
     <p class="sp-check rec-check">${icon.check}<span></span></p>
   </div>
   ${opts.compact || opts.sideRoot ? '' : SIDE}
@@ -83,7 +83,7 @@ function render() {
     const b = root.querySelector(`.sp-person[data-p="${p}"] .sp-pa`);
     countMoney(b, prev ? prev.people[p].cents : r.people[p].cents, r.people[p].cents, prev ? 380 : 0);
   });
-  root.querySelector('.rec-check span').innerHTML = `Shares add up to <b class="money">${money(r.check.sumCents)}</b>, exactly.`;
+  root.querySelector('.rec-check span').innerHTML = `Adds up to <b class="money">${money(r.check.sumCents)}</b>`;
   opts.onChange?.(r);
   if (opts.compact) { prev = r; return; }
   const you = r.people.you.cents;

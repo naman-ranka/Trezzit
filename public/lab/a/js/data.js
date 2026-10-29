@@ -6,10 +6,10 @@ import { prettyName } from './util.js';
 
 export { SAMPLES, PEOPLE, CATEGORIES, getSample };
 
-/* One quiet palette: people and categories are ink/slate shades (names and labels carry the meaning);
- * brand blue is the one accent and green is kept for money owed to you and "Adds up to".
+/* Categories are ink/slate shades (labels carry the meaning). People get the kit's distinct hues, a step darker for
+ * white initials (all 4.5:1 or better), with You in navy, so each column of the split grid reads at a glance.
  * The kit's objects are shared, so this restyles every module on the page without editing the kit. */
-const PEOPLE_TONE = { you: '#0f1f3d', maya: '#2f3f5c', jordan: '#4a5a75', sam: '#5f6b82', alex: '#3d4e6c', priya: '#5f6b82' };
+const PEOPLE_TONE = { you: '#0f1f3d', maya: '#0f766e', jordan: '#b45309', sam: '#7c3aed', alex: '#be185d', priya: '#2461bd' };
 const CAT_TONE = {
   groceries: '#0f1f3d', household: '#8590a6', health: '#0f1f3d', 'personal-care': '#4a5a75', gifts: '#8590a6',
   dining: '#0f1f3d', rent: '#0f1f3d', utilities: '#4a5a75', internet: '#8590a6', parking: '#b8c0cd', other: '#b8c0cd',
@@ -28,6 +28,20 @@ export const SHORT = {
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
+/* One household on every page: the kit's dinner sample is Alex and Priya's; here it is the same roommates as the
+ * story (Maya and Jordan), renamed in this copy only (same penny order, so the engine's cents are unchanged). */
+const CAST = { alex: 'maya', priya: 'jordan' };
+const recast = (id) => CAST[id] || id;
+function recastSplit(sp) {
+  if (!sp) return sp;
+  const out = clone(sp);
+  if (out.people) out.people = out.people.map(recast);
+  ['shares', 'percents', 'amounts'].forEach((k) => {
+    if (out[k]) out[k] = Object.fromEntries(Object.entries(out[k]).map(([id, v]) => [recast(id), v]));
+  });
+  return out;
+}
+
 /** Build a model from a scan result ({sampleId, raw, bill}) or a sample id. */
 export async function loadModel(id) {
   const raw = await loadScan(id);
@@ -37,7 +51,7 @@ export async function loadModel(id) {
 export function modelFrom(result) {
   const sample = result.sampleId ? getSample(result.sampleId) : null;
   const bill = result.bill;
-  const people = sample ? [...sample.people] : ['you', 'maya', 'jordan', 'sam'];
+  const people = sample ? sample.people.map(recast) : ['you', 'maya', 'jordan', 'sam'];
   const lines = bill.items.map((it, i) => {
     const def = sample?.lines?.[i] || {};
     const extra = it.isExtraCharge;
@@ -50,7 +64,7 @@ export function modelFrom(result) {
       taxCents: toCents(it.taxAmount),
       totalCents: toCents(it.amount) + (extra ? 0 : toCents(it.taxAmount)),
       category: def.category || (sample?.tipCategory) || 'other',
-      split: def.split ? clone(def.split) : (extra ? null : { type: 'equal', people: [...people] }),
+      split: def.split ? recastSplit(def.split) : (extra ? null : { type: 'equal', people: [...people] }),
       extra,
     };
   });

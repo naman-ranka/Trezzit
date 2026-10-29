@@ -31,6 +31,7 @@
 <link rel="modulepreload" href="./js/hero.js">
 <link rel="modulepreload" href="./js/scenarios.js">
 <link rel="modulepreload" href="./js/chat.js">
+<link rel="modulepreload" href="./js/ledger.js">
 <link rel="modulepreload" href="../_kit/split-engine.js">
 <link rel="modulepreload" href="../_kit/receipts.js">
 <link rel="modulepreload" href="../_kit/scan-client.js">
@@ -65,15 +66,15 @@
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <h1 id="hero-title" class="display">See what you<br class="br-d"> actually spent.</h1>
-      <p class="lede"><span>Your bank shows what you paid.</span> <span>Trezzit shows what you spent.</span></p>
+      <p class="lede">Your bank shows what you paid.</p>
       <div class="cta-row">
         <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
         <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
       </div>
-      <p class="micro"><span>No bank login. Never moves money.</span> <a class="link-arrow micro-ai" href="#ai">Works in Claude and ChatGPT</a></p>
+      <p class="micro">No bank login needed.</p>
     </div>
 
-    <figure class="hero-visual" id="hero-visual" aria-label="Your bank says you paid $100.00. Trezzit says you spent $30.00.">
+    <figure class="hero-visual" id="hero-visual">
       <div class="hv-receipt" id="hv-receipt" aria-hidden="true"></div>
 
       <div class="hv-cards">
@@ -90,12 +91,13 @@
         <p class="hv-label hv-label-tz"><svg viewBox="0 0 120 120" width="14" height="14" aria-hidden="true" fill="currentColor"><polygon points="10.56,85.55 109.44,24.22 109.44,35.03 10.56,96.58" fill-opacity=".64"/><path d="M10 8.8h100v10.26H10zM45.42 8.8h9.07v81.23h-9.07zM64.69 30.01h9.08v81.17h-9.08zM10 100.92h100v10.26H10z"/></svg>Trezzit</p>
         <p class="hv-spent-k">You spent</p>
         <p class="hv-spent-v money" id="hv-spent-v">$30.00</p>
-        <div class="hv-bar" role="img" aria-label="Groceries $22.00, household $8.00">
-          <span class="seg seg-g" style="--w:73.333%"></span><span class="seg seg-h" style="--w:26.667%"></span>
+        <div class="hv-bar" aria-hidden="true">
+          <span class="seg seg-g" style="--w:33.333%"></span><span class="seg seg-h" style="--w:66.667%"></span>
         </div>
+        <!-- where the $30.00 comes from: the items that are yours, plus your quarter of what you share -->
         <ul class="hv-legend" role="list">
-          <li><span class="dot" style="--c:var(--cat-groceries)"></span>Groceries<span class="money">$22.00</span></li>
-          <li><span class="dot" style="--c:var(--cat-household)"></span>Household<span class="money">$8.00</span></li>
+          <li><span class="dot" style="--c:var(--cat-groceries)"></span>Avocados, cold brew<span class="money">$10.00</span></li>
+          <li><span class="dot" style="--c:var(--cat-household)"></span>¼ of groceries + towels<span class="money">$20.00</span></li>
         </ul>
         <p class="hv-owe">Roommates owe you <strong class="money">$70.00</strong></p>
       </div>
@@ -110,7 +112,6 @@
   <div class="wrap">
     <header class="sec-head" data-reveal>
       <h2 id="scan-title" class="h2">Snap the receipt.<br class="br-d"> Get every item.</h2>
-      <p class="sub">Tap a sample, or try yours.</p>
     </header>
     <div class="scan-demo" id="scan-demo" data-reveal>
       <noscript><p class="sub">The scan demo needs JavaScript.</p></noscript>
@@ -150,17 +151,22 @@
     </header>
 
     <div class="ledger">
-      <!-- the vision, shown: the real app's month, personal and shared rows in one list, only your share counted -->
+      <!-- the vision, live: your month in one list (personal, shared, monthly; only your share counts), and the receipt
+           you just split lands in it with whatever share you gave yourself above -->
       <figure class="ledger-fig" data-reveal>
-        <div class="phone-wrap">
-          <div class="phone phone-crop">
-            <img src="./assets/app-ledger.webp" width="780" height="1688" loading="lazy" decoding="async" alt="The Trezzit app: Spent this month $1,253.26. Gym membership $39.00, personal, repeats monthly. Farmers market produce $9.20 of $32.25, with Flatmates. Corner Café $9.70, personal.">
-          </div>
-          <!-- pinned to real rows of the screenshot (row centre / cropped image height) -->
-          <ul class="callouts" role="list" aria-hidden="true">
-            <li style="--y:.558"><span><span class="cl-l">Repeats </span>monthly</span></li>
-            <li style="--y:.669"><span>Your share<span class="cl-l"> of $32.25</span></span></li>
-            <li style="--y:.781"><span>Just you</span></li>
+        <div class="month" id="month">
+          <p class="m-k">Spent this month <span>· October</span></p>
+          <p class="m-v money" id="m-total">$1,253.26</p>
+          <p class="m-n"><span id="m-count">26</span> expenses</p>
+          <ul class="m-rows" role="list">
+            <li class="m-row"><span class="m-ico" style="--bg:#fde8ec;--fg:#e11d48"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M6.5 8v8M9.5 9.5v5M17.5 8v8M14.5 9.5v5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><i class="m-rep" title="Repeats monthly"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15 10a5 5 0 1 1-1.6-3.7M15 3.8v3h-3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></i></span>
+              <span class="m-t">Gym membership<small>Personal · Repeats monthly</small></span><span class="m-a"><strong class="money">$39.00</strong></span></li>
+            <li class="m-row"><span class="m-ico" style="--bg:#ffedd5;--fg:#ea580c"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8zM8.5 9l3-5m4 5l-3-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="m-t">Farmers market produce<small>Roommates · Oct 28</small></span><span class="m-a"><strong class="money">$9.20</strong><small class="money">of $32.25</small></span></li>
+            <li class="m-row"><span class="m-ico" style="--bg:#ffedd5;--fg:#ea580c"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10h12v4a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5zM17 11h1.5a2.5 2.5 0 0 1 0 5H17M8 4.5v2.5M11.5 4.5v2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="m-t">Corner Café<small>Personal · Oct 27</small></span><span class="m-a"><strong class="money">$9.70</strong></span></li>
+            <li class="m-row m-new" id="m-gb"><span class="m-ico" style="--bg:#ffedd5;--fg:#ea580c"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8zM8.5 9l3-5m4 5l-3-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="m-t">Green Basket Market<small>Roommates · <b>just split</b></small></span><span class="m-a"><strong class="money" id="m-gb-v">$30.00</strong><small class="money">of $100.00</small></span></li>
           </ul>
         </div>
       </figure>
@@ -177,26 +183,26 @@
 <section class="sec sec-ai dark" id="ai" aria-labelledby="ai-title" data-nav="dark">
   <div class="wrap">
     <header class="sec-head sec-head-c" data-reveal>
-      <h2 id="ai-title" class="h2 ai-h"><span>Or just ask</span> <span>your AI.</span></h2>
-      <p class="sub">It shows you before it saves.</p>
+      <h2 id="ai-title" class="h2 ai-h">Your AI can read it.<br> <span class="ai-h2">And write it.</span></h2>
+      <p class="sub">It shows you before it saves. It never moves money.</p>
+      <div class="ai-connect">
+        <a class="btn btn-light btn-lg" href="/mcp#connect-claude">Connect to Claude</a>
+        <a class="btn btn-light btn-lg" href="/mcp#connect-chatgpt">Connect to ChatGPT</a>
+      </div>
+      <p class="ai-note">Needs a free Trezzit account.</p>
     </header>
     <div class="chat-wrap" id="chat-root" data-reveal></div>
-    <p class="ai-log"><span class="ti" data-icon="list"></span>Everything your AI adds shows in your activity log.</p>
-    <div class="ai-connect">
-      <a class="btn btn-dark-quiet btn-lg" href="/mcp#connect-claude">Connect to Claude</a>
-      <a class="btn btn-dark-quiet btn-lg" href="/mcp#connect-chatgpt">Connect to ChatGPT</a>
-    </div>
   </div>
 </section>
 
 <!-- ============ CLOSE ============ -->
-<section class="sec sec-close dark" id="close" aria-labelledby="close-title" data-nav="dark">
+<section class="sec sec-close" id="close" aria-labelledby="close-title">
   <div class="wrap close-in">
     <div class="close-copy" data-reveal>
       <h2 id="close-title" class="display close-title">Start with one receipt.</h2>
       <div class="cta-row">
-        <a class="btn btn-light btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
-        <a class="btn btn-dark-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
+        <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+        <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
       </div>
     </div>
   </div>
@@ -220,7 +226,7 @@
       <a href="/delete-account">Delete account</a>
       <a href="/support">Support</a>
     </nav>
-    <p class="foot-legal">Sample receipts on this page are made up. Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
+    <p class="foot-legal">Sample receipts are made up. Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
   </div>
 </footer>
 </body>

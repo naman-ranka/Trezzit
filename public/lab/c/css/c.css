@@ -1346,3 +1346,88 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-
   .tc-t { font-size: 16px; }
   .msg.u .bub { font-size: 15px; }
 }
+
+/* no layout shift: reserves re-measured after the round 6 changes (smallest final height per range, 320-1440) */
+.verb-demo #scan-demo { min-height: 539px; }
+.verb-demo #split-demo { min-height: 711px; }
+.verb-demo #ledger-demo { min-height: 692px; }
+#chat-demo { min-height: 607px; }
+.ai-hero-demo#chat-demo { min-height: 617px; }
+#split-demo.res-trips { min-height: 1102px; }
+#trip-demo { min-height: 655px; }
+#rec-side { min-height: 708px; }
+@media (min-width: 600px) { .ai-hero-demo#chat-demo { min-height: 714px; } }
+@media (min-width: 640px) { #chat-demo { min-height: 714px; } }
+@media (min-width: 720px) { .verb-demo #scan-demo { min-height: 574px; } }
+@media (min-width: 860px) { .verb-demo #split-demo { min-height: 510px; } #split-demo.res-trips { min-height: 866px; } }
+@media (min-width: 880px) { .verb-demo #ledger-demo { min-height: 466px; } }
+@media (min-width: 900px) { #trip-demo { min-height: 498px; } }
+@media (min-width: 1000px) { #split-demo.res-trips { min-height: 1068px; } }
+@media (min-width: 1024px) { .ai-hero-demo#chat-demo { min-height: 714px; } }
+
+/* =====================================================================
+   Round 7 fixes
+   ===================================================================== */
+/* "You" avatar: a person glyph (never the word shrunk to 9px inside the circle) */
+.av .av-you { width: 62%; height: 62%; display: block; }
+.who .av .av-you { color: inherit; }
+
+/* chat: after a save, the app's activity row (proof, not a promise) */
+.msg.act { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--wash); font-size: 14px; color: var(--muted); line-height: 1.35; }
+.msg.act b { color: var(--text); font-weight: 600; }
+.act-i { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #ecfdf5; color: #047857; }
+.act-i svg { width: 14px; height: 14px; }
+
+/* roommates: a debt is plain ink (red was the loudest moment on the page); only "owes you" is green */
+.bal-list li.neg b { color: var(--ink); }
+.bal-note { margin: 4px 0 6px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+
+/* split totals, stacked tiles (phones, narrow columns): the first name sits beside a small avatar,
+   so every tile says whose share it is */
+@media (max-width: 859px) {
+  .sp-person { grid-template-columns: auto auto; justify-content: center; column-gap: 5px; row-gap: 1px; }
+  .sp-person .av { width: 20px; height: 20px; font-size: 10px; }
+  .sp-pn { display: block; font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sp-pa { grid-column: 1 / -1; }
+}
+@container split (max-width: 720px) {
+  .sp-person { grid-template-columns: auto auto; justify-content: center; column-gap: 6px; row-gap: 1px; }
+  .sp-person .av { width: 22px; height: 22px; font-size: 10px; }
+  .sp-pn { display: block; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sp-pa { grid-column: 1 / -1; }
+}
+
+/* scenario heroes at desktop: a wider copy column (about 42%), so H1s set in 2-3 lines; it stays sticky beside the demo */
+@media (min-width: 1000px) {
+  .sc-hero-demo .wrap { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: 56px; }
+  .sc-hero-demo .wrap > .sc-copy { padding-top: 24px; }
+}
+
+/* understand: colour carries one meaning (category). Deltas are neutral text with arrows,
+   tiles and row bars are neutral; the hue lives only in each category's icon and the top bar */
+.lg-sub .down, .lg-sub .up { color: var(--text); }
+.lg-cd, .lg-cd.down, .lg-cd.up, .lg-cd.new { color: var(--muted); font-variant-numeric: tabular-nums; }
+.lg-ci, .lg-ri { background: var(--wash); }
+.lg-cb i { background: #b9c3d3; }
+.lg-cat[aria-pressed="true"] .lg-cb i { background: var(--ink); }
+
+/* the pizza highlight is drawn inside the row, so its edges line up with the list's dividers */
+.ledger.point .lg-row[data-id='pizza'] { box-shadow: inset 0 0 0 2px var(--accent); margin-inline: 0; padding-inline: 12px; }
+
+/* scan: before the first read there is no status to show (the chips already say what to do) */
+.scan:not([data-stage]) .so-status, .scan[data-stage='idle'] .so-status { visibility: hidden; }
+
+/* hero: the AI line is a quiet pill under the CTAs, not a bare link */
+.ai-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 16px 8px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 15px; font-weight: 600; text-decoration: none; transition: background-color .2s; }
+.ai-chip:hover { background: color-mix(in srgb, var(--accent) 16%, #fff); }
+.ai-chip svg { flex: none; }
+.hero .micro { margin-top: 14px; }
+@media (max-width: 480px) { .ai-chip { font-size: 14px; padding-inline: 10px 12px; min-height: 44px; } }
+
+/* steps: the number badge sits in the heading (no kicker word that repeats it); wrapped lines hang beside it */
+.verb-copy h3 { display: flex; align-items: flex-start; gap: 14px; --h3: clamp(32px, 4vw, 52px); }
+.verb-copy h3 .verb-n { flex: none; width: 34px; height: 34px; margin-top: calc((1.06 * var(--h3) - 34px) / 2); font-size: 16px; font-weight: 700; color: var(--accent); letter-spacing: 0; }
+@media (max-width: 719px) { .verb-copy h3 { gap: 10px; } .verb-copy h3 .verb-n { width: 28px; height: 28px; font-size: 14px; margin-top: calc((1.06 * var(--h3) - 28px) / 2); } }@media (max-width: 480px) { .ai-chip .chip-more { display: none; } .hero .micro { margin-top: 10px; } }
+@media (max-width: 479px) { .msg.act { padding: 7px 10px; font-size: 13.5px; gap: 8px; } }
+@media (max-width: 400px) { .sp-person { column-gap: 4px; } .sp-person .av { width: 18px; height: 18px; font-size: 9.5px; } .sp-pn { font-size: 12.5px; } }
+.tc-people b.neg { color: var(--ink); }

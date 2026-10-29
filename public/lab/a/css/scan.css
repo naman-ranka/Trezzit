@@ -2,10 +2,13 @@
 .pg { background: var(--bg-alt); }
 .pg .nav { background: rgba(245, 246, 248, 0.82); }
 .back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--ink); text-decoration: none; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; margin-left: -6px; padding-right: 6px; }
-.pg-steps { list-style: none; margin: 0 auto; padding: 0; display: none; gap: 4px; }
+.pg-nav { display: none; }
+@media (min-width: 720px) { .pg-nav { display: block; margin: 0 auto; } }
+.pg-steps { list-style: none; margin: 0; padding: 0; display: none; gap: 4px; }
+.pg-steps a[aria-current='step'] { color: var(--ink); background: #fff; }
 .pg-steps a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px; color: var(--muted); text-decoration: none; font-size: 15px; font-weight: 600; }
 .pg-steps a:hover { color: var(--ink); background: #fff; }
-@media (min-width: 720px) { .pg-steps { display: flex; } .pg-steps + .nav-cta { margin-left: 0; } }
+@media (min-width: 720px) { .pg-steps { display: flex; } .pg-nav + .nav-cta { margin-left: 0; } }
 .pg-sec { padding-block: clamp(32px, 5vw, 64px); }
 .pg-head { margin-bottom: 28px; max-width: 720px; }
 .pg-head .sub { margin-top: 10px; }
@@ -13,8 +16,12 @@
 .pg-end { padding-block: clamp(64px, 9vw, 120px); text-align: center; background: #fff; }
 .pg-end .sub { margin-inline: auto; }
 .pg-foot { padding: 28px 0 calc(32px + env(safe-area-inset-bottom)); font-size: 14px; color: var(--muted); background: #fff; border-top: 1px solid var(--line); }
-.pg-foot p + p { margin-top: 6px; }
-.pg-foot a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; }
+.pg-links { display: flex; flex-wrap: wrap; gap: 0 12px; margin-top: 8px; margin-left: -4px; }
+.pg-foot a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; color: var(--muted); }
+.pg-foot a:hover { color: var(--ink); }
+.pg-ai { margin-top: 20px; justify-self: start; display: inline-flex; align-items: center; min-height: 44px; font-size: 16px; color: var(--muted); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 4px; }
+.pg-ai:hover { color: var(--ink); text-decoration-color: currentColor; }
+.pg-end .cta-row + .pg-ai { justify-self: center; }
 @media (min-width: 900px) {
   .pg .viewer { height: min(680px, calc(100svh - 230px)); min-height: 520px; }
   .pg .result { height: min(680px, calc(100svh - 230px)); min-height: 520px; }

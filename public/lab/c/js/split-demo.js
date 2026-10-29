@@ -3,7 +3,7 @@
  * remainder), so the totals always add up to the receipt exactly. */
 import { billFromScan, splitBill, toCents } from '../../_kit/split-engine.js';
 import { PEOPLE, CATEGORIES, SAMPLE_META, getSample, sampleBill } from './data.js';
-import { esc, money, countMoney, itemName, storeName, icon, bus, reduced } from './util.js';
+import { esc, money, countMoney, itemName, storeName, icon, bus, reduced, YOU_GLYPH } from './util.js';
 
 const ROOMIES = ['you', 'maya', 'jordan', 'sam'];
 const eq = (people) => ({ type: 'equal', people });
@@ -27,8 +27,8 @@ export function mountSplit(root, opts = {}) {
     <div class="sp-tip" hidden>
       <span id="sp-tip-l-${uid}">Tax and tip</span>
       <div class="seg" role="radiogroup" aria-labelledby="sp-tip-l-${uid}">
-        <button type="button" role="radio" aria-checked="true" data-tip="proportional">In proportion</button>
-        <button type="button" role="radio" aria-checked="false" data-tip="equal">Equally</button>
+        <button type="button" role="radio" aria-checked="true" tabindex="0" data-tip="proportional">In proportion</button>
+        <button type="button" role="radio" aria-checked="false" tabindex="-1" data-tip="equal">Equally</button>
       </div>
     </div>
     <p class="sp-hint">Tap a person on any line</p>
@@ -51,6 +51,14 @@ export function mountSplit(root, opts = {}) {
   const hint = $('.sp-hint');
   const HINT = hint.textContent;
   let hintT = 0;
+
+  function markTip() {
+    root.querySelectorAll('.sp-tip [data-tip]').forEach((b) => {
+      const on = b.dataset.tip === st.tipMode;
+      b.setAttribute('aria-checked', String(on));
+      b.tabIndex = on ? 0 : -1;
+    });
+  }
 
   function participants(line, i) {
     const shares = st.result?.items.find((it) => it.index === i)?.shares || {};
@@ -85,7 +93,7 @@ export function mountSplit(root, opts = {}) {
     const r = st.result;
     if (first) {
       peopleEl.innerHTML = st.people.map((p) => `<li class="sp-person" data-p="${p}">
-        <span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span>
+        <span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span>
         <span class="sp-pn">${PEOPLE[p].name}</span><b class="money sp-pa">${money(r.people[p]?.cents || 0)}</b></li>`).join('');
       return;
     }
@@ -114,8 +122,8 @@ export function mountSplit(root, opts = {}) {
     const it = st.bill.items[i];
     const item = st.result.items.find((x) => x.index === i);
     const cat = CATEGORIES[line.category] || null;
-    // the line price already includes its tax, so say "incl.", never "+"
-    const tax = item.taxCents ? `incl. ${money(item.taxCents)} tax` : '';
+    // the receipt's own price, plus its tax: the sum is the line total the shares add up to
+    const tax = item.taxCents ? `${money(item.totalCents - item.taxCents)} + ${money(item.taxCents)} tax` : '';
     return `<li class="sp-row" data-i="${i}">
       <div class="sp-line">
         <span class="sp-name">${esc(itemName(it.name))}</span>
@@ -124,7 +132,7 @@ export function mountSplit(root, opts = {}) {
       </div>
       <div class="sp-who" role="group" aria-label="Who shares ${esc(itemName(it.name))}" style="--n:${st.people.length}">
         ${st.people.map((p, k) => `<button type="button" class="who" data-p="${p}" aria-pressed="false" tabindex="${k === 0 ? 0 : -1}" style="--av-c:${PEOPLE[p].color}">
-          <span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span>
+          <span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span>
           <span class="who-n">${PEOPLE[p].name}</span><span class="money who-a"></span></button>`).join('')}
       </div></li>`;
   }
@@ -172,15 +180,15 @@ export function mountSplit(root, opts = {}) {
     el.hidden = false;
     el.innerHTML = `<div class="sp-line"><span class="sp-name">Tip</span><b class="money sp-price">${money(tip.totalCents)}</b>
       <span class="sp-meta">${st.tipMode === 'equal' ? 'Equally' : ''}</span></div>
-      <p class="sp-tipshares">${st.people.map((p) => `<span><span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span><b class="money">${money(tip.shares[p] || 0)}</b><span class="visually-hidden"> ${PEOPLE[p].name}</span></span>`).join('')}</p>`;
+      <p class="sp-tipshares">${st.people.map((p) => `<span><span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span><b class="money">${money(tip.shares[p] || 0)}</b><span class="visually-hidden"> ${PEOPLE[p].name}</span></span>`).join('')}</p>`;
   }
 
   function renderFoot() {
     renderExtras();
     const r = st.result;
     $('.sp-check span').innerHTML = r.check.ok
-      ? `Shares add up to <b class="money">${money(r.totalCents)}</b>, exactly.`
-      : `Shares add up to ${money(r.check.sumCents)}.`;
+      ? `Adds up to <b class="money">${money(r.totalCents)}</b>`
+      : `Adds up to ${money(r.check.sumCents)}`;
     root.classList.toggle('is-ok', r.check.ok);
     const changed = st.lines.some((l, i) => JSON.stringify(l.split) !== JSON.stringify(st.original[i].split)) || st.tipMode !== 'proportional';
     $('.sp-reset').disabled = !changed;
@@ -243,7 +251,7 @@ export function mountSplit(root, opts = {}) {
     st.original = st.lines.map((l) => ({ ...l }));
     st.expanded = !!opts.expanded;
     st.tipMode = 'proportional';
-    root.querySelectorAll('.sp-tip [data-tip]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.tip === 'proportional')));
+    markTip();
     renderAll();
   }
 
@@ -300,24 +308,40 @@ export function mountSplit(root, opts = {}) {
     new ResizeObserver(() => root.style.setProperty('--sp-people-h', `${peopleEl.offsetHeight}px`)).observe(peopleEl);
   }
   more.addEventListener('click', () => {
+    // collapsing removes 11 rows above the button: keep the button where the pointer is, so nobody lands in the next section
+    const top = more.getBoundingClientRect().top;
     st.expanded = !st.expanded;
     renderRows();
+    if (!st.expanded) {
+      window.scrollBy({ top: more.getBoundingClientRect().top - top, behavior: 'instant' });
+      more.focus({ preventScroll: true });
+    }
     if (st.expanded) itemsEl.querySelectorAll('.sp-row')[st.featured.length]?.querySelector('.who')?.focus({ preventScroll: true });
   });
   $('.sp-reset').addEventListener('click', () => {
     st.lines = st.original.map((l) => ({ ...l }));
     st.tipMode = 'proportional';
-    root.querySelectorAll('.sp-tip [data-tip]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.tip === 'proportional')));
+    markTip();
     update();
     say.textContent = 'Split reset.';
   });
-  root.querySelectorAll('.sp-tip [data-tip]').forEach((b) => b.addEventListener('click', () => {
-    st.tipMode = b.dataset.tip;
-    root.querySelectorAll('.sp-tip [data-tip]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+  const setTip = (mode) => {
+    if (st.tipMode === mode) return;
+    st.tipMode = mode;
+    markTip();
     update();
     const you = st.result.people.you?.cents;
     say.textContent = `Tax and tip ${st.tipMode === 'equal' ? 'equally' : 'in proportion'}.${you != null ? ` You ${money(you)}.` : ''}`;
-  }));
+  };
+  root.querySelectorAll('.sp-tip [data-tip]').forEach((b) => b.addEventListener('click', () => setTip(b.dataset.tip)));
+  // a real radio group: one tab stop, arrows select and move focus
+  $('.sp-tip .seg').addEventListener('keydown', (e) => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    e.preventDefault();
+    const other = root.querySelector(`.sp-tip [data-tip]:not([data-tip="${st.tipMode}"])`);
+    setTip(other.dataset.tip);
+    other.focus();
+  });
 
   if (opts.listen) {
     bus.on('receipt', (res) => {

@@ -1,7 +1,7 @@
 /* scan-demo.js: tap a sample receipt (or use your own photo) and watch it read, line by line.
  * Samples replay the kit's recorded scans. A photo is scanned for real only on https://trezzit.com
  * (scan-client decides), after the AI disclosure; anywhere else it falls back to a sample, with a notice. */
-import { scan, isLive, closestSample } from '../../_kit/scan-client.js';
+import { scan, isLive, closestSample, normalizeScan } from '../../_kit/scan-client.js';
 import { loadScan, receiptHTML, getSample, SAMPLES, CATEGORIES } from '../../_kit/receipts.js';
 import { toCents } from '../../_kit/split-engine.js';
 import { $, $$, esc, money, ICON, onceVisible, reduced, prettyName, paper as clean } from './util.js';
@@ -19,7 +19,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   const samples = SAMPLES.filter((s) => !exclude.includes(s.id));
   root.innerHTML = `
     <div class="seg-ctl scan-picker" role="group" aria-label="Choose a receipt">
-      ${samples.map((s) => `<button type="button" data-id="${s.id}" aria-pressed="false">${SHORT[s.id].label}<span class="money">${money(toCents(s.total))}</span></button>`).join('')}
+      ${samples.map((s) => `<button type="button" data-id="${s.id}" aria-pressed="false">${SHORT[s.id].label}</button>`).join('')}
       <button type="button" class="file-pick" aria-pressed="false">${ICON.upload}Your photo</button>
       <input type="file" class="visually-hidden file-in" accept="image/*,application/pdf" tabindex="-1" aria-hidden="true">
     </div>
@@ -66,7 +66,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   const splitBtn = $('.split-btn', root);
   const more = $('.more-items', root);
   // phones: the parsed list stays a fixed 5 rows (no layout shift); the rest folds behind "+N more"
-  const FOLD = 5;
+  const FOLD = 4;
   const compact = () => innerWidth < 900;
   const showCta = (on) => { cta.classList.toggle('is-off', !on); splitBtn.tabIndex = on ? 0 : -1; };
   function fold(open) {
@@ -131,14 +131,17 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
 
   async function run(input, { notice, instant = false } = {}) {
     if (typeof input !== 'string' && !isLive()) {
-      // Off trezzit.com the API refuses this origin: say so up front and play the closest sample.
+      // Off trezzit.com the API refuses this origin: say so up front (before the read starts) and play the closest sample.
       return run(closestSample(input), { notice: 'Live scanning runs on trezzit.com, so here is a sample receipt instead.' });
     }
     ctrl?.abort();
     ctrl = new AbortController();
     const signal = ctrl.signal;
     const isFile = typeof input !== 'string';
-    press(isFile ? 'file' : input);
+    // a photo that fell back to a sample keeps "Your photo" pressed, and its notice is the status for the whole run
+    press(isFile || notice ? 'file' : input);
+    const say = (text, kind) => { if (!notice) setStatus(text, kind); };
+    if (notice) setStatus(notice, 'note');
     list.innerHTML = '';
     list.tabIndex = -1; // an empty list is no tab stop (0px tall, so its focus ring would be invisible)
     list.classList.remove('is-open', 'is-six');
@@ -168,26 +171,26 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     viewer.classList.add('is-scanning');
     let shown = 0;
     try {
-      const result = await scan(input, {
+      const result = await (isFile ? scan : quick)(input, {
         signal,
         instant: instant || undefined,
         onStage(stage, detail) {
           if (signal.aborted) return;
           // a sample has no photo to upload: it reads from the first moment
-          if (stage === 'uploading') { setStatus(isFile ? 'Uploading the photo' : 'Reading the receipt'); bar.style.width = '12%'; }
+          if (stage === 'uploading') { say(isFile ? 'Uploading the photo' : 'Reading the receipt'); bar.style.width = '12%'; }
           if (stage === 'reading') {
             const items = detail.items || [];
-            if (!items.length) { setStatus('Reading the receipt'); bar.style.width = '18%'; return; }
+            if (!items.length) { say('Reading the receipt'); bar.style.width = '18%'; return; }
             for (; shown < items.length; shown += 1) {
               list.appendChild(itemRow(items[shown], shown, sample));
               if (sample && !instant) place(shown);
             }
             if (!instant) list.scrollTop = list.scrollHeight;
             const n = total || items.length;
-            setStatus(`Reading items: ${items.length} of ${n}`);
+            say(`Reading items: ${items.length} of ${n}`);
             bar.style.width = `${18 + 70 * (items.length / n)}%`;
           }
-          if (stage === 'checking') { setStatus('Checking the totals'); bar.style.width = '94%'; }
+          if (stage === 'checking') { say('Checking the totals'); bar.style.width = '94%'; }
         },
       });
       if (signal.aborted) return;
@@ -229,7 +232,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     bar.style.width = '100%';
     onResult?.(model);
     if (result.notice) setStatus(result.notice, 'note');
-    else setStatus(ok ? `Adds up to ${money(toCents(b.total))}.` : 'Check the total before saving.', 'done');
+    else setStatus(ok ? 'Adds up to the total.' : 'Check the total before saving.', 'done');
   }
 
   $$('.scan-picker button[data-id]', root).forEach((b) => b.addEventListener('click', () => run(b.dataset.id)));
@@ -256,8 +259,31 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
 
   // watch the stage, not the root: the landing lays the root out with display: contents (no box to observe)
   // phones start a little before the stage is in view, so a visitor scrolling at normal speed meets the end of the read
-  if (autoStart) onceVisible($('.scan-stage', root), () => run('green-basket'), compact() ? { threshold: 0, rootMargin: '0px 0px 120px 0px' } : { threshold: 0.3 });
+  if (autoStart) onceVisible($('.scan-stage', root), () => run('green-basket'), compact() ? { threshold: 0, rootMargin: '0px 0px 120px 0px' } : { threshold: 0.1 });
   return { run, get model() { return current; } };
+}
+
+/* A sample replays the kit's recorded scan, faster than the kit's 2.5 s default: about 1.3 s from tap to total, so a
+ * visitor scrolling at normal speed meets the finished read, not a half-read card. Same stages, same data. */
+const nap = (ms, signal) => new Promise((resolve, reject) => {
+  const t = setTimeout(resolve, ms);
+  signal?.addEventListener('abort', () => { clearTimeout(t); reject(new DOMException('Aborted', 'AbortError')); }, { once: true });
+});
+async function quick(id, { onStage, instant, signal }) {
+  const raw = await loadScan(id);
+  const bill = normalizeScan(raw);
+  const fast = instant || reduced();
+  const emit = (stage, detail = {}) => onStage?.(stage, { sampleId: id, ...detail });
+  emit('uploading', { progress: 1 });
+  if (!fast) await nap(150, signal);
+  emit('reading', { items: [] });
+  if (!fast) {
+    const step = 900 / Math.max(1, bill.items.length);
+    for (let i = 1; i <= bill.items.length; i += 1) { await nap(step, signal); emit('reading', { items: bill.items.slice(0, i) }); }
+  } else emit('reading', { items: bill.items });
+  emit('checking', {});
+  if (!fast) await nap(250, signal);
+  return { source: 'sample', sampleId: id, raw, bill };
 }
 
 // keeps the totals block at its final height while it is hidden (phones show only the Total row)

@@ -1,9 +1,9 @@
 /* scenarios.js: one playable Bank | Trezzit pair; the rail switches which charge it shows. */
 
-import { loadScenarios, PEOPLE, KINDS } from './data.js';
-import { createSplitEditor, catBar, catList } from './split-editor.js';
+import { loadScenarios, PEOPLE } from './data.js';
+import { createSplitEditor, catBar, catList, setMoney } from './split-editor.js';
 import { initNav, initReveal } from './shared.js';
-import { money, bankAmt, esc, tweenMoney, listNames } from './util.js';
+import { money, bankAmt, esc, listNames } from './util.js';
 
 initNav();
 
@@ -18,8 +18,9 @@ function oweHTML(sc, s) {
   return 'Nobody owes anybody.';
 }
 
-/* Examples page order: a shared charge first, so "Tap a face" matches what is on screen. */
-const ORDER = ['groceries', 'rent', 'trip', 'streaming', 'dinner', 'pharmacy', 'order'];
+/* Examples page order: Rent first (an unequal split the home page only summarises), the
+   home hero's Green Basket last, so the first thing seen here is new. */
+const ORDER = ['rent', 'trip', 'streaming', 'dinner', 'order', 'pharmacy', 'groceries'];
 
 function card(sc) {
   const s = sc.sum;
@@ -29,9 +30,8 @@ function card(sc) {
     <header class="scn-h">
       <span class="kind kind-${sc.kind}" aria-hidden="true"></span>
       <div>
-        <p class="scn-kind">${KINDS[sc.kind].label}${sc.repeat ? ` · ${esc(sc.repeat)}` : ''}</p>
         <h2 id="t-${sc.id}" tabindex="-1">${esc(sc.title)}</h2>
-        <p class="lede">${esc(sc.lesson)}</p>
+        ${sc.why ? `<p class="lede">${esc(sc.why)}</p>` : ''}
       </div>
     </header>
     <div class="pair pair-scn">
@@ -42,7 +42,7 @@ function card(sc) {
         </div>
       </div>
       <div class="pane-tz">
-        <p class="pane-label tz"><span>Trezzit</span><span>${esc(sc.merchant)}</span></p>
+        <p class="pane-label tz"><span>${esc(sc.merchant)}${sc.repeat ? ` · ${esc(sc.repeat)}` : ''}</span></p>
         <div class="scn-top">
           <div>
             <p class="pt-label">You spent</p>
@@ -77,7 +77,8 @@ loadScenarios({ extras: true }).then((loaded) => {
       compact: true,
       onChange(sum) {
         if (!sum) return;
-        tweenMoney(art.querySelector('[data-mine]'), sum.mine);
+        // every figure changes in the same frame, so they always add up (no count-up)
+        setMoney(art.querySelector('[data-mine]'), sum.mine);
         art.querySelector('[data-catbar]').innerHTML = catBar(sum.byCategory);
         art.querySelector('[data-cats]').innerHTML = catList(sum.byCategory, { limit: 5 });
         art.querySelector('[data-owe]').innerHTML = oweHTML(sc, sum);
@@ -92,6 +93,8 @@ loadScenarios({ extras: true }).then((loaded) => {
     }
   }
 
+  // a chip that gets focus off-screen scrolls fully into the rail
+  rail.addEventListener('focusin', (e) => e.target.closest('[data-pick]')?.scrollIntoView({ inline: 'nearest', block: 'nearest' }));
   rail.addEventListener('click', (e) => {
     const b = e.target.closest('[data-pick]');
     if (b) show(b.dataset.pick, { focus: true });

@@ -1,8 +1,9 @@
 /* chat.js: a scripted assistant exchange. Neutral chat styling (not a copy of any AI app),
- * Trezzit's own cards for tool results. Two prompts (a read across the ledger, a write with a preview) and a Replay.
- * The log is as tall as the longest finished exchange and its messages sit at the bottom, like a real chat, so any
- * spare room is above the conversation, never an empty band under it. The panel opens on the read, finished;
- * a chip or Replay plays one, and while it plays Replay becomes Skip. A one-line result is announced when a run ends. */
+ * Trezzit's own cards for tool results. Two prompts: the write (this page's receipt, split from a sentence, shown as a
+ * preview and saved only after "Save it") and the read (what you spent, your share only), plus a Replay.
+ * The log has one fixed height (the taller finished exchange, measured at this width), and messages start at its top,
+ * so switching prompts never moves the page and nothing sits above the request. The panel opens on the write, finished;
+ * a chip or Replay plays one (Replay rests while it plays). A one-line result is announced when a run ends. */
 import { $, $$, esc, money, ICON, reduced, avatar } from './util.js';
 import { loadModel, compute, PEOPLE } from './data.js';
 
@@ -10,37 +11,42 @@ const TZ = '<svg viewBox="0 0 120 120" aria-hidden="true" fill="currentColor"><p
 
 async function scripts() {
   const gb = compute(await loadModel('green-basket'));
-  const row = (p) => `<div class="r">${avatar(PEOPLE[p])}<span>${esc(PEOPLE[p].name)}</span><span class="money">${money(gb.people[p].cents)}</span></div>`;
+  // a person's total, and (for the two named in the request) the items that made it, so the preview can be checked
+  const row = (p, items) => `<div class="r">${avatar(PEOPLE[p])}<span>${esc(PEOPLE[p].name)}${items ? `<small class="why">${esc(items)} + ¼ shared</small>` : ''}</span><span class="money">${money(gb.people[p].cents)}</span></div>`;
+  const owes = (p, cents) => `<div class="r">${avatar(PEOPLE[p])}<span>${esc(PEOPLE[p].name)} <small>owes you</small></span><span class="money pos">${money(cents)}</span></div>`;
   return {
-    // the read first: the shared-aware ledger, across every bill, that only an AI connected to it can answer
+    // the write first: the page's own receipt, handed to the AI; a preview, then saved only after a yes
+    split: {
+      chip: 'Split this receipt',
+      say: 'Saved to Roommates.',
+      steps: [
+        { t: 'user', att: true, text: 'Split this with my roommates. Avocados and cold brew are mine, oat milk and kale chips are Maya’s.' },
+        { t: 'tool', label: 'Reading the receipt', done: '14 items read' },
+        { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Green Basket Market · Oct 24</strong><span class="money">${money(gb.totalCents)}</span></div>
+          <span class="tag">Preview · not saved yet</span>
+          <div class="rows rows-p">${row('you', 'Avocados, cold brew')}${row('maya', 'Oat milk, kale chips')}${row('jordan')}${row('sam')}</div></div>` },
+        { t: 'user', text: 'Save it' },
+        { t: 'tool', label: 'Saving', done: 'Saved to Roommates', ok: true },
+      ],
+    },
+    // the read: the shared-aware ledger, across every bill, that only an AI connected to it can answer
     ask: {
       chip: 'What did I spend?',
-      say: 'Groceries, October: $49.00, your share.',
+      say: 'Groceries, October: $49.00. Maya owes you $112.40, Jordan $64.10, Sam $58.75.',
       steps: [
-        { t: 'user', text: 'What did I actually spend on groceries this month?' },
-        { t: 'tool', label: 'Adding up your shares', done: 'Your shares, October' },
-        { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Groceries · October</strong><span>your share</span></div>
+        { t: 'user', text: 'What did I actually spend on groceries?' },
+        { t: 'tool', label: 'Adding up your shares', done: 'Groceries, October' },
+        { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Groceries · October</strong></div>
           <p class="big money">$49.00</p>
           <div class="rows">
             <div class="r"><span class="dot" style="--c:var(--cat-groceries)"></span><span>Green Basket Market</span><span class="money">$22.00 <small>of $100.00</small></span></div>
             <div class="r"><span class="dot" style="--c:var(--cat-groceries)"></span><span>Green Grocer</span><span class="money">$17.80 <small>yours</small></span></div>
             <div class="r"><span class="dot" style="--c:var(--cat-groceries)"></span><span>Farmers market</span><span class="money">$9.20 <small>of $32.25</small></span></div>
           </div></div>` },
-        { t: 'ai', text: 'Shared bills count only your share.' },
-      ],
-    },
-    // the write: the page's own receipt, handed to the AI; a preview, then saved only on a yes
-    split: {
-      chip: 'Split this receipt',
-      say: 'Saved to Roommates.',
-      steps: [
-        { t: 'user', att: true, text: 'Split this with my roommates. Avocados and cold brew are mine, oat milk and kale chips are Maya’s.' },
-        { t: 'tool', label: 'Reading the receipt', done: 'Preview ready' },
-        { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Green Basket Market · Oct 24</strong><span class="money">${money(gb.totalCents)}</span></div>
-          <span class="tag">Preview · not saved yet</span>
-          <div class="rows rows-p">${['you', 'maya', 'jordan', 'sam'].map(row).join('')}</div></div>` },
-        { t: 'user', text: 'Save it' },
-        { t: 'tool', label: 'Saving', done: 'Saved to Roommates' },
+        // balances carry across every bill, so "who owes me" is one more question, not a spreadsheet
+        { t: 'user', text: 'And who owes me?' },
+        { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Roommates · all bills</strong></div>
+          <div class="rows rows-p">${owes('maya', 11240)}${owes('jordan', 6410)}${owes('sam', 5875)}</div></div>` },
       ],
     },
   };
@@ -63,12 +69,8 @@ export async function initChat() {
   const chat = $('.chat', root);
   const rp = $('.rp', root);
   const live = $('[data-live]', root);
-  // Replay while idle (icon, labelled); Skip while an exchange plays (its visible word is its name: WCAG 2.5.3)
-  const setBtn = (playing) => {
-    rp.classList.toggle('is-skip', playing);
-    if (playing) { rp.textContent = 'Skip'; rp.removeAttribute('aria-label'); }
-    else { rp.innerHTML = ICON.replay; rp.setAttribute('aria-label', 'Replay'); }
-  };
+  // one control, one size: Replay, resting while an exchange plays (every run is under six seconds)
+  const setBtn = (playing) => { rp.setAttribute('aria-disabled', String(playing)); };
   let token = 0;
   let paused = false;
   let running = false;
@@ -88,13 +90,21 @@ export async function initChat() {
 
   function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
 
-  const userNode = (st) => el(`<div class="msg msg-u">${st.att ? `<div class="att"><img src="./assets/receipt-thumb.webp" alt="" width="40" height="52">green-basket.jpg</div>` : ''}${esc(st.text)}</div>`);
+  // the photo rides inside the request, as a thumbnail, so the question and its receipt are one bubble
+  const userNode = (st) => el(st.att
+    ? `<div class="msg msg-u has-att"><img src="./assets/receipt-thumb.webp" alt="Photo of the Green Basket receipt" width="40" height="52"><span>${esc(st.text)}</span></div>`
+    : `<div class="msg msg-u">${esc(st.text)}</div>`);
 
   // keep: the first message is already on screen (the primed panel), so the run continues from it without a flash
+  // each finished exchange's height, measured by fit(): the log takes it before a run starts, so the final frame shows
+  // the whole exchange (the request included) with no empty band above a short answer
+  const H = {};
+  const size = () => { const h = Math.max(0, ...Object.values(H)); if (h) log.style.height = `${h}px`; };
   async function play(key, { instant = false, keep = false } = {}) {
     token += 1;
     const tk = token;
     active = key;
+    size(key);
     $$('.chat-chips button', root).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.k === key)));
     const kept = keep && log.childElementCount === 1;
     if (!kept) log.innerHTML = '';
@@ -109,7 +119,7 @@ export async function initChat() {
           scrollDown();
           if (!fast) await wait(500, tk);
         } else if (st.t === 'tool') {
-          const node = el(`<div class="tool"><span class="tz">${TZ}</span><span class="tl">Trezzit · ${esc(st.label)}</span><span class="s"></span></div>`);
+          const node = el(`<div class="tool${st.ok ? ' tool-ok' : ''}"><span class="tz">${TZ}</span><span class="tl">Trezzit · ${esc(st.label)}</span><span class="s"></span></div>`);
           log.appendChild(node); scrollDown();
           if (!fast) await wait(900, tk);
           node.classList.add('done');
@@ -144,27 +154,26 @@ export async function initChat() {
   const start = (k) => {
     setPaused(false);
     const r = chat.getBoundingClientRect();
-    if (r.top < 0 || r.bottom > innerHeight) chat.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' });
+    const bottom = r.bottom;
+    if (r.top < 0 || bottom > innerHeight) {
+      const dy = r.top < 0 ? r.top - 16 : Math.min(r.top - 72, bottom - innerHeight + 16);
+      scrollBy({ top: dy, behavior: reduced() ? 'auto' : 'smooth' });
+    }
     play(k);
   };
   $$('.chat-chips button', root).forEach((b) => b.addEventListener('click', () => start(b.dataset.k)));
-  rp.addEventListener('click', () => {
-    if (running) {
-      const k = active || keys[0];
-      play(k, { instant: true }).then(() => { live.textContent = S[k].say; });
-      return;
-    }
-    start(active || keys[0]);
-  });
+  rp.addEventListener('click', () => { if (!running) start(active || keys[0]); });
 
-  // The log is exactly as tall as the opening exchange (the read), so it never shows an empty band; playing the
-  // longer split scrolls inside it instead of moving the page.
+  // The log takes each exchange's finished height (measured here at this width), so every final frame shows the whole
+  // exchange, request included, and a short answer never sits under an empty band. Switching eases the height.
   async function fit() {
-    const keep = active;
+    const keep = active || keys[0];
+    log.classList.add('is-measuring');
+    for (const k of keys) { delete H[k]; }
     log.style.height = '';
-    await play(keys[0], { instant: true });
-    log.style.height = `${log.scrollHeight}px`;
-    if (keep && keep !== keys[0]) await play(keep, { instant: true });
+    for (const k of keys) { await play(k, { instant: true }); H[k] = log.scrollHeight; }
+    log.classList.remove('is-measuring');
+    await play(keep, { instant: true });
     scrollDown();
   }
   // Never an empty or half-played panel: it opens on the first exchange, finished, at every width (nothing plays on

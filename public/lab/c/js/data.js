@@ -60,7 +60,10 @@ async function sampleEntry(sampleId, { title, group, date, payer, kind }) {
     const cat = l.category || (item.itemType === 'Tip' ? 'dining' : 'other');
     return { name: item.itemType === 'Tip' ? 'Tip' : itemName(l.name), cat, cents: l.cents, itemCents: item.totalCents ?? l.cents };
   });
-  return { id: sampleId, title, group, date, payer, kind, totalCents: r.totalCents, lines, youCents: you.cents };
+  // lines that were someone else's (so a search for them can say whose they were)
+  const others = r.items.filter((it) => it.itemType !== 'Tip' && !(it.shares?.you > 0))
+    .map((it) => ({ name: itemName(it.name), people: Object.keys(it.shares || {}).filter((k) => it.shares[k] > 0) }));
+  return { id: sampleId, title, group, date, payer, kind, totalCents: r.totalCents, lines, youCents: you.cents, others };
 }
 
 let ledgerPromise = null;

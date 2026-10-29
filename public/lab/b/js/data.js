@@ -105,31 +105,28 @@ const DEFS = [
   {
     id: 'groceries', kind: 'shared', title: 'Groceries with roommates', short: 'Groceries',
     sample: 'green-basket', payer: 'you', group: 'Roommates',
-    // Examples page: a shared line opens first (towels, 4 ways), so the first tap takes someone
+    // Examples page: a shared line leads (towels, 4 ways), so the first tap takes someone
     // off and the shares visibly change; then the lines that make the shares differ.
-    lead: [13, 0, 11, 12, 9, 10], open: 13, inside: true,
+    lead: [13, 0, 11, 12, 9, 10],
     bank: { date: 'OCT 24', merchant: 'GREEN BASKET MKT', cat: 'Shopping' }, day: 'Oct 24',
-    lesson: 'One charge, four people.',
   },
   {
     id: 'dinner', kind: 'shared', title: 'Dinner a friend paid', short: 'Dinner',
     sample: 'taqueria-sol', payer: 'alex', group: 'Taco Thursday',
-    // Home split demo: the shared line opens, so the first tap removes someone (never the
+    // Home split demo: the shared line leads, so the first tap removes someone (never the
     // "someone has to have it" guard); the lines that make the shares differ follow.
-    lead: [3, 5, 0, 1, 2], open: 3,
+    lead: [3, 5, 0, 1, 2],
     bank: null, day: 'Oct 18',
-    lesson: 'Not on your statement. Still your dinner.',
   },
   {
     id: 'pharmacy', kind: 'personal', title: 'A pharmacy run, just yours', short: 'Pharmacy',
     sample: 'corner-pharmacy', payer: 'you', group: null,
     bank: { date: 'OCT 20', merchant: 'CORNER PHARMACY', cat: 'Health' }, day: 'Oct 20',
-    lesson: 'All yours. Four kinds of spending.',
   },
   {
     id: 'rent', kind: 'recurring', title: 'Rent and bills', short: 'Rent',
     payer: 'you', group: 'Roommates', repeat: 'Every month on the 1st',
-    bank: { date: 'OCT 01', merchant: 'TRANSFER OAK ST PROPERTY', cat: 'Transfer' }, day: 'Oct 1', store: 'Oak St Property',
+    bank: { date: 'OCT 01', merchant: 'OAK ST PROPERTY', cat: 'Transfer' }, day: 'Oct 1', store: 'Oak St Property',
     people: ROOMIES,
     items: [
       { name: 'Rent', amount: '2400.00', category: 'rent', split: { type: 'percentage', percents: { you: 25, maya: 25, jordan: 28, sam: 22 } } },
@@ -139,7 +136,7 @@ const DEFS = [
       { name: 'Parking space 12', amount: '75.00', category: 'parking', split: { type: 'exact', amounts: { jordan: '75.00' } } },
     ],
     total: '2632.40',
-    lesson: 'Jordan has the big room and the parking spot.',
+    why: 'Jordan has the big room and parking. Sam has the small room.',
     next: ['Nov 1', 'Dec 1', 'Jan 1'],
   },
   {
@@ -149,7 +146,6 @@ const DEFS = [
     people: ROOMIES,
     items: [{ name: 'Premium plan', amount: '22.99', category: 'subscriptions', split: eq(ROOMIES) }],
     total: '22.99',
-    lesson: 'A quarter of it is yours.',
     next: ['Nov 3', 'Dec 3', 'Jan 3'],
   },
   {
@@ -162,7 +158,6 @@ const DEFS = [
       { name: 'Cleaning fee', amount: '60.00', category: 'travel', split: eq(ROOMIES) },
     ],
     total: '540.00',
-    lesson: 'You booked it for four.',
   },
 ];
 
@@ -182,7 +177,6 @@ const EXTRA = [
     ],
     tax: '5.03',
     total: '67.96',
-    lesson: 'One order, five different things.',
   },
 ];
 

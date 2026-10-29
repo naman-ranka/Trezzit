@@ -1,41 +1,9 @@
 /* shared.js: pieces used by both pages (index and scenarios). */
 
 import { PEOPLE, CATEGORIES } from './data.js';
-import { money, bankAmt, esc, ICON, avatar, listNames, reduced } from './util.js';
+import { money, bankAmt, esc, reduced } from './util.js';
 
 export { money, bankAmt };
-
-/* Rows whose receipt is the home page's "Split it by the item." demo. */
-export const SPLITTABLE = { dinner: 'taqueria-sol' };
-
-/* ---------- Bank | Trezzit (scoped to one element, e.g. the hero figure) ---------- */
-export function initViewToggle(scope, { onChange } = {}) {
-  const group = scope.querySelector('[data-vt]');
-  const buttons = [...group.querySelectorAll('[data-set-view]')];
-  // In Bank view the Trezzit pane is covered by "That's all your bank knows.": take it out of the
-  // accessibility tree and expose the message instead, so screen readers hear the same switch.
-  const pane = scope.querySelector('.pane-tz');
-  const knows = scope.querySelector('.bank-knows');
-  const covered = pane ? [...pane.children].filter((c) => c !== knows && !c.classList.contains('seam')) : [];
-  const set = (view) => {
-    if (scope.dataset.view === view) return;
-    scope.dataset.view = view;
-    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setView === view)));
-    const bank = view === 'bank';
-    covered.forEach((c) => { c.inert = bank; if (bank) c.setAttribute('aria-hidden', 'true'); else c.removeAttribute('aria-hidden'); });
-    if (knows) { if (bank) knows.removeAttribute('aria-hidden'); else knows.setAttribute('aria-hidden', 'true'); }
-    onChange?.(view);
-  };
-  buttons.forEach((b) => b.addEventListener('click', () => set(b.dataset.setView)));
-  group.addEventListener('keydown', (e) => {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-    const v = e.key === 'ArrowLeft' ? 'bank' : 'trezzit';
-    set(v);
-    group.querySelector(`[data-set-view="${v}"]`).focus();
-    e.preventDefault();
-  });
-  return set;
-}
 
 /* ---------- nav: hairline when stuck ---------- */
 export function initNav() {
@@ -55,77 +23,6 @@ export function initReveal() {
   els.forEach((e) => io.observe(e));
 }
 
-/* ---------- copy ---------- */
-export function initCopy() {
-  document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'Copied'; } catch { b.textContent = 'Select and copy'; }
-    setTimeout(() => { b.textContent = 'Copy'; }, 1800);
-  }));
-}
-
-/* ---------- statement row, opened: one line, then who or what ----------
-   Shared rows: the people chips carry every number (no sentence repeats them).
-   A personal row lists its items with their categories, plus item search. */
-const SEARCH_ICON = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.75" cy="8.75" r="5.25" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12.75 12.75L16.5 16.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-export const SEARCH_DEFAULT = 'milk';
-
-export function summaryHTML(sc, { base = 'scenarios/', search = false } = {}) {
-  const res = sc.sum.result;
-  let body;
-  if (sc.people.length > 1) {
-    body = `<ul class="sd-chips" role="list">${sc.people.map((id) => {
-      const p = PEOPLE[id];
-      return `<li class="${id === 'you' ? 'is-you' : ''}">${avatar(p, { size: 'sm' })}<span>${esc(p.name)}</span><b class="money">${money(res.people[id]?.cents || 0)}</b></li>`;
-    }).join('')}</ul>`;
-  } else {
-    body = `<ul class="sd-items" role="list">${res.items.map((it) => {
-      const c = CATEGORIES[it.category] || CATEGORIES.other;
-      return `<li><span class="dot" style="--c:${c.color}" aria-hidden="true"></span><span>${esc(it.name)}</span><small>${esc(c.label)}</small><b class="money">${money(it.totalCents)}</b></li>`;
-    }).join('')}</ul>`;
-    if (search) {
-      body += `<div class="sd-search">
-        <label class="sd-q">${SEARCH_ICON}<span class="visually-hidden">Search your October items</span><input type="search" value="${SEARCH_DEFAULT}" placeholder="Search items, stores, categories" autocomplete="off" spellcheck="false" data-search></label>
-        <ul class="sd-results" role="list" aria-live="polite" data-results></ul>
-      </div>`;
-    }
-  }
-  if (sc.inside) body += insideHTML(sc);
-  const next = sc.next ? `<p class="sd-next">${ICON.repeat}<span>Adds itself ${esc(sc.next.join(' · '))}</span></p>` : '';
-  // One way on, with one label: the home split demo if this is its receipt, otherwise the examples page.
-  const label = sc.people.length > 1 ? 'Change who had what' : 'Open the example';
-  const link = SPLITTABLE[sc.id]
-    ? `<a class="sd-link" href="#snap" data-split-it="${SPLITTABLE[sc.id]}">${label}<span aria-hidden="true">&darr;</span></a>`
-    : `<a class="sd-link" href="${base}#${sc.id}">${label}<span aria-hidden="true">&rarr;</span></a>`;
-  return `<div class="sd-tz">
-      <p class="sd-lesson">${esc(sc.lesson || '')}</p>
-      ${body}
-      ${next}
-      <p class="sd-links">${link}</p>
-    </div>`;
-}
-
-/* What was inside a shared receipt: lines grouped by who had them ("Avocados, cold brew · You"). */
-const shortName = (n) => n.split(' ').filter((w) => !/\d/.test(w)).join(' ') || n;
-function insideHTML(sc) {
-  const res = sc.sum.result;
-  const groups = new Map();
-  res.items.forEach((it) => {
-    if (it.isExtraCharge || it.itemType === 'Tip' || it.itemType === 'Fee') return;
-    const who = sc.people.filter((id) => it.shares?.[id]);
-    const key = who.join(',');
-    if (!groups.has(key)) groups.set(key, { who, names: [] });
-    groups.get(key).names.push(shortName(it.name));
-  });
-  const all = sc.people.join(',');
-  const rows = [...groups.values()].sort((x, y) => (x.who.join(',') === all) - (y.who.join(',') === all));
-  return `<ul class="sd-inside" role="list">${rows.map(({ who, names }) => {
-    const everyone = who.join(',') === all;
-    const what = everyone && names.length > 2 ? `The other ${names.length} items` : names.map((n, i) => (i ? n.toLowerCase() : n)).join(', ');
-    const whoTxt = everyone ? `All ${who.length}` : listNames(who.map((id) => PEOPLE[id].name));
-    return `<li><span>${esc(what)}</span><span class="sd-who"><span class="savs" aria-hidden="true">${who.map((id) => `<span class="sav" style="--c:${PEOPLE[id].color}">${id === 'you' ? 'Y' : esc(PEOPLE[id].initials)}</span>`).join('')}</span>${esc(whoTxt)}</span></li>`;
-  }).join('')}</ul>`;
-}
-
 /* ---------- item search over the month (every line of every expense) ---------- */
 export function itemIndex(list) {
   const rows = [];
@@ -135,25 +32,51 @@ export function itemIndex(list) {
     const store = sc.store || sc.merchant || sc.title;
     const mine = it.shares?.you || 0;
     const owner = Object.keys(it.shares || {}).filter((id) => it.shares[id]);
-    rows.push({ name: it.name, store, cat: c.label, color: c.color, day: sc.day || '', mine, owner, hay: `${it.name} ${store} ${c.label}`.toLowerCase() });
+    rows.push({ name: it.name, store, cat: c.label, color: c.color, day: sc.day || '', mine, owner, hay: `${it.name} ${store} ${c.label} ${owner.filter((id) => id !== 'you').map((id) => PEOPLE[id].name).join(' ')}`.toLowerCase() });
   }));
   return rows;
 }
 
-export function wireSearch(scope, index) {
+/* Bank statement lines: what a bank can search (store name and its own category). */
+export function bankIndex(list) {
+  return list.filter((sc) => sc.bank).map((sc) => ({ ...sc.bank, cents: sc.sum.total, hay: `${sc.bank.merchant} ${sc.bank.cat}`.toLowerCase() }));
+}
+
+/**
+ * One query, two searches: the bank's (store names) mirrors what you type into Trezzit's
+ * (every line of every receipt, its store, category and the people on it).
+ */
+export function wireSearch(scope, index, bank = []) {
   const input = scope.querySelector('[data-search]');
   const out = scope.querySelector('[data-results]');
+  const bankQ = scope.querySelector('[data-bank-q]');
+  const bankOut = scope.querySelector('[data-bank-res]');
   if (!input || !out) return;
+  const names = Object.keys(PEOPLE).filter((id) => id !== 'you').map((id) => PEOPLE[id].name.toLowerCase());
   const draw = () => {
-    const q = input.value.trim().toLowerCase();
-    if (!q) { out.innerHTML = ''; return; }
-    const hits = index.filter((r) => q.split(/\s+/).every((w) => r.hay.includes(w)));
-    out.innerHTML = hits.slice(0, 3).map((r) => {
-      const amt = r.mine ? `<b class="money">${money(r.mine)}</b>` : `<small>${esc(listNames(r.owner.map((id) => PEOPLE[id].name)))}&rsquo;s</small>`;
-      return `<li><span class="dot" style="--c:${r.color}" aria-hidden="true"></span><span>${esc(r.name)}<small>${esc(r.store)} · ${esc(r.day)}</small></span>${amt}</li>`;
-    }).join('') + (hits.length > 3 ? `<li class="sd-more-hits">${hits.length - 3} more</li>` : '')
-      + (hits.length ? '' : '<li class="sd-none">Nothing in October</li>');
+    const raw = input.value.trim();
+    const words = raw.toLowerCase().split(/\s+/).filter(Boolean);
+    if (bankQ) { bankQ.textContent = raw || 'Search'; bankQ.classList.toggle('is-empty', !raw); }
+    if (!words.length) { out.innerHTML = ''; if (bankOut) bankOut.innerHTML = ''; return; }
+    // your record is your share: only lines you had a share in
+    let hits = index.filter((r) => r.mine > 0 && words.every((w) => r.hay.includes(w)));
+    // a person's name: the things you shared with fewer people come first
+    if (words.some((w) => names.includes(w))) hits = [...hits].sort((x, y) => x.owner.length - y.owner.length);
+    out.innerHTML = hits.slice(0, 3).map((r) => `<li><span class="dot" style="--c:${r.color}" aria-hidden="true"></span><span>${esc(r.name)}<small>${esc(r.store)} · ${esc(r.day)}</small></span><b class="money">${money(r.mine)}</b></li>`).join('')
+      + (hits.length ? '' : '<li class="sd-none">Nothing in October.</li>');
+    if (bankOut) {
+      const b = bank.filter((l) => words.every((w) => l.hay.includes(w)));
+      bankOut.innerHTML = b.length
+        ? `<ul role="list">${b.map((l) => `<li><span>${esc(l.date)}</span><span>${esc(l.merchant)}</span><span>${bankAmt(l.cents)}</span></li>`).join('')}</ul>`
+        : '<p class="fb-none">No results</p><p class="fb-why">Store names only.</p>';
+    }
   };
   input.addEventListener('input', draw);
+  scope.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-try]');
+    if (!t) return;
+    input.value = t.textContent;
+    draw();
+  });
   draw();
 }

@@ -9,7 +9,7 @@
  * kit's engine (integer cents) re-splits. Any tap or keyboard focus on a dot jumps straight to it.
  * Keyboard: the dots are one tab stop (roving tabindex, always present); arrows move between dots. */
 import { PEOPLE, CATEGORIES } from '../../_kit/receipts.js';
-import { $, $$, esc, money, countTo, reduced, avatar, onceVisible, ICON } from './util.js';
+import { $, $$, esc, money, reduced, avatar, onceVisible, ICON } from './util.js';
 import { loadModel, compute, lineMembers } from './data.js';
 
 const LAST = 3; // the playground step
@@ -36,23 +36,23 @@ export async function initStory() {
   const dots = (label) => `<span class="who" role="group" aria-label="Who had ${esc(label)}">${people.map((p) => `<button type="button" class="dot-b" data-p="${p}" aria-label="${esc(label)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button>`).join('')}</span>`;
   const lineRow = (l, i, sub = false) => `
       <div class="st-row${sub ? ' st-subrow' : ''}" data-i="${i}" data-g="${GROUP(i)}" style="--r:${i}">
-        <span class="nm">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">tax in</small>' : ''}</span><span class="money">${money(res.items[i].totalCents)}</span>
+        <span class="nm">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">+ tax</small>' : ''}</span><span class="money"${l.taxCents ? ' data-n="with tax"' : ''}>${money(res.items[i].totalCents)}</span>
         ${dots(l.pretty)}
       </div>`;
   const grpLabel = `${fold.length} shared groceries`;
   stage.innerHTML = `
     <p class="st-cap" aria-hidden="true"><b></b><span></span></p>
     <div class="st-people"><span class="st-sp" aria-hidden="true"><strong>${esc(model.merchant)}</strong><small>${model.lines.length} items · ${money(model.totalCents)}</small></span><div class="st-pp">${people.map((id) => `
-      <div class="st-p" data-p="${id}">${avatar(PEOPLE[id])}<span class="nm">${esc(PEOPLE[id].name)}</span><span class="amt money">$0.00</span></div>`).join('')}
+      <div class="st-p" data-p="${id}">${avatar(PEOPLE[id])}<span class="nm">${esc(PEOPLE[id].name)}</span><span class="amt money">–</span></div>`).join('')}
     </div></div>
     <div class="st-items">${folded.length ? `
       <div class="st-row st-grp" data-lines="${folded.join(',')}" data-g="1" style="--r:0">
-        <span class="nm"><button type="button" class="st-exp" aria-expanded="false" aria-controls="st-sub"><span class="gl">Groceries</span> <small>${folded.length} shared</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span><span class="money">${money(sumOf(folded))}</span>
+        <span class="nm"><button type="button" class="st-exp" aria-expanded="false" aria-controls="st-sub"><span class="gl">Groceries</span> <small>${folded.length} shared</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span><span class="money" data-n="${folded.length} shared">${money(sumOf(folded))}</span>
         ${dots(grpLabel)}
       </div>
       <div class="st-sub" id="st-sub" hidden>${folded.map((i) => lineRow(model.lines[i], i, true)).join('')}</div>` : ''}
       ${model.lines.map((l, i) => (folded.includes(i) ? '' : lineRow(l, i))).join('')}</div>
-    <div class="st-foot"><p class="ss-owe">You spent <strong class="money ss-you"></strong> <span class="ss-them">roommates owe you <b class="money"></b></span></p><span class="ss-check"></span><button type="button" class="st-reset" tabindex="-1" aria-label="Reset the split" title="Reset">${ICON.replay}</button></div>
+    <div class="st-foot"><p class="ss-owe">You spent <strong class="money ss-you"></strong> <span class="ss-them">Roommates owe you <b class="money"></b></span></p><span class="ss-check"></span><button type="button" class="st-reset" tabindex="-1" aria-label="Reset the split" title="Reset">${ICON.replay}</button></div>
     <p class="visually-hidden" aria-live="polite" data-live></p>`;
 
   const allRows = $$('.st-row', stage);
@@ -65,7 +65,15 @@ export async function initStory() {
   const live = $('[data-live]', stage);
   const amts = Object.fromEntries(people.map((p) => [p, $(`.st-p[data-p="${p}"] .amt`, stage)]));
   const avs = Object.fromEntries(people.map((p) => [p, $(`.st-p[data-p="${p}"]`, stage)]));
-  const shown = Object.fromEntries(people.map((p) => [p, 0]));
+  const shown = Object.fromEntries(people.map((p) => [p, '–']));
+  // the ledger below shows this receipt landing in your month: tell it your share whenever it changes
+  const share = () => {
+    const cents = res.people.you?.cents || 0;
+    if (window.__tzShare === cents) return;
+    window.__tzShare = cents;
+    document.dispatchEvent(new CustomEvent('tz:share', { detail: { cents, totalCents: model.totalCents } }));
+  };
+  share();
   const steps = $$('.step', root);
   let current = -1;
   let edited = false;
@@ -120,12 +128,13 @@ export async function initStory() {
     allRows.forEach((row) => {
       const ix = linesOf(row);
       const assigned = step >= LAST || +row.dataset.g <= step;
-      row.classList.toggle('mine', ix.some((i) => (res.items[i].shares.you || 0) > 0));
       $$('.dot-b', row).forEach((b, c) => {
         const n = ix.filter((i) => (res.items[i].shares[b.dataset.p] || 0) > 0).length;
         const all = n === ix.length;
         b.classList.toggle('on', assigned && all);
         b.classList.toggle('part', assigned && n > 0 && !all);
+        // before its beat, a row shows who will have it, faintly (so step 1's personal rows are not empty)
+        b.classList.toggle('pre', !assigned && step > 0 && all);
         b.setAttribute('aria-pressed', all ? 'true' : n ? 'mixed' : 'false');
         b.tabIndex = row === focusRow && c === fc ? 0 : -1; // exactly one dot is always reachable by Tab
       });
@@ -138,9 +147,11 @@ export async function initStory() {
     const run = () => {
       const t = totalsAt(step);
       people.forEach((p) => {
-        if (shown[p] !== t[p]) { countTo(amts[p], shown[p], t[p], { dur: 600 }); shown[p] = t[p]; }
+        const txt = step === 0 ? '–' : money(t[p]);
+        if (shown[p] !== txt) { amts[p].textContent = txt; shown[p] = txt; }
       });
       renderFoot(t);
+      if (step === LAST) share();
     };
     if (delay) totT = setTimeout(run, delay); else run();
   }
@@ -217,10 +228,20 @@ export async function initStory() {
     resplit();
   }
   function toggleFold(open = sub.hidden) {
+    const y0 = expBtn.getBoundingClientRect().top;
+    pinned = true;
+    if (current !== LAST) apply(LAST);
     sub.hidden = !open;
     expBtn.setAttribute('aria-expanded', String(open));
     grpRow.classList.toggle('is-open', open);
+    stage.classList.toggle('is-open', open);
+    if (open) sub.scrollTop = 0;
     paintDots(current < 0 ? 0 : current);
+    // the pinned stage keeps its place while the nine are open (it grows downward, not re-centred), and if the page
+    // itself moved, scroll back so the row you clicked stays under the cursor
+    if (!open) setH();
+    const dy = expBtn.getBoundingClientRect().top - y0;
+    if (Math.abs(dy) > 1) scrollBy({ top: dy, behavior: 'instant' });
   }
   stage.addEventListener('keydown', (e) => {
     const btn = e.target.closest?.('.dot-b');
@@ -242,11 +263,17 @@ export async function initStory() {
     const btn = e.target.closest?.('.dot-b');
     if (!btn) return;
     focusRow = btn.closest('.st-row'); fc = people.indexOf(btn.dataset.p);
+    const first = !pinned;
     pinned = true;
     if (current !== LAST) apply(LAST);
+    if (first && e.target.matches(':focus-visible')) {
+      const r = stage.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > innerHeight) stage.scrollIntoView({ block: 'center', behavior: reduced() ? 'auto' : 'smooth' });
+    }
   });
   stage.addEventListener('click', (e) => {
-    if (e.target.closest('.st-exp')) { toggleFold(); return; }
+    // the whole label of the folded row opens it (on phones its price sits under the name)
+    if (e.target.closest('.st-exp') || (e.target.closest('.st-grp') && !e.target.closest('.who'))) { toggleFold(); return; }
     const btn = e.target.closest('.dot-b');
     if (!btn) return;
     const row = btn.closest('.st-row');
@@ -302,7 +329,7 @@ export async function initStory() {
     apply(step);
   }
   const pin = $('#story-pin');
-  const setH = () => root.style.setProperty('--stage-h', `${pin.offsetHeight}px`);
+  function setH() { if (!stage.classList.contains('is-open')) root.style.setProperty('--stage-h', `${pin.offsetHeight}px`); }
   setH();
   if ('ResizeObserver' in window) new ResizeObserver(setH).observe(pin);
   const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(measure); } };

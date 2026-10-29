@@ -5,7 +5,7 @@
  */
 
 import { PEOPLE, CATEGORIES, summarise } from './data.js';
-import { money, esc, avatar, tweenMoney, ICON, listNames } from './util.js';
+import { money, esc, avatar, ICON, listNames, reduced } from './util.js';
 
 const whole = (c) => (c % 100 === 0 ? money(c).replace(/\.00$/, '') : money(c));
 /**
@@ -44,42 +44,35 @@ export function toggleSplit(orig, cur, id, order) {
   return { type: 'equal', people: next };
 }
 
-/**
- * Who had a line: a quiet stack of the people on it, and (on the open line
- * only) the full row of 44px toggles. One line is open at a time.
- */
-export function whoHTML(order, who, name, open) {
-  const stack = order.filter((id) => who.includes(id))
-    .map((id) => `<span class="sav" style="--c:${PEOPLE[id].color}">${id === 'you' ? 'Y' : esc(PEOPLE[id].initials)}</span>`).join('');
-  const toggles = order.map((id) => avatar(PEOPLE[id], { pressed: who.includes(id), label: `${PEOPLE[id].name} on ${name}` })).join('');
-  return `<span class="who${open ? ' is-open' : ''}">
-    <button type="button" class="who-stack" aria-expanded="${open}" aria-label="Change who had ${esc(name)}"><span class="savs" aria-hidden="true">${stack}</span>${ICON.chevron}</button>
-    <span class="who-toggles" role="group" aria-label="Who had ${esc(name)}">${toggles}</span>
-  </span>`;
+/** Who had a line: one face per person, filled = on it, dashed = off. Every line, same control.
+ *  Each line is one Tab stop (roving tabindex); arrows move between people and lines (wireFaceKeys). */
+export function facesHTML(order, who, name) {
+  return `<span class="faces" role="group" aria-label="Who had ${esc(name)}" aria-describedby="faces-keys">${order.map((id, k) => avatar(PEOPLE[id], { size: 'face', pressed: who.includes(id), label: `${PEOPLE[id].name} on ${name}` }).replace('<button ', `<button tabindex="${k ? -1 : 0}" `)).join('')}</span>`;
 }
 
-/** Redraw a line's stack after a toggle. */
-export function updateStack(li, order, who) {
-  const savs = li.querySelector('.savs');
-  if (!savs) return;
-  savs.innerHTML = order.filter((id) => who.includes(id))
-    .map((id) => `<span class="sav" style="--c:${PEOPLE[id].color}">${id === 'you' ? 'Y' : esc(PEOPLE[id].initials)}</span>`).join('');
-}
-
-/** Open one line's toggles, close the rest. */
-export function openLine(list, li) {
-  list.querySelectorAll('.who.is-open').forEach((w) => {
-    if (li && w.closest('li') === li) return;
-    w.classList.remove('is-open');
-    w.querySelector('.who-stack').setAttribute('aria-expanded', 'false');
-    w.closest('li').classList.remove('is-open');
+/** Left/Right (and Home/End) move along a line's faces; Up/Down move to the same person on the next line. */
+export function wireFaceKeys(scope) {
+  scope.addEventListener('keydown', (e) => {
+    const b = e.target.closest?.('.faces .av');
+    if (!b) return;
+    const row = b.parentElement;
+    const faces = [...row.children];
+    const k = faces.indexOf(b);
+    let to = null;
+    if (e.key === 'ArrowRight') to = faces[Math.min(faces.length - 1, k + 1)];
+    else if (e.key === 'ArrowLeft') to = faces[Math.max(0, k - 1)];
+    else if (e.key === 'Home') to = faces[0];
+    else if (e.key === 'End') to = faces[faces.length - 1];
+    else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      const rows = [...scope.querySelectorAll('.faces')].filter((r) => r.offsetParent);
+      const r = rows[rows.indexOf(row) + (e.key === 'ArrowDown' ? 1 : -1)];
+      to = r ? (r.querySelector(`.av[data-id="${b.dataset.id}"]`) || r.firstElementChild) : null;
+    } else return;
+    e.preventDefault();
+    if (!to || to === b) return;
+    [...to.parentElement.children].forEach((f) => { f.tabIndex = f === to ? 0 : -1; });
+    to.focus();
   });
-  if (!li) return;
-  const w = li.querySelector('.who');
-  if (!w) return;
-  w.classList.add('is-open');
-  li.classList.add('is-open');
-  w.querySelector('.who-stack').setAttribute('aria-expanded', 'true');
 }
 
 export const splitPeople = (split, order) => {
@@ -111,20 +104,17 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     const lead = sc.lead || [];
     const shown = [...lead.map((i) => res.items.find((it) => it.index === i && !isExtra(it))).filter(Boolean),
       ...res.items.filter((it) => isExtra(it) || !lead.includes(it.index))];
-    const openAt = sc.open ?? shown.find((it) => !isExtra(it))?.index;
     const rows = shown.map((it) => {
-      const open = !isExtra(it) && it.index === openAt;
       const extra = it.isExtraCharge || it.itemType === 'Tip' || it.itemType === 'Fee' || it.itemType === 'Discount';
       const src = extra ? null : items[it.index];
       const who = src ? splitPeople(src.split, order) : [];
       const c = cat(it.category);
-      const tax = !extra && it.taxCents ? `<span class="se-tax">incl. ${money(it.taxCents)} tax</span>` : '';
       const whoCell = multi && !extra
-        ? `<div class="se-who">${whoHTML(order, who, it.name, open)}</div>`
+        ? `<div class="se-who">${facesHTML(order, who, it.name)}</div>`
         : (extra ? '<span class="se-prop">In proportion to each share</span>' : `<span class="se-cat"><span class="dot" style="--c:${c.color}"></span>${esc(c.label)}</span>`);
-      return `<li class="se-item${extra ? ' is-extra' : ''}${multi && open ? ' is-open' : ''}" data-i="${extra ? '' : it.index}" style="--cat:${extra ? '#94a3b8' : c.color}">
-        <div class="se-line"><span class="dot" style="--c:${extra ? '#94a3b8' : c.color}" title="${esc(c.label)}"></span><span class="se-name">${esc(it.name)}${tax}</span><span class="se-price money">${money(it.totalCents)}</span></div>
-        <div class="se-sub">${whoCell}<span class="se-each money">${multi ? esc(shareText(it.shares, order)) : ''}</span></div>
+      return `<li class="se-item${extra ? ' is-extra' : ''}" data-i="${extra ? '' : it.index}" style="--cat:${extra ? '#94a3b8' : c.color}">
+        <div class="se-line"><span class="dot" style="--c:${extra ? '#94a3b8' : c.color}" title="${esc(c.label)}"></span><span class="se-name">${esc(it.name)}</span><span class="se-meta"><span class="se-price money">${money(it.totalCents)}</span><span class="se-each money">${multi ? esc(shareText(it.shares, order)) : ''}</span></span></div>
+        <div class="se-sub">${whoCell}</div>
       </li>`;
     }).join('');
 
@@ -148,8 +138,9 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     }).join('');
 
     root.innerHTML = `
-      <ol class="se-items${res.items.length > 5 ? ' is-clipped' : ''}" role="list">${rows}</ol>
-      ${res.items.length > 5 ? `<button type="button" class="btn btn-quiet btn-sm se-more" data-more>Show all ${res.items.length} lines</button>` : ''}
+      ${multi ? '<p class="se-hint">Tap a face.</p>' : ''}
+      <ol class="se-items${res.items.length > 8 ? ' is-clipped' : ''}" role="list">${rows}</ol>
+      ${res.items.length > 8 ? `<button type="button" class="se-more" data-more>Show all ${res.items.length} lines</button>` : ''}
       <div class="se-side">
         ${people ? `<ul class="se-people${compact ? ' snap-people' : ''}" role="list">${people}</ul>` : ''}
         <div class="se-yours">
@@ -157,7 +148,7 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
           <div class="catbar" aria-hidden="true">${catBar(sum.byCategory)}</div>
           <ul class="cats" role="list">${catList(sum.byCategory)}</ul>
         </div>
-        <p class="se-check">${ICON.check}<span>Adds up to <b class="money">${money(res.totalCents)}</b></span></p>
+        <div class="se-end"><p class="se-check">${ICON.check}<span>Adds up to <b class="money">${money(res.totalCents)}</b></span></p>${multi ? '<button type="button" class="btn btn-quiet btn-sm" data-reset>Reset</button>' : ''}</div>
         <p class="visually-hidden" aria-live="polite" data-live></p>
       </div>`;
     last = sum;
@@ -178,8 +169,7 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
       }
       if (!extra) {
         const who = splitPeople(items[it.index].split, order);
-        li.querySelectorAll('.who-toggles .av').forEach((b) => b.setAttribute('aria-pressed', String(who.includes(b.dataset.id))));
-        updateStack(li, order, who);
+        li.querySelectorAll('.faces .av').forEach((b) => b.setAttribute('aria-pressed', String(who.includes(b.dataset.id))));
       }
     });
     root.querySelectorAll('.se-item.is-extra').forEach((li, k) => {
@@ -190,7 +180,7 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
       const li = root.querySelector(`.se-person[data-id="${id}"]`);
       if (!li) return;
       const cents = res.people[id]?.cents || 0;
-      tweenMoney(li.querySelector('.se-pamt'), cents);
+      setMoney(li.querySelector('.se-pamt'), cents);
       const bar = li.querySelector('.se-bar i');
       if (bar) bar.style.width = `${res.totalCents ? (cents / res.totalCents) * 100 : 0}%`;
     });
@@ -205,11 +195,16 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
   }
 
   root.addEventListener('click', (e) => {
+    if (e.target.closest('[data-reset]')) {
+      const open = !root.querySelector('.se-items.is-clipped') && root.querySelector('.se-items');
+      api.reset();
+      if (open) { root.querySelector('.se-items').classList.remove('is-clipped'); root.querySelector('[data-more]')?.remove(); }
+      root.querySelector('[data-reset]')?.focus();
+      return;
+    }
     const more = e.target.closest('[data-more]');
     if (more) { root.querySelector('.se-items').classList.remove('is-clipped'); more.remove(); return; }
-    const st = e.target.closest('.who-stack');
-    if (st) { openLine(root.querySelector('.se-items'), st.closest('.se-item')); st.closest('.se-item').querySelector('.who-toggles .av')?.focus(); return; }
-    const b = e.target.closest('.who-toggles .av');
+    const b = e.target.closest('.faces .av');
     if (!b) return;
     const li = b.closest('.se-item');
     const i = Number(li.dataset.i);
@@ -226,7 +221,8 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     update(i);
   });
 
-  return {
+  wireFaceKeys(root);
+  const api = {
     load(scenario) {
       sc = scenario;
       items = scenario.bill.items.map((it) => ({ ...it, split: it.split ? JSON.parse(JSON.stringify(it.split)) : { type: 'equal', people: scenario.people } }));
@@ -238,6 +234,16 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     get scenario() { return sc; },
     label,
   };
+  return api;
+}
+
+/** Set a figure in the same frame as every other figure (no count-up); a changed one flashes once. */
+export function setMoney(node, cents) {
+  if (!node) return;
+  const changed = node.dataset.cents !== String(cents);
+  node.dataset.cents = String(cents);
+  node.textContent = money(cents);
+  if (changed && !reduced()) { node.classList.remove('flash'); void node.offsetWidth; node.classList.add('flash'); }
 }
 
 export function catBar(byCat) {

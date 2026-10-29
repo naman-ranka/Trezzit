@@ -39,6 +39,9 @@ export async function mountLedger(root, opts = {}) {
   const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
   const max = cats[0][1];
   const delta = spent - last;
+  // colour means one thing at a time: the bar shows the top 4 categories in their hue and one grey "Other"
+  const rest = cats.slice(4).reduce((a, [, c]) => a + c, 0);
+  const barParts = cats.slice(0, 4).map(([k, c]) => [c, cat(k).color]).concat(rest ? [[rest, '#cbd2dc']] : []);
   root.classList.add('ledger');
   // compact (home): fewer categories and rows on phones, so the demo stays one screen tall
   if (opts.compact) root.classList.add('compact');
@@ -56,12 +59,13 @@ export async function mountLedger(root, opts = {}) {
       <p class="lg-label">Spent in October <span class="lg-tag">Your share only</span></p>
       <p class="lg-total money"><span class="visually-hidden">${money(spent)}</span><span class="lg-n" aria-hidden="true">${money(spent)}</span></p>
       <p class="lg-sub"><span class="${delta < 0 ? 'down' : 'up'}">${money(Math.abs(delta))} ${delta < 0 ? 'less' : 'more'} than September</span></p>
-      <div class="lg-bar" aria-hidden="true">${cats.map(([k, c]) => `<i style="--c:${cat(k).color};--w:${(c / spent) * 100}%"></i>`).join('')}</div>
+      <div class="lg-bar" aria-hidden="true">${barParts.map(([c, color]) => `<i style="--c:${color};--w:${(c / spent) * 100}%"></i>`).join('')}</div>
       <ul class="lg-cats short" role="list" aria-label="By category">
         ${cats.map(([k, c]) => {
           const prev = LAST_MONTH[k] || 0;
           const d = c - prev;
-          const dTxt = prev === 0 ? 'new' : d === 0 ? 'same' : `${d < 0 ? '−' : '+'}${money(Math.abs(d))}`;
+          // neutral text with an arrow: red and green already mean categories here
+          const dTxt = prev === 0 ? 'new' : d === 0 ? 'same' : `<span aria-hidden="true">${d < 0 ? '↓' : '↑'}</span><span class="visually-hidden">${d < 0 ? 'down' : 'up'} </span>${money(Math.abs(d))}`;
           return `<li><button type="button" class="lg-cat" data-cat="${k}" aria-pressed="false">
             <span class="lg-ci" style="--c:${cat(k).color}">${catIcon(k)}</span>
             <span class="lg-cn">${cat(k).label}</span>
@@ -105,6 +109,17 @@ export async function mountLedger(root, opts = {}) {
       <span class="lg-ra"><b class="money">${money(l.cents)}</b>${l.itemCents !== l.cents ? `<small class="money">of ${money(l.itemCents)}</small>` : ''}</span></li>`;
   }
 
+  // a search for something on a shared receipt that wasn't yours says whose it was, not "no match"
+  const otherLines = entries.flatMap((e) => (e.others || []).map((o) => ({ ...o, entry: e })));
+  const names = (ids) => ids.map((k) => (k === 'you' ? 'you' : PEOPLE[k]?.name || k));
+  const andList = (a) => (a.length < 3 ? a.join(' and ') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`);
+  function emptyText(q, ql) {
+    const o = !filterCat && ql.length > 2 && otherLines.find((l) => l.name.toLowerCase().includes(ql) && l.people.length);
+    if (!o) return `No items match “${esc(q)}”.`;
+    const who = names(o.people);
+    return `${esc(o.name)} was ${esc(andList(who))}’s, so it isn’t in your spending.`;
+  }
+
   function render() {
     const q = input.value.trim();
     const ql = q.toLowerCase();
@@ -121,7 +136,7 @@ export async function mountLedger(root, opts = {}) {
     const cap = opts.compact ? 5 : 8;
     listEl.innerHTML = hits.length
       ? hits.slice(0, cap).map((l) => lineRow(l, q)).join('') + (hits.length > cap ? `<li class="lg-moreline">and ${hits.length - cap} more items</li>` : '')
-      : `<li class="lg-empty">No items match “${esc(q)}”.</li>`;
+      : `<li class="lg-empty">${emptyText(q, ql)}</li>`;
     countEl.innerHTML = hits.length
       ? `${hits.length} ${hits.length === 1 ? 'item' : 'items'}${filterCat ? ` in ${cat(filterCat).label}` : ''} <span aria-hidden="true">·</span> your share <b class="money">${money(sum)}</b>`
       : '';
@@ -170,4 +185,3 @@ export async function mountLedger(root, opts = {}) {
   }
   return { data };
 }
-void PEOPLE;

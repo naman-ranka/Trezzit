@@ -106,8 +106,11 @@ export const icon = {
   tool: '<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M3.5 6.5h13M3.5 10h13M3.5 13.5h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
 };
 
+/** "You" is a person glyph, never the word squeezed into a circle (the name sits beside it). */
+export const YOU_GLYPH = '<svg class="av-you" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="7.2" r="3.3" fill="currentColor"/><path d="M3.8 17.2c.7-3.3 3.2-5.2 6.2-5.2s5.5 1.9 6.2 5.2z" fill="currentColor"/></svg>';
+
 /** Person avatar markup. */
 export function avatar(p, { size = 'md', pressed = null, label = '' } = {}) {
-  const init = p.id === 'you' ? 'You' : p.name.charAt(0);
-  return `<span class="av av-${size}" style="--av:${p.color}" aria-hidden="true">${esc(init)}</span>`;
+  const init = p.id === 'you' ? YOU_GLYPH : esc(p.name.charAt(0));
+  return `<span class="av av-${size}" style="--av:${p.color}" aria-hidden="true">${init}</span>`;
 }

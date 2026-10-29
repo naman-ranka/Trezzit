@@ -4,14 +4,23 @@ import { mountSplit } from './split-demo.js';
 import { splitAmount } from '../../_kit/split-engine.js';
 import { splitSample } from '../../_kit/receipts.js';
 import { PEOPLE, getSample, sampleBill } from './data.js';
-import { money, countMoney, esc } from './util.js';
+import { money, countMoney, esc, YOU_GLYPH } from './util.js';
 
 initPage();
-// collapsed like home (3 lines + "Show all 7 items"), so the tip and who owes whom are in the first screen
-mountSplit(document.getElementById('split-demo'), { sampleId: 'taqueria-sol', tipToggle: true, balances: true, yours: false });
-
 const TRIO = ['you', 'alex', 'priya'];
-const av = (p) => `<span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span>`;
+// collapsed like home (3 lines + "Show all 7 items"), so the tip and who owes whom are in the first screen.
+// Every tap or tip flip feeds the weekend below, so the two demos never disagree (as on /roommates).
+let taqLive = null;
+let setTaq = null;
+mountSplit(document.getElementById('split-demo'), {
+  sampleId: 'taqueria-sol', tipToggle: true, balances: true, yours: false,
+  onChange: (r, st) => {
+    taqLive = { shares: Object.fromEntries(TRIO.map((p) => [p, r.people[p]?.cents || 0])), note: st.tipMode === 'equal' ? 'By item, tip equally' : 'By item, tip in proportion' };
+    setTaq?.(taqLive);
+  },
+});
+
+const av = (p) => `<span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span>`;
 const who = (p) => (p === 'you' ? 'You' : PEOPLE[p].name);
 
 async function tripDemo(root) {
@@ -35,7 +44,7 @@ async function tripDemo(root) {
     <div>
       <ul class="trip-bills" role="list">${bills.map((b) => `<li>
         <label class="tb-on"><input type="checkbox" checked data-id="${b.id}"><span class="visually-hidden">Include ${esc(b.title)}</span><span class="tick" aria-hidden="true"></span></label>
-        <span><b>${esc(b.title)}</b><small>${who(b.payer)} paid · ${b.note}</small></span>
+        <span><b>${esc(b.title)}</b><small>${who(b.payer)} paid · <span data-note="${b.id}">${b.note}</span></small></span>
         <b class="money">${money(b.cents)}</b></li>`).join('')}</ul>
     </div>
     <div class="trip-side">
@@ -101,5 +110,13 @@ async function tripDemo(root) {
     render(false);
   }));
   render(true);
+  const taqBill = bills.find((b) => b.id === 'taq');
+  setTaq = ({ shares, note }) => {
+    taqBill.shares = shares;
+    taqBill.note = note;
+    root.querySelector('[data-note="taq"]').textContent = note;
+    render(false);
+  };
+  if (taqLive) setTaq(taqLive);
 }
 tripDemo(document.getElementById('trip-demo'));

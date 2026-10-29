@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" href="../_kit/brand/apple-touch-icon.png">
 <link rel="preload" href="../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../_kit/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../_kit/fonts/plex-mono-600-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../_kit/tokens.css">
 <link rel="stylesheet" href="css/b.css">
 <script>document.documentElement.classList.add('js');</script>
@@ -34,8 +35,8 @@
       <img src="../_kit/brand/trezzit-mark.svg" alt="" width="28" height="28"><span>Trezzit</span>
     </a>
     <nav class="nav-links" aria-label="Main">
-      <a href="scenarios/" class="hide-sm">Examples</a>
-      <a href="#ai">Ask AI</a>
+      <a href="scenarios/">Examples</a>
+      <a href="#ai" class="hide-sm">Ask AI</a>
       <a href="https://app.trezzit.com/login">Log in</a>
       <a href="https://app.trezzit.com/signup" class="btn btn-primary btn-sm">Sign up</a>
     </nav>
@@ -60,12 +61,15 @@
       <div class="pair pair-hero" data-hero>
         <div class="pane-bank">
           <p class="pane-label"><span>Your bank</span><span>Checking ··4242</span></p>
+          <div class="pb-stack">
           <div class="pb-lines" role="tablist" aria-label="October charges" aria-orientation="vertical">
-            <button type="button" class="pb-line" role="tab" id="pb-groceries" aria-controls="pt-groceries" aria-selected="true" aria-label="Oct 24, Green Basket, minus $100.00" data-from="10000"><span>OCT 24</span><span>GREEN BASKET MKT</span><span>&minus;100.00</span></button>
-            <button type="button" class="pb-line" role="tab" id="pb-pharmacy" aria-controls="pt-pharmacy" aria-selected="false" tabindex="-1" aria-label="Oct 20, Corner Pharmacy, minus $48.22" data-from="4822"><span>OCT 20</span><span>CORNER PHARMACY</span><span>&minus;48.22</span></button>
-            <button type="button" class="pb-line" role="tab" id="pb-trip" aria-controls="pt-trip" aria-selected="false" tabindex="-1" aria-label="Oct 11, Pines Cabin, minus $540.00" data-from="54000"><span>OCT 11</span><span>PINES CABIN</span><span>&minus;540.00</span></button>
+            <button type="button" class="pb-line" role="tab" id="pb-groceries" aria-controls="pt-groceries" aria-selected="true" data-from="10000"><span>OCT 24</span><span>GREEN BASKET MKT</span><span>&minus;100.00</span></button>
+            <button type="button" class="pb-line" role="tab" id="pb-pharmacy" aria-controls="pt-pharmacy" aria-selected="false" tabindex="-1" data-from="4822"><span>OCT 20</span><span>CORNER PHARMACY</span><span>&minus;48.22</span></button>
+            <button type="button" class="pb-line" role="tab" id="pb-rent" aria-controls="pt-rent" aria-selected="false" tabindex="-1" data-from="263240"><span>OCT 01</span><span>OAK ST PROPERTY</span><span>&minus;2,632.40</span></button>
           </div>
+          <p class="pb-paid" aria-hidden="true"><span>You paid</span><b data-paid-amt>&minus;100.00</b></p>
           <p class="pb-knows">That&rsquo;s all your bank knows.</p>
+          </div>
         </div>
         <div class="pane-tz">
           <span class="seam" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4 10h11m0 0l-4.5-4.5M15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -100,25 +104,24 @@
                 <li><span class="dot" style="--c:#db2777"></span><span>Gifts</span><span class="money">$5.39</span></li>
                 <li><span class="dot" style="--c:#059669"></span><span>Groceries</span><span class="money">$1.29</span></li>
               </ul>
-              <p class="pt-owe"><span>Nobody owes anybody.</span></p>
-              <p class="pt-ai">Added by ChatGPT from <span class="pt-file">pharmacy.jpg</span></p>
+              <p class="pt-ai pt-end">Added by ChatGPT from <span class="pt-file">pharmacy.jpg</span></p>
             </div>
-            <div class="pt-view" id="pt-trip" role="tabpanel" aria-labelledby="pb-trip">
-              <p class="pane-label tz"><span>Oct 11 · Cabin trip</span></p>
-              <p class="pt-merchant">Pines Cabin</p>
+            <div class="pt-view" id="pt-rent" role="tabpanel" aria-labelledby="pb-rent">
+              <p class="pane-label tz"><span>Oct 1 · Roommates</span></p>
+              <p class="pt-merchant">Rent and bills</p>
               <p class="pt-label">You spent</p>
-              <p class="pt-amount money" data-amt data-cents="13500" data-to="13500">$135.00</p>
-              <p class="pt-of">of <span class="money">$540.00</span> · you paid</p>
-              <div class="catbar" aria-hidden="true"><i style="flex-grow:12000;--c:#4f46e5"></i><i style="flex-grow:1500;--c:#818cf8"></i></div>
-              <ul class="cats" role="list">
-                <li><span class="dot" style="--c:#4f46e5"></span><span>Cabin, 2 nights <small>4 ways</small></span><span class="money">$120.00</span></li>
-                <li><span class="dot" style="--c:#818cf8"></span><span>Cleaning fee <small>4 ways</small></span><span class="money">$15.00</span></li>
+              <p class="pt-amount money" data-amt data-cents="63935" data-to="63935">$639.35</p>
+              <p class="pt-of">of <span class="money">$2,632.40</span> · you paid</p>
+              <div class="catbar" aria-hidden="true"><i style="flex-grow:60000;--c:#0f1f3d"></i><i style="flex-grow:2310;--c:#0d9488"></i><i style="flex-grow:1625;--c:#0891b2"></i></div>
+              <ul class="cats cats-4" role="list">
+                <li><span class="dot" style="--c:#0f1f3d"></span><span>Rent</span><span class="money">$600.00</span></li>
+                <li><span class="dot" style="--c:#0d9488"></span><span>Utilities</span><span class="money">$23.10</span></li>
+                <li><span class="dot" style="--c:#0891b2"></span><span>Internet</span><span class="money">$16.25</span></li>
               </ul>
-              <p class="pt-owe">
-                <span class="avs" aria-hidden="true"><span class="av sm" style="--c:#0f766e">M</span><span class="av sm" style="--c:#b45309">J</span><span class="av sm" style="--c:#7c3aed">S</span></span>
-                <span>Cabin trip owes you</span><b class="money money-in">$405.00</b>
-              </p>
-              <p class="pt-ai">Added by Claude from <span class="pt-file">oct-statement.pdf</span></p>
+              <div class="pt-next">
+                <p class="pt-rep"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 9V8a3 3 0 013-3h9m0 0l-2.5-2.5M16 5l-2.5 2.5M16 11v1a3 3 0 01-3 3H4m0 0l2.5 2.5M4 15l2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Every month</p>
+                <ul role="list" aria-label="Coming up"><li>Nov 1<b class="money">$639.35</b></li><li>Dec 1<b class="money">$639.35</b></li><li>Jan 1<b class="money">$639.35</b></li></ul>
+              </div>
             </div>
           </div>
         </div>
@@ -127,74 +130,30 @@
   </div>
 </section>
 
-<!-- 2 · One statement, two stories -->
-<section class="sec sec-stmt" id="statement" aria-labelledby="stmt-h">
-  <div class="wrap">
-    <header class="sec-head reveal">
-      <h2 id="stmt-h">One statement. Two stories.</h2>
-      <p class="lede">Tap a charge to see what was inside.</p>
-    </header>
-
-    <div class="stmt reveal" data-stmt>
-      <div class="srow shead" aria-hidden="true">
-        <span class="sb"><span>Your bank</span><span>Checking ··4242 · October</span></span>
-        <span class="st"><span>Trezzit</span><span>What you spent</span></span>
+<!-- 2 · AI: the vision, kept for you -->
+<section class="sec sec-ai" id="ai" aria-labelledby="ai-h">
+  <div class="wrap ai-grid">
+    <div class="ai-copy">
+      <h2 id="ai-h" class="reveal">Your spending, kept by Claude or ChatGPT.</h2>
+      <p class="lede reveal">Connect once. Send it receipts and statements, or ask what you spent.</p>
+      <div class="ai-cta reveal">
+        <a class="btn btn-white" href="/mcp#connect-claude">Add to Claude</a>
+        <a class="btn btn-white" href="/mcp#connect-chatgpt">Add to ChatGPT</a>
       </div>
-      <ol class="srows" role="list">
-        <li class="srow" data-id="groceries" data-kind="shared">
-          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-groceries">
-            <span class="sb"><span class="sb-d">OCT 24</span><span class="sb-m">GREEN BASKET MKT</span><span class="sb-a">&minus;100.00</span></span>
-            <span class="st"><span class="kind kind-shared" title="Shared"></span><span class="st-t"><b>Grocery run</b><small>Groceries · Household</small></span><span class="st-a"><b class="money">$30.00</b><small>of $100.00</small></span><span class="chev" aria-hidden="true"></span></span>
-          </button>
-          <div class="sdetail" id="sd-groceries" hidden></div>
-        </li>
-        <li class="srow" data-id="pharmacy" data-kind="personal">
-          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-pharmacy">
-            <span class="sb"><span class="sb-d">OCT 20</span><span class="sb-m">CORNER PHARMACY</span><span class="sb-a">&minus;48.22</span></span>
-            <span class="st"><span class="kind kind-personal" title="Personal"></span><span class="st-t"><b>Pharmacy</b><small>4 categories</small></span><span class="st-a"><b class="money">$48.22</b><small>all yours</small></span><span class="chev" aria-hidden="true"></span></span>
-          </button>
-          <div class="sdetail" id="sd-pharmacy" hidden></div>
-        </li>
-        <li class="srow" data-id="dinner" data-kind="shared">
-          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-dinner">
-            <span class="sb sb-none"><span class="sb-d">OCT 18</span><span class="sb-m">No charge</span><span class="sb-a">&nbsp;</span></span>
-            <span class="st"><span class="kind kind-shared" title="Shared"></span><span class="st-t"><b>Dinner</b><small>Taqueria Sol</small></span><span class="st-a"><b class="money">$27.03</b><small>you owe Alex</small></span><span class="chev" aria-hidden="true"></span></span>
-          </button>
-          <div class="sdetail" id="sd-dinner" hidden></div>
-        </li>
-        <li class="srow" data-id="trip" data-kind="shared">
-          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-trip">
-            <span class="sb"><span class="sb-d">OCT 11</span><span class="sb-m">PINES CABIN</span><span class="sb-a">&minus;540.00</span></span>
-            <span class="st"><span class="kind kind-shared" title="Shared"></span><span class="st-t"><b>Weekend away</b><small>Travel · Cabin trip</small></span><span class="st-a"><b class="money">$135.00</b><small>of $540.00</small></span><span class="chev" aria-hidden="true"></span></span>
-          </button>
-          <div class="sdetail" id="sd-trip" hidden></div>
-        </li>
-        <li class="srow" data-id="streaming" data-kind="recurring">
-          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-streaming">
-            <span class="sb"><span class="sb-d">OCT 03</span><span class="sb-m">STREAMBOX.TV</span><span class="sb-a">&minus;22.99</span></span>
-            <span class="st"><span class="kind kind-recurring" title="Recurring"></span><span class="st-t"><b>Streaming</b><small>Every month · 4 ways</small></span><span class="st-a"><b class="money">$5.75</b><small>of $22.99</small></span><span class="chev" aria-hidden="true"></span></span>
-          </button>
-          <div class="sdetail" id="sd-streaming" hidden></div>
-        </li>
-        <li class="srow" data-id="rent" data-kind="recurring">
-          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-rent">
-            <span class="sb"><span class="sb-d">OCT 01</span><span class="sb-m">TRANSFER OAK ST PROPERTY</span><span class="sb-a">&minus;2,632.40</span></span>
-            <span class="st"><span class="kind kind-recurring" title="Recurring"></span><span class="st-t"><b>Rent and bills</b><small>Every month</small></span><span class="st-a"><b class="money">$639.35</b><small>of $2,632.40</small></span><span class="chev" aria-hidden="true"></span></span>
-          </button>
-          <div class="sdetail" id="sd-rent" hidden></div>
-        </li>
-      </ol>
-      <div class="srow sfoot">
-        <span class="sb"><span>Paid</span><span class="sb-a" data-paid>&minus;3,343.61</span></span>
-        <span class="st"><span>You spent</span><b class="money" data-spent data-cents="88535">$885.35</b></span>
+      <p class="trust reveal">No bank login · Never moves money</p>
+    </div>
+    <div class="chat reveal" data-chat>
+      <div class="chat-h">
+        <span class="chat-title">Example</span>
+        <span class="chat-conn"><i aria-hidden="true"></i>Trezzit connected</span>
+        <button type="button" class="chat-ctl" data-ctl data-state="replay" aria-label="Replay the conversation"></button>
       </div>
-      <div class="srow ssearch">
-        <span class="sb"><span>Bank search</span><span>Merchant names only</span></span>
-        <div class="st sd-search">
-          <label class="sd-q"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.75" cy="8.75" r="5.25" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12.75 12.75L16.5 16.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="visually-hidden">Search every item you bought in October</span><input type="search" value="chips" placeholder="Search every item" autocomplete="off" spellcheck="false" data-search></label>
-          <ul class="sd-results" role="list" aria-live="polite" data-results></ul>
-        </div>
+      <div class="chat-log" data-log role="log" aria-label="Example conversation" aria-live="off"></div>
+      <div class="prompts" role="group" aria-label="Try a prompt">
+        <button type="button" class="prompt" data-script="match" aria-pressed="true">Add what&rsquo;s missing from my statement</button>
+        <button type="button" class="prompt" data-script="house" aria-pressed="false">Who owes who? Sam paid me back</button>
       </div>
+      <p class="visually-hidden" aria-live="polite" data-chat-live></p>
     </div>
   </div>
 </section>
@@ -204,7 +163,7 @@
   <div class="wrap">
     <header class="sec-head reveal">
       <h2 id="snap-h">Split it by the item.</h2>
-      <p class="lede">Tap a face to change who had what.</p>
+      <p class="lede">Tap a face.</p>
     </header>
 
     <div class="snap" data-snap data-sample="taqueria-sol">
@@ -212,26 +171,18 @@
         <div class="snap-paper" data-paper-box>
           <button type="button" class="paper-thumb" aria-expanded="false" aria-controls="paper-view" data-thumb>
             <span class="thumb-img" aria-hidden="true" data-thumb-img></span>
-            <span class="thumb-t"><b>Taqueria Sol receipt</b><small>Read from a photo</small></span>
+            <span class="thumb-t"><b>Taqueria Sol receipt</b><small data-paper-tag></small></span>
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <p class="pane-label"><span>The receipt</span><span data-paper-tag></span></p>
+          <p class="pane-label"><span data-paper-tag></span></p>
           <div class="paper-view" id="paper-view"><div class="paper" data-paper></div></div>
         </div>
         <div class="snap-card" data-card>
-          <div class="snap-body">
-          <div class="snap-sum" data-sum>
-            <div class="mini">
-              <span class="mini-tz"><span>You spent</span><b class="money" data-sum-mine>&nbsp;</b></span>
-            </div>
-            <ul class="snap-people" role="list" data-people></ul>
-            <span class="snap-progress" aria-hidden="true"><i data-progress></i></span>
-          </div>
+          <ul class="snap-people" role="list" data-people></ul>
           <ol class="snap-items" role="list" data-items></ol>
-          <button type="button" class="btn btn-quiet btn-sm snap-more" data-more hidden></button>
-          </div>
           <div class="snap-foot" data-foot></div>
           <p class="visually-hidden" aria-live="polite" data-live></p>
+          <p class="visually-hidden" id="faces-keys">Arrow keys move between people and lines.</p>
         </div>
       </div>
       <a class="snap-own" href="https://app.trezzit.com/split">Scan your own receipt <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m0 0l-4.5-4.5M15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -239,34 +190,31 @@
   </div>
 </section>
 
-<!-- 4 · AI -->
-<section class="sec sec-ai" id="ai" aria-labelledby="ai-h">
-  <div class="wrap ai-grid">
-    <div class="ai-copy">
-      <h2 id="ai-h" class="reveal">Or just ask.</h2>
-      <p class="lede reveal">Add Trezzit to Claude or ChatGPT once. Then send it receipts and statements.</p>
-      <div class="prompts reveal" role="group" aria-label="Try a prompt">
-        <button type="button" class="prompt" data-script="match" aria-pressed="true">What&rsquo;s missing from Trezzit?</button>
-        <button type="button" class="prompt" data-script="split" aria-pressed="false">Split this receipt with my roommates</button>
-        <button type="button" class="prompt" data-script="house" aria-pressed="false">Who owes who in the house?</button>
+<!-- 4 · Search every item: the bank searches store names, Trezzit searches what you bought -->
+<section class="sec sec-find" id="search" aria-labelledby="find-h">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <h2 id="find-h">Search every item.</h2>
+    </header>
+
+    <div class="pair pair-find reveal" data-find>
+      <div class="pane-bank fb">
+        <p class="pane-label"><span>Your bank</span><span>October</span></p>
+        <p class="fb-q" aria-hidden="true"><svg viewBox="0 0 20 20"><circle cx="8.75" cy="8.75" r="5.25" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12.75 12.75L16.5 16.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span data-bank-q>chips</span></p>
+        <div class="fb-res" data-bank-res></div>
       </div>
-    </div>
-    <div class="chat reveal" data-chat>
-      <div class="chat-h">
-        <span class="chat-title">Example</span>
-        <span class="chat-conn"><i aria-hidden="true"></i>Trezzit connected</span>
-        <button type="button" class="chat-ctl" data-ctl data-state="replay" aria-label="Replay the conversation"></button>
+      <div class="pane-tz ft">
+        <p class="pane-label tz"><span>Trezzit</span></p>
+        <label class="sd-q"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.75" cy="8.75" r="5.25" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12.75 12.75L16.5 16.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="visually-hidden">Search every item you bought in October</span><input type="search" value="chips" placeholder="Search every item" autocomplete="off" spellcheck="false" data-search></label>
+        <p class="ft-try"><span>Try</span><button type="button" data-try>towels</button><button type="button" data-try>pharmacy</button><button type="button" data-try>rent</button></p>
+        <ul class="sd-results" role="list" aria-live="polite" data-results></ul>
       </div>
-      <div class="chat-log" data-log role="log" aria-label="Example conversation" aria-live="off"></div>
-      <p class="visually-hidden" aria-live="polite" data-chat-live></p>
-    </div>
-    <div class="ai-after reveal">
-      <ul class="trust" role="list">
-        <li>No bank login</li>
-        <li>Never moves money</li>
-        <li>What it adds shows in your activity log</li>
-      </ul>
-      <a class="btn btn-white connect-link" href="/mcp">Connect Claude or ChatGPT</a>
+      <div class="pane-bank fb-foot">
+        <span>Paid in October</span><b data-paid>&minus;3,343.61</b>
+      </div>
+      <div class="pane-tz ft-foot">
+        <span>You spent</span><b class="money" data-spent>$885.35</b>
+      </div>
     </div>
   </div>
 </section>
@@ -275,7 +223,6 @@
 <section class="sec sec-close" aria-labelledby="close-h">
   <div class="wrap close-in">
     <h2 id="close-h" class="close-line reveal">Everything you spend. One&nbsp;place.</h2>
-    <p class="close-ai reveal">Every item, alone or shared. Search any of it.</p>
     <div class="ctas reveal">
       <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
     </div>

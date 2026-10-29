@@ -25,10 +25,12 @@
       <svg viewBox="0 0 120 120" width="22" height="22" aria-hidden="true" fill="currentColor"><polygon points="10.56,85.55 109.44,24.22 109.44,35.03 10.56,96.58" fill-opacity=".64"/><path d="M10 8.8h100v10.26H10zM45.42 8.8h9.07v81.23h-9.07zM64.69 30.01h9.08v81.17h-9.08zM10 100.92h100v10.26H10z"/></svg>
       <span>Trezzit</span>
     </a>
-    <ol class="pg-steps" aria-label="Steps">
-      <li><a href="#scan">1 Scan</a></li>
-      <li><a href="#split">2 Split</a></li>
-    </ol>
+    <nav class="pg-nav" aria-label="Steps">
+      <ol class="pg-steps" role="list">
+        <li><a href="#scan" aria-current="step">1 Scan</a></li>
+        <li><a href="#split">2 Split</a></li>
+      </ol>
+    </nav>
     <div class="nav-cta">
       <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
       <a class="btn btn-primary btn-sm" href="https://app.trezzit.com/signup">Sign up</a>
@@ -41,7 +43,6 @@
     <div class="wrap">
       <header class="pg-head">
         <h1 id="pg-title" class="h2">Try a receipt.</h1>
-        <p class="sub">Scan it, then split it.</p>
       </header>
       <div class="scan-demo" id="scan-demo"><noscript><p class="sub">This playground needs JavaScript.</p></noscript></div>
     </div>
@@ -64,14 +65,15 @@
         <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
         <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
       </div>
+      <a class="pg-ai" href="/mcp">Next time, ask Claude or ChatGPT</a>
     </div>
   </section>
 </main>
 
 <footer class="pg-foot">
   <div class="wrap">
-    <p>Sample receipts are made up. Your own photo is scanned only on trezzit.com, after you agree to send it to Google Gemini. <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/support">Support</a></p>
-    <p>Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
+    <p>Sample receipts are made up. Your own photo is scanned only on trezzit.com, after you agree to send it to Google Gemini. Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
+    <nav class="pg-links" aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/support">Support</a></nav>
   </div>
 </footer>
 </body>

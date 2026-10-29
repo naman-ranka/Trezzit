@@ -2,9 +2,10 @@
 import { $, $$, esc, money, icon, tweenMoney, announce } from './ui.js';
 import { getWorld, getSample, PEOPLE, itemName, splitWith, cents } from './world.js';
 
+// Four curated rows are the demo; the rest of the receipt is one quiet line, never a wall of avatars.
 const BILLS = {
-  'green-basket': { payer: 'you', group: 'Flat 3B', order: [13, 9, 10, 11, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8], visible: 4, moreLabel: (n) => `${n} more items` },
-  'taqueria-sol': { payer: 'alex', group: 'Thursday dinners', order: [0, 1, 2, 3, 4, 5, 6], visible: 7, moreLabel: (n) => `${n} more items` },
+  'green-basket': { payer: 'you', group: 'Flat 3B', thumb: 'assets/thumb-green-basket.webp', order: [13, 9, 10, 11, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8], visible: 4 },
+  'taqueria-sol': { payer: 'alex', group: 'Dinner crew', thumb: 'assets/thumb-taqueria.webp', order: [0, 1, 2, 3, 4, 5, 6], visible: 7 },
 };
 // The same rows up front at every width (so "10 more items" never changes with the screen).
 const visibleRows = (cfg) => cfg.visible;
@@ -23,7 +24,7 @@ export async function initSplit() {
 
   function load(id) {
     const s = getSample(id);
-    state = { id, s, cfg: BILLS[id], scan: w.scans[id].bill, sets: defaults(id), open: false, settled: 0 };
+    state = { id, s, cfg: BILLS[id], scan: w.scans[id].bill, sets: defaults(id), open: false };
     tabs.forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.bill === id)));
     render();
   }
@@ -46,7 +47,7 @@ export async function initSplit() {
     const r = compute();
     const { cfg, s } = state;
     const vis = visibleRows(cfg);
-    const shown = state.open ? cfg.order : cfg.order.slice(0, vis);
+    const shown = cfg.order.slice(0, vis);
     const hidden = cfg.order.length - shown.length;
     const rows = shown.map((i) => {
       const it = r.items.find((x) => x.index === i);
@@ -62,7 +63,10 @@ export async function initSplit() {
     }).join('');
     const tip = r.items.find((x) => x.itemType === 'Tip');
     const tipRow = tip ? `<div class="sitem extra"><span class="nm">Tip</span><span class="pr money">${money(tip.totalCents)}</span><span class="meta" data-meta="tip">${esc(tipMeta(tip))}</span></div>` : '';
-    const more = hidden ? `<button class="show-more" type="button" data-more>${esc(cfg.moreLabel(hidden))}</button>` : '<span></span>';
+    const more = hidden ? `<span class="more-note">+ ${hidden} more items</span>` : '<span></span>';
+    // The scan is where the rows came from: the receipt, read and checked, heads the list.
+    const nItems = r.items.filter((x) => x.itemType !== 'Tip').length;
+    const head = `<div class="split-head"><img src="${cfg.thumb}" alt="" width="40" height="58"><span class="t"><b>${esc(s.title)}</b><span>Scanned · ${nItems} items</span></span><span class="status ok">${icon('check')}Checked</span></div>`;
 
     const payer = cfg.payer;
     // "Owes you" is said once, as a label over the people who owe the payer.
@@ -79,23 +83,15 @@ export async function initSplit() {
 
     // Phones: one slim line of shares heads the list, so every cent moves right above where you tap.
     const bar = `<div class="sbar" aria-hidden="true"><span class="sbar-row">${s.people.map((p) => `<span class="sp" data-sp="${p}"><span class="av" style="--c:${PEOPLE[p].color}">${p === 'you' ? 'You' : PEOPLE[p].initials}</span><b class="money" data-samt="${p}" data-cents="${r.people[p].cents}">${money(r.people[p].cents)}</b></span>`).join('')}</span></div>`;
-    host.innerHTML = `<div class="panel split-items">${bar}<div data-rows>${rows}${tipRow}</div>
-        <div class="split-foot">${more}<button class="reset-link" type="button" data-split-reset>Reset</button></div></div>
-      <div class="panel totals" aria-live="off"><h3>${esc(s.title)} · ${esc(cfg.group)}</h3>${people}
-        <div class="check-line" data-check>${checkText(r)}</div>
-        <div class="settle" data-settle>${settleHtml(r)}</div></div>`;
-    $('[data-more]', host)?.addEventListener('click', () => { state.open = true; render(); $(`[data-row="${cfg.order[vis]}"] button`, host)?.focus(); });
+    host.innerHTML = `<div class="panel split-items">${head}${bar}<div data-rows>${rows}${tipRow}</div>
+        <div class="split-foot">${more}<span class="check-line sm" data-check aria-hidden="true">${checkText(r)}</span><button class="reset-link" type="button" data-split-reset>Reset</button></div></div>
+      <div class="panel totals" aria-live="off"><h3>${esc(cfg.group)}</h3>${people}
+        <div class="check-line" data-check>${checkText(r)}</div></div>`;
   }
 
-  /* The flat's running balance with Maya: this receipt plus the rest of Flat 3B (she paid Netflix).
-     Settling up records that she paid you back; Trezzit never moves money. */
-  const flatBase = () => (w.net.maya || 0) - (w.scans['green-basket'].split.people.maya?.cents || 0);
-  function settleHtml(r) {
-    if (state.id !== 'green-basket') return '';
-    const owed = flatBase() + r.people.maya.cents;
-    if (state.settled) return `<span class="done">${icon('check')}Maya paid you ${money(state.settled)} · recorded</span>`;
-    if (owed <= 0) return `<span>Flat 3B: you owe Maya ${money(-owed)}</span>`;
-    return `<span>Flat 3B balance: Maya owes you <b class="money">${money(owed)}</b></span><button type="button" class="settle-btn" data-settle-up data-owed="${owed}">Settle up</button>`;
+  /* The October list below is the same list: tell it when this receipt's split changes. */
+  function publish(r) {
+    if (state.id === 'green-basket') document.dispatchEvent(new CustomEvent('d:split', { detail: { id: state.id, split: r } }));
   }
 
   function tipMeta(tip) {
@@ -120,22 +116,13 @@ export async function initSplit() {
       }
       tweenMoney(b, r.people[p].cents);
     });
-    state.settled = 0;
-    const st = $('[data-settle]', host); if (st) st.innerHTML = settleHtml(r);
-    const ch = $('[data-check]', host);
-    ch.innerHTML = checkText(r); ch.classList.toggle('bad', !r.check.ok);
+    publish(r);
+    $$('[data-check]', host).forEach((ch) => { ch.innerHTML = checkText(r); ch.classList.toggle('bad', !r.check.ok); });
     announce(state.s.people.map((p) => `${p === 'you' ? 'You' : PEOPLE[p].name} ${money(r.people[p].cents)}`).join(', ') + `. Adds up to ${money(r.check.sumCents)}.`);
   }
 
   host.addEventListener('click', (e) => {
-    if (e.target.closest('[data-split-reset]')) { load(state.id); $('[data-split-reset]', host)?.focus(); return; }
-    const su = e.target.closest('[data-settle-up]');
-    if (su) {
-      state.settled = Number(su.dataset.owed);
-      $('[data-settle]', host).innerHTML = settleHtml(compute());
-      announce(`Recorded: Maya paid you ${money(state.settled)}.`);
-      return;
-    }
+    if (e.target.closest('[data-split-reset]')) { load(state.id); publish(compute()); $('[data-split-reset]', host)?.focus(); return; }
     const b = e.target.closest('button[data-p]');
     if (!b) return;
     $$('button', b.parentElement).forEach((x) => { x.tabIndex = x === b ? 0 : -1; });

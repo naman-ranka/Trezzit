@@ -30,6 +30,8 @@ const checkLI = (c, i, pending) => `<li class="${c.passed ? 'ok' : 'warn'}${pend
  *  splitTarget: selector the "Split this receipt" button scrolls to (omit to hide it).
  */
 export function mountScan(root, opts = {}) {
+  // one mount per frame: a second call would rewrite the markup under a running scan
+  if (root._scan) return root._scan;
   ensureReceiptStyles();
   const ids = opts.samples || ['green-basket', 'taqueria-sol', 'corner-pharmacy', 'monthly-rent'];
   const base = new URL('../assets/', import.meta.url).href;
@@ -50,7 +52,7 @@ export function mountScan(root, opts = {}) {
       </div>
       <div class="scan-out">
         <div class="so-head">
-          <p class="so-status" aria-live="polite"><span class="dot"></span><span class="txt">Pick a receipt</span></p>
+          <p class="so-status" aria-live="polite"><span class="dot"></span><span class="txt"></span></p>
           <p class="so-store"></p>
         </div>
         <ol class="so-items" aria-label="Items read from the receipt"></ol>
@@ -273,15 +275,15 @@ export function mountScan(root, opts = {}) {
   const first = opts.initial || ids[0];
   sampleBill(first).then(({ raw, bill }) => {
     if (root.dataset.stage) return;
-    press(first);
     showPaper(receiptHTML(raw, { sample: getSample(first), shadow: false }));
     reset(storeLine(raw.receipt));
     layout(bill);
     setStage('idle');
-    statusEl.querySelector('.txt').textContent = 'Tap a receipt to scan it';
+    statusEl.querySelector('.txt').textContent = '';
     if (opts.autoplay !== false) onVisible(root, () => { if (root.dataset.stage === 'idle') run(first); }, { threshold: 0.45 });
   });
 
-  return { run, get last() { return last; } };
+  root._scan = { run, get last() { return last; } };
+  return root._scan;
 }
 let uid = 0;

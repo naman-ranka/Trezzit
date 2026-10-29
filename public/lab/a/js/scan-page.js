@@ -29,3 +29,12 @@ const scanned = liveModel ? Promise.resolve() : scanner.run(start, { instant: ar
 if (arriving) {
   Promise.all([play.ready, scanned]).then(() => requestAnimationFrame(() => $('#split').scrollIntoView()));
 }
+
+// the step nav marks where you are (aria-current="step")
+const steps = [...document.querySelectorAll('.pg-steps a')];
+if ('IntersectionObserver' in window && steps.length) {
+  new IntersectionObserver((es) => es.forEach((e) => {
+    const onSplit = e.isIntersecting;
+    steps.forEach((a) => { if ((a.hash === '#split') === onSplit) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current'); });
+  }), { rootMargin: '-45% 0px -45% 0px' }).observe($('#split'));
+}

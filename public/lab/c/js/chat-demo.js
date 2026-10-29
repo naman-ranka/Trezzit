@@ -9,9 +9,9 @@
  * the same data as the demos. */
 import { PEOPLE, CATEGORIES, LAST_MONTH, getSample, sampleBill, octoberLedger } from './data.js';
 import { splitSample } from '../../_kit/receipts.js';
-import { esc, money, icon, sleep, reduced, h } from './util.js';
+import { esc, money, icon, sleep, reduced, h, YOU_GLYPH } from './util.js';
 
-const av = (p, sz = 'sm') => `<span class="av av-${sz}" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span>`;
+const av = (p, sz = 'sm') => `<span class="av av-${sz}" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span>`;
 const thumb = (id) => new URL(`../assets/thumb-${id}.webp`, import.meta.url).href;
 
 async function buildScripts() {
@@ -62,9 +62,12 @@ async function buildScripts() {
         { t: 'ai', text: 'Here’s the draft. Save it to Apartment 3B?', wide: true },
         { t: 'user', text: 'Save it.', wait: 900, wide: true },
         { t: 'tool', name: 'Save the bill', wide: true },
-        // the draft card turns into the saved one in place: the end state shows card and answer together
-        { t: 'card', html: splitCard(true), replace: true },
+        // wide: the draft stays a draft in the log and the save is its own turn; phones drop the
+        // "Save it?" turn for room, so there the card flips to Saved in place
+        { t: 'card', html: splitCard(true), replace: true, narrowOnly: true },
         { t: 'ai', html: `Saved. Maya, Jordan and Sam owe you <b class="money">${money(owed)}</b>.` },
+        // the proof behind "you see everything it adds": the row the app's activity feed shows
+        { t: 'act', html: '<b>Activity</b> <span aria-hidden="true">·</span> Green Basket Market added by your AI <span aria-hidden="true">·</span> just now', narrow: { html: '<b>Activity</b> <span aria-hidden="true">·</span> Added by your AI <span aria-hidden="true">·</span> just now' } },
       ],
     },
     groceries: {
@@ -106,7 +109,7 @@ export async function mountChat(root, opts = {}) {
   const keys = opts.scripts || ['statement', 'split', 'groceries'];
   // phones: the panel must fit one screen under the nav, so long exchanges drop their optional turns
   const narrowMQ = matchMedia('(max-width: 479px)');
-  const stepsOf = (k) => S[k].steps.filter((st) => !(st.wide && narrowMQ.matches)).map((st) => (narrowMQ.matches && st.narrow ? { ...st, ...st.narrow } : st));
+  const stepsOf = (k) => S[k].steps.filter((st) => !(st.wide && narrowMQ.matches) && !(st.narrowOnly && !narrowMQ.matches)).map((st) => (narrowMQ.matches && st.narrow ? { ...st, ...st.narrow } : st));
   root.classList.add('chat');
   root.innerHTML = `
     <div class="chat-win">
@@ -153,6 +156,8 @@ export async function mountChat(root, opts = {}) {
         if (prev) { prev.querySelector('.tc').outerHTML = step.html; if (!instant) prev.classList.add('swap'); return prev; }
       }
       el = h(`<li class="msg card">${step.html}</li>`);
+    } else if (step.t === 'act') {
+      el = h(`<li class="msg act"><span class="act-i">${icon.check}</span><span>${step.html}</span></li>`);
     } else {
       el = h(`<li class="msg a"><p>${step.html || esc(step.text)}</p></li>`);
     }
@@ -228,6 +233,7 @@ export async function mountChat(root, opts = {}) {
         if (s.t === 'tool') await wait(220, my);
         if (s.t === 'card') await wait(160, my);
         if (s.t === 'ai') await wait(320, my);
+        if (s.t === 'act') await wait(500, my);
         const el = add(s, false);
         if (s.t === 'tool') { await wait(280, my); el.classList.add('done'); }
       }
