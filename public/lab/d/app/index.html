@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>The Trezzit app</title>
+<meta name="description" content="Recordings of the real Trezzit app: scan a receipt, split each item, see your share of everything.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="../../_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../../_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="../../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../css/d.css">
+<script type="module" src="../js/sub.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-replay" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c.6 4.4 2.6 6.4 7 7-4.4.6-6.4 2.6-7 7-.6-4.4-2.6-6.4-7-7 4.4-.6 6.4-2.6 7-7z" fill="currentColor" stroke="none"/><path d="M19 15.5c.25 1.6.9 2.25 2.5 2.5-1.6.25-2.25.9-2.5 2.5-.25-1.6-.9-2.25-2.5-2.5 1.6-.25 2.25-.9 2.5-2.5z" fill="currentColor" stroke="none" opacity=".55"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.4-3 8-7 9.5-4-1.5-7-5.1-7-9.5V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
+    <symbol id="i-unplug" viewBox="0 0 24 24"><path d="M7 17l-3 3M17 7l3-3M9.5 9.5L8 8 5.5 10.5a3.5 3.5 0 0 0 0 5l3 3a3.5 3.5 0 0 0 5 0L16 16l-1.5-1.5M14.5 9.5L16 8M10.5 13.5L12 12"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10l9-5 9 5M5 10v8M19 10v8M9.5 10v8M14.5 10v8M3 20h18"/></symbol>
+  </defs>
+</svg>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="brand" href="../" aria-label="Trezzit home"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
+    <a class="nav-link" href="../#scan">How it works</a>
+    <a class="nav-link" href="../app/" aria-current="page">The app</a>
+    <a class="nav-link" href="../connect/">AI apps</a>
+    <a class="nav-link show-sm" href="https://app.trezzit.com/login">Log in</a>
+    <a class="btn btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+  </div>
+</header>
+<main id="main">
+
+<section class="sub-hero">
+  <div class="wrap">
+    <span class="eyebrow">The app</span>
+    <h1>Everything you ask, you can tap.</h1>
+    <p class="sub">The same Trezzit, in your browser on any phone or computer. These are recordings of the real app.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <section class="chapter" aria-labelledby="ch1">
+    <div>
+      <span class="num">1 · Scan</span>
+      <h2 id="ch1">Snap the receipt. Every line comes back.</h2>
+      <p>Add expense, then Scan. Trezzit reads each item and checks it against the total.</p>
+      <span class="ask-mini"><small>Or ask your AI</small>“Scan this receipt.”</span>
+    </div>
+    <div class="stage"><div class="phone short">
+      <video muted playsinline loop preload="none" poster="../assets/scan-app-poster.webp" data-src="../assets/scan-app.mp4" data-webm="../assets/scan-app.webm" width="600" height="450" aria-label="Recording: the app reading a receipt and finding 14 items"></video>
+      <button class="media-btn" type="button" data-media-btn aria-label="Play recording"><svg class="i"><use href="#i-play"/></svg></button>
+    </div></div>
+  </section>
+
+  <section class="chapter flip" aria-labelledby="ch2">
+    <div>
+      <span class="num">2 · Split</span>
+      <h2 id="ch2">Tap who shared each item.</h2>
+      <p>Every item has its own split. Pennies land somewhere, so it always adds up: $4.06 three ways is $1.36, $1.35 and $1.35.</p>
+      <span class="ask-mini"><small>Or ask your AI</small>“Split it with my roommates.”</span>
+    </div>
+    <div class="stage"><div class="phone">
+      <video muted playsinline loop preload="none" poster="../assets/split-app-poster.webp" data-src="../assets/split-app.mp4" data-webm="../assets/split-app.webm" width="600" height="1220" aria-label="Recording: tapping three people on one item; $4.06 becomes $1.36, $1.35 and $1.35"></video>
+      <button class="media-btn" type="button" data-media-btn aria-label="Play recording"><svg class="i"><use href="#i-play"/></svg></button>
+    </div></div>
+  </section>
+
+  <section class="chapter" aria-labelledby="ch3">
+    <div>
+      <span class="num">3 · Save</span>
+      <h2 id="ch3">See who owes what, then save.</h2>
+      <p>Whoever paid gets the rest back. Everyone's share lands in their own spending.</p>
+    </div>
+    <div class="stage"><div class="phone short"><img src="../assets/review-app.webp" alt="Review expense screen: Alex Morgan paid $74.43; Jordan owes $21.98, Maya Chen $18.88, Sam Rivera $14.38; Alex gets $55.24 back" width="600" height="693" loading="lazy"></div></div>
+  </section>
+
+  <section class="chapter flip" aria-labelledby="ch4">
+    <div>
+      <span class="num">4 · Understand</span>
+      <h2 id="ch4">Your share of everything, in one list.</h2>
+      <p>Personal and shared together, each row showing what it was of. Search any item.</p>
+      <span class="ask-mini"><small>Or ask your AI</small>“What did I actually spend in October?”</span>
+    </div>
+    <div class="stage"><div class="phone crop">
+      <video muted playsinline loop preload="none" poster="../assets/ledger-poster.webp" data-src="../assets/ledger.mp4" data-webm="../assets/ledger.webm" width="600" height="1298" aria-label="Recording: scrolling the Expenses list, each row showing your share of the bill"></video>
+      <button class="media-btn" type="button" data-media-btn aria-label="Play recording"><svg class="i"><use href="#i-play"/></svg></button>
+    </div></div>
+  </section>
+</div>
+
+<section class="close" aria-labelledby="close-h">
+  <div class="wrap">
+    <h2 id="close-h">See what you actually spent.</h2>
+    <p>Works in your browser. No bank login needed.</p>
+    <div class="ctas">
+      <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+      <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split"><span class="hide-sm">Split a bill, no account</span><span class="only-sm">Split a bill</span></a>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div class="row1">
+      <a class="brand" href="../"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
+      <span>Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></span>
+    </div>
+    <nav aria-label="Footer">
+      <a href="https://app.trezzit.com/split">Split a bill</a>
+      <a href="../connect/">AI apps</a>
+      <a href="../app/">The app</a>
+      <a href="https://app.trezzit.com/login">Log in</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/your-data">Your data</a>
+      <a href="/delete-account">Delete account</a>
+      <a href="/support">Support</a>
+    </nav>
+    <p>Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
+  </div>
+</footer>
+</body>
+</html>

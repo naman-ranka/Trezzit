@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Trezzit: see what you actually spent, item by item</title>
+<meta name="description" content="Your bank shows what you paid. Trezzit shows what you spent: every item, alone or shared. Split any bill in a minute.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="../_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../_kit/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="../_kit/receipts/receipt.css" data-tz-receipt>
+<link rel="stylesheet" href="css/b.css">
+<script>document.documentElement.classList.add('js');</script>
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" data-nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="./" aria-label="Trezzit home">
+      <img src="../_kit/brand/trezzit-mark.svg" alt="" width="28" height="28"><span>Trezzit</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="scenarios/" class="hide-sm">Scenarios</a>
+      <a href="/mcp" class="hide-sm">AI apps</a>
+      <a href="https://app.trezzit.com/login" class="hide-xs">Log in</a>
+      <a href="https://app.trezzit.com/signup" class="btn btn-primary btn-sm">Sign up</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- 1 · Hero: the proof, drawn -->
+<section class="hero" aria-labelledby="h1">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow hero-eyebrow">Everything you spend, in one place</p>
+      <h1 id="h1" class="display">See what you actually spent.</h1>
+      <p class="lede">Your bank shows what you paid. Trezzit shows what you spent.</p>
+      <div class="ctas">
+        <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+        <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
+      </div>
+      <p class="micro">No bank login needed. Trezzit never moves money.</p>
+    </div>
+
+    <figure class="proof" aria-labelledby="proof-cap" data-proof data-view="trezzit">
+      <div class="proof-bar">
+        <span class="proof-hint" id="vt-hint">View as</span>
+        <div class="vt" role="group" aria-labelledby="vt-hint" data-vt data-vt-hero>
+          <button type="button" data-set-view="bank" aria-pressed="false"><span class="vt-bank">Bank</span></button>
+          <button type="button" data-set-view="trezzit" aria-pressed="true"><span>Trezzit</span></button>
+          <i class="vt-thumb" aria-hidden="true"></i>
+        </div>
+        <button type="button" class="icon-btn" data-replay-hero aria-label="Replay the animation">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10a5.5 5.5 0 105.5-5.5H7m0 0l2.2-2.2M7 4.5l2.2 2.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="pair pair-hero" data-hero>
+        <div class="pane-bank">
+          <p class="pane-label"><span>Your bank</span><span>Checking ··4242</span></p>
+          <ol class="pb-lines" role="list">
+            <li class="ctx"><span>OCT 26</span><span>COFFEE CART</span><span>&minus;4.75</span></li>
+            <li class="ctx"><span>OCT 25</span><span>METRO TRANSIT</span><span>&minus;2.90</span></li>
+            <li class="focal"><span>OCT 24</span><span>GREEN BASKET MKT</span><span>&minus;100.00</span><em>Shopping · 1 line</em></li>
+            <li class="ctx"><span>OCT 23</span><span>CITY PARKING</span><span>&minus;6.00</span></li>
+            <li class="ctx"><span>OCT 20</span><span>CORNER PHARMACY</span><span>&minus;48.22</span></li>
+            <li class="ctx"><span>OCT 17</span><span>CORNER CAFE</span><span>&minus;9.70</span></li>
+            <li class="ctx"><span>OCT 11</span><span>PINES CABIN RENTALS</span><span>&minus;540.00</span></li>
+          </ol>
+        </div>
+        <div class="pane-tz">
+          <span class="seam" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4 10h11m0 0l-4.5-4.5M15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <p class="pane-label tz"><span>Trezzit</span><span>Oct 24 · 14 items</span></p>
+          <p class="pt-merchant">Green Basket Market</p>
+          <p class="pt-label">You spent</p>
+          <p class="pt-amount money" data-hero-amt data-cents="3000">$30.00</p>
+          <p class="pt-of">of <span class="money">$100.00</span> · you paid</p>
+          <div class="catbar" aria-hidden="true"><i style="flex-grow:22;--c:#059669"></i><i style="flex-grow:8;--c:#2461bd"></i></div>
+          <ul class="cats" role="list">
+            <li><span class="dot" style="--c:#059669"></span><span>Groceries <small>11 items</small></span><span class="money">$22.00</span></li>
+            <li><span class="dot" style="--c:#2461bd"></span><span>Household <small>towels, 4 ways</small></span><span class="money">$8.00</span></li>
+          </ul>
+          <p class="pt-owe">
+            <span class="avs" aria-hidden="true"><span class="av sm" style="--c:#0d9488">M</span><span class="av sm" style="--c:#b45309">J</span><span class="av sm" style="--c:#7c3aed">S</span></span>
+            <span>Roommates owe you</span><b class="money money-in">$70.00</b>
+          </p>
+          <div class="bank-knows" aria-hidden="true">
+            <p class="bk-big">That&rsquo;s all your bank knows.</p>
+            <p class="bk-small">One line. One category. No items, no shares.</p>
+          </div>
+        </div>
+      </div>
+      <figcaption id="proof-cap" class="proof-cap"><span class="cap-paid">Paid $100.</span> <span class="cap-spent">Spent $30.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 2 · One statement, two stories -->
+<section class="sec sec-stmt" id="statement" aria-labelledby="stmt-h">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <p class="eyebrow">Shared · Personal · Recurring</p>
+      <h2 id="stmt-h">One statement. Two stories.</h2>
+      <p class="lede">Your October, both ways. Tap a charge to see what was inside.</p>
+    </header>
+
+    <div class="filters reveal" role="group" aria-label="Show">
+      <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" class="chip" data-filter="shared" aria-pressed="false">Shared</button>
+      <button type="button" class="chip" data-filter="personal" aria-pressed="false">Personal</button>
+      <button type="button" class="chip" data-filter="recurring" aria-pressed="false">Recurring</button>
+    </div>
+
+    <div class="stmt reveal" data-stmt>
+      <div class="srow shead" aria-hidden="true">
+        <span class="sb"><span>Your bank</span><span>Checking ··4242 · October</span></span>
+        <span class="st"><span>Trezzit</span><span>What you spent</span></span>
+      </div>
+      <ol class="srows" role="list">
+        <li class="srow" data-id="groceries" data-kind="shared">
+          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-groceries">
+            <span class="sb"><span class="sb-d">OCT 24</span><span class="sb-m">GREEN BASKET MKT</span><span class="sb-a">&minus;100.00</span></span>
+            <span class="st"><span class="kind kind-shared" title="Shared"></span><span class="st-t"><b>Groceries with roommates</b><small>Groceries $22.00 · Household $8.00</small></span><span class="st-a"><b class="money">$30.00</b><small>of $100.00</small></span><span class="chev" aria-hidden="true"></span></span>
+          </button>
+          <div class="sdetail" id="sd-groceries" hidden></div>
+        </li>
+        <li class="srow" data-id="dinner" data-kind="shared">
+          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-dinner">
+            <span class="sb sb-none"><span class="sb-d">OCT 18</span><span class="sb-m">Nothing. Alex paid.</span><span class="sb-a">&nbsp;</span></span>
+            <span class="st"><span class="kind kind-shared" title="Shared"></span><span class="st-t"><b>Dinner a friend paid</b><small>Dining out · Alex paid $84.87</small></span><span class="st-a"><b class="money">$27.03</b><small>you owe Alex</small></span><span class="chev" aria-hidden="true"></span></span>
+          </button>
+          <div class="sdetail" id="sd-dinner" hidden></div>
+        </li>
+        <li class="srow" data-id="pharmacy" data-kind="personal">
+          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-pharmacy">
+            <span class="sb"><span class="sb-d">OCT 20</span><span class="sb-m">CORNER PHARMACY</span><span class="sb-a">&minus;48.22</span></span>
+            <span class="st"><span class="kind kind-personal" title="Personal"></span><span class="st-t"><b>A pharmacy run, just yours</b><small>Health · Personal care · Gifts · Groceries</small></span><span class="st-a"><b class="money">$48.22</b><small>all yours</small></span><span class="chev" aria-hidden="true"></span></span>
+          </button>
+          <div class="sdetail" id="sd-pharmacy" hidden></div>
+        </li>
+        <li class="srow" data-id="rent" data-kind="recurring">
+          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-rent">
+            <span class="sb"><span class="sb-d">OCT 01</span><span class="sb-m">TRANSFER OAK ST PROPERTY</span><span class="sb-a">&minus;2,632.40</span></span>
+            <span class="st"><span class="kind kind-recurring" title="Recurring"></span><span class="st-t"><b>Rent and bills</b><small>Every month · rent, utilities, internet</small></span><span class="st-a"><b class="money">$639.35</b><small>of $2,632.40</small></span><span class="chev" aria-hidden="true"></span></span>
+          </button>
+          <div class="sdetail" id="sd-rent" hidden></div>
+        </li>
+        <li class="srow" data-id="streaming" data-kind="recurring">
+          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-streaming">
+            <span class="sb"><span class="sb-d">OCT 03</span><span class="sb-m">STREAMBOX.TV</span><span class="sb-a">&minus;22.99</span></span>
+            <span class="st"><span class="kind kind-recurring" title="Recurring"></span><span class="st-t"><b>Streaming, split four ways</b><small>Every month · Subscriptions</small></span><span class="st-a"><b class="money">$5.75</b><small>of $22.99</small></span><span class="chev" aria-hidden="true"></span></span>
+          </button>
+          <div class="sdetail" id="sd-streaming" hidden></div>
+        </li>
+        <li class="srow" data-id="trip" data-kind="shared">
+          <button type="button" class="srow-btn" aria-expanded="false" aria-controls="sd-trip">
+            <span class="sb"><span class="sb-d">OCT 11</span><span class="sb-m">PINES CABIN RENTALS</span><span class="sb-a">&minus;540.00</span></span>
+            <span class="st"><span class="kind kind-shared" title="Shared"></span><span class="st-t"><b>A weekend away</b><small>Travel · four of you</small></span><span class="st-a"><b class="money">$135.00</b><small>of $540.00</small></span><span class="chev" aria-hidden="true"></span></span>
+          </button>
+          <div class="sdetail" id="sd-trip" hidden></div>
+        </li>
+      </ol>
+      <div class="srow sfoot">
+        <span class="sb"><span>Paid</span><span class="sb-a" data-paid>&minus;3,343.61</span></span>
+        <span class="st"><span>You spent</span><b class="money" data-spent data-cents="88535">$885.35</b></span>
+      </div>
+    </div>
+    <p class="more reveal"><a href="scenarios/">All scenarios, full size <span aria-hidden="true">&rarr;</span></a></p>
+
+    <div class="inapp reveal">
+      <figure class="inapp-media">
+        <div class="app-frame">
+          <video data-video muted playsinline loop preload="none" poster="assets/ledger-rows-poster.webp" width="600" height="760" aria-label="The Trezzit app: a list of expenses, each row showing your share and, under it, the whole bill">
+            <source src="assets/ledger-rows.mp4" type="video/mp4">
+          </video>
+        </div>
+        <button type="button" class="media-btn" data-video-btn aria-label="Pause the video">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="5.5" y="4.5" width="3" height="11" rx="1" fill="currentColor"/><rect x="11.5" y="4.5" width="3" height="11" rx="1" fill="currentColor"/></svg>
+        </button>
+      </figure>
+      <div class="inapp-copy">
+        <p class="inapp-title">The same, in the app.</p>
+        <p>Your share is the big number on every row. The whole bill sits under it.</p>
+        <p class="inapp-cap">The Trezzit app, from a test account.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · Snap it. Split it. -->
+<section class="sec sec-snap" id="snap" aria-labelledby="snap-h">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <h2 id="snap-h">Snap it. Split it.</h2>
+      <p class="lede">Trezzit reads every line of the receipt. Tap a face to take someone off a line. Tax and tip follow what each person had.</p>
+    </header>
+
+    <div class="snap" data-snap>
+      <div class="snap-top">
+        <div class="snap-picks" role="group" aria-label="Sample receipts">
+          <button type="button" class="pick" data-sample="taqueria-sol" aria-pressed="true"><b>Taqueria Sol</b><span>Alex paid · $84.87</span></button>
+          <button type="button" class="pick" data-sample="green-basket" aria-pressed="false"><b>Green Basket</b><span>Groceries · $100.00</span></button>
+          <button type="button" class="pick" data-sample="monthly-rent" aria-pressed="false"><b>Monthly rent</b><span>Every month · $2,632.40</span></button>
+          <button type="button" class="pick" data-sample="corner-pharmacy" aria-pressed="false"><b>Corner Pharmacy</b><span>Just you · $48.22</span></button>
+        </div>
+        <a class="snap-own" href="https://app.trezzit.com/split">Scan your own receipt <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m0 0l-4.5-4.5M15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+
+      <div class="snap-grid">
+        <div class="snap-paper">
+          <p class="pane-label"><span>The receipt</span><span data-paper-tag></span></p>
+          <div class="paper-view"><div class="paper" data-paper></div></div>
+        </div>
+        <div class="snap-card" data-card>
+          <div class="snap-sum" data-sum>
+            <div class="mini">
+              <span class="mini-bank"><span data-sum-bank>&nbsp;</span><b data-sum-bank-amt></b></span>
+              <span class="mini-tz"><span>You spent</span><b class="money" data-sum-mine>&nbsp;</b></span>
+            </div>
+            <ul class="snap-people" role="list" data-people></ul>
+          </div>
+          <p class="snap-status" data-status aria-live="polite">&nbsp;</p>
+          <ol class="snap-items" role="list" data-items></ol>
+          <button type="button" class="btn btn-quiet btn-sm snap-more" data-more hidden></button>
+          <div class="snap-foot" data-foot></div>
+          <p class="visually-hidden" aria-live="polite" data-live></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · AI -->
+<section class="sec sec-ai" id="ai" aria-labelledby="ai-h">
+  <div class="wrap ai-grid">
+    <div class="ai-copy reveal">
+      <h2 id="ai-h">Or just ask.</h2>
+      <p class="lede">Connect Claude or ChatGPT to Trezzit. Ask it to scan, split, record, or tell you what you spent.</p>
+      <div class="prompts" role="group" aria-label="Try a prompt">
+        <button type="button" class="prompt" data-script="match" aria-pressed="true">Check my statement</button>
+        <button type="button" class="prompt" data-script="spent" aria-pressed="false">What did I actually spend in October?</button>
+        <button type="button" class="prompt" data-script="split" aria-pressed="false">Split this receipt with my roommates</button>
+        <button type="button" class="prompt" data-script="rent" aria-pressed="false">Add our rent every month</button>
+      </div>
+      <ul class="trust" role="list">
+        <li>Never moves money</li>
+        <li>Shows a preview before it saves</li>
+        <li>Everything your AI adds shows in your activity log</li>
+        <li>No bank login. You bring the statement.</li>
+      </ul>
+      <div class="connect">
+        <a class="btn btn-light" href="/mcp">How to connect <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m0 0l-4.5-4.5M15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="url">
+          <code id="mcp-url">https://api.trezzit.com/api/mcp</code>
+          <button type="button" class="copy" data-copy="https://api.trezzit.com/api/mcp" aria-describedby="mcp-url">Copy</button>
+        </div>
+      </div>
+    </div>
+    <div class="chat reveal" data-chat>
+      <div class="chat-h">
+        <span class="chat-title">Your AI app</span>
+        <span class="chat-conn"><i aria-hidden="true"></i>Trezzit connected</span>
+        <button type="button" class="chat-ctl" data-ctl data-state="replay" aria-label="Replay the conversation"></button>
+      </div>
+      <div class="chat-log" data-log aria-live="off"></div>
+      <p class="chat-note">An example conversation. Your AI app shows its own interface.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · Vision -->
+<section class="sec sec-close" aria-labelledby="close-h">
+  <div class="wrap close-in">
+    <h2 id="close-h" class="close-line reveal">Everything you spend, in one place. Item by item.</h2>
+    <p class="close-ai reveal">Ask Claude or ChatGPT about any of it, or have it add the next one.</p>
+    <div class="ctas reveal">
+      <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+      <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <a class="brand" href="./"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24"><span>Trezzit</span></a>
+      <p>Track and split expenses, item by item.</p>
+    </div>
+    <nav aria-label="Footer" class="foot-links">
+      <a href="https://app.trezzit.com/split">Split a bill</a>
+      <a href="/mcp">AI apps</a>
+      <a href="scenarios/">Scenarios</a>
+      <a href="https://app.trezzit.com/login">Log in</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/your-data">Your data</a>
+      <a href="/delete-account">Delete account</a>
+      <a href="/support">Support</a>
+    </nav>
+    <p class="foot-small">&copy; 2026 Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></p>
+    <p class="foot-small">Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
+  </div>
+</footer>
+</body>
+</html>

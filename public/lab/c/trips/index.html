@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+  // Vercel (trailingSlash: false) serves this page without the slash; relative links need it.
+  if (!/\/$/.test(location.pathname)) history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('anim');
+  document.documentElement.classList.add('js');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Trips and dinners: tax and tip in proportion | Trezzit</title>
+<meta name="description" content="Each person pays for what they ordered, plus their fair part of tax and tip. Settle a whole trip in a few payments.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="../../_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../../_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="../../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../../_kit/receipts/receipt.css" data-tz-receipt>
+<link rel="stylesheet" href="../css/c.css">
+<script type="module" src="../js/trips.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="../" aria-label="Trezzit home"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="26" height="26"><span>Trezzit</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="../#how">How it works</a>
+      <a href="../#scenarios">For you</a>
+      <a href="../ai/">With AI</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
+      <a class="c-btn c-btn-sm c-btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+    </div>
+  </div>
+</header>
+<main id="main">
+<section class="sc-hero" aria-labelledby="sc-t">
+  <div class="wrap">
+    <a class="crumb" href="../"><span aria-hidden="true">←</span> Trezzit</a>
+    <p class="eyebrow" style="--c:#ea580c">Trips and dinners</p>
+    <h1 id="sc-t">Dinner for three. Tip in proportion.</h1>
+    <p class="lede">Each person pays for their order, plus a fair part of the tip.</p>
+    <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a></div>
+  </div>
+</section>
+
+<section class="sc-demo" aria-labelledby="demo-t">
+  <div class="wrap">
+    <header class="sec-head rv"><h2 id="demo-t">Flip the tip.</h2><p>In proportion or equally. Exact to the cent either way.</p></header>
+    <div class="verb-demo rv" style="background:#fdf5ee"><div class="demo-frame" id="split-demo"><noscript><p class="nojs">Taqueria Sol, $84.87: You $27.03, Alex $29.88, Priya $27.96.</p></noscript></div></div>
+  </div>
+</section>
+
+<section class="sc-demo" aria-labelledby="trip-t">
+  <div class="wrap">
+    <header class="sec-head rv"><h2 id="trip-t">A whole weekend, settled.</h2><p>Leave a bill out and watch the settle-up change.</p></header>
+    <div class="verb-demo rv" style="background:var(--wash)"><div class="demo-frame" id="trip-demo"><noscript><p class="nojs">You pay Alex $84.76. Priya pays Alex $165.46.</p></noscript></div></div>
+  </div>
+</section>
+
+<section class="inapp" aria-labelledby="app-t">
+  <div class="wrap inapp-grid">
+    <div class="rv">
+      <h2 id="app-t">Friends not on Trezzit? Send a link.</h2>
+      <p>Everyone opens the link, sees their share and marks it paid. <a href="https://app.trezzit.com/split">Split a bill, no account</a></p>
+    </div>
+    <figure class="shot"><img src="../assets/split-shared.webp" alt="A shared split page: you owe Maya $26.84 of $129.92, with everyone's share listed." width="640" height="1385" loading="lazy" decoding="async"><figcaption>A shared bill page</figcaption></figure>
+  </div>
+</section>
+
+<section class="inapp inapp-alt" aria-labelledby="app2-t">
+  <div class="wrap inapp-grid">
+    <div class="rv">
+      <h2 id="app2-t">In a group, balances keep up.</h2>
+      <p>Who owes whom across every bill, and each share still counts in its owner’s spending.</p>
+    </div>
+    <figure class="shot"><img src="../assets/app-trip.webp" alt="A trip group in the Trezzit app: you are owed $77.17; Leo, Maya and Priya each owe you." width="720" height="978" loading="lazy" decoding="async"><figcaption>From the Trezzit app</figcaption></figure>
+  </div>
+</section>
+<section class="next" aria-labelledby="next-t">
+  <div class="wrap">
+    <h2 id="next-t">More ways to use Trezzit</h2>
+    <ul role="list"><li><a href="../roommates/"><b>Roommates</b><span>Groceries for four, fair to the cent.</span></a></li><li><a href="../just-me/"><b>Just me</b><span>Just yours, still item by item.</span></a></li><li><a href="../recurring/"><b>Every month</b><span>Rent and Netflix, added for you.</span></a></li><li><a href="../ai/"><b>With your AI</b><span>Ask Claude or ChatGPT to do it.</span></a></li></ul>
+  </div>
+</section>
+<section class="close close-sm" aria-labelledby="close-t">
+  <div class="wrap">
+    <h2 id="close-t" class="close-t rv">See what you <span>actually</span> spent.</h2>
+    <div class="cta-row rv">
+      <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+      <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
+    </div>
+    <p class="micro rv">No bank login needed.</p>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="../"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="22" height="22"><span>Trezzit</span></a>
+      <nav aria-label="Footer">
+        <ul role="list">
+          <li><a href="../roommates/">Roommates</a></li><li><a href="../trips/">Trips</a></li><li><a href="../just-me/">Just me</a></li><li><a href="../recurring/">Every month</a></li><li><a href="../ai/">With AI</a></li>
+        </ul>
+        <ul role="list">
+          <li><a href="https://app.trezzit.com/split">Split a bill</a></li><li><a href="/mcp">AI apps</a></li><li><a href="https://app.trezzit.com/login">Log in</a></li><li><a href="https://app.trezzit.com/signup">Sign up</a></li>
+        </ul>
+        <ul role="list">
+          <li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="/your-data">Your data</a></li><li><a href="/delete-account">Delete account</a></li><li><a href="/support">Support</a></li>
+        </ul>
+      </nav>
+    </div>
+    <p class="foot-legal">Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></p>
+    <p class="foot-legal">Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Trezzit: see what you actually spent</title>
+<meta name="description" content="Your bank shows what you paid. Trezzit shows what you spent: every item, alone or shared. Split any bill in a minute.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="../_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="../_kit/receipts/receipt.css" data-tz-receipt>
+<link rel="stylesheet" href="css/d.css">
+<script>
+  document.documentElement.classList.add('js');
+  /* If the page script never boots, show the static end states. */
+  window.__dBoot = setTimeout(function () { document.documentElement.classList.remove('js'); }, 3500);
+</script>
+<link rel="modulepreload" href="js/ui.js">
+<link rel="modulepreload" href="js/chat.js">
+<link rel="modulepreload" href="js/world.js">
+<link rel="modulepreload" href="../_kit/receipts.js">
+<link rel="modulepreload" href="../_kit/split-engine.js">
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-replay" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c.6 4.4 2.6 6.4 7 7-4.4.6-6.4 2.6-7 7-.6-4.4-2.6-6.4-7-7 4.4-.6 6.4-2.6 7-7z" fill="currentColor" stroke="none"/><path d="M19 15.5c.25 1.6.9 2.25 2.5 2.5-1.6.25-2.25.9-2.5 2.5-.25-1.6-.9-2.25-2.5-2.5 1.6-.25 2.25-.9 2.5-2.5z" fill="currentColor" stroke="none" opacity=".55"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.4-3 8-7 9.5-4-1.5-7-5.1-7-9.5V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
+    <symbol id="i-unplug" viewBox="0 0 24 24"><path d="M7 17l-3 3M17 7l3-3M9.5 9.5L8 8 5.5 10.5a3.5 3.5 0 0 0 0 5l3 3a3.5 3.5 0 0 0 5 0L16 16l-1.5-1.5M14.5 9.5L16 8M10.5 13.5L12 12"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10l9-5 9 5M5 10v8M19 10v8M9.5 10v8M14.5 10v8M3 20h18"/></symbol>
+  </defs>
+</svg>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="Trezzit home"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
+    <a class="nav-link" href="#scan">How it works</a>
+    <a class="nav-link" href="app/">The app</a>
+    <a class="nav-link" href="connect/">AI apps</a>
+    <a class="nav-link show-sm" href="https://app.trezzit.com/login">Log in</a>
+    <a class="btn btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="hero" aria-labelledby="h1">
+  <div class="wrap">
+    <div>
+      <a class="pill-link" href="#ai"><span class="dot"><svg class="i"><use href="#i-spark"/></svg></span>Works with Claude and ChatGPT</a>
+      <h1 id="h1">See what you actually spent.</h1>
+      <p class="sub">Your bank shows what you paid. Trezzit shows what you spent: every item, in one place. Ask the app, or ask Claude or ChatGPT.</p>
+      <div class="ctas">
+        <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+        <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split"><span class="hide-sm">Split a bill, no account</span><span class="only-sm">Split a bill</span></a>
+      </div>
+      <p class="micro"><svg class="i"><use href="#i-shield"/></svg>No bank login needed. Trezzit never moves money.</p>
+    </div>
+
+    <div class="chat" id="hero-chat" role="region" aria-label="Example conversation with an AI assistant connected to Trezzit">
+      <div class="chat-head">
+        <span class="ai-avatar" aria-hidden="true"><svg class="i"><use href="#i-spark"/></svg></span>
+        <span class="chat-title"><b>Your AI assistant</b><span><i class="live-dot"></i>Trezzit connected</span></span>
+        <button class="ctl" type="button" data-chat-ctl><svg class="i" aria-hidden="true"><use href="#i-play"/></svg><span>Play</span></button>
+      </div>
+      <div class="chat-log" data-chat-log>
+        <!-- finished conversation: the page opens on this; Play replays it -->
+        <div class="msg user has-thumb"><img class="thumb" src="assets/thumb-green-basket.webp" alt="Receipt photo" width="40" height="58"><span>Split this with Maya, Jordan and Sam. Avocados and cold brew are mine, oat milk and kale chips are Maya's.</span></div><div class="tool"><span class="st ok"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><b>Trezzit</b><span class="res">Read 14 items and saved the split</span></div><div class="tcard"><div class="tcard-head"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt></span><span class="t"><b>Green Basket Market</b><span>Oct 24 · Flat 3B · you paid</span></span></div>
+    <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v money">−$100.00</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">$30.00</span></div></div>
+    <div class="catbar" aria-hidden="true"><i style="flex-grow:2200;background:#059669"></i><i style="flex-grow:800;background:#2461bd"></i></div>
+  <div class="legend"><span><i style="background:#059669"></i>Groceries <b class="money">$22.00</b></span><span><i style="background:#2461bd"></i>Household <b class="money">$8.00</b></span></div></div><div class="msg ai">Saved. You paid $100.00 and spent $30.00. Maya, Jordan and Sam owe you $70.00.</div>
+      </div>
+      <div class="chat-foot">
+        <div class="chips" role="group" aria-label="Try a question" data-chat-chips>
+          <button class="chip" type="button" data-script="split" aria-pressed="true">Split this receipt</button>
+          <button class="chip" type="button" data-script="october" aria-pressed="false">What did I spend in October?</button>
+          <button class="chip" type="button" data-script="rent" aria-pressed="false">Add rent every month</button>
+          <button class="chip" type="button" data-script="towels" aria-pressed="false">What did the towels cost me?</button>
+        </div>
+        <form class="composer" data-chat-form>
+          <label class="visually-hidden" for="hero-ask">Ask about an item or a category</label>
+          <input id="hero-ask" type="text" autocomplete="off" placeholder="Ask about an item, like avocados" enterkeyhint="send">
+          <button type="submit" aria-label="Send"><svg class="i"><use href="#i-send"/></svg></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCAN ============ -->
+<section class="turn" id="scan" aria-labelledby="scan-h">
+  <div class="wrap">
+    <div class="ask"><h2 id="scan-h">Scan this receipt.</h2></div>
+    <div class="reply"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt=""></span><p>Every line, checked against the total.</p></div>
+    <div class="stage">
+      <div class="toolbar">
+        <div class="seg grid2" role="group" aria-label="Pick a receipt" data-scan-picker>
+          <button type="button" data-sample="green-basket" aria-pressed="true">Groceries <span class="money">$100.00</span></button>
+          <button type="button" data-sample="corner-pharmacy" aria-pressed="false">Pharmacy <span class="money">$48.22</span></button>
+          <button type="button" data-sample="taqueria-sol" aria-pressed="false">Dinner <span class="money">$84.87</span></button>
+          <button type="button" data-sample="monthly-rent" aria-pressed="false">Rent <span class="money">$2,632.40</span></button>
+        </div>
+        <button class="btn btn-quiet" type="button" data-scan-own aria-label="Scan your own receipt"><svg class="i"><use href="#i-upload"/></svg><span class="hide-sm">Your receipt</span></button>
+      </div>
+      <div class="scan-grid">
+        <div class="paper" data-paper aria-hidden="true"><img src="assets/receipt-green-basket.webp" alt="" width="300" height="704" style="width:300px" loading="lazy" data-paper-static><div class="beam"></div></div>
+        <div class="panel result" data-result aria-live="polite">
+<div class="result-head"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt></span><span class="t"><b data-r-title>Green Basket Market</b><span data-r-sub>Oct 24, 2026 · 14 items</span></span><span class="status ok" data-r-status><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Checked</span></div>
+              <ol class="steps" data-r-steps><li class="done">Upload</li><li class="done">Read</li><li class="done">Check</li><li class="done">Done</li></ol>
+              <ul class="items" data-r-items><li class="seen"><span class="n">Eggs large 18ct</span><span class="a money">$5.48</span></li><li class="seen"><span class="n">Whole milk 1 gal</span><span class="a money">$4.28</span></li><li class="seen"><span class="n">Sourdough loaf</span><span class="a money">$5.96</span></li><li class="seen"><span class="n">Bananas</span><span class="a money">$1.44</span></li><li class="more seen"><button type="button" class="link-arrow" data-more>+ 10 more items</button></li></ul>
+              <div class="sums" data-r-sums><div><span>Subtotal</span><span class="money">$97.63</span></div><div><span>Tax</span><span class="money">$2.37</span></div><div class="tot"><span>Total</span><span class="money">$100.00</span></div></div>
+              <ul class="checks" data-r-checks><li class="seen"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Items add up to the subtotal</li><li class="seen"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Everything adds up to the total</li><li class="seen"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Tax lands on the right items</li></ul>
+              <div class="result-foot" data-r-foot><a class="link-arrow" href="#split" data-next>Split it <svg class="i" aria-hidden="true"><use href="#i-down"/></svg></a></div>
+            
+        </div>
+      </div>
+    </div>
+  </div>
+  <dialog class="sheet" data-scan-dialog aria-labelledby="own-h">
+    <form method="dialog">
+      <h3 id="own-h">Scan your own receipt</h3>
+      <p data-own-copy>Your photo is sent to Google Gemini to read it. Guest scans are kept for 90 days. <a href="/privacy">Privacy</a></p>
+      <div class="acts">
+        <button class="btn btn-quiet" value="cancel" type="submit">Cancel</button>
+        <label class="btn btn-primary" style="cursor:pointer"><input type="file" accept="image/*,application/pdf" class="visually-hidden" data-own-file>Choose a photo</label>
+      </div>
+    </form>
+  </dialog>
+</section>
+
+<!-- ============ SPLIT ============ -->
+<section class="turn" id="split" aria-labelledby="split-h">
+  <div class="wrap">
+    <div class="ask"><h2 id="split-h">Split it with my roommates.</h2></div>
+    <div class="reply"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt=""></span><p>Tap who shared what. Every cent adds up.</p></div>
+    <div class="stage">
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Pick a bill" data-split-tabs>
+          <button type="button" data-bill="green-basket" aria-pressed="true">Groceries<span class="hide-sm">· 4 people</span></button>
+          <button type="button" data-bill="taqueria-sol" aria-pressed="false">Dinner<span class="hide-sm">· 3 people</span></button>
+        </div>
+        <button class="btn btn-quiet" type="button" data-split-reset aria-label="Reset the split"><svg class="i"><use href="#i-replay"/></svg><span class="hide-sm">Reset</span></button>
+      </div>
+      <div class="split-grid" data-split>
+        <noscript><p class="panel card-pad">You $30.00 · Maya $30.00 · Jordan $20.00 · Sam $20.00. Adds up to $100.00.</p></noscript>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AI ============ -->
+<section class="night" id="ai" aria-labelledby="ai-h">
+  <div class="wrap">
+    <span class="eyebrow">Claude and ChatGPT</span>
+    <h2 id="ai-h">Ask your AI to do all of this.</h2>
+    <p class="lede">Connect Trezzit once. Then check, add and ask in plain words, statement in hand.</p>
+    <div class="night-grid">
+      <div class="chat" id="ai-chat" role="region" aria-label="Example: an AI assistant checks a bank statement against Trezzit">
+        <div class="chat-head">
+          <span class="ai-avatar" aria-hidden="true"><svg class="i"><use href="#i-spark"/></svg></span>
+          <span class="chat-title"><b>Your AI assistant</b><span><i class="live-dot"></i>Trezzit connected</span></span>
+          <button class="ctl" type="button" data-chat-ctl><svg class="i" aria-hidden="true"><use href="#i-play"/></svg><span>Play</span></button>
+        </div>
+        <div class="chat-log" data-chat-log>
+          <div class="msg user"><div class="attach"><span>october-statement.pdf</span></div>Here's my October statement. Is it all in Trezzit?</div><div class="tool"><span class="st ok"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><b>Trezzit</b><span class="res">3 payments in October, all matched</span></div><div class="msg ai">All three are in Trezzit. You paid $2,780.62 but spent $749.10: most of the rest is your roommates’ rent.</div><div class="msg user">Add $12.50 at the farmers market too. Cash, just mine.</div><div class="tool"><span class="st ok"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><b>Trezzit</b><span class="res">Personal expense, $12.50</span></div><div class="tcard"><div class="tcard-head"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt></span><span class="t"><b>Activity</b><span>Just now</span></span></div>
+    <div class="rows"><div class="row"><span class="n"><b style="color:var(--ink)">Farmers market</b> · Personal</span><span class="a money">$12.50</span></div>
+    <div class="row" style="padding-top:0"><span class="n m">Added by your AI app</span></div></div></div><div class="msg ai">Added. It’s in your Activity, marked as added by your AI app.</div>
+        </div>
+      </div>
+
+      <div class="connect">
+        <ol class="csteps">
+          <li><div><b>Copy the server URL</b>
+            <div class="urlbox"><code id="mcp-url">https://api.trezzit.com/api/mcp</code><button type="button" data-copy="https://api.trezzit.com/api/mcp" aria-describedby="mcp-url"><svg class="i"><use href="#i-copy"/></svg><span>Copy</span></button></div></div></li>
+          <li><div><b>Add it to your AI app</b>
+            <div class="seg" role="tablist" aria-label="AI app" data-tabs>
+              <button type="button" role="tab" aria-selected="true" aria-controls="t-claude" id="tb-claude">Claude</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="t-chatgpt" id="tb-chatgpt" tabindex="-1">ChatGPT</button>
+            </div>
+            <p role="tabpanel" id="t-claude" aria-labelledby="tb-claude" style="margin-top:10px"><strong>Settings → Connectors → Add custom connector.</strong> Name it Trezzit and paste the URL.</p>
+            <p role="tabpanel" id="t-chatgpt" aria-labelledby="tb-chatgpt" style="margin-top:10px" hidden>Search for <strong>Trezzit</strong> in the apps directory. Until it's listed, add it in <strong>developer mode</strong> with the URL.</p>
+          </div></li>
+          <li><div><b>Sign in and allow access</b><p>You choose what it can see and do.</p></div></li>
+        </ol>
+        <ul class="trust">
+          <li><svg class="i"><use href="#i-shield"/></svg>Never moves money</li>
+          <li><svg class="i"><use href="#i-eye"/></svg>Shows you before it saves</li>
+          <li><svg class="i"><use href="#i-list"/></svg>Everything it adds is in your Activity</li>
+          <li><svg class="i"><use href="#i-unplug"/></svg>Disconnect any time</li>
+        </ul>
+        <div>
+          <a class="link-arrow" href="connect/">Full setup, permissions and prompts <svg class="i"><use href="#i-arrow"/></svg></a>
+          <p class="fine">Custom connectors may need a paid plan in the AI app.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LEDGER ============ -->
+<section class="turn" id="october" aria-labelledby="october-h">
+  <div class="wrap">
+    <div class="ask"><h2 id="october-h">What did I actually spend in October?</h2></div>
+    <div class="reply"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt=""></span><p>Your share of everything, in one list.</p></div>
+    <div class="stage">
+      <div class="led" data-led><noscript><p class="panel card-pad">October: you paid $2,780.62 and spent $749.10. Rent $600.00, dining out $27.03, groceries $23.29, health $23.20, utilities $23.10, everything else $52.48.</p></noscript></div>
+    </div>
+    <p class="after"><a class="link-arrow" href="app/">See the real app <svg class="i"><use href="#i-arrow"/></svg></a></p>
+  </div>
+</section>
+
+<!-- ============ CLOSE ============ -->
+<section class="close" aria-labelledby="close-h">
+  <div class="wrap">
+    <h2 id="close-h">Everything you spend. In one place.</h2>
+    <p>Alone or shared, down to the item, one question away.</p>
+    <div class="ctas">
+      <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+      <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split"><span class="hide-sm">Split a bill, no account</span><span class="only-sm">Split a bill</span></a>
+    </div>
+    <p class="micro"><svg class="i"><use href="#i-shield"/></svg>No bank login needed. Trezzit never moves money.</p>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="row1">
+      <a class="brand" href="./"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
+      <span>Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></span>
+    </div>
+    <nav aria-label="Footer">
+      <a href="https://app.trezzit.com/split">Split a bill</a>
+      <a href="connect/">AI apps</a>
+      <a href="app/">The app</a>
+      <a href="https://app.trezzit.com/login">Log in</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/your-data">Your data</a>
+      <a href="/delete-account">Delete account</a>
+      <a href="/support">Support</a>
+    </nav>
+    <p>Example people, stores and amounts are made up. Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
+  </div>
+</footer>
+</body>
+</html>
