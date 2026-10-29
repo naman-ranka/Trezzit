@@ -972,3 +972,6 @@ ul.trust { gap: 8px 16px; }
   /* the three bank lines sit level with "You spent", so the arrow points from the line to the number */
   .pair-hero .pb-lines { margin-block: auto; padding-bottom: 28px; }
 }
+.scn-rail .chip[aria-pressed='true'] { color: #fff; background: var(--ink); border-color: var(--ink); }
+.page-scn .scn-hero { padding-bottom: 8px; }
+.page-scn .scn-list { padding-top: clamp(20px, 3vw, 36px); }
