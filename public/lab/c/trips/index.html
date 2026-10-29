@@ -20,6 +20,12 @@
 <link rel="stylesheet" href="../../_kit/tokens.css">
 <link rel="stylesheet" href="../../_kit/receipts/receipt.css" data-tz-receipt>
 <link rel="stylesheet" href="../css/c.css">
+<link rel="modulepreload" href="../js/util.js">
+<link rel="modulepreload" href="../js/data.js">
+<link rel="modulepreload" href="../js/page.js">
+<link rel="modulepreload" href="../../_kit/split-engine.js">
+<link rel="modulepreload" href="../../_kit/scan-client.js">
+<link rel="modulepreload" href="../../_kit/receipts.js">
 <script type="module" src="../js/trips.js"></script>
 </head>
 <body>
@@ -46,7 +52,7 @@
       <h1 id="sc-t">Dinner for three. Tip by what you ordered.</h1>
       <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a></div>
     </div>
-    <div class="sc-side"><div class="demo-frame" id="split-demo"><noscript><p class="nojs">Taqueria Sol, $84.87: You $27.03, Alex $29.88, Priya $27.96.</p></noscript></div></div>
+    <div class="sc-side"><div class="demo-frame res-trips" id="split-demo"><noscript><p class="nojs">Taqueria Sol, $84.87: You $27.03, Alex $29.88, Priya $27.96.</p></noscript></div></div>
   </div>
 </section>
 
@@ -74,7 +80,6 @@
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
       <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no sign-up</a>
     </div>
-    <p class="micro rv">No bank login needed.</p>
   </div>
 </section>
 </main>

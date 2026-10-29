@@ -19,7 +19,13 @@ export function initChrome() {
     const label = b.querySelector('span') || b;
     const was = label.textContent;
     try { await navigator.clipboard.writeText(b.dataset.copy); label.textContent = 'Copied'; }
-    catch { label.textContent = 'Select and copy'; }
+    catch {
+      // No clipboard access: select the URL instead and say how to copy it, without changing the button's width.
+      const code = b.parentElement.querySelector('code');
+      if (code) { const r = document.createRange(); r.selectNodeContents(code); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+      b.title = 'Selected. Press Ctrl+C or ⌘C to copy.';
+      return;
+    }
     setTimeout(() => { label.textContent = was; }, 1800);
   }));
 

@@ -57,9 +57,9 @@ export async function mountLedger(root, opts = {}) {
       <button type="button" class="c-link-btn lg-more">Show all ${cats.length} categories</button>
     </div>
     <div class="lg-find">
-      ${opts.compact ? '' : `<label class="lg-search">${icon.search}<span class="visually-hidden">Search your spending</span>
-        <input type="search" placeholder="Search items, stores, categories" autocomplete="off" spellcheck="false"></label>
-      <p class="lg-try"><span>Try</span>${chips.map((q) => `<button type="button" class="chip-q" data-q="${q}" aria-pressed="false">${q}</button>`).join('')}</p>`}
+      <label class="lg-search">${icon.search}<span class="visually-hidden">Search every item</span>
+        <input type="search" placeholder="${opts.compact ? 'Search any item, like “towels”' : 'Search items, stores, categories'}" autocomplete="off" spellcheck="false"></label>
+      ${opts.compact ? '' : `<p class="lg-try"><span>Try</span>${chips.map((q) => `<button type="button" class="chip-q" data-q="${q}" aria-pressed="false">${q}</button>`).join('')}</p>`}
       <p class="lg-count" aria-live="polite"></p>
       <ul class="lg-list" role="list"></ul>
     </div>`;

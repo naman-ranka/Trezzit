@@ -3,7 +3,7 @@
 import { loadScenarios, KINDS, PEOPLE } from './data.js';
 import { initSnapSplit } from './snap-split.js';
 import { initChatDemo } from './chat-demo.js';
-import { initViewToggle, initReveal, initNav, initCopy, summaryHTML, bankAmt } from './shared.js';
+import { initViewToggle, initReveal, initNav, summaryHTML, bankAmt, itemIndex, wireSearch } from './shared.js';
 import { tweenMoney, reduced, money, whenVisible } from './util.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -11,7 +11,6 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
 initNav();
 initReveal();
-initCopy();
 
 /* ---------- hero: the bank line becomes what you spent ----------
    The count runs from the bank's $100.00 down to $30.00, once, when the card is
@@ -74,11 +73,14 @@ loadScenarios().then((list) => {
     $('.srow-btn', li).setAttribute('aria-label', `${sc.title}. ${KINDS[sc.kind].label}. ${bank}; ${share}.`);
   });
 
+  let index = null;
   function toggleRow(li, open) {
     const btn = $('.srow-btn', li);
     const det = $('.sdetail', li);
     if (open && !det.dataset.built) {
-      det.innerHTML = summaryHTML(byId[li.dataset.id]);
+      const sc = byId[li.dataset.id];
+      det.innerHTML = summaryHTML(sc, { search: sc.people.length === 1 });
+      wireSearch(det, (index ||= itemIndex(list)));
       det.dataset.built = '1';
     }
     btn.setAttribute('aria-expanded', String(open));

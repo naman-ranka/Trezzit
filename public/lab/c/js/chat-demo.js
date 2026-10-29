@@ -35,11 +35,11 @@ async function buildScripts() {
         { t: 'tool', name: 'Read the receipt' },
         { t: 'tool', name: 'Draft the bill' },
         { t: 'card', html: splitCard(false) },
-        { t: 'ai', text: 'Here it is before I save it. The rest is shared by all four of you, and the tax stays with the towels. Save it to Apartment 3B? Maya, Jordan and Sam will be notified.' },
+        { t: 'ai', text: 'Here’s the draft. Save it to Apartment 3B?' },
         { t: 'user', text: 'Save it.', wait: 900 },
         { t: 'tool', name: 'Save the bill' },
         { t: 'card', html: splitCard(true), replace: true },
-        { t: 'ai', html: `Saved. Maya, Jordan and Sam owe you <b class="money">${money(owed)}</b>. Your <b class="money">${money(r.people.you.cents)}</b> counts as groceries ${money(r.people.you.byCategory.groceries)} and household ${money(r.people.you.byCategory.household)}.` },
+        { t: 'ai', html: `Saved. Maya, Jordan and Sam owe you <b class="money">${money(owed)}</b>.` },
       ],
     },
     groceries: {
@@ -53,7 +53,7 @@ async function buildScripts() {
           <p class="tc-t big money">${money(groc)}</p>
           <ul class="tc-rows" role="list">${grocLines.map(({ e, c }) => `<li><span><b>${esc(e.title)}</b><small>${e.date} · ${e.kind === 'personal' ? 'just you' : esc(e.group)}</small></span><span class="r"><b class="money">${money(c)}</b>${e.totalCents !== c ? `<small class="money">of ${money(e.totalCents)}</small>` : ''}</span></li>`).join('')}</ul>
         </div>` },
-        { t: 'ai', html: `<b class="money">${money(groc)}</b>, counting only your share. Most of it was your part of the Green Basket run; the ${money(grocLines.find((x) => x.e.id === 'corner-pharmacy')?.c || 0)} was sparkling water at Corner Pharmacy. That’s ${money(grocDelta)} less than September.` },
+        { t: 'ai', html: `<b class="money">${money(groc)}</b>, your share only. That’s ${money(grocDelta)} less than September.` },
       ],
     },
     rent: {
@@ -72,10 +72,10 @@ async function buildScripts() {
           </ul>
           <p class="tc-s">Next: Dec 1 · your share <b class="money">$639.35</b></p>
         </div>` },
-        { t: 'ai', text: 'Should I add it automatically each month, or ask you first so you can check the amounts?' },
+        { t: 'ai', text: 'Add it automatically, or ask you first each month?' },
         { t: 'user', text: 'Add it automatically.', wait: 900 },
         { t: 'tool', name: 'Save the monthly expense' },
-        { t: 'ai', text: 'Done. Rent lands on the 1st of every month with the same split, and you can skip or change any month.' },
+        { t: 'ai', text: 'Done. It lands on the 1st, and you can skip or change any month.' },
       ],
     },
     owe: {
@@ -92,7 +92,7 @@ async function buildScripts() {
             <li>${av('jordan')}<span>Jordan owes you</span><b class="money pos">$16.75</b></li>
             <li>${av('maya')}<span>You owe Maya</span><b class="money neg">$603.10</b></li>
           </ul></div>` },
-        { t: 'ai', html: 'Four people owe you <b class="money">$100.83</b>, from Friday dinner and the apartment. You owe Maya <b class="money">$603.10</b>: your <b class="money">$639.35</b> of October rent, less the <b class="money">$36.25</b> she owes you.' },
+        { t: 'ai', html: 'Four people owe you <b class="money">$100.83</b>. You owe Maya <b class="money">$603.10</b>, your rent less the <b class="money">$36.25</b> she owes you.' },
       ],
     },
     statement: {
@@ -105,9 +105,9 @@ async function buildScripts() {
           <div class="tc-h"><span class="tc-k">Statement vs Trezzit</span><span>6 charges</span></div>
           <ul class="tc-rows tight mono" role="list">
             ${[['GREEN BASKET MARKET', '100.00', 1], ['CORNER PHARMACY', '48.22', 1], ['TAQUERIA SOL', '84.87', 1], ['NETFLIX.COM', '24.99', 1], ['HARBOR HARDWARE', '37.15', 0], ['CITY PARKING', '12.00', 0]]
-              .map(([n, a, ok]) => `<li class="${ok ? '' : 'miss'}"><span>${n}</span><span class="r">−$${a} ${ok ? `<em class="ok">${icon.check}</em>` : '<em class="no">Not in Trezzit</em>'}</span></li>`).join('')}
+              .map(([n, a, ok]) => `<li class="${ok ? '' : 'miss'}"><span>${n}${ok ? '' : '<em class="no">Not in Trezzit</em>'}</span><span class="r">−$${a} <em class="${ok ? 'ok' : 'nx'}">${ok ? icon.check : ''}</em></span></li>`).join('')}
           </ul></div>` },
-        { t: 'ai', text: 'Four of six charges are already in Trezzit. Harbor Hardware and City Parking aren’t. Do you have the hardware receipt? I can scan it and ask you what to split.' },
+        { t: 'ai', text: 'Two charges aren’t in Trezzit yet. Got the hardware receipt?' },
       ],
     },
     settle: {
@@ -119,7 +119,7 @@ async function buildScripts() {
           <div class="tc-h"><span class="tc-k">${icon.check} Settlement recorded</span><span>Apartment 3B</span></div>
           <ul class="tc-people" role="list"><li>${av('you')}<span>You paid Maya</span><b class="money">$603.10</b></li></ul>
           <p class="tc-s">Paid outside Trezzit, by bank transfer.</p></div>` },
-        { t: 'ai', text: 'Recorded. Trezzit doesn’t move money; this notes the payment you made. You and Maya are even now.' },
+        { t: 'ai', text: 'Recorded. You and Maya are even now. Trezzit doesn’t move money.' },
       ],
     },
   };
@@ -161,8 +161,27 @@ export async function mountChat(root, opts = {}) {
     ctl.dataset.mode = mode;
   };
 
-  const toEl = (el) => log.scrollTo({ top: Math.max(0, el.offsetTop), behavior: reduced() ? 'auto' : 'smooth' });
-  const toEnd = (smooth = true) => log.scrollTo({ top: log.scrollHeight, behavior: smooth && !reduced() ? 'smooth' : 'auto' });
+  // Nothing is pinned or overlaid: the question starts at the top of the panel, and the panel
+  // only scrolls when the answer outgrows it, keeping the top of the newest card in view.
+  let ask = null;
+  const follow = (el) => {
+    const pad = 14;
+    const anchor = el.classList.contains('card') || el.classList.contains('a') ? el : null;
+    let top = Math.max(ask ? ask.offsetTop - pad : 0, el.offsetTop + el.offsetHeight - log.clientHeight + pad);
+    const card = [...log.querySelectorAll('.msg.card')].filter((c) => !ask || c.offsetTop > ask.offsetTop).pop();
+    if (card && anchor) top = Math.min(top, card.offsetTop - pad);
+    // never leave a sliver of the question at the top edge: show all of it or none of it
+    if (ask && top > ask.offsetTop - pad && top < ask.offsetTop + ask.offsetHeight) {
+      const below = ask.offsetTop + ask.offsetHeight + 4;
+      top = card && anchor ? Math.min(below, card.offsetTop - pad) : below;
+    }
+    top = Math.max(0, top);
+    // room below the answer when needed, so the panel can rest exactly there (like a chat app)
+    log.style.paddingBottom = '';
+    const room = top + log.clientHeight - log.scrollHeight;
+    if (room > 0) log.style.paddingBottom = `${parseFloat(getComputedStyle(log).paddingBottom) + room}px`;
+    log.scrollTo({ top, behavior: reduced() ? 'auto' : 'smooth' });
+  };
 
   async function wait(ms, my) {
     let left = ms;
@@ -182,9 +201,7 @@ export async function mountChat(root, opts = {}) {
       const att = step.attach ? (step.attach.doc
         ? `<span class="att doc"><span class="doc-i" aria-hidden="true">PDF</span>${esc(step.attach.label)}</span>`
         : `<span class="att"><img src="${thumb(step.attach.id)}" alt="" width="28" height="40">${esc(step.attach.label)}</span>`) : '';
-      // the newest request stays pinned to the top of the panel while its answer plays below it
-      log.querySelectorAll('.msg.u.pin').forEach((x) => x.classList.remove('pin'));
-      el = h(`<li class="msg u pin"><div class="bub">${att}<p>${esc(step.text)}</p></div></li>`);
+      el = h(`<li class="msg u"><div class="bub">${att}<p>${esc(step.text)}</p></div></li>`);
     } else if (step.t === 'tool') {
       el = h(`<li class="msg tool${instant ? ' done' : ''}"><span class="tl-i">${icon.tool}</span><span>Trezzit <span aria-hidden="true">·</span> ${esc(step.name)}</span><span class="tl-s" aria-hidden="true">${icon.check}</span></li>`);
     } else if (step.t === 'card') {
@@ -208,7 +225,9 @@ export async function mountChat(root, opts = {}) {
     paused = false;
     gate?.();
     root.querySelectorAll('.prompt').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
-    if (!from) log.innerHTML = '';
+    log.style.paddingBottom = '';
+    if (!from) { log.innerHTML = ''; ask = null; }
+    else ask = log.querySelector('.msg.u');
     log.setAttribute('aria-busy', 'true');
     const steps = S[k].steps;
     if (instant) {
@@ -228,7 +247,10 @@ export async function mountChat(root, opts = {}) {
         if (s.t === 'ai') await wait(320, my);
         const el = add(s, false);
         // a new request scrolls to the top of the panel; answers grow below it
-        if (s.t === 'user') toEl(el); else toEnd();
+        if (s.t === 'user') ask = el;
+        // once a result card lands, the question folds to one line so question, card and answer fit together
+        if (s.t === 'card' && ask) ask.classList.add('brief');
+        follow(el);
         if (s.t === 'tool') { await wait(280, my); el.classList.add('done'); }
       }
       state = 'done'; setCtl();

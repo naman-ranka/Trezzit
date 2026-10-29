@@ -34,7 +34,7 @@ root.innerHTML = `<div class="rec${opts.compact ? ' rec-compact' : ''}">
     </div>
     <div class="rec-edit">
       <label for="rent-in">Rent</label>
-      <span class="money-in-field">$<input id="rent-in" inputmode="decimal" value="2,400.00" aria-describedby="rent-help"></span>
+      <span class="money-in-field">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-help"></span>
       <span class="step-btns"><button type="button" data-step="-2500" aria-label="Lower rent by $25">−</button><button type="button" data-step="2500" aria-label="Raise rent by $25">+</button></span>
       <span id="rent-help" class="muted small">Split 25 · 25 · 28 · 22 %</span>
     </div>
@@ -97,12 +97,25 @@ function render() {
 
 function setRent(cents, fromInput = false) {
   rent = Math.max(0, Math.min(1000000, Math.round(cents)));
-  if (!fromInput) input.value = (rent / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (!fromInput) { input.value = (rent / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); lastText = input.value; }
   render();
 }
+// the field and the math never disagree: only a well-formed amount changes the rent;
+// anything else keeps the last good rent until the field is left (then it snaps back)
+const VALID = /^\d[\d,]*(\.\d{0,2})?$/;
+input.addEventListener('beforeinput', (e) => {
+  if (e.data && /[^0-9.,]/.test(e.data)) e.preventDefault();
+});
+let lastText = input.value;
 input.addEventListener('input', () => {
-  const v = Number(input.value.replace(/[^0-9.]/g, ''));
-  if (Number.isFinite(v)) setRent(v * 100, true);
+  const raw = input.value.trim();
+  if (raw === '') return; // clearing to retype: the math keeps the last rent until a new one is typed
+  if (!VALID.test(raw)) { input.value = lastText; return; } // refuse a malformed edit ("1.2.3")
+  lastText = raw;
+  const v = Math.round(Number(raw.replace(/,/g, '')) * 100);
+  if (!Number.isFinite(v)) return;
+  if (v > 1000000) { setRent(1000000); return; }
+  setRent(v, true);
 });
 input.addEventListener('blur', () => setRent(rent));
 root.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => setRent(rent + Number(b.dataset.step))));

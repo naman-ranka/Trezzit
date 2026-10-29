@@ -75,7 +75,9 @@ export function avatar(p, { size = '', pressed = null, label = '', speak = false
   const attrs = pressed === null ? (speak ? '' : 'aria-hidden="true"') : `aria-pressed="${pressed}" aria-label="${esc(label || p.name)}"`;
   const tag = pressed === null ? 'span' : 'button type="button"';
   const close = pressed === null ? 'span' : 'button';
-  return `<${tag} class="av ${size}" data-id="${p.id}" style="--c:${p.color}" ${attrs}>${p.id === 'you' ? 'You' : esc(p.initials)}</${close}>`;
+  // "You" fits a 44px face; a small face shows "Y" next to its name.
+  const mark = p.id === 'you' ? (size === 'sm' ? 'Y' : 'You') : esc(p.initials);
+  return `<${tag} class="av ${size}" data-id="${p.id}" style="--c:${p.color}" ${attrs}>${mark}</${close}>`;
 }
 
 export function listNames(names) {

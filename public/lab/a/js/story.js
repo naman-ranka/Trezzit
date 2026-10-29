@@ -1,27 +1,22 @@
 /* story.js: the split story. One receipt, four roommates.
  * Three beats: 1 shared items four ways (towels included), 2 personal items, 3 the playground.
  * Desktop: a sticky stage; the step nearest the reading line sets its state (native scroll).
- * Phones: the stage sits still and plays steps 1-3 once it is in view; a one-line caption at the top of
- * the stage says which step is showing, and the people row sticks while you scroll the rows.
- * The stage footer carries the "Adds up to" check + Reset at every width.
- * At step 3 the stage becomes the playground: tap a dot to add or remove someone from an item,
- * and the kit's engine (integer cents) re-splits. A light balance block follows live: what this
- * receipt says roommates owe you, and the running balance for the month (sample bills), which you
- * can mark as paid (a recorded note; nothing moves money).
- * Keyboard: the dots are one tab stop (roving tabindex); arrows move between people and rows. */
+ * Phones: no timed play. The stage arrives finished (step 3) and its dots pop in once it is in view,
+ * so the payoff never depends on reading speed.
+ * The stage footer carries "Roommates owe you", the "Adds up to" check and Reset, at every width.
+ * At step 3 the stage is the playground: tap a dot to add or remove someone from an item, and the
+ * kit's engine (integer cents) re-splits. Any tap or keyboard focus on a dot jumps straight to it.
+ * Keyboard: the dots are one tab stop (roving tabindex, always present); arrows move between dots. */
 import { PEOPLE, CATEGORIES } from '../../_kit/receipts.js';
 import { $, $$, esc, money, countTo, reduced, avatar, onceVisible, ICON } from './util.js';
 import { loadModel, compute, lineMembers } from './data.js';
 
 const LAST = 3; // the playground step
 const compact = () => innerWidth < 900;
-// the month's other sample bills (rent, Sunday bagels, farmers market): what each roommate already owes you
-const MONTH_BASE = { maya: 8240, jordan: 4410, sam: 3875 };
 
 export async function initStory() {
   const root = $('#story-root');
   const stage = $('#story-stage');
-  const sumEls = ['#story-sum', '#story-sum-m'].map((s) => $(s)).filter(Boolean);
   if (!root || !stage) return;
   const model = await loadModel('green-basket');
   const original = JSON.parse(JSON.stringify(model.lines));
@@ -30,20 +25,19 @@ export async function initStory() {
   // beat 1 = lines everyone shares (the taxed towels too), beat 2 = lines that are someone's own
   const groups = original.map((l) => (lineMembers(l).length === people.length ? 1 : 2));
   const GROUP = (i) => groups[i];
-  let settled = false;
 
-  const CAPTION = { 0: `${model.lines.length} items · ${money(model.totalCents)}`, [LAST]: 'Tap a dot to change who had what.' };
+  const CAPTION = { 0: `${model.lines.length} items · ${money(model.totalCents)}`, [LAST]: 'Tap to change who had what.' };
   stage.innerHTML = `
     <p class="st-cap" aria-hidden="true"><b></b><span></span></p>
     <div class="st-people">${people.map((id) => `
       <div class="st-p" data-p="${id}">${avatar(PEOPLE[id])}<span class="nm">${esc(PEOPLE[id].name)}</span><span class="amt money">$0.00</span></div>`).join('')}
     </div>
     <div class="st-items">${model.lines.map((l, i) => `
-      <div class="st-row" data-i="${i}" data-g="${GROUP(i)}" style="--c:${CATEGORIES[l.category].color}">
-        <span class="nm">${esc(l.pretty)}</span><span class="money">${money(res.items[i].totalCents)}</span>
+      <div class="st-row" data-i="${i}" data-g="${GROUP(i)}" style="--c:${CATEGORIES[l.category].color};--r:${i}">
+        <span class="nm">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">tax in</small>' : ''}</span><span class="money">${money(res.items[i].totalCents)}</span>
         <span class="who" role="group" aria-label="Who had ${esc(l.pretty)}">${people.map((p) => `<button type="button" class="dot-b" data-p="${p}" aria-label="${esc(l.pretty)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button>`).join('')}</span>
       </div>`).join('')}</div>
-    <div class="st-foot"><span class="ss-check"></span><button type="button" class="st-reset" hidden>${ICON.replay}Reset</button></div>
+    <div class="st-foot"><p class="ss-owe">Roommates owe you <strong class="money"></strong></p><span class="ss-check"></span><button type="button" class="st-reset" tabindex="-1" aria-label="Reset the split" title="Reset">${ICON.replay}</button></div>
     <p class="visually-hidden" aria-live="polite" data-live></p>`;
 
   const rows = $$('.st-row', stage);
@@ -54,21 +48,43 @@ export async function initStory() {
   const steps = $$('.step', root);
   let current = -1;
   let edited = false;
+  let pinned = false; // a dot was tapped or focused: keep the playground while the story is in view
   let fr = 0; // roving focus: row
   let fc = 0; // roving focus: person
   const capN = $('.st-cap b', stage);
   const capT = $('.st-cap span', stage);
   const footCheck = $('.st-foot .ss-check', stage);
   const footReset = $('.st-foot .st-reset', stage);
+  const footOwe = $('.st-foot .ss-owe strong', stage);
   footReset.addEventListener('click', () => reset());
+  // the month's running tab: this receipt plus the month's other sample bills (live, follows every edit)
+  const tabEl = $('#story-tab');
+  const TAB_BASE = { maya: 8240, jordan: 4410, sam: 3875 };
+  // desktop: one caption beside the stage, cross-faded in place as each (invisible) scroll step activates
+  const sideCap = $('.story-cap span', root);
+  let capT0 = 0;
   function caption(step) {
-    capN.textContent = step ? String(step) : '';
+    capN.textContent = step && step !== LAST ? String(step) : '';
     capT.textContent = step === LAST || step === 0 ? CAPTION[step] : $('h3', steps[step - 1]).textContent;
+    if (!sideCap) return;
+    const text = $('h3', steps[Math.max(1, step) - 1]).textContent;
+    if (sideCap.textContent === text) return;
+    clearTimeout(capT0);
+    if (reduced() || !sideCap.textContent) { sideCap.textContent = text; return; }
+    sideCap.classList.add('is-out');
+    capT0 = setTimeout(() => { sideCap.textContent = text; sideCap.classList.remove('is-out'); }, 200);
   }
   function renderFoot() {
     footCheck.className = `ss-check${res.check.ok ? '' : ' bad'}`;
-    footCheck.innerHTML = res.check.ok ? `${ICON.check}Adds up to ${money(res.check.sumCents)}.` : `Shares add up to ${money(res.check.sumCents)}, not ${money(res.check.expectedCents)}.`;
-    footReset.hidden = !edited;
+    footCheck.innerHTML = res.check.ok ? `${ICON.check}Adds up to ${money(res.check.sumCents)}` : `Shares add up to ${money(res.check.sumCents)}, not ${money(res.check.expectedCents)}`;
+    // Reset keeps its slot (visibility only), so it never reflows the footer
+    footReset.classList.toggle('is-off', !edited);
+    footReset.tabIndex = edited ? 0 : -1;
+    const others = people.filter((p) => p !== 'you');
+    footOwe.textContent = money(others.reduce((a, p) => a + (res.people[p]?.cents || 0), 0));
+    if (tabEl) {
+      tabEl.innerHTML = `<span class="nw">Owed to you this month:</span> ${others.map((p) => `<span class="nw">${esc(PEOPLE[p].name)} <b class="money">${money((TAB_BASE[p] || 0) + (res.people[p]?.cents || 0))}</b></span>`).join(' · ')}`;
+    }
   }
 
   const totalsAt = (step) => {
@@ -78,29 +94,6 @@ export async function initStory() {
     });
     return t;
   };
-
-  /* ---------- the balance block (step 3): this receipt, then the month ---------- */
-  function renderSum() {
-    const others = people.filter((p) => p !== 'you');
-    const owed = others.reduce((a, p) => a + (res.people[p]?.cents || 0), 0);
-    const month = others.map((p) => [p, (MONTH_BASE[p] || 0) + (res.people[p]?.cents || 0)]);
-    const html = `
-      <p class="ss-owe">Roommates owe you <strong class="money">${money(settled ? 0 : owed)}</strong></p>
-      <div class="ss-month${settled ? ' is-settled' : ''}">
-        <span class="ss-k">This month, all bills</span>
-        <ul role="list">${month.map(([p, c]) => `<li>${avatar(PEOPLE[p])}<span class="visually-hidden">${esc(PEOPLE[p].name)}</span><span class="money">${settled ? '$0.00' : money(c)}</span></li>`).join('')}</ul>
-        <button type="button" class="ss-paid" aria-pressed="${settled}">${settled ? `${ICON.check}Marked as paid` : 'Mark as paid'}</button>
-      </div>`;
-    sumEls.forEach((el) => { el.innerHTML = html; });
-  }
-  sumEls.forEach((el) => el.addEventListener('click', (e) => {
-    if (!e.target.closest('.ss-paid')) return;
-    settled = !settled;
-    renderSum();
-    renderFoot();
-    $('.ss-paid', el)?.focus({ preventScroll: true });
-    live.textContent = settled ? 'Marked as paid. A note for your records; no money moved.' : 'Balances restored.';
-  }));
 
   /* ---------- dots + totals ---------- */
   function paintDots(step) {
@@ -113,7 +106,7 @@ export async function initStory() {
         const has = (shares[b.dataset.p] || 0) > 0;
         b.classList.toggle('on', assigned && has);
         b.setAttribute('aria-pressed', String(has));
-        b.tabIndex = step === LAST && i === fr && c === fc ? 0 : -1;
+        b.tabIndex = i === fr && c === fc ? 0 : -1; // exactly one dot is always reachable by Tab
       });
     });
   }
@@ -177,6 +170,7 @@ export async function initStory() {
     stage.dataset.step = String(step);
     stage.classList.toggle('is-play', step === LAST);
     root.classList.toggle('is-play', step === LAST);
+    tabEl?.classList.toggle('is-on', step === LAST);
     steps.forEach((s) => s.classList.toggle('is-active', +s.dataset.step === step));
     caption(step);
     rows.forEach((row) => {
@@ -194,14 +188,12 @@ export async function initStory() {
     res = compute(model);
     paintDots(LAST);
     paintTotals(LAST);
-    renderSum();
     renderFoot();
     live.textContent = people.map((p) => `${PEOPLE[p].name} ${money(res.people[p]?.cents || 0)}`).join(', ') + (res.check.ok ? '. Adds up exactly.' : '.');
   }
   function reset() {
     model.lines = JSON.parse(JSON.stringify(original));
     edited = false;
-    settled = false;
     resplit();
   }
   stage.addEventListener('keydown', (e) => {
@@ -218,17 +210,22 @@ export async function initStory() {
     paintDots(current);
     $$('.dot-b', rows[fr])[fc]?.focus();
   });
+  // a keyboard user who tabs into the dots gets the playground right away
+  stage.addEventListener('focusin', (e) => {
+    const btn = e.target.closest?.('.dot-b');
+    if (!btn) return;
+    fr = +btn.closest('.st-row').dataset.i; fc = people.indexOf(btn.dataset.p);
+    pinned = true;
+    if (current !== LAST) apply(LAST);
+  });
   stage.addEventListener('click', (e) => {
     const btn = e.target.closest('.dot-b');
     if (!btn) return;
     const i = +btn.closest('.st-row').dataset.i;
     fr = i; fc = people.indexOf(btn.dataset.p);
-    if (current !== LAST) {
-      // a tap mid-play stops the play and keeps the change, if the tapped row already shows its people
-      const shown = current >= GROUP(i);
-      stopAuto(); apply(LAST);
-      if (!shown) return;
-    }
+    // a tap at any step jumps to the playground and still counts as the edit
+    pinned = true;
+    if (current !== LAST) apply(LAST);
     const line = model.lines[i];
     const p = btn.dataset.p;
     let members = lineMembers(line);
@@ -241,41 +238,18 @@ export async function initStory() {
       members = members.filter((x) => x !== p);
     } else members = [...members, p];
     line.split = { type: 'equal', people: people.filter((x) => members.includes(x)) };
-    edited = true;
+    // back to the original split (toggled off, then on again) means nothing is edited
+    edited = JSON.stringify(model.lines.map((l) => l.split)) !== JSON.stringify(original.map((l) => l.split));
     resplit();
   });
 
-  /* ---------- phones: play once in view, tap a step to jump ---------- */
-  let autoT = 0;
-  let autoOn = false;
-  function stopAuto() { autoOn = false; clearTimeout(autoT); }
-  function autoplay() {
-    if (!compact() || current === LAST) return;
-    autoOn = true;
-    const next = () => {
-      if (!autoOn) return;
-      apply(Math.min(LAST, current + 1));
-      if (current < LAST) autoT = setTimeout(next, 1900);
-    };
+  /* ---------- phones: arrive finished; the dots pop in once the stage is in view ---------- */
+  function enterPhone() {
     if (reduced()) { apply(LAST); return; }
-    autoT = setTimeout(next, 400);
+    stage.classList.add('is-enter');
+    apply(LAST);
+    setTimeout(() => stage.classList.remove('is-enter'), 1400);
   }
-  steps.forEach((s) => {
-    const card = $('.step-card', s);
-    card.addEventListener('click', (e) => {
-      if (!compact() || e.target.closest('.story-sum')) return;
-      stopAuto(); apply(+s.dataset.step);
-    });
-  });
-  const tabSteps = () => steps.forEach((s) => {
-    const card = $('.step-card', s);
-    if (compact()) { card.setAttribute('role', 'button'); card.tabIndex = 0; } else { card.removeAttribute('role'); card.removeAttribute('tabindex'); }
-  });
-  steps.forEach((s) => $('.step-card', s).addEventListener('keydown', (e) => {
-    if (compact() && (e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget) { e.preventDefault(); stopAuto(); apply(+s.dataset.step); }
-  }));
-  tabSteps();
-  onceVisible(stage, autoplay, { threshold: 0.45 });
 
   /* ---------- desktop: which step is under the reading line ---------- */
   let ticking = false;
@@ -286,36 +260,28 @@ export async function initStory() {
     const sr = stage.getBoundingClientRect();
     if (sr.bottom < innerHeight * 0.15 || sr.top > innerHeight * 0.85) dropFlyers();
     if (compact()) return;
-    const line = innerHeight * 0.62;
+    // the steps are invisible scroll triggers: the last one whose top has passed the reading line wins
+    const line = innerHeight * 0.55;
     let step = 0;
-    let best = Infinity;
-    const mid = innerHeight * 0.5;
-    const first = $('.step-card', steps[0]).getBoundingClientRect();
-    if (first.top + first.height / 2 < line) {
-      steps.forEach((s) => {
-        const c = $('.step-card h3', s).getBoundingClientRect();
-        const d = Math.abs(c.top + c.height / 2 - mid);
-        if (d < best) { best = d; step = +s.dataset.step; }
-      });
-    }
+    steps.forEach((s) => { if (s.getBoundingClientRect().top < line) step = +s.dataset.step; });
     const rr = root.getBoundingClientRect();
     if (rr.bottom < innerHeight * 0.3) step = LAST;
     // once played with, keep the playground state while it is in view
-    if (edited && step < LAST && rr.bottom > 0 && rr.top < innerHeight) step = LAST;
+    if ((edited || pinned) && step < LAST && rr.bottom > 0 && rr.top < innerHeight) step = LAST;
     apply(step);
   }
-  const setH = () => root.style.setProperty('--stage-h', `${stage.offsetHeight}px`);
+  const pin = $('#story-pin');
+  const setH = () => root.style.setProperty('--stage-h', `${pin.offsetHeight}px`);
   setH();
-  if ('ResizeObserver' in window) new ResizeObserver(setH).observe(stage);
+  if ('ResizeObserver' in window) new ResizeObserver(setH).observe(pin);
   const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(measure); } };
   addEventListener('scroll', onScroll, { passive: true });
-  let wasCompact = compact();
-  addEventListener('resize', () => {
-    if (compact() !== wasCompact) { wasCompact = compact(); tabSteps(); }
-    onScroll();
-  }, { passive: true });
+  addEventListener('resize', onScroll, { passive: true });
 
-  renderSum();
   renderFoot();
-  if (compact()) apply(0); else measure();
+  if (compact()) {
+    // the caption and footer have their final size at step 0 too, so arriving moves nothing
+    apply(0);
+    onceVisible(stage, enterPhone, { threshold: 0.2 });
+  } else measure();
 }

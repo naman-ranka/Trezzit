@@ -69,7 +69,8 @@ export function initScan(onSplitRequest) {
 
   // Hold the panel at its tallest size so a new scan never pushes the page around.
   const panel = $('[data-result]', root);
-  const hold = () => { panel.style.minHeight = Math.max(panel.offsetHeight, parseFloat(panel.style.minHeight) || 0) + 'px'; };
+  // Desktop: the fixed-height receipt sets the row, so the panel can size to its content.
+  const hold = () => { if (matchMedia('(min-width: 760px)').matches) { panel.style.minHeight = ''; return; } panel.style.minHeight = Math.max(panel.offsetHeight, parseFloat(panel.style.minHeight) || 0) + 'px'; };
 
   function reset(label) {
     hold();

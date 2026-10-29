@@ -63,41 +63,73 @@ export function initCopy() {
   }));
 }
 
-/* ---------- statement row, opened: a short read-only summary ---------- */
-export function summaryHTML(sc, { base = 'scenarios/' } = {}) {
-  const s = sc.sum;
-  const res = s.result;
-  const payerName = PEOPLE[sc.payer]?.name || '';
-  let chips;
-  let paidLine = '';
+/* ---------- statement row, opened: one line, then who or what ----------
+   Shared rows: the people chips carry every number (no sentence repeats them).
+   A personal row lists its items with their categories, plus item search. */
+const SEARCH_ICON = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.75" cy="8.75" r="5.25" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12.75 12.75L16.5 16.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+export const SEARCH_DEFAULT = 'milk';
+
+export function summaryHTML(sc, { base = 'scenarios/', search = false } = {}) {
+  const res = sc.sum.result;
+  let body;
   if (sc.people.length > 1) {
-    chips = sc.people.map((id) => {
+    body = `<ul class="sd-chips" role="list">${sc.people.map((id) => {
       const p = PEOPLE[id];
-      const name = id === 'you' ? '' : `<span>${esc(p.name)}</span>`;
-      return `<li class="${id === 'you' ? 'is-you' : ''}">${avatar(p, { size: 'sm', speak: id === 'you' })}${name}<b class="money">${money(res.people[id]?.cents || 0)}</b></li>`;
-    }).join('');
-    const others = sc.people.filter((id) => id !== 'you').map((id) => PEOPLE[id].name);
-    paidLine = sc.payer === 'you'
-      ? `You paid ${money(s.total)} · ${esc(listNames(others))} owe${others.length === 1 ? 's' : ''} you <b class="money money-in">${money(s.owedToYou)}</b>`
-      : `${esc(payerName)} paid ${money(s.total)} · You owe ${esc(payerName)} <b class="money">${money(s.youOwe)}</b>`;
-    paidLine = `<p class="sd-paid">${paidLine}</p>`;
+      return `<li class="${id === 'you' ? 'is-you' : ''}">${avatar(p, { size: 'sm' })}<span>${esc(p.name)}</span><b class="money">${money(res.people[id]?.cents || 0)}</b></li>`;
+    }).join('')}</ul>`;
   } else {
-    chips = Object.entries(s.byCategory).sort((x, y) => y[1] - x[1]).map(([k, v]) => {
-      const c = CATEGORIES[k] || CATEGORIES.other;
-      return `<li><span class="dot" style="--c:${c.color}"></span><span>${esc(c.label)}</span><b class="money">${money(v)}</b></li>`;
-    }).join('');
+    body = `<ul class="sd-items" role="list">${res.items.map((it) => {
+      const c = CATEGORIES[it.category] || CATEGORIES.other;
+      return `<li><span class="dot" style="--c:${c.color}" aria-hidden="true"></span><span>${esc(it.name)}</span><small>${esc(c.label)}</small><b class="money">${money(it.totalCents)}</b></li>`;
+    }).join('')}</ul>`;
+    if (search) {
+      body += `<div class="sd-search">
+        <label class="sd-q">${SEARCH_ICON}<span class="visually-hidden">Search your October items</span><input type="search" value="${SEARCH_DEFAULT}" placeholder="Search items, stores, categories" autocomplete="off" spellcheck="false" data-search></label>
+        <ul class="sd-results" role="list" aria-live="polite" data-results></ul>
+      </div>`;
+    }
   }
   const next = sc.next ? `<p class="sd-next">${ICON.repeat}<span>Adds itself ${esc(sc.next.join(' · '))}</span></p>` : '';
-  // One way on from here: split it yourself if it is a Snap tab, otherwise play with it on the scenarios page.
+  // One way on from here: split it yourself if it is a Snap tab, otherwise open it on the examples page.
   const link = SPLITTABLE[sc.id]
     ? `<a class="sd-link" href="#snap" data-split-it="${SPLITTABLE[sc.id]}">Split it yourself<span aria-hidden="true">&darr;</span></a>`
-    : `<a class="sd-link" href="${base}#${sc.id}">Change who had what<span aria-hidden="true">&rarr;</span></a>`;
+    : `<a class="sd-link" href="${base}#${sc.id}">${sc.people.length > 1 ? 'Change who had what' : 'Open the example'}<span aria-hidden="true">&rarr;</span></a>`;
   return `<div class="sd-tz">
       <p class="sd-lesson">${esc(sc.lesson || '')}</p>
-      <ul class="sd-chips" role="list">${chips}</ul>
-      ${paidLine}
-      <p class="sd-check">${ICON.check}<span>Adds up to <b class="money">${money(res.totalCents)}</b>, to the cent.</span></p>
+      ${body}
       ${next}
       <p class="sd-links">${link}</p>
     </div>`;
+}
+
+/* ---------- item search over the month (every line of every expense) ---------- */
+export function itemIndex(list) {
+  const rows = [];
+  list.forEach((sc) => sc.sum.result.items.forEach((it) => {
+    if (it.isExtraCharge || it.itemType === 'Tip' || it.itemType === 'Fee') return;
+    const c = CATEGORIES[it.category] || CATEGORIES.other;
+    const store = sc.store || sc.merchant || sc.title;
+    const mine = it.shares?.you || 0;
+    const owner = Object.keys(it.shares || {}).filter((id) => it.shares[id]);
+    rows.push({ name: it.name, store, cat: c.label, color: c.color, day: sc.day || '', mine, owner, hay: `${it.name} ${store} ${c.label}`.toLowerCase() });
+  }));
+  return rows;
+}
+
+export function wireSearch(scope, index) {
+  const input = scope.querySelector('[data-search]');
+  const out = scope.querySelector('[data-results]');
+  if (!input || !out) return;
+  const draw = () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { out.innerHTML = ''; return; }
+    const hits = index.filter((r) => q.split(/\s+/).every((w) => r.hay.includes(w)));
+    out.innerHTML = hits.slice(0, 3).map((r) => {
+      const amt = r.mine ? `<b class="money">${money(r.mine)}</b>` : `<small>${esc(listNames(r.owner.map((id) => PEOPLE[id].name)))}&rsquo;s</small>`;
+      return `<li><span class="dot" style="--c:${r.color}" aria-hidden="true"></span><span>${esc(r.name)}<small>${esc(r.store)} · ${esc(r.day)}</small></span>${amt}</li>`;
+    }).join('') + (hits.length > 3 ? `<li class="sd-more-hits">${hits.length - 3} more</li>` : '')
+      + (hits.length ? '' : '<li class="sd-none">Nothing in October</li>');
+  };
+  input.addEventListener('input', draw);
+  draw();
 }

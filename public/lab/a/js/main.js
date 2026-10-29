@@ -15,10 +15,15 @@ reveals();
 nav();
 trustIcons();
 
-// The scan's "Split it yourself" opens the full playground with the same receipt.
+// "Split it": the story right below already splits this receipt, so the button goes there; any other
+// sample, or your own photo, opens the full playground with that receipt.
 safe(() => mountScan($('#scan-demo'), {
-  splitLabel: 'Split it yourself',
+  splitLabel: 'Split it',
   onSplit(model) {
+    if (model.id === 'green-basket') {
+      $('#story').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      return;
+    }
     let id = model.id;
     if (model.source === 'live') {
       try { sessionStorage.setItem('tz-a-live', JSON.stringify({ raw: model.raw, bill: model.bill })); } catch { id = 'green-basket'; }
@@ -29,23 +34,6 @@ safe(() => mountScan($('#scan-demo'), {
 safe(initStory);
 safe(initScenarios);
 safe(initChat);
-copyMcp();
-
-function copyMcp() {
-  const btn = $('#mcp-copy');
-  const url = $('#mcp-url');
-  if (!btn || !url) return;
-  btn.addEventListener('click', async () => {
-    let ok = false;
-    try { await navigator.clipboard.writeText(url.textContent.trim()); ok = true; } catch {
-      // fallback: select the text so a keyboard copy works
-      const r = document.createRange(); r.selectNodeContents(url);
-      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-    }
-    btn.textContent = ok ? 'Copied' : 'Selected';
-    setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
-  });
-}
 
 function nav() {
   const navEl = $('#nav');

@@ -3,27 +3,34 @@
 import { loadScenarios, PEOPLE, KINDS } from './data.js';
 import { createSplitEditor, catBar, catList } from './split-editor.js';
 import { initNav, initReveal } from './shared.js';
-import { money, bankAmt, esc, ICON, tweenMoney, listNames } from './util.js';
+import { money, bankAmt, esc, tweenMoney, listNames } from './util.js';
 
 initNav();
 
 const list = document.querySelector('[data-list]');
 const rail = document.querySelector('[data-rail]');
 
+/* Who owes whom, naming only the people who still have a share. */
+function oweHTML(sc, s) {
+  const others = sc.people.filter((id) => id !== 'you' && s.result.people[id]?.cents > 0).map((id) => PEOPLE[id].name);
+  if (s.owedToYou && others.length) return `${esc(listNames(others))} owe${others.length === 1 ? 's' : ''} you <b class="money money-in">${money(s.owedToYou)}</b>`;
+  if (s.youOwe) return `You owe ${esc(PEOPLE[sc.payer].name)} <b class="money">${money(s.youOwe)}</b>`;
+  return 'Nobody owes anybody.';
+}
+
+/* Examples page order: the charges the home page shows least come first. */
+const ORDER = ['order', 'pharmacy', 'dinner', 'trip', 'streaming', 'rent', 'groceries'];
+
 function card(sc) {
   const s = sc.sum;
   const b = sc.bank;
-  const others = sc.people.filter((id) => id !== 'you').map((id) => PEOPLE[id].name);
-  const owe = s.owedToYou
-    ? `${esc(listNames(others))} owe${others.length === 1 ? 's' : ''} you <b class="money money-in" data-owe>${money(s.owedToYou)}</b>`
-    : (s.youOwe ? `You owe ${esc(PEOPLE[sc.payer].name)} <b class="money" data-owe>${money(s.youOwe)}</b>` : 'Nobody owes anybody.');
   return `
   <article class="scn" id="scn-${sc.id}" data-kind="${sc.kind}" aria-labelledby="t-${sc.id}">
     <header class="scn-h">
       <span class="kind kind-${sc.kind}" aria-hidden="true"></span>
       <div>
         <p class="scn-kind">${KINDS[sc.kind].label}${sc.repeat ? ` · ${esc(sc.repeat)}` : ''}</p>
-        <h2 id="t-${sc.id}">${esc(sc.title)}</h2>
+        <h2 id="t-${sc.id}" tabindex="-1">${esc(sc.title)}</h2>
         <p class="lede">${esc(sc.lesson)}</p>
       </div>
     </header>
@@ -33,7 +40,6 @@ function card(sc) {
         <div class="scn-line${b ? '' : ' is-none'}">
           ${b ? `<span>${esc(b.date)}</span><span>${esc(b.merchant)}</span><span>${bankAmt(s.total)}</span>` : '<span class="none-msg">No charge on your statement</span>'}
         </div>
-        <p class="scn-says">${b ? `${esc(b.cat)} · 1 line` : `${esc(PEOPLE[sc.payer].name)} paid`}</p>
       </div>
       <div class="pane-tz">
         <p class="pane-label tz"><span>Trezzit</span><span>${esc(sc.merchant)}</span></p>
@@ -48,22 +54,18 @@ function card(sc) {
             <ul class="cats" role="list" data-cats>${catList(s.byCategory, { limit: 5 })}</ul>
           </div>
         </div>
-        <div class="sd-meta">
-          <span class="tag">${sc.itemCount} item${sc.itemCount === 1 ? '' : 's'}</span>
-          ${sc.people.length > 1 ? `<span class="tag">${ICON.people}${sc.people.length} people</span>` : `<span class="tag">${ICON.person}Just you</span>`}
-          ${sc.group ? `<span class="tag">${esc(sc.group)}</span>` : ''}
-          ${sc.repeat ? `<span class="tag rec">${ICON.repeat}Repeats</span>` : ''}
-        </div>
         <div data-editor></div>
-        <p class="sd-owe">${owe}</p>
+        <p class="sd-owe" data-owe>${oweHTML(sc, s)}</p>
         ${sc.next ? `<div class="sd-next" aria-label="Coming up">${sc.next.map((d) => `<span>${esc(d)}<b class="money">${money(s.mine)}</b></span>`).join('')}</div>` : ''}
       </div>
     </div>
   </article>`;
 }
 
-loadScenarios({ extras: true }).then((all) => {
-  const byId = Object.fromEntries(all.map((sc) => [sc.id, sc]));
+loadScenarios({ extras: true }).then((loaded) => {
+  const byId = Object.fromEntries(loaded.map((sc) => [sc.id, sc]));
+  const all = [...ORDER.map((id) => byId[id]).filter(Boolean), ...loaded.filter((sc) => !ORDER.includes(sc.id))];
+  const status = document.querySelector('[data-status]');
   rail.innerHTML = all.map((sc) => `<button type="button" class="chip" data-pick="${sc.id}" aria-pressed="false"><span class="kind-dot kind-${sc.kind}" aria-hidden="true"></span>${esc(sc.short || sc.title)}</button>`).join('');
 
   function show(id, { focus = false } = {}) {
@@ -78,19 +80,21 @@ loadScenarios({ extras: true }).then((all) => {
         tweenMoney(art.querySelector('[data-mine]'), sum.mine);
         art.querySelector('[data-catbar]').innerHTML = catBar(sum.byCategory);
         art.querySelector('[data-cats]').innerHTML = catList(sum.byCategory, { limit: 5 });
-        const owe = art.querySelector('[data-owe]');
-        if (owe) owe.textContent = money(sum.owedToYou || sum.youOwe);
+        art.querySelector('[data-owe]').innerHTML = oweHTML(sc, sum);
         art.querySelectorAll('.sd-next b').forEach((b) => { b.textContent = money(sum.mine); });
       },
     });
     ed.load(sc);
     if (history.replaceState) history.replaceState(null, '', `#${sc.id}`);
-    if (focus) art.querySelector('h2')?.focus?.({ preventScroll: true });
+    if (focus) {
+      art.querySelector('h2')?.focus({ preventScroll: true });
+      if (status) status.textContent = `Showing: ${sc.title}`;
+    }
   }
 
   rail.addEventListener('click', (e) => {
     const b = e.target.closest('[data-pick]');
-    if (b) show(b.dataset.pick);
+    if (b) show(b.dataset.pick, { focus: true });
   });
   show(location.hash.slice(1));
   addEventListener('hashchange', () => show(location.hash.slice(1)));

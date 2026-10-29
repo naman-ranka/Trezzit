@@ -21,7 +21,7 @@
   --pair-split: minmax(0, 0.92fr) minmax(0, 1fr);
 }
 
-html { scroll-padding-top: 76px; }
+html { scroll-padding-top: 64px; }
 body { background: #fff; overflow-x: clip; }
 .wrap { max-width: var(--page-max); margin-inline: auto; padding-inline: var(--gutter); }
 .skip { position: absolute; left: 12px; top: -60px; z-index: 50; background: var(--ink); color: #fff; padding: 10px 14px; border-radius: 10px; }
@@ -378,7 +378,8 @@ ul.trust { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; margin
 .chat-conn i { width: 8px; height: 8px; border-radius: 50%; background: var(--positive); box-shadow: 0 0 0 3px #d1fae5; }
 .chat-ctl { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--ink); background: var(--surface-muted); }
 .chat-ctl svg { width: 16px; height: 16px; }
-.chat-log { height: min(560px, 68vh); overflow-y: auto; overscroll-behavior: contain; padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+/* height: JS sets it to the finished conversation (capped on desktop); see chat-demo.js fit() */
+.chat-log { height: auto; overflow-y: auto; overscroll-behavior: contain; padding: 22px; display: flex; flex-direction: column; gap: 12px; }
 .chat-log > .msg:first-child { margin-top: 0; }
 .chat-note { padding: 0 22px 18px; font-size: 14px; color: var(--text-secondary); }
 .msg { max-width: 92%; opacity: 0; transform: translateY(8px); transition: opacity .35s var(--ease), transform .35s var(--ease); }
@@ -420,7 +421,7 @@ ul.trust { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; margin
 .stmt-mini { display: grid; gap: 4px; padding: 8px; border-radius: 14px; background: var(--bank-bg); font-family: var(--mono); font-size: 12.5px; color: var(--bank-strong); }
 .stmt-mini div { display: grid; grid-template-columns: 6ch minmax(0, 1fr) auto; gap: 10px; padding: 8px 10px; border-radius: 9px; background: #fff; }
 .stmt-mini span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-@media (max-width: 479px) { .chat-log { padding: 16px; height: 440px; } .chat-h { padding-left: 16px; } .chat-title { display: none; } }
+@media (max-width: 479px) { .chat-log { padding: 16px; } .chat-h { padding-left: 16px; } }
 
 /* ---------- close ---------- */
 .sec-close { text-align: center; padding-bottom: clamp(96px, 12vw, 160px); }
@@ -847,7 +848,6 @@ ul.trust { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 0; font-si
 .connect { margin-top: 22px; }
 .where { display: grid; gap: 6px; margin-top: 14px; font-size: 13px; line-height: 1.5; color: #aab8d3; }
 .where b { color: #fff; font-weight: 600; }
-.chat-log { height: 460px; }
 .chat-note { padding-top: 2px; }
 .tzcard-f { display: block; }
 .tzcard-f .rec { vertical-align: -3px; }
@@ -859,7 +859,6 @@ ul.trust { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 0; font-si
   .prompts { margin-top: 22px; }
 }
 @media (max-width: 479px) {
-  .chat-log { height: 420px; }
   .ai-copy .lede { margin-top: 16px; }
 }
 
@@ -951,9 +950,6 @@ ul.trust { gap: 8px 16px; }
   .ss-item.is-pending::before { left: 18px; }
 }
 
-/* AI: the log is as tall as the conversation (JS sets it); capped on desktop */
-.chat-log { height: auto; }
-@media (max-width: 479px) { .chat-log { height: auto; } }
 
 /* close: one button */
 .sec-close .ctas .btn { flex: 0 0 auto; }
@@ -975,3 +971,85 @@ ul.trust { gap: 8px 16px; }
 .scn-rail .chip[aria-pressed='true'] { color: #fff; background: var(--ink); border-color: var(--ink); }
 .page-scn .scn-hero { padding-bottom: 8px; }
 .page-scn .scn-list { padding-top: clamp(20px, 3vw, 36px); }
+
+
+/* =====================================================================
+   Round 4 fixes
+   ===================================================================== */
+
+/* type: one hero, then quieter section heads (82 -> 52 on desktop, 44 -> 32 on phones) */
+h2 { font-size: clamp(32px, 3.7vw, 52px); line-height: 1.05; letter-spacing: -0.035em; }
+.close-line { font-size: clamp(36px, 3.9vw, 56px); line-height: 1.04; letter-spacing: -0.04em; }
+.sec-head { margin-bottom: 40px; }
+.sec-head .lede { margin-top: 12px; }
+@media (max-width: 639px) { .sec-head { margin-bottom: 28px; } }
+
+/* nav: "Ask AI" stays on phones */
+@media (max-width: 479px) { .nav-links a:not(.btn) { padding: 0 9px; } .brand { font-size: 18px; } }
+@media (max-width: 374px) { .nav-in { gap: 4px; } .nav-links { gap: 2px; } .nav-links a:not(.btn) { padding: 0 7px; font-size: 14.5px; } .nav-links .btn-sm { padding: 0 13px; } .brand { gap: 7px; } }
+
+/* hero bank pane: a real statement, top-aligned; the focal line sits level with the merchant */
+@media (min-width: 640px) {
+  .pair-hero .pb-lines { margin-block: 0; padding-bottom: 0; gap: 4px; }
+  .pair-hero .pane-bank { gap: 22px; }
+}
+.pb-lines li { padding-inline: 10px; }
+.pair-hero .pane-label { padding-inline: 10px; }
+.pb-lines .far { color: #8a909a; }
+@media (max-width: 639px) {
+  .pair-hero .pane-label { padding-inline: 0; }
+  .pair-hero .pane-tz .pane-label { margin-top: 10px; padding-right: 44px; }
+}
+
+/* statement: an opened row keeps the ledger's two columns; the detail lives under Trezzit */
+@media (min-width: 760px) {
+  .sdetail:not([hidden]) { grid-template-columns: var(--pair-split); }
+  .sdetail::before { content: ''; background: var(--bank-bg); border-bottom: 1px solid var(--bank-line); }
+  .sd-tz { padding: 18px 22px 18px 22px; padding-left: calc(22px + 36px + 14px); }
+}
+.sd-tz { background: #fff; box-shadow: inset 0 1px 0 var(--divider); }
+.sd-settle { margin-top: 6px; font-size: 14px; color: var(--text-secondary); }
+.sd-chips { gap: 6px; }
+.sd-chips li { height: 38px; padding: 0 12px 0 5px; gap: 7px; font-size: 14.5px; }
+
+/* snap: the sample switch is the same pill control as the hero's Bank | Trezzit */
+.snap-picks { display: inline-grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); grid-template-columns: none; gap: 0; flex: 0 1 auto; max-width: none; padding: 3px; border-radius: 999px; background: var(--surface-muted); box-shadow: inset 0 0 0 1px var(--line); }
+.pick { min-height: 44px; padding: 0 22px; border-radius: 999px; background: transparent; box-shadow: none; text-align: center; }
+.pick b { font-size: 15px; font-weight: 600; color: #475569; }
+.pick span { display: none; }
+.pick:hover { box-shadow: none; }
+.pick:hover b { color: var(--ink); }
+.pick[aria-pressed='true'] { background: #fff; box-shadow: 0 1px 2px rgba(15, 31, 61, .12), 0 2px 8px rgba(15, 31, 61, .08); }
+.pick[aria-pressed='true'] b { color: var(--ink); }
+@media (max-width: 899px) { .snap-picks { grid-template-columns: none; } }
+@media (max-width: 639px) {
+  .pick { min-height: 44px; padding: 0 18px; border-radius: 999px; }
+  .pick b { font-size: 15px; }
+  /* phones: no second copy of the receipt; the link to scan your own sits under the editor */
+  .snap { display: flex; flex-direction: column; }
+  .snap-top { display: contents; }
+  .snap-picks { order: 0; align-self: flex-start; margin-bottom: 14px; }
+  .snap-grid { order: 1; }
+  .snap-own { order: 2; align-self: center; margin-top: 10px; }
+  .snap-paper { display: none; }
+}
+/* the split lands in one frame: every figure fades in together */
+.snap-card.is-landing .mini-tz b, .snap-card.is-landing .snap-people b, .snap-card.is-landing .ss-end, .snap-card.is-landing .ss-split { animation: land .2s ease-out both; }
+@keyframes land { from { opacity: 0; } }
+.mini-tz b.flash, .snap-people b.flash { animation: flash .6s var(--ease); }
+.sav { font-size: 12px; letter-spacing: 0; }
+
+/* AI: prompts, two facts and one link; the chat card fits one screen and grows up from the bottom */
+.sec-ai { overflow: clip; }
+.ai-after { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; margin-top: 28px; }
+ul.trust { font-size: 15px; color: #cbd5e1; gap: 8px 18px; }
+.connect-link { min-height: 44px; }
+.chat-log.is-playing > :first-child { margin-top: auto; }
+.tzcard-note { padding: 10px 16px 0; font-size: 13.5px; line-height: 1.45; color: var(--text-secondary); }
+.chat-title { color: var(--text-secondary); font-weight: 600; font-size: 14px; }
+@media (max-width: 1023px) { .ai-after { margin-top: 24px; } }
+
+/* close: the vision line, one level under the hero; tall enough that the dark section above never shows as a band under the nav */
+.sec-close { min-height: calc(100vh - 360px); display: grid; align-content: center; }
+.close-in { gap: 28px; }
+.close-ai { margin-top: -10px; }

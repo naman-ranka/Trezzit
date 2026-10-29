@@ -5,7 +5,8 @@ import { $, $$, esc, money, ICON, avatar } from './util.js';
 import { loadModel, compute, lineMembers, SHORT, SAMPLES } from './data.js';
 import { toCents } from '../../_kit/split-engine.js';
 
-const EXTRA_PEOPLE = { 'corner-pharmacy': ['you', 'maya'] };
+// who paid each sample (the landing says the same): dinner is Alex's group bill; the rest you paid
+const PAYER = { 'taqueria-sol': 'alex' };
 const COLLAPSE_AT = 7;
 
 export function mountSplit(root, { initial = 'green-basket' } = {}) {
@@ -43,11 +44,7 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
 
   const press = (id) => $$('.play-bar .seg-ctl button', root).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
 
-  function prep(m) {
-    const extra = EXTRA_PEOPLE[m.id];
-    if (extra) m.people = [...extra];
-    return m;
-  }
+  const prep = (m) => m;
 
   async function load(idOrModel) {
     const m = typeof idOrModel === 'string' ? await loadModel(idOrModel) : idOrModel;
@@ -109,6 +106,14 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
     checkEl.className = `p-check${ok ? '' : ' bad'}`;
     checkEl.innerHTML = ok ? `${ICON.check}<span>Adds up to ${money(sum)}.</span>` : `<span>Shares add up to ${money(sum)}, not ${money(res.check.expectedCents)}.</span>`;
 
+    const payer = PAYER[model.id] || 'you';
+    if (payer !== 'you') {
+      // someone else paid: your share still counts, and you owe it to them
+      const mine = res.people.you?.cents || 0;
+      youEl.innerHTML = `
+        <div class="p-you-row"><span>${esc(PEOPLE[payer].name)} paid</span><span class="money">${money(res.totalCents)}</span></div>
+        <div class="p-you-row"><span>You owe ${esc(PEOPLE[payer].name)}</span><strong class="money">${money(mine)}</strong></div>`;
+    } else {
     // you paid the whole bill; everyone else owes you their share
     const others = model.people.filter((p) => p !== 'you' && (res.people[p]?.cents || 0) > 0);
     const owed = others.reduce((a, p) => a + res.people[p].cents, 0);
@@ -117,6 +122,7 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
     youEl.innerHTML = `
       <div class="p-you-row"><span>You paid</span><span class="money">${money(res.totalCents)}</span></div>
       ${owed ? `<div class="p-you-row"><span>${esc(who)} you</span><strong class="money">${money(owed)}</strong></div>` : '<div class="p-you-row"><span>All yours. Nobody owes you.</span></div>'}`;
+    }
 
     clearTimeout(announceT);
     announceT = setTimeout(() => {

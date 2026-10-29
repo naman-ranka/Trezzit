@@ -1,10 +1,10 @@
 // "Split it with my roommates": a playable itemized split, exact to the cent (kit split engine).
 import { $, $$, esc, money, icon, tweenMoney, announce } from './ui.js';
-import { getWorld, getSample, PEOPLE, catOf, itemName, splitWith, cents } from './world.js';
+import { getWorld, getSample, PEOPLE, catOf, itemName, splitWith, cents, tone } from './world.js';
 
 const BILLS = {
-  'green-basket': { payer: 'you', group: 'Flat 3B', order: [13, 9, 10, 11, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8], visible: 5, moreLabel: (n) => `Show ${n} more shared groceries` },
-  'taqueria-sol': { payer: 'alex', group: 'Thursday dinners', order: [0, 1, 2, 3, 4, 5, 6], visible: 7, moreLabel: (n) => `Show ${n} more items` },
+  'green-basket': { payer: 'you', group: 'Flat 3B', order: [13, 9, 10, 11, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8], visible: 5, moreLabel: (n) => `${n} more items` },
+  'taqueria-sol': { payer: 'alex', group: 'Thursday dinners', order: [0, 1, 2, 3, 4, 5, 6], visible: 7, moreLabel: (n) => `${n} more items` },
 };
 // Phones show fewer rows up front; the rest is one tap away.
 const visibleRows = (cfg) => (matchMedia('(max-width: 520px)').matches ? Math.min(4, cfg.visible) : cfg.visible);
@@ -33,10 +33,12 @@ export async function initSplit() {
   function metaFor(it) {
     const ids = Object.keys(it.shares).filter((k) => it.shares[k]);
     const all = state.s.people.length;
-    if (ids.length === 1) return `Just ${ids[0] === 'you' ? 'you' : PEOPLE[ids[0]].name}`;
+    // One person: the filled avatar already says it.
+    if (ids.length === 1) return '';
     const vals = ids.map((k) => it.shares[k]);
     const same = vals.every((v) => v === vals[0]);
-    const who = ids.length === all ? 'Everyone' : ids.map((k) => (k === 'you' ? 'You' : PEOPLE[k].name)).join(', ');
+    if (ids.length === all && same) return `${money(vals[0])} each`;
+    const who = ids.map((k) => (k === 'you' ? 'You' : PEOPLE[k].name)).join(', ');
     return same ? `${who} · ${money(vals[0])} each` : `${who} · ${vals.map((v) => money(v)).join(' · ')}`;
   }
 
@@ -79,7 +81,21 @@ export async function initSplit() {
       <div class="panel totals" aria-live="off"><h3>${esc(s.title)} · ${esc(cfg.group)}</h3>${people}
         <div class="youcats" data-youcats>${youCats(r)}</div>
         <div class="check-line" data-check>${checkText(r)}</div></div>`;
+    watchBar();
     $('[data-more]', host)?.addEventListener('click', () => { state.open = true; render(); $(`[data-row="${cfg.order[vis]}"] button`, host)?.focus(); });
+  }
+
+  // Phones: the totals bar fades in only once the item list is well into view.
+  let io;
+  function watchBar() {
+    io?.disconnect();
+    const list = $('.split-items', host);
+    if (!list || !('IntersectionObserver' in window)) { list?.classList.add('bar-on'); return; }
+    io = new IntersectionObserver(([e]) => {
+      const vis = e.intersectionRect.height / Math.min(e.boundingClientRect.height, innerHeight);
+      list.classList.toggle('bar-on', e.isIntersecting && vis >= 0.3);
+    }, { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1] });
+    io.observe(list);
   }
 
   function tipMeta(tip) {
@@ -87,13 +103,14 @@ export async function initSplit() {
     return `By what each person ordered · ${parts.join(' · ')}`;
   }
   function youCats(r) {
-    const cats = Object.entries(r.people.you.byCategory).filter(([, c]) => c > 0).map(([id, cents]) => ({ cents, ...catOf(id) }));
+    const cats = Object.entries(r.people.you.byCategory).filter(([, c]) => c > 0).map(([id, cents]) => ({ cents, ...catOf(id) }))
+      .sort((a, b) => b.cents - a.cents).map((c, i) => ({ ...c, color: tone(i) }));
     if (!cats.length) return '';
     return `<div class="catbar" aria-hidden="true">${cats.map((c) => `<i style="flex-grow:${c.cents};background:${c.color}"></i>`).join('')}</div>
       <div class="legend">${cats.map((c) => `<span><i style="background:${c.color}"></i>${esc(c.label)} <b class="money">${money(c.cents)}</b></span>`).join('')}</div>`;
   }
   function checkText(r) {
-    return r.check.ok ? `${icon('check')}Shares add up to ${money(r.totalCents)}` : `Shares add up to ${money(r.check.sumCents)}, not ${money(r.totalCents)}`;
+    return r.check.ok ? `${icon('check')}Adds up to ${money(r.totalCents)}` : `Adds up to ${money(r.check.sumCents)}, not ${money(r.totalCents)}`;
   }
 
   function update() {

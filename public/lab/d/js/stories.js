@@ -1,9 +1,8 @@
 // "What did I actually spend in October?": the ledger, all from the computed world.
 import { $, $$, esc, money, icon } from './ui.js';
-import { getWorld, catOf, PEOPLE } from './world.js';
+import { getWorld, catOf, PEOPLE, tone, OTHER_TONE } from './world.js';
 
 /* ---------- October ---------- */
-const ICON_BG = { 'green-basket': '#047857', 'corner-pharmacy': '#dc2626', 'taqueria-sol': '#c2410c', netflix: '#9333ea', 'monthly-rent': '#0f1f3d' };
 export async function initLedger() {
   const host = document.querySelector('[data-led]');
   if (!host) return;
@@ -21,14 +20,14 @@ export async function initLedger() {
         </div>
       </div>
       <label class="search" data-find>${icon('search')}<span class="visually-hidden">Search items, stores, categories</span><input type="search" placeholder="Search any item or store" data-q autocomplete="off"></label>
-      <div class="sugg" data-find><span class="visually-hidden">Try:</span>${['towels', 'avocados', 'sunscreen', 'groceries'].map((q) => `<button type="button" data-try="${q}">${q}</button>`).join('')}</div>
+      <div class="sugg" data-find>${['towels', 'avocados'].map((q) => `<button type="button" data-try="${q}">${q}</button>`).join('')}</div>
       <div data-list aria-live="polite"></div>
     </div>
     <div class="panel sum-card">
       <div class="kicker">October</div>
       <div class="paidspent"><div><span>You paid</span><b class="money">${money(w.paidCents)}</b></div><div class="sp"><span>You spent</span><b class="money">${money(w.spentCents)}</b></div></div>
-      <div class="cats">${top.map((c) => `<div class="cat"><div class="l"><span>${esc(c.label)}</span><b class="money">${money(c.cents)}</b></div><div class="hbar"><i style="width:${Math.max(2, (c.cents / max) * 100)}%;background:${c.color}"></i></div></div>`).join('')}
-        <div class="cat"><div class="l"><span>Everything else</span><b class="money">${money(rest)}</b></div><div class="hbar"><i style="width:${Math.max(2, (rest / max) * 100)}%;background:#94a3b8"></i></div></div></div>
+      <div class="cats">${top.map((c, i) => `<div class="cat"><div class="l"><span>${esc(c.label)}</span><b class="money">${money(c.cents)}</b></div><div class="hbar"><i style="width:${Math.max(2, (c.cents / max) * 100)}%;background:${tone(i)}"></i></div></div>`).join('')}
+        <div class="cat"><div class="l"><span>Everything else</span><b class="money">${money(rest)}</b></div><div class="hbar"><i style="width:${Math.max(2, (rest / max) * 100)}%;background:${OTHER_TONE}"></i></div></div></div>
     </div>`;
 
   const list = $('[data-list]', host);
@@ -41,7 +40,7 @@ export async function initLedger() {
     if (term) {
       const hits = w.items.filter((it) => [it.name, it.bill, catOf(it.category).label].some((s) => s.toLowerCase().includes(term)));
       list.innerHTML = hits.length
-        ? hits.map((it) => `<div class="lrow"><span class="ic" style="background:${catOf(it.category).color}">${esc(it.name[0])}</span><span class="t"><b>${esc(it.name)}</b><span>${esc(it.bill)} · ${it.date}${it.n > 1 ? ` · split ${it.n} ways` : ''}</span></span><span class="v"><b class="money">${money(it.cents)}</b>${it.n > 1 ? `<span class="money">of ${money(it.totalCents)}</span>` : ''}</span></div>`).join('')
+        ? hits.map((it) => `<div class="lrow"><span class="ic">${esc(it.name[0])}</span><span class="t"><b>${esc(it.name)}</b><span>${esc(it.bill)} · ${it.date}${it.n > 1 ? ` · split ${it.n} ways` : ''}</span></span><span class="v"><b class="money">${money(it.cents)}</b>${it.n > 1 ? `<span class="money">of ${money(it.totalCents)}</span>` : ''}</span></div>`).join('')
           + `<div class="led-foot"><span>${hits.length} item${hits.length === 1 ? '' : 's'}</span><b class="money">${money(hits.reduce((a, h) => a + h.cents, 0))}</b></div>`
         : `<p class="noresult">Nothing called “${esc(q.value.trim())}” in October.</p>`;
       return;
@@ -52,7 +51,7 @@ export async function initLedger() {
         + `<div class="led-foot"><span>Left your account</span><b class="money">${money(w.paidCents)}</b></div>`;
       return;
     }
-    list.innerHTML = w.bills.map((b) => `<div class="lrow"><span class="ic" style="background:${ICON_BG[b.id]}">${b.recurring ? icon('repeat') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.recurring ? '<i class="tag">Monthly</i>' : ''}${b.date} · ${b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('');
+    list.innerHTML = w.bills.map((b) => `<div class="lrow"><span class="ic"${b.recurring ? ' aria-label="Monthly" role="img"' : ''}>${b.recurring ? icon('repeat') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.date}${b.recurring ? ' · monthly' : ''} · ${b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('');
   }
   render();
 

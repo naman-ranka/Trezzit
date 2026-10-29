@@ -9,8 +9,8 @@ import { money, esc, avatar, tweenMoney, ICON, listNames } from './util.js';
 
 const whole = (c) => (c % 100 === 0 ? money(c).replace(/\.00$/, '') : money(c));
 /**
- * Who pays what on one line, in words: "Just Maya", "$1.37 per person",
- * "$3.27–$3.28 per person" (a penny left over), or names for a weighted split
+ * Who pays what on one line, in words: "Just Maya", "$1.37 each",
+ * "$3.27–$3.28 each" (a penny left over), or names for a weighted split
  * ("You $600 · Maya $600 · Jordan $672 · Sam $528").
  */
 export const shareText = (shares, order) => {
@@ -20,8 +20,8 @@ export const shareText = (shares, order) => {
   const vals = ids.map((id) => shares[id]);
   const lo = Math.min(...vals);
   const hi = Math.max(...vals);
-  if (lo === hi) return `${money(lo)} per person`;
-  if (hi - lo === 1) return `${money(lo)}–${money(hi)} per person`;
+  if (lo === hi) return `${money(lo)} each`;
+  if (hi - lo === 1) return `${money(lo)}–${money(hi)} each`;
   return ids.map((id) => `${id === 'you' ? 'You' : PEOPLE[id].name} ${whole(shares[id])}`).join(' · ');
 };
 
@@ -50,7 +50,7 @@ export function toggleSplit(orig, cur, id, order) {
  */
 export function whoHTML(order, who, name, open) {
   const stack = order.filter((id) => who.includes(id))
-    .map((id) => `<span class="sav" style="--c:${PEOPLE[id].color}">${id === 'you' ? 'You' : esc(PEOPLE[id].initials)}</span>`).join('');
+    .map((id) => `<span class="sav" style="--c:${PEOPLE[id].color}">${id === 'you' ? 'Y' : esc(PEOPLE[id].initials)}</span>`).join('');
   const toggles = order.map((id) => avatar(PEOPLE[id], { pressed: who.includes(id), label: `${PEOPLE[id].name} on ${name}` })).join('');
   return `<span class="who${open ? ' is-open' : ''}">
     <button type="button" class="who-stack" aria-expanded="${open}" aria-label="Change who had ${esc(name)}"><span class="savs" aria-hidden="true">${stack}</span>${ICON.chevron}</button>
@@ -63,7 +63,7 @@ export function updateStack(li, order, who) {
   const savs = li.querySelector('.savs');
   if (!savs) return;
   savs.innerHTML = order.filter((id) => who.includes(id))
-    .map((id) => `<span class="sav" style="--c:${PEOPLE[id].color}">${id === 'you' ? 'You' : esc(PEOPLE[id].initials)}</span>`).join('');
+    .map((id) => `<span class="sav" style="--c:${PEOPLE[id].color}">${id === 'you' ? 'Y' : esc(PEOPLE[id].initials)}</span>`).join('');
 }
 
 /** Open one line's toggles, close the rest. */
@@ -107,23 +107,33 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     const sum = summarise(sc, bill());
     const res = sum.result;
     const cat = (c) => CATEGORIES[c] || CATEGORIES.other;
-    const firstOpen = res.items.findIndex((it) => !isExtra(it));
-    const rows = res.items.map((it, k) => {
+    // Same order as the home page: the lines that explain the shares lead.
+    const lead = sc.lead || [];
+    const shown = [...lead.map((i) => res.items.find((it) => it.index === i && !isExtra(it))).filter(Boolean),
+      ...res.items.filter((it) => isExtra(it) || !lead.includes(it.index))];
+    const openAt = sc.open ?? shown.find((it) => !isExtra(it))?.index;
+    const rows = shown.map((it) => {
+      const open = !isExtra(it) && it.index === openAt;
       const extra = it.isExtraCharge || it.itemType === 'Tip' || it.itemType === 'Fee' || it.itemType === 'Discount';
       const src = extra ? null : items[it.index];
       const who = src ? splitPeople(src.split, order) : [];
       const c = cat(it.category);
       const tax = !extra && it.taxCents ? `<span class="se-tax">incl. ${money(it.taxCents)} tax</span>` : '';
       const whoCell = multi && !extra
-        ? `<div class="se-who">${whoHTML(order, who, it.name, k === firstOpen)}</div>`
+        ? `<div class="se-who">${whoHTML(order, who, it.name, open)}</div>`
         : (extra ? '<span class="se-prop">In proportion to each share</span>' : `<span class="se-cat"><span class="dot" style="--c:${c.color}"></span>${esc(c.label)}</span>`);
-      return `<li class="se-item${extra ? ' is-extra' : ''}${multi && k === firstOpen ? ' is-open' : ''}" data-i="${extra ? '' : it.index}" style="--cat:${extra ? '#94a3b8' : c.color}">
+      return `<li class="se-item${extra ? ' is-extra' : ''}${multi && open ? ' is-open' : ''}" data-i="${extra ? '' : it.index}" style="--cat:${extra ? '#94a3b8' : c.color}">
         <div class="se-line"><span class="dot" style="--c:${extra ? '#94a3b8' : c.color}" title="${esc(c.label)}"></span><span class="se-name">${esc(it.name)}${tax}</span><span class="se-price money">${money(it.totalCents)}</span></div>
         <div class="se-sub">${whoCell}<span class="se-each money">${multi ? esc(shareText(it.shares, order)) : ''}</span></div>
       </li>`;
     }).join('');
 
-    const people = order.map((id) => {
+    // Compact (examples page): the same pills as the home page's split, everyone but you
+    // ("You spent" is your pill); no bars, no labels.
+    const people = compact ? order.filter((id) => id !== 'you').map((id) => {
+      const cents = res.people[id]?.cents || 0;
+      return `<li class="se-person" data-id="${id}">${avatar(PEOPLE[id], { size: 'sm' })}<span class="sp-name">${esc(PEOPLE[id].name)}</span><b class="se-pamt money" data-cents="${cents}">${money(cents)}</b></li>`;
+    }).join('') : order.map((id) => {
       const p = PEOPLE[id];
       const cents = res.people[id]?.cents || 0;
       const isPayer = sc.payer === id;
@@ -141,7 +151,7 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
       <ol class="se-items${res.items.length > 4 ? ' is-clipped' : ''}" role="list">${rows}</ol>
       ${res.items.length > 4 ? `<button type="button" class="btn btn-quiet btn-sm se-more" data-more>Show all ${res.items.length} lines</button>` : ''}
       <div class="se-side">
-        <ul class="se-people" role="list">${people}</ul>
+        ${people ? `<ul class="se-people${compact ? ' snap-people' : ''}" role="list">${people}</ul>` : ''}
         <div class="se-yours">
           <p class="se-ytitle">Your ${money(sum.mine)}, by category</p>
           <div class="catbar" aria-hidden="true">${catBar(sum.byCategory)}</div>
@@ -178,9 +188,11 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     });
     order.forEach((id) => {
       const li = root.querySelector(`.se-person[data-id="${id}"]`);
+      if (!li) return;
       const cents = res.people[id]?.cents || 0;
       tweenMoney(li.querySelector('.se-pamt'), cents);
-      li.querySelector('.se-bar i').style.width = `${res.totalCents ? (cents / res.totalCents) * 100 : 0}%`;
+      const bar = li.querySelector('.se-bar i');
+      if (bar) bar.style.width = `${res.totalCents ? (cents / res.totalCents) * 100 : 0}%`;
     });
     root.querySelector('.se-ytitle').textContent = `Your ${money(sum.mine)}, by category`;
     root.querySelector('.catbar').innerHTML = catBar(sum.byCategory);

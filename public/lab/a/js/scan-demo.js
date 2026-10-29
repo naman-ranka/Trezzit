@@ -40,9 +40,9 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
         <div class="result-cta is-off"><button type="button" class="btn btn-primary split-btn" tabindex="-1">${esc(splitLabel)}</button></div>
       </div>
     </div>
-    <dialog class="consent">
+    <dialog class="consent" aria-labelledby="consent-t">
       <form method="dialog">
-        <h3>Scan your own receipt</h3>
+        <p class="consent-t" id="consent-t">Scan your own receipt</p>
         <p>To read it, your photo is sent to Google Gemini. Trezzit keeps scan photos for 90 days. Up to 10 scans an hour.</p>
         <p><a href="/privacy">Privacy</a> · <a href="/your-data">Your data</a></p>
         <div class="row"><button class="btn btn-quiet" value="cancel">Not now</button><button class="btn btn-primary" value="ok">Choose a photo</button></div>

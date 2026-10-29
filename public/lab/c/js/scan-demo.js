@@ -54,6 +54,7 @@ export function mountScan(root, opts = {}) {
         <div class="so-foot">
           <p class="so-total"><span>Total</span><b class="money"></b></p>
           ${opts.splitTarget ? `<button type="button" class="c-btn c-btn-sm c-btn-primary so-split">Split this receipt ${icon.arrow}</button>` : ''}
+          ${opts.soloHref ? `<a class="c-btn c-btn-sm c-btn-quiet so-split so-solo" href="${esc(opts.soloHref)}" hidden>See it sorted ${icon.arrow}</a>` : ''}
         </div>
         <p class="so-notice" hidden></p>
       </div>
@@ -74,7 +75,15 @@ export function mountScan(root, opts = {}) {
   const list = root.querySelector('.so-items');
   const checks = root.querySelector('.so-checks');
   const totalEl = root.querySelector('.so-total b');
-  const splitBtn = root.querySelector('.so-split');
+  const splitBtn = root.querySelector('button.so-split');
+  const soloLink = root.querySelector('.so-solo');
+  // a receipt that is just yours has nothing to split: offer where it lands instead
+  const setSolo = (id) => {
+    if (!soloLink || !splitBtn) return;
+    const solo = !!id && getSample(id)?.people?.length === 1;
+    soloLink.hidden = !solo;
+    splitBtn.hidden = solo;
+  };
   const notice = root.querySelector('.so-notice');
   const moreBtn = root.querySelector('.so-more');
   const syncMore = () => {
@@ -152,6 +161,7 @@ export function mountScan(root, opts = {}) {
     const isFile = typeof input !== 'string';
     if (!isFile) {
       press(input);
+      setSolo(input);
       const { raw, bill } = await sampleBill(input);
       showPaper(receiptHTML(raw, { sample: getSample(input), shadow: false }));
       reset(storeLine(raw.receipt));
@@ -159,6 +169,7 @@ export function mountScan(root, opts = {}) {
       opts.onStart?.(input);
     } else {
       press(null);
+      setSolo(null);
       if (objectUrl) URL.revokeObjectURL(objectUrl);
       objectUrl = input.type.startsWith('image/') ? URL.createObjectURL(input) : null;
       showPaper(objectUrl ? `<img class="scan-photo" src="${objectUrl}" alt="">` : '<div class="scan-pdf">PDF</div>');
@@ -191,6 +202,7 @@ export function mountScan(root, opts = {}) {
       if (result.source === 'sample' && isFile) {
         // fell back: show the sample we played
         press(result.sampleId);
+        setSolo(result.sampleId);
         showPaper(receiptHTML(result.raw, { sample: getSample(result.sampleId), shadow: false }));
         settlePaper();
         storeEl.innerHTML = storeLine(result.raw.receipt);

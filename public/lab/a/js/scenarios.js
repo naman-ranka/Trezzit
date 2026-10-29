@@ -1,42 +1,64 @@
-/* scenarios.js: dinner (Alex paid; your share still counts; tax + tip proportional), just yours (item search +
- * categories), every month (itemized rent + schedule modes), and the real app recording in the close.
- * All amounts come from the kit's engine. */
+/* scenarios.js: "One place for everything you spend": every month (rent by room, bills four ways, parking just
+ * Jordan's; a toggle re-splits the rent) and just yours (item search across every sample receipt, plus the pharmacy's
+ * categories). All amounts come from the kit's engine. */
 import { PEOPLE, CATEGORIES } from '../../_kit/receipts.js';
-import { $, $$, esc, money, ICON, avatar, reduced } from './util.js';
-import { loadModel, compute, SAMPLES, dateLabel, splitLabel, RAMP } from './data.js';
-import { STORE_ICON } from './scan-demo.js';
+import { $, $$, esc, money, ICON, avatar } from './util.js';
+import { loadModel, compute, SAMPLES, dateLabel, RAMP, lineMembers } from './data.js';
 
 export async function initScenarios() {
-  await Promise.all([dinner(), search(), rent()]);
-  video();
+  await Promise.all([rent(), search()]);
 }
 
-/* ---------- dinner ---------- */
-async function dinner() {
-  const el = $('#dinner');
+/* ---------- rent: by room or equally, re-split by the engine ---------- */
+async function rent() {
+  const el = $('#rent');
   if (!el) return;
-  const m = await loadModel('taqueria-sol');
-  const r = compute(m);
-  const tip = r.items.find((x) => x.itemType === 'Tip');
+  const m = await loadModel('monthly-rent');
+  const byRoom = JSON.parse(JSON.stringify(m.lines[0].split));
   const ppl = m.people;
-  // one quiet palette here: ink for you, slate for friends
-  const tone = (p, i) => (p === 'you' ? '#0f1f3d' : ['#3d4e6c', '#5f6b82'][(i - 1) % 2]);
-  const you = $('#dinner-you');
-  if (you) you.textContent = money(r.people.you.cents);
-  const cols = ppl.map((p, i) => `<div class="dn-col">
-      <div class="dn-who">${avatar({ ...PEOPLE[p], color: tone(p, i) })}${esc(PEOPLE[p].name)}</div>
-      <div class="dn-tot"><span>Total</span><span class="money">${money(r.people[p].cents)}</span></div>
-    </div>`).join('');
-  el.innerHTML = `<div class="panel dinner">
-    <div class="dn-head"><strong>Taqueria Sol</strong><span class="dn-paid">${avatar({ ...PEOPLE.alex, color: tone('alex', 1) })}Alex paid <b class="money">${money(r.totalCents)}</b></span></div>
-    <div class="dn-tip">
-      <p><strong>Tip ${money(tip.totalCents)}</strong>, split by what each person ordered</p>
-      <div class="dn-bar" role="img" aria-label="${ppl.map((p) => `${PEOPLE[p].name} ${money(tip.shares[p])}`).join(', ')}">
-        ${ppl.map((p, i) => `<span style="--c:${tone(p, i)};--w:${(100 * tip.shares[p]) / tip.totalCents}%">${esc(PEOPLE[p].name)} ${money(tip.shares[p])}</span>`).join('')}
-      </div>
-    </div>
-    <div class="dn-cols">${cols}</div>
+  // rent, the bills (water, trash, internet) and parking, as three rows
+  const GROUPS = [
+    { name: 'Rent', ix: [0] },
+    { name: 'Bills', ix: m.lines.map((l, i) => (['utilities', 'internet'].includes(l.category) ? i : -1)).filter((i) => i >= 0) },
+    { name: 'Parking', ix: m.lines.map((l, i) => (l.category === 'parking' ? i : -1)).filter((i) => i >= 0) },
+  ];
+  el.innerHTML = `<div class="panel rent">
+    <div class="rn-head"><strong>Rent and bills</strong><span class="rn-rep">${ICON.repeat}Repeats on the 1st</span></div>
+    <div class="rn-rows"></div>
+    <div class="rn-people">${ppl.map((p) => `<div class="rn-p${p === 'you' ? ' is-you' : ''}" data-p="${p}">${avatar(p === 'you' ? { ...PEOPLE[p], color: '#fff' } : PEOPLE[p])}<span class="nm">${esc(PEOPLE[p].name)}</span><span class="amt money"></span></div>`).join('')}</div>
+    <p class="visually-hidden" aria-live="polite" data-live></p>
   </div>`;
+  const rowsEl = $('.rn-rows', el);
+  const live = $('[data-live]', el);
+  let mode = 'room';
+  const render = () => {
+    m.lines[0].split = mode === 'room' ? JSON.parse(JSON.stringify(byRoom)) : { type: 'equal', people: [...ppl] };
+    const r = compute(m);
+    const how = (g) => {
+      if (g.name === 'Rent') return '';
+      const who = lineMembers(m.lines[g.ix[0]]);
+      return who.length === 1 ? `Just ${PEOPLE[who[0]].name}` : `${who.length} ways`;
+    };
+    rowsEl.innerHTML = GROUPS.map((g) => {
+      const sum = g.ix.reduce((a, i) => a + r.items[i].totalCents, 0);
+      const ctl = g.name === 'Rent' ? `<span class="mini-seg" role="group" aria-label="Split the rent">
+          <button type="button" data-m="room" aria-pressed="${mode === 'room'}">By room</button><button type="button" data-m="equal" aria-pressed="${mode === 'equal'}">Equally</button></span>` : `<small>${esc(how(g))}</small>`;
+      return `<div class="rn-r"><span class="nm">${g.name}</span>${ctl}<span class="money">${money(sum)}</span></div>`;
+    }).join('');
+    ppl.forEach((p) => { $(`.rn-p[data-p="${p}"] .amt`, el).textContent = money(r.people[p].cents); });
+    const sum = ppl.reduce((a, p) => a + r.people[p].cents, 0);
+    if (sum !== r.totalCents) console.error('[lab/a] rent split does not add up', sum, r.totalCents);
+    return r;
+  };
+  rowsEl.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-m]');
+    if (!b || b.dataset.m === mode) return;
+    mode = b.dataset.m;
+    const r = render();
+    $(`[data-m="${mode}"]`, rowsEl)?.focus();
+    live.textContent = `Rent ${mode === 'room' ? 'by room' : 'equally'}: ${ppl.map((p) => `${PEOPLE[p].name} ${money(r.people[p].cents)}`).join(', ')}.`;
+  });
+  render();
 }
 
 /* ---------- search ---------- */
@@ -49,9 +71,12 @@ async function search() {
     const r = compute(m);
     m.lines.forEach((l, i) => {
       const it = r.items.find((x) => x.index === i);
-      const mine = it?.shares?.you || 0;
-      if (!mine) return;
-      index.push({ name: l.pretty, merchant: m.merchant, date: m.date, cat: l.category, mine, total: it.totalCents, shared: Object.keys(it.shares).length > 1, i });
+      if (!it) return;
+      const mine = it.shares?.you || 0;
+      const who = Object.keys(it.shares || {}).filter((p) => (it.shares[p] || 0) > 0);
+      // lines that are someone else's stay findable too, marked as theirs
+      const owner = !mine ? (who.length === 1 ? `${PEOPLE[who[0]]?.name || 'Someone'}’s` : 'Not yours') : '';
+      index.push({ id: s.id, name: l.pretty, merchant: m.merchant, date: m.date, cat: l.category, mine, total: it.totalCents, shared: who.length > 1, owner, i });
     });
   }
   const ph = await loadModel('corner-pharmacy');
@@ -65,111 +90,30 @@ async function search() {
     <div class="sd-chips" role="group" aria-label="Try a search">${['sunscreen', 'milk', 'household', 'rent'].map((q) => `<button type="button">${q}</button>`).join('')}</div>
     <div class="sd-results" aria-live="polite" aria-atomic="true"></div>
     <div class="sd-cats">
-      <div class="sd-cats-h"><span>Corner Pharmacy · ${dateLabel(ph.date)} · just you</span><strong class="money">${money(phr.totalCents)}</strong></div>
+      <div class="sd-cats-h"><span>Corner Pharmacy · ${dateLabel(ph.date).replace(/, \d{4}$/, '')} · just you</span><strong class="money">${money(phr.totalCents)}</strong></div>
       <div class="cat-bar" role="img" aria-label="${cats.map(([c, v]) => `${CATEGORIES[c].label} ${money(v)}`).join(', ')}">${cats.map(([c, v], k) => `<i style="--c:${RAMP[k % RAMP.length]};--w:${(100 * v) / phr.totalCents}%"></i>`).join('')}</div>
       <div class="cat-legend">${cats.map(([c, v], k) => `<span><i class="dot" style="--c:${RAMP[k % RAMP.length]}"></i>${CATEGORIES[c].label} <b class="money">${money(v)}</b></span>`).join('')}</div>
     </div>`;
   const input = $('input', el);
   const out = $('.sd-results', el);
+  const catsEl = $('.sd-cats', el);
   // an empty box shows your three newest items; the card is as tall as its results (no reserved empty band)
-  const newest = [...index].sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.i - b.i).slice(0, 3);
+  const newest = index.filter((x) => x.mine).sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.i - b.i).slice(0, 3);
   const show = (q) => {
     const t = q.trim().toLowerCase();
-    const hits = t ? index.filter((x) => `${x.name} ${x.merchant} ${CATEGORIES[x.cat]?.label}`.toLowerCase().includes(t)).slice(0, 3) : newest;
+    // your own items first, then everyone else's
+    const hits = t ? index.filter((x) => `${x.name} ${x.merchant} ${CATEGORIES[x.cat]?.label}`.toLowerCase().includes(t)).sort((a, b) => (b.mine > 0) - (a.mine > 0)).slice(0, 3) : newest;
     out.innerHTML = hits.length ? hits.map((x) => `<div class="sd-r"><span class="dot" style="--c:${CATEGORIES[x.cat]?.color}"></span>
       <span class="nm">${esc(x.name)}</span><span class="meta">${esc(x.merchant)} · ${dateLabel(x.date).replace(/, \d{4}$/, '')}</span>
-      <span class="amt"><strong class="money">${money(x.mine)}</strong>${x.shared ? `<small class="money">of ${money(x.total)}</small>` : '<small>yours</small>'}</span></div>`).join('')
-      : `<p class="sd-empty">Nothing called "${esc(q)}" yet.</p>`;
+      <span class="amt${x.mine ? '' : ' is-theirs'}"><strong class="money">${money(x.mine)}</strong>${x.owner ? `<small>${esc(x.owner)}</small>` : x.shared ? `<small class="money">of ${money(x.total)}</small>` : '<small>yours</small>'}</span></div>`).join('')
+      : `<p class="sd-empty">No item matches "${esc(q)}".</p>`;
     $$('.sd-chips button', el).forEach((b) => b.setAttribute('aria-pressed', String(b.textContent === t)));
+    // the pharmacy's breakdown belongs to pharmacy results only, so it never reads as the answer to another search
+    catsEl.hidden = !(hits.length && hits.every((x) => x.id === 'corner-pharmacy'));
   };
   input.addEventListener('input', () => show(input.value));
   $$('.sd-chips button', el).forEach((b) => b.addEventListener('click', () => { input.value = b.textContent; show(input.value); }));
   // it opens on the headline's own search, already answered, so its height never changes on its own
   input.value = 'sunscreen';
   show(input.value);
-}
-
-/* ---------- rent ---------- */
-async function rent() {
-  const el = $('#rent');
-  if (!el) return;
-  const m = await loadModel('monthly-rent');
-  const r = compute(m);
-  const you = r.people.you.cents;
-  // only the lines you have a share in (parking is Jordan's, so it is not in your spending)
-  const lines = m.lines.map((l, i) => {
-    const it = r.items.find((x) => x.index === i);
-    const yours = it.shares.you || 0;
-    if (!yours) return '';
-    return `<div class="rent-line" style="--c:${CATEGORIES[l.category].color}"><span class="cat"></span>
-      <span class="nm">${esc(l.pretty)}</span><span class="how${l.split?.type === 'percentage' ? ' how-pct' : ''}">${esc(splitLabel(l))}</span>
-      <span class="amt"><strong class="money">${money(yours)}</strong><small class="money">of ${money(it.totalCents)}</small></span></div>`;
-  }).join('');
-  el.innerHTML = `<div class="panel rent">
-    <div class="rent-head"><span class="rent-ico">${STORE_ICON.home}</span>
-      <div><strong>Monthly rent</strong><small>${ICON.repeat.replace('width="18" height="18"', 'width="14" height="14" style="display:inline;vertical-align:-2px"')} Monthly · on the 1st</small></div>
-      <span class="money">${money(r.totalCents)}</span></div>
-    <div class="rent-lines">${lines}</div>
-    <div class="rent-you"><span>Your share, every month</span><strong class="money">${money(you)}</strong></div>
-    <div class="sched">
-      <div class="sched-top"><p>Next months</p>
-        <div class="mini-seg" role="group" aria-label="When it repeats">
-          <button type="button" data-mode="auto" aria-pressed="true">Add it for me</button>
-          <button type="button" data-mode="review" aria-pressed="false">Ask me first</button>
-        </div></div>
-      <div class="months" aria-live="polite"></div>
-    </div>
-  </div>`;
-  const months = $('.months', el);
-  const drawMonths = (mode) => {
-    const ms = [['Nov 1', true], ['Dec 1', false], ['Jan 1', false]];
-    months.innerHTML = ms.map(([d, past]) => {
-      const cls = past ? (mode === 'auto' ? 'added' : 'review') : '';
-      const st = past ? (mode === 'auto' ? 'Added' : 'Waiting for you') : (mode === 'auto' ? 'Auto' : 'Asks you');
-      return `<div class="month ${cls}"><b>${d}</b><span class="money">${money(you)}</span><span class="st">${st}</span></div>`;
-    }).join('');
-  };
-  drawMonths('auto');
-  $$('.mini-seg button', el).forEach((b) => b.addEventListener('click', () => {
-    $$('.mini-seg button', el).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    drawMonths(b.dataset.mode);
-  }));
-}
-
-/* ---------- real app video ---------- */
-function video() {
-  const v = $('#ledger-video');
-  const btn = $('#video-btn');
-  if (!v || !btn) return;
-  // nothing downloads on first load: the poster and sources attach ~600px before the phone scrolls in
-  let loaded = false;
-  const load = () => {
-    if (loaded) return;
-    loaded = true;
-    v.poster = v.dataset.poster;
-    v.innerHTML = `<source src="${v.dataset.srcWebm}" type="video/webm"><source src="${v.dataset.srcMp4}" type="video/mp4">`;
-    v.load();
-  };
-  let userPaused = reduced();
-  const sync = () => {
-    const playing = !v.paused;
-    btn.innerHTML = playing ? ICON.pause : ICON.play;
-    btn.setAttribute('aria-label', playing ? 'Pause video' : 'Play video');
-    btn.setAttribute('aria-pressed', String(playing));
-  };
-  v.addEventListener('play', sync); v.addEventListener('pause', sync);
-  sync();
-  btn.addEventListener('click', () => {
-    load();
-    if (v.paused) { userPaused = false; v.play().catch(() => {}); } else { userPaused = true; v.pause(); }
-  });
-  if ('IntersectionObserver' in window) {
-    const near = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { near.disconnect(); load(); } }, { rootMargin: '600px 0px' });
-    near.observe(v);
-    new IntersectionObserver((es) => {
-      es.forEach((e) => {
-        if (e.isIntersecting && !userPaused) { load(); v.play().catch(() => {}); } else if (!e.isIntersecting) v.pause();
-      });
-    }, { threshold: 0.4 }).observe(v);
-  } else load();
 }

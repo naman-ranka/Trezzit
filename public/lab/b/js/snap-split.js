@@ -5,17 +5,21 @@
  * placeholders), so nothing below moves while it plays. All maths goes
  * through the kit's split engine via summarise(), in cents.
  *
- * The read is short (about a second), starts only once the list is well on
- * screen, and jumps straight to the finished split if the visitor scrolls on.
+ * The read starts as soon as the card edges on screen and always finishes in
+ * about 1.2 s: it is driven by elapsed time, so a throttled timer or a quick
+ * scroll can only make it jump ahead, never stall half-built. When it ends the
+ * final numbers appear at once (no count-up), so every figure on screen
+ * agrees with every other at every frame.
  */
 
 import { loadScan, getSample, receiptHTML, ensureReceiptStyles } from '../../_kit/receipts.js';
 import { PEOPLE, CATEGORIES, summarise } from './data.js';
 import { shareText, splitPeople, isExtra, whoHTML, updateStack, openLine, toggleSplit } from './split-editor.js';
-import { money, bankAmt, esc, avatar, tweenMoney, ICON, listNames, reduced, whenVisible, sleep } from './util.js';
+import { money, bankAmt, esc, avatar, ICON, listNames, reduced, whenVisible } from './util.js';
 
 const SHOWN_LINES = 5;
-const READ_MS = 700; // all rows, whatever the receipt length
+const READ_MS = 1000; // all rows, whatever the receipt length
+const CHECK_MS = 200; // "Checking the math" before the split shows
 
 export function initSnapSplit(root, scenarioFor) {
   ensureReceiptStyles();
@@ -77,8 +81,10 @@ export function initSnapSplit(root, scenarioFor) {
   }
 
   function oweText(sum) {
-    const names = others().map((id) => PEOPLE[id].name);
-    if (sc.payer === 'you' && sum.owedToYou) return `${esc(listNames(names))} owe${names.length === 1 ? 's' : ''} you <b class="money" data-owe>${money(sum.owedToYou)}</b><small>They don&rsquo;t need an account.</small>`;
+    // Only the people who still have a share owe anything.
+    const names = others().filter((id) => sum.result.people[id]?.cents > 0).map((id) => PEOPLE[id].name);
+    if (sc.payer === 'you' && !names.length) return 'All yours. Nobody owes anybody.';
+    if (sc.payer === 'you' && sum.owedToYou) return `${esc(listNames(names))} owe${names.length === 1 ? 's' : ''} you <b class="money" data-owe>${money(sum.owedToYou)}</b>`;
     if (sc.payer !== 'you') return `You owe ${esc(PEOPLE[sc.payer].name)} <b class="money" data-owe>${money(sum.youOwe)}</b>`;
     return 'All yours. Nobody owes anybody.';
   }
@@ -87,8 +93,12 @@ export function initSnapSplit(root, scenarioFor) {
     order = sc.people;
     const sum = summarise(sc, bill());
     const res = sum.result;
-    const firstOpen = res.items.findIndex((it) => !isExtra(it));
-    list.innerHTML = res.items.map((it, k) => rowHTML(it, k === firstOpen)).join('');
+    // The lines that explain the shares lead (sc.lead); the rest follow in receipt order.
+    const lead = sc.lead || [];
+    const shown = [...lead.map((i) => res.items.find((it) => it.index === i && !isExtra(it))).filter(Boolean),
+      ...res.items.filter((it) => isExtra(it) || !lead.includes(it.index))];
+    const openAt = sc.open ?? shown.find((it) => !isExtra(it))?.index;
+    list.innerHTML = shown.map((it) => rowHTML(it, !isExtra(it) && it.index === openAt)).join('');
     peopleEl.innerHTML = peopleHTML(res);
     root.classList.toggle('is-solo', order.length === 1);
     sumBank.textContent = sc.bank ? `${sc.bank.date} ${sc.bank.merchant}` : 'Not on your statement';
@@ -122,10 +132,19 @@ export function initSnapSplit(root, scenarioFor) {
         updateStack(li, order, who);
       }
     });
-    others().forEach((id) => tweenMoney(peopleEl.querySelector(`[data-id="${id}"] b`), res.people[id]?.cents || 0));
-    tweenMoney(sumMine, sum.mine);
+    others().forEach((id) => setMoney(peopleEl.querySelector(`[data-id="${id}"] b`), res.people[id]?.cents || 0));
+    setMoney(sumMine, sum.mine);
     foot.querySelector('[data-owe-line]').innerHTML = oweText(sum);
     live.textContent = order.map((id) => `${PEOPLE[id].name} ${money(res.people[id]?.cents || 0)}`).join(', ');
+  }
+
+  /* A changed figure is set in the same frame as every other figure and flashes once. */
+  function setMoney(node, cents) {
+    if (!node) return;
+    const changed = node.dataset.cents !== String(cents);
+    node.dataset.cents = String(cents);
+    node.textContent = money(cents);
+    if (changed && !reduced()) { node.classList.remove('flash'); void node.offsetWidth; node.classList.add('flash'); }
   }
 
   /* ---------- the read ---------- */
@@ -135,10 +154,6 @@ export function initSnapSplit(root, scenarioFor) {
     const y = Math.min(max, Math.max(0, line.offsetTop - view.clientHeight * 0.4));
     paper.style.transform = `translateY(${-y}px)`;
   }
-  const onScreen = () => {
-    const r = card.getBoundingClientRect();
-    return r.bottom > 80 && r.top < innerHeight;
-  };
 
   /* Pending: rows are placeholders, amounts are "…", nothing claims a result yet. */
   function pending() {
@@ -149,45 +164,55 @@ export function initSnapSplit(root, scenarioFor) {
     progress.style.setProperty('--p', '0');
   }
 
-  /* Finished: the split, with the money counting in from the bill total. */
+  /* Finished: every figure lands in the same frame (the card fades them in together). */
   function finish({ animate = true } = {}) {
     paper.querySelectorAll('.tz-r-line.is-active').forEach((l) => l.classList.remove('is-active'));
     paper.style.transform = '';
     [...list.children].forEach((r) => r.classList.remove('is-pending'));
+    const sum = summarise(sc, bill());
+    sumMine.dataset.cents = String(sum.mine);
+    sumMine.textContent = money(sum.mine);
+    others().forEach((id) => {
+      const b = peopleEl.querySelector(`[data-id="${id}"] b`);
+      const c = sum.result.people[id]?.cents || 0;
+      b.dataset.cents = String(c);
+      b.textContent = money(c);
+    });
     setPhase('split');
     progress.style.setProperty('--p', '0');
-    const sum = summarise(sc, bill());
-    const dur = animate && !reduced() ? 600 : 0;
-    tweenMoney(sumMine, sum.mine, { from: sum.total, dur });
-    others().forEach((id) => tweenMoney(peopleEl.querySelector(`[data-id="${id}"] b`), sum.result.people[id]?.cents || 0, { from: 0, dur }));
-    if (animate) hint();
+    if (animate && !reduced()) {
+      card.classList.remove('is-landing'); void card.offsetWidth; card.classList.add('is-landing');
+      hint();
+    }
   }
 
-  async function read(id) {
+  /* The read is a function of elapsed time: each tick shows every row that is due. */
+  function read(id) {
     if (reduced()) { finish({ animate: false }); return; }
     pending();
     const rows = [...list.children];
     const lines = [...paper.querySelectorAll('.tz-r-line')];
     const status = foot.querySelector('[data-read-status]');
-    const per = Math.max(40, Math.min(140, READ_MS / rows.length));
-    await sleep(150);
-    for (let k = 0; k < rows.length; k += 1) {
+    const n = rows.length;
+    const t0 = performance.now();
+    let shown = 0;
+    const tick = () => {
       if (id !== run) return;
-      if (!onScreen()) { finish({ animate: false }); return; } // scrolled on: no half-built card
-      const r = rows[k];
-      const line = lines.find((l) => Number(l.dataset.index) === Number(r.dataset.i));
-      lines.forEach((l) => l.classList.toggle('is-active', l === line));
-      if (line) follow(line);
-      r.classList.remove('is-pending');
-      progress.style.setProperty('--p', String((k + 1) / rows.length));
-      if (status) status.textContent = `Reading line ${k + 1} of ${rows.length}`;
-      await sleep(per);
-    }
-    if (id !== run) return;
-    if (status) status.textContent = 'Checking the math';
-    await sleep(220);
-    if (id !== run) return;
-    finish();
+      const t = performance.now() - t0;
+      const due = Math.min(n, Math.ceil((t / READ_MS) * n));
+      for (; shown < due; shown += 1) rows[shown].classList.remove('is-pending');
+      if (shown > 0) {
+        const r = rows[shown - 1];
+        const line = lines.find((l) => Number(l.dataset.index) === Number(r.dataset.i));
+        lines.forEach((l) => l.classList.toggle('is-active', l === line));
+        if (line) follow(line);
+      }
+      progress.style.setProperty('--p', String(shown / n));
+      if (status) status.textContent = shown < n ? `Reading line ${Math.max(1, shown)} of ${n}` : 'Checking the math';
+      if (t >= READ_MS + CHECK_MS) { finish(); return; }
+      setTimeout(tick, 40);
+    };
+    tick();
   }
 
   /* one-time nudge on the open line's faces once the read is done */
@@ -261,11 +286,11 @@ export function initSnapSplit(root, scenarioFor) {
   let played = false;
   load(first, { play: false, wait: !reduced() }).then(() => {
     if (reduced()) return;
-    whenVisible(list, () => {
+    whenVisible(card, () => {
       if (played || sampleId !== first) return;
       played = true;
       read(run);
-    }, { threshold: 0, rootMargin: '0px 0px -35% 0px' });
+    }, { threshold: 0.15 });
   });
 
   return {

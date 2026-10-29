@@ -11,7 +11,8 @@ import { PEOPLE as KIT_PEOPLE, CATEGORIES as KIT_CATEGORIES, SAMPLES, loadScan, 
 import { normalizeScan, titleCase } from '../../_kit/scan-client.js';
 import { splitBill, billFromScan, toCents } from '../../_kit/split-engine.js';
 
-export const PEOPLE = KIT_PEOPLE;
+/* Maya's teal is darkened to #0f766e so a white initial on it passes AA (5.5:1). */
+export const PEOPLE = { ...KIT_PEOPLE, maya: { ...KIT_PEOPLE.maya, color: '#0f766e' } };
 
 export const CATEGORIES = {
   ...KIT_CATEGORIES,
@@ -51,26 +52,29 @@ export function itemName(raw) {
 const DEFS = [
   {
     id: 'groceries', kind: 'shared', title: 'Groceries with roommates', short: 'Groceries',
-    sample: 'green-basket', payer: 'you', group: 'Flatmates',
-    bank: { date: 'OCT 24', merchant: 'GREEN BASKET MKT', cat: 'Shopping' },
+    sample: 'green-basket', payer: 'you', group: 'Roommates',
+    // The lines that make the shares differ come first (oat milk and kale chips are Maya's,
+    // avocados and cold brew are yours, towels are split 4 ways); oat milk opens.
+    lead: [11, 12, 9, 10, 13], open: 11,
+    bank: { date: 'OCT 24', merchant: 'GREEN BASKET MKT', cat: 'Shopping' }, day: 'Oct 24',
     lesson: 'One charge, four people.',
   },
   {
     id: 'dinner', kind: 'shared', title: 'Dinner a friend paid', short: 'Dinner',
     sample: 'taqueria-sol', payer: 'alex', group: 'Taco Thursday',
-    bank: null,
+    bank: null, day: 'Oct 18',
     lesson: 'Not on your statement. Still your dinner.',
   },
   {
     id: 'pharmacy', kind: 'personal', title: 'A pharmacy run, just yours', short: 'Pharmacy',
     sample: 'corner-pharmacy', payer: 'you', group: null,
-    bank: { date: 'OCT 20', merchant: 'CORNER PHARMACY', cat: 'Health' },
+    bank: { date: 'OCT 20', merchant: 'CORNER PHARMACY', cat: 'Health' }, day: 'Oct 20',
     lesson: 'All yours. Four kinds of spending.',
   },
   {
     id: 'rent', kind: 'recurring', title: 'Rent and bills', short: 'Rent',
-    payer: 'you', group: 'Flatmates', repeat: 'Every month on the 1st',
-    bank: { date: 'OCT 01', merchant: 'TRANSFER OAK ST PROPERTY', cat: 'Transfer' },
+    payer: 'you', group: 'Roommates', repeat: 'Every month on the 1st',
+    bank: { date: 'OCT 01', merchant: 'TRANSFER OAK ST PROPERTY', cat: 'Transfer' }, day: 'Oct 1', store: 'Oak St Property',
     people: ROOMIES,
     items: [
       { name: 'Rent', amount: '2400.00', category: 'rent', split: { type: 'percentage', percents: { you: 25, maya: 25, jordan: 28, sam: 22 } } },
@@ -80,13 +84,13 @@ const DEFS = [
       { name: 'Parking space 12', amount: '75.00', category: 'parking', split: { type: 'exact', amounts: { jordan: '75.00' } } },
     ],
     total: '2632.40',
-    lesson: 'One transfer, five lines, every month.',
+    lesson: 'Jordan has the big room and the parking spot.',
     next: ['Nov 1', 'Dec 1', 'Jan 1'],
   },
   {
     id: 'streaming', kind: 'recurring', title: 'Streaming, split four ways', short: 'Streaming',
-    payer: 'you', group: 'Flatmates', repeat: 'Every month on the 3rd',
-    bank: { date: 'OCT 03', merchant: 'STREAMBOX.TV', cat: 'Entertainment' },
+    payer: 'you', group: 'Roommates', repeat: 'Every month on the 3rd',
+    bank: { date: 'OCT 03', merchant: 'STREAMBOX.TV', cat: 'Entertainment' }, day: 'Oct 3', store: 'StreamBox',
     people: ROOMIES,
     items: [{ name: 'Premium plan', amount: '22.99', category: 'subscriptions', split: eq(ROOMIES) }],
     total: '22.99',
@@ -96,7 +100,7 @@ const DEFS = [
   {
     id: 'trip', kind: 'shared', title: 'A weekend away', short: 'Trip',
     payer: 'you', group: 'Lake weekend',
-    bank: { date: 'OCT 11', merchant: 'PINES CABIN', cat: 'Travel' },
+    bank: { date: 'OCT 11', merchant: 'PINES CABIN', cat: 'Travel' }, day: 'Oct 11', store: 'Pines Cabin',
     people: ROOMIES,
     items: [
       { name: 'Cabin, 2 nights', amount: '480.00', category: 'travel', split: eq(ROOMIES) },
@@ -112,7 +116,7 @@ const EXTRA = [
   {
     id: 'order', kind: 'personal', title: 'One online order', short: 'Online order',
     payer: 'you', group: null,
-    bank: { date: 'OCT 15', merchant: 'MKTPLACE ORDER *3B7Q1', cat: 'Shopping' },
+    bank: { date: 'OCT 15', merchant: 'MKTPLACE ORDER *3B7Q1', cat: 'Shopping' }, day: 'Oct 15', store: 'Online order',
     people: ['you'],
     items: [
       { name: 'USB-C charger, 2-pack', amount: '18.99', category: 'electronics' },

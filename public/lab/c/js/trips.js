@@ -72,7 +72,7 @@ async function tripDemo(root) {
     ul.innerHTML = pays.length
       ? pays.map((x) => `<li>${av(x.from)}<span>${who(x.from)} ${x.from === 'you' ? 'pay' : 'pays'} ${x.to === 'you' ? 'you' : who(x.to)}</span><b class="money">${money(x.c)}</b></li>`).join('')
       : '<li>Everyone is even.</li>';
-    root.querySelector('.settle-n').textContent = pays.length ? `${pays.length} ${pays.length === 1 ? 'payment settles' : 'payments settle'} ${on.size === 1 ? 'this bill' : `all ${on.size} bills`}. You mark each one paid.` : '';
+    root.querySelector('.settle-n').textContent = pays.length ? `${pays.length} ${pays.length === 1 ? 'payment settles' : 'payments settle'} ${on.size === 1 ? 'this bill' : on.size === 2 ? 'both bills' : `all ${on.size} bills`}. You mark each one paid.` : '';
     const prevPaid = first ? paid : (Number(paidEl.dataset.c) || 0);
     const prevSpent = first ? spent : (Number(spentEl.dataset.c) || 0);
     paidEl.dataset.c = paid; spentEl.dataset.c = spent;

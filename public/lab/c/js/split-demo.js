@@ -48,6 +48,9 @@ export function mountSplit(root, opts = {}) {
   const itemsEl = $('.sp-items');
   const more = $('.sp-more');
   const say = $('.sp-say');
+  const hint = $('.sp-hint');
+  const HINT = hint.textContent;
+  let hintT = 0;
 
   function participants(line, i) {
     const shares = st.result?.items.find((it) => it.index === i)?.shares || {};
@@ -91,10 +94,9 @@ export function mountSplit(root, opts = {}) {
       const b = li.querySelector('.sp-pa');
       const to = r.people[p]?.cents || 0;
       const from = toCents(b.textContent);
-      if (from !== to) {
-        li.classList.remove('flash'); void li.offsetWidth; li.classList.add('flash');
-        countMoney(b, from, to, 420);
-      }
+      // always (re)target the figure: a tap that undoes the last one must cancel its count
+      if (from !== to) { li.classList.remove('flash'); void li.offsetWidth; li.classList.add('flash'); }
+      countMoney(b, from, to, 420);
     });
   }
 
@@ -198,6 +200,8 @@ export function mountSplit(root, opts = {}) {
     const nItems = st.bill.items.filter((it) => !it.isExtraCharge).length;
     $('.sp-sub').textContent = `${money(st.result.totalCents)} · ${nItems} items · ${st.payer === 'you' ? 'you paid' : `${PEOPLE[st.payer].name} paid`}`;
     $('.sp-tip').hidden = !(opts.tipToggle && st.bill.tip);
+    // one person: nothing to tap, so no hint
+    $('.sp-hint').hidden = st.people.length < 2;
     renderPeople(true);
     renderYours();
     renderRows();
@@ -254,11 +258,20 @@ export function mountSplit(root, opts = {}) {
       const row = b.closest('.sp-row');
       row.classList.remove('nope'); void row.offsetWidth; row.classList.add('nope');
       say.textContent = `Someone has to pay for ${name}.`;
+      // say it where the eye is, too, then put the hint back
+      hint.textContent = 'Someone has to pay for it';
+      root.classList.add('hinting');
+      clearTimeout(hintT);
+      hintT = setTimeout(() => { hint.textContent = HINT; root.classList.remove('hinting'); }, 1500);
       return;
     }
     root.classList.add('touched');
     const ordered = st.people.filter((x) => next.includes(x));
-    st.lines[i] = { ...st.lines[i], split: eq(ordered) };
+    // toggling back to the original people restores the original split (a percent line stays a percent line)
+    const orig = st.original[i]?.split;
+    const origPeople = orig ? (orig.people || Object.keys(orig.percents || orig.amounts || orig.shares || {})) : null;
+    const same = origPeople && origPeople.length === ordered.length && ordered.every((x) => origPeople.includes(x));
+    st.lines[i] = { ...st.lines[i], split: same ? orig : eq(ordered) };
     update();
     const mine = st.result.items.find((x) => x.index === i)?.shares?.you || 0;
     say.textContent = `${name}: ${method(st.lines[i])}${mine ? `, your part ${money(mine)}` : ''}.`;

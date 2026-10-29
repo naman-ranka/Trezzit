@@ -29,6 +29,10 @@ export const CATS = {
   subscriptions: { label: 'Subscriptions', color: '#9333ea' },
 };
 export const catOf = (id) => CATS[id] || CATS.other;
+/* Charts use one hue: navy for the largest share, then lighter steps; grey is "everything else". */
+const TONES = ['#0f1f3d', '#3f5b8c', '#7f95bb', '#b3c1d9', '#d3dcea'];
+export const tone = (i) => TONES[Math.min(i, TONES.length - 1)];
+export const OTHER_TONE = '#cbd2dc';
 
 const NAME_FIX = { 'RENT OCTOBER': 'Rent', 'RENT NOVEMBER': 'Rent', 'INTERNET 1 GIG': 'Internet', 'PARKING SPACE 12': 'Parking space' };
 export const itemName = (raw) => NAME_FIX[raw] || sentence(raw);

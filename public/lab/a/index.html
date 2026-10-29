@@ -45,8 +45,8 @@
     <nav class="nav-links" aria-label="Sections">
       <a href="#scan">Scan</a>
       <a href="#story">Split</a>
-      <a href="#ai">With your AI</a>
-      <a href="#scenarios">Every bill</a>
+      <a href="#scenarios">Track</a>
+      <a href="#ai">AI</a>
     </nav>
     <div class="nav-cta">
       <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
@@ -62,7 +62,7 @@
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <h1 id="hero-title" class="display">See what you<br class="br-d"> actually spent.</h1>
-      <p class="lede">Scan a receipt. Split it. Count only your share.</p>
+      <p class="lede"><span>Your bank shows what you paid.</span> <span>Trezzit shows what you spent.</span></p>
       <div class="cta-row">
         <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
         <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
@@ -118,76 +118,42 @@
 <!-- ============ STORY (sticky stage) ============ -->
 <section class="sec sec-story" id="story" aria-labelledby="story-title">
   <div class="wrap story" id="story-root">
-    <header class="sec-head story-head" data-reveal>
-      <h2 id="story-title" class="h2">One receipt.<br class="br-d"> Four roommates.</h2>
-      <p class="sub">Add roommates by name. They join when they want.</p>
-    </header>
+    <div class="story-left">
+      <header class="sec-head story-head" data-reveal>
+        <h2 id="story-title" class="h2"><span>One receipt.</span> <span>Four roommates.</span></h2>
+      </header>
+      <p class="story-cap" aria-hidden="true"><span></span></p>
+    </div>
     <div class="story-stage-wrap">
       <div class="story-pin" id="story-pin">
         <div class="story-stage" id="story-stage" role="group" aria-label="The Green Basket receipt, split four ways"></div>
+        <p class="story-tab" id="story-tab"></p>
       </div>
-      <div class="story-sum story-sum-m" id="story-sum-m"></div>
     </div>
+    <!-- desktop: invisible scroll triggers (their headings stay in the reading order); the caption beside the stage cross-fades -->
     <ol class="story-steps" role="list">
-      <li class="step" data-step="1">
-        <div class="step-card">
-          <h3>Split what you share.</h3>
-          <p>Ten items, four ways.</p>
-        </div>
-      </li>
-      <li class="step" data-step="2">
-        <div class="step-card">
-          <h3>Keep what's yours.</h3>
-          <p>Avocados: yours. Oat milk: Maya's.</p>
-        </div>
-      </li>
-      <li class="step" data-step="3">
-        <div class="step-card">
-          <h3>Your share, sorted.</h3>
-          <p class="step-hint">Tap a dot to change who had what.</p>
-          <div class="story-sum story-sum-d" id="story-sum"></div>
-        </div>
-      </li>
+      <li class="step" data-step="1"><div class="step-card"><h3>Split what you share.</h3></div></li>
+      <li class="step" data-step="2"><div class="step-card"><h3>Keep what's yours.</h3></div></li>
+      <li class="step" data-step="3"><div class="step-card"><h3>Tap to change who had what.</h3></div></li>
     </ol>
   </div>
 </section>
 
 
-<!-- ============ AI ============ -->
-<section class="sec sec-ai dark" id="ai" aria-labelledby="ai-title" data-nav="dark">
-  <div class="wrap">
-    <header class="sec-head sec-head-c" data-reveal>
-      <h2 id="ai-title" class="h2">Or just ask.</h2>
-      <p class="sub">In Claude or ChatGPT.</p>
-    </header>
-    <div class="chat-wrap" id="chat-root" data-reveal></div>
-    <ul class="trust" role="list" data-reveal>
-      <li><span class="ti" data-icon="lock"></span>No bank login. Never moves money.</li>
-      <li><span class="ti" data-icon="list"></span>Everything your AI adds shows in your activity log.</li>
-      <li><span class="ti" data-icon="unplug"></span>Only after you allow it. Disconnect anytime.</li>
-    </ul>
-    <div class="ai-connect" data-reveal>
-      <a class="btn btn-light btn-lg" href="/mcp#connect-claude">Connect your AI</a>
-      <div class="mcp-url"><code id="mcp-url">https://api.trezzit.com/api/mcp</code><button type="button" class="copy-btn" id="mcp-copy" aria-describedby="mcp-url">Copy</button></div>
-    </div>
-  </div>
-</section>
-
 <!-- ============ SCENARIOS ============ -->
 <section class="sec sec-scen" id="scenarios" aria-labelledby="scen-title">
   <div class="wrap">
     <header class="sec-head sec-head-c" data-reveal>
-      <h2 id="scen-title" class="h2">Every kind of bill.</h2>
+      <h2 id="scen-title" class="h2">One place for everything you spend.</h2>
     </header>
 
-    <!-- Shared: dinner -->
-    <article class="chapter" id="shared" aria-labelledby="ch-shared">
+    <!-- Every month: rent -->
+    <article class="chapter" id="monthly" aria-labelledby="ch-monthly">
       <div class="ch-copy" data-reveal>
-        <p class="eyebrow">Shared</p>
-        <h3 id="ch-shared" class="h3">Alex paid. Your share still counts.</h3>
-        <p class="sub">Your share: <span class="money" id="dinner-you">$27.03</span>, tax and tip in.</p>
+        <p class="eyebrow">Every month</p>
+        <h3 id="ch-monthly" class="h3">Rent by room. Bills four ways.</h3>
       </div>
-      <div class="ch-visual" id="dinner" data-reveal></div>
+      <div class="ch-visual" id="rent" data-reveal></div>
     </article>
 
     <!-- Personal -->
@@ -201,34 +167,38 @@
       </div>
     </article>
 
-    <!-- Recurring -->
-    <article class="chapter" id="recurring" aria-labelledby="ch-recurring">
-      <div class="ch-copy" data-reveal>
-        <p class="eyebrow">Every month</p>
-        <h3 id="ch-recurring" class="h3">Rent, split line by line.</h3>
-      </div>
-      <div class="ch-visual" id="rent" data-reveal></div>
-    </article>
   </div>
 </section>
 
+<!-- ============ AI ============ -->
+<section class="sec sec-ai dark" id="ai" aria-labelledby="ai-title" data-nav="dark">
+  <div class="wrap">
+    <header class="sec-head sec-head-c" data-reveal>
+      <h2 id="ai-title" class="h2 ai-h"><span>Or just ask</span> <span>your AI.</span></h2>
+      <p class="sub">In Claude or ChatGPT. It shows you before it saves.</p>
+    </header>
+    <div class="chat-wrap" id="chat-root" data-reveal></div>
+    <p class="ai-log"><span class="ti" data-icon="list"></span>Everything your AI adds shows in your activity log.</p>
+    <div class="ai-connect">
+      <a class="btn btn-dark-quiet btn-lg" href="/mcp#connect-claude">Connect to Claude</a>
+      <a class="btn btn-dark-quiet btn-lg" href="/mcp#connect-chatgpt">Connect to ChatGPT</a>
+    </div>
+  </div>
+</section>
 
 <!-- ============ CLOSE ============ -->
 <section class="sec sec-close dark" id="close" aria-labelledby="close-title" data-nav="dark">
   <div class="wrap close-in">
     <div class="close-copy" data-reveal>
-      <h2 id="close-title" class="display close-title"><span>Everything you spend.</span> <span>Item by item.</span></h2>
+      <h2 id="close-title" class="display close-title">Start with one receipt.</h2>
       <div class="cta-row">
         <a class="btn btn-light btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
         <a class="btn btn-dark-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
       </div>
     </div>
-    <figure class="phone" id="phone" data-reveal>
-      <div class="phone-screen">
-        <video id="ledger-video" muted playsinline loop preload="none" width="600" height="1298" data-poster="./assets/ledger-poster.webp" data-src-webm="./assets/ledger.webm" data-src-mp4="./assets/ledger.mp4" aria-label="The Trezzit app: Spent this month, $1,253.26, each row showing your share of the bill"></video>
-      </div>
-      <figcaption><span>The Trezzit app</span><button class="media-btn" id="video-btn" type="button" aria-label="Play video" aria-pressed="false"></button></figcaption>
-    </figure>
+    <div class="phone" id="phone" data-reveal>
+      <img src="./assets/app-ledger.webp" width="780" height="1688" loading="lazy" decoding="async" alt="The Trezzit app: Spent this month, $1,253.26, each row showing your share of the bill">
+    </div>
   </div>
 </section>
 </main>
@@ -250,8 +220,7 @@
       <a href="/delete-account">Delete account</a>
       <a href="/support">Support</a>
     </nav>
-    <p class="foot-legal">Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
-    <p class="foot-legal">Sample receipts on this page are made up.</p>
+    <p class="foot-legal">Sample receipts on this page are made up. Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
   </div>
 </footer>
 </body>

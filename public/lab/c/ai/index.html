@@ -20,6 +20,12 @@
 <link rel="stylesheet" href="../../_kit/tokens.css">
 <link rel="stylesheet" href="../../_kit/receipts/receipt.css" data-tz-receipt>
 <link rel="stylesheet" href="../css/c.css">
+<link rel="modulepreload" href="../js/util.js">
+<link rel="modulepreload" href="../js/data.js">
+<link rel="modulepreload" href="../js/page.js">
+<link rel="modulepreload" href="../../_kit/split-engine.js">
+<link rel="modulepreload" href="../../_kit/scan-client.js">
+<link rel="modulepreload" href="../../_kit/receipts.js">
 <script type="module" src="../js/ai-page.js"></script>
 </head>
 <body>
@@ -48,7 +54,6 @@
         <a class="c-btn c-btn-primary c-btn-lg" href="#connect">Connect your AI</a>
       </div>
       <ul class="trust" role="list">
-        <li>Asks before it saves, and tells you who gets notified</li>
         <li>Everything it adds shows in your activity</li>
         <li>Never moves money</li>
         <li>Disconnect any time</li>
@@ -67,7 +72,7 @@
         <h3>Claude</h3>
         <ol>
           <li>Open <a href="https://claude.ai/settings/connectors">Settings, then Connectors</a>.</li>
-          <li>Find Trezzit and select Connect, or add a custom connector with the server URL below.</li>
+          <li>Add a custom connector with the server URL below.</li>
           <li>Sign in to Trezzit and allow access.</li>
         </ol>
       </div>
@@ -92,7 +97,6 @@
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
       <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no sign-up</a>
     </div>
-    <p class="micro rv">No bank login needed.</p>
   </div>
 </section>
 </main>

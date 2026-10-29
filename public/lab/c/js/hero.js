@@ -12,7 +12,7 @@ export function initHero(root) {
 
   const finish = () => {
     root.classList.add('s1', 's2', 's3', 's4');
-    amt.textContent = '$30.00';
+    countMoney(amt, 3000, 3000, 0);
     label.textContent = 'You spent';
   };
 
@@ -20,7 +20,7 @@ export function initHero(root) {
     const my = ++run;
     if (reduced() || !document.documentElement.classList.contains('anim')) { finish(); return; }
     root.classList.remove('s1', 's2', 's3', 's4');
-    amt.textContent = '$100.00';
+    countMoney(amt, 10000, 10000, 0); // also cancels a count still running from the last play
     label.textContent = 'You paid';
     void root.offsetWidth;
     const step = async (ms, cls) => { await sleep(ms); if (my !== run) throw new Error('stale'); root.classList.add(cls); };

@@ -36,12 +36,17 @@ export function onVisible(el, cb, { threshold = 0.35, rootMargin = '0px' } = {})
 }
 
 /** Tween a money figure from `from` to `to` cents. */
+const tweens = new WeakMap();
 export function countMoney(el, from, to, dur = 700, cur = 'USD') {
+  // a newer tween on the same element always wins (no two counts fighting over one figure)
+  const my = (tweens.get(el) || 0) + 1;
+  tweens.set(el, my);
   if (reduced() || dur <= 0 || from === to) { el.textContent = money(to, cur); return Promise.resolve(); }
   return new Promise((resolve) => {
     const t0 = performance.now();
     const ease = (x) => 1 - Math.pow(1 - x, 3);
     const step = (now) => {
+      if (tweens.get(el) !== my) { resolve(); return; }
       const p = Math.min(1, (now - t0) / dur);
       el.textContent = money(Math.round(from + (to - from) * ease(p)), cur);
       if (p < 1) requestAnimationFrame(step); else resolve();

@@ -1,6 +1,6 @@
 /* scan-page.js: /lab/a/scan/. Scan a receipt; the result drops straight into the split.
  * ?r=<sample id> (or ?r=live, from the landing page's own scan) picks the receipt to start with.
- * Arriving with #split (the landing's "Split it yourself"): the scan renders finished, at once,
+ * Arriving with #split (the landing scan's "Split it" for a sample other than the story's): the scan renders finished, at once,
  * and the page opens on step 2 after everything above it has its final height. */
 import { $ } from './util.js';
 import { mountScan } from './scan-demo.js';

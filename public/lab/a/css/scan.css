@@ -23,3 +23,6 @@
   /* reserve the demo's final height before the module mounts (no shift of the split below) */
   .pg .scan-demo { min-height: calc(72px + min(680px, max(520px, 100svh - 230px))); }
 }
+/* the scan's own sample chips drive the split, so the split's chip row would repeat them */
+.pg .play-bar .seg-ctl { display: none; }
+.pg .play-bar { justify-content: flex-end; }
