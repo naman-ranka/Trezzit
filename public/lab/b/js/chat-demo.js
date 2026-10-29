@@ -44,7 +44,7 @@ export function scripts(sc) {
       chip: "What's on my statement but not in Trezzit?",
       steps: [
         { user: "Here's my October statement. Add what's not in Trezzit yet. The café was with Maya.", attach: { icon: 'doc', name: 'october-statement.pdf' } },
-        { tools: ['Checked your payments', 'Added 2 expenses'] },
+        { tools: ['Added 2 expenses'] },
         { html: card('Added from your statement', '2 charges that weren’t in Trezzit',
           row(`${line('OCT 23', 'CITY PARKING', parking.total)}<small>Just you</small>`, money(parking.mine))
           + row(`${line('OCT 17', 'CORNER CAFE', cafe.total)}<small>You and Maya</small>`, money(cafe.mine)),

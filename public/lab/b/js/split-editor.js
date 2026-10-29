@@ -148,8 +148,8 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     }).join('');
 
     root.innerHTML = `
-      <ol class="se-items${res.items.length > 4 ? ' is-clipped' : ''}" role="list">${rows}</ol>
-      ${res.items.length > 4 ? `<button type="button" class="btn btn-quiet btn-sm se-more" data-more>Show all ${res.items.length} lines</button>` : ''}
+      <ol class="se-items${res.items.length > 5 ? ' is-clipped' : ''}" role="list">${rows}</ol>
+      ${res.items.length > 5 ? `<button type="button" class="btn btn-quiet btn-sm se-more" data-more>Show all ${res.items.length} lines</button>` : ''}
       <div class="se-side">
         ${people ? `<ul class="se-people${compact ? ' snap-people' : ''}" role="list">${people}</ul>` : ''}
         <div class="se-yours">

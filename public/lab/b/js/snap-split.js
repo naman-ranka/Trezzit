@@ -61,16 +61,17 @@ export function initSnapSplit(root, scenarioFor) {
       <span class="dot" aria-hidden="true"></span>
       <span class="ss-name"><span>${esc(it.name)}</span>
         <small class="ss-read">${extra ? 'On the receipt' : esc(c.label)}</small>
-        <small class="ss-split" data-each>${esc(subText(it))}</small></span>
+        <small class="ss-split" data-each>${subHTML(it)}</small></span>
       ${faces}
       <span class="ss-price money"><span class="ss-read">${money(it.totalCents - (it.taxCents || 0))}</span><span class="ss-split">${money(it.totalCents)}</span></span>
     </li>`;
   }
 
-  function subText(it) {
+  /* "$8.00 each · incl. $2.37 tax"; the tax part drops on narrow phones so the line never wraps. */
+  function subHTML(it) {
     if (isExtra(it)) return order.length > 1 ? 'In proportion to each share' : 'All yours';
     const share = order.length > 1 ? shareText(it.shares, order) : (CATEGORIES[it.category] || CATEGORIES.other).label;
-    return it.taxCents ? `${share} · incl. ${money(it.taxCents)} tax` : share;
+    return esc(share) + (it.taxCents ? `<span class="ss-tax"> · incl. ${money(it.taxCents)} tax</span>` : '');
   }
 
   function peopleHTML(res) {
@@ -122,10 +123,10 @@ export function initSnapSplit(root, scenarioFor) {
       const li = list.querySelector(`.ss-item[data-i="${it.index}"]`);
       if (!li) return;
       const each = li.querySelector('[data-each]');
-      const txt = subText(it);
+      const html = subHTML(it);
       clearTimeout(Number(each.dataset.t || 0));
       each.classList.remove('is-warn');
-      if (each.textContent !== txt) { each.textContent = txt; each.classList.remove('flash'); void each.offsetWidth; each.classList.add('flash'); }
+      if (each.innerHTML !== html) { each.innerHTML = html; each.classList.remove('flash'); void each.offsetWidth; each.classList.add('flash'); }
       if (!isExtra(it)) {
         const who = splitPeople(items[it.index].split, order);
         li.querySelectorAll('.who-toggles .av').forEach((b) => b.setAttribute('aria-pressed', String(who.includes(b.dataset.id))));
@@ -250,7 +251,7 @@ export function initSnapSplit(root, scenarioFor) {
     each.textContent = msg;
     each.classList.add('is-warn');
     clearTimeout(Number(each.dataset.t || 0));
-    each.dataset.t = String(setTimeout(() => { each.classList.remove('is-warn'); if (it) each.textContent = subText(it); }, 2400));
+    each.dataset.t = String(setTimeout(() => { each.classList.remove('is-warn'); if (it) each.innerHTML = subHTML(it); }, 2400));
     b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
   }
 

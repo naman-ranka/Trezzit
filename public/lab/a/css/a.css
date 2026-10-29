@@ -733,3 +733,6 @@ body { background: var(--canvas); overflow-x: clip; }
   .flyer { display: none; }
   .status .spin, .tool .s { animation: none; }
 }
+
+/* narrow phones: the merchant stays whole on one line */
+@media (max-width: 379px) { .hv-bank-name { font-size: 13px; letter-spacing: 0; } .hv-bank-row { gap: 10px; } }
