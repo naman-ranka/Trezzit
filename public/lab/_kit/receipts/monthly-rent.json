@@ -1,0 +1,169 @@
+{
+  "receipt": {
+    "storeInformation": {
+      "title": "MONTHLY RENT",
+      "storeAddress": "Unit 4B, 123 Main Street, Anytown, USA",
+      "dateTimeOfPurchase": "2026-11-01",
+      "currency": "USD"
+    },
+    "items": [
+      {
+        "name": "RENT NOVEMBER",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "2400.00",
+        "originalPrice": "2400.00",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "2400.00"
+      },
+      {
+        "name": "WATER & SEWER",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "68.40",
+        "originalPrice": "68.40",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "68.40"
+      },
+      {
+        "name": "TRASH & RECYCLING",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "24.00",
+        "originalPrice": "24.00",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "24.00"
+      },
+      {
+        "name": "INTERNET 1 GIG",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "65.00",
+        "originalPrice": "65.00",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "65.00"
+      },
+      {
+        "name": "PARKING SPACE 12",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "75.00",
+        "originalPrice": "75.00",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "75.00"
+      }
+    ],
+    "discounts": [],
+    "tip": {
+      "amount": "0.00"
+    },
+    "taxSummary": {
+      "totalTaxAmount": "0.00",
+      "taxRate": "0.00",
+      "taxBreakdown": []
+    },
+    "taxMode": "single",
+    "taxRates": [],
+    "subtotalBeforeChargesAndTaxes": "2632.40",
+    "grandTotal": "2632.40",
+    "taxIncludedInPrices": false,
+    "paymentDetails": {
+      "paymentMethod": "ACH"
+    },
+    "warnings": [
+      "Sum of item prices (2632.40) matches the printed subtotal."
+    ],
+    "backend_validations": [
+      {
+        "check": "items_total_check",
+        "expected": "2632.40",
+        "actual": "2632.40",
+        "passed": true,
+        "message": "Items included in subtotal match subtotalBeforeChargesAndTaxes"
+      },
+      {
+        "check": "grand_total_check",
+        "expected": "2632.40",
+        "actual": "2632.40",
+        "passed": true,
+        "message": "Grand total matches subtotal, charges, taxes, tip, and discounts"
+      },
+      {
+        "check": "tax_distribution_check",
+        "expected": "0.00",
+        "actual": "0.00",
+        "passed": true,
+        "message": "Per-item tax amounts sum to total tax"
+      }
+    ]
+  },
+  "backend_validations": [
+    {
+      "check": "items_total_check",
+      "expected": "2632.40",
+      "actual": "2632.40",
+      "passed": true,
+      "message": "Items included in subtotal match subtotalBeforeChargesAndTaxes"
+    },
+    {
+      "check": "grand_total_check",
+      "expected": "2632.40",
+      "actual": "2632.40",
+      "passed": true,
+      "message": "Grand total matches subtotal, charges, taxes, tip, and discounts"
+    },
+    {
+      "check": "tax_distribution_check",
+      "expected": "0.00",
+      "actual": "0.00",
+      "passed": true,
+      "message": "Per-item tax amounts sum to total tax"
+    }
+  ],
+  "tax_distribution": {
+    "total_tax": "0.00",
+    "items_taxed": 0
+  },
+  "discount_info": null,
+  "warnings": [],
+  "errors": [],
+  "provider": "gemini",
+  "model": "gemini-3.1-flash-lite",
+  "status": "completed",
+  "receipt_keys": []
+}

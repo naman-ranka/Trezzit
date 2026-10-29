@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Kit tests</title>
+<link rel="icon" href="./brand/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./tokens.css">
+<link rel="stylesheet" href="./receipts/receipt.css" data-tz-receipt>
+<style>
+  main { max-width: 1120px; margin: 0 auto; padding: 32px 16px 80px; }
+  h1 { font-size: 32px; margin-bottom: 8px; }
+  h2 { font-size: 22px; margin: 40px 0 12px; }
+  #summary { font-weight: 600; }
+  #summary.ok { color: var(--positive-text); }
+  #summary.fail { color: var(--negative); }
+  #results { list-style: none; padding: 0; margin: 12px 0 0; font-size: 15px; }
+  #results li { padding: 6px 0; border-bottom: var(--hairline); display: flex; gap: 10px; }
+  #results .p { color: var(--positive-text); font-weight: 700; }
+  #results .f { color: var(--negative); font-weight: 700; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 32px; align-items: start; }
+  .sample { display: grid; gap: 16px; justify-items: center; }
+  .shares { width: 100%; max-width: 320px; padding: 12px 16px; }
+  .shares div { display: flex; justify-content: space-between; font-size: 15px; padding: 2px 0; }
+  .shares small { color: var(--text-secondary); font-size: 14px; }
+  .scanbox { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  #stage { font-weight: 600; color: var(--action-blue); }
+  #stage-items { font-size: 14px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Kit tests</h1>
+  <p class="muted">split-engine, receipts and scan-client, run in this browser. <span id="summary">Running…</span></p>
+  <ul id="results" aria-live="polite"></ul>
+
+  <h2>Scan a sample</h2>
+  <div class="scanbox">
+    <button class="btn btn-primary" id="scan-btn" type="button">Scan Green Basket</button>
+    <label class="btn btn-ghost">Try a file<input id="file" type="file" accept="image/*,application/pdf" class="visually-hidden"></label>
+    <span id="stage" aria-live="polite">idle</span>
+    <span id="stage-items"></span>
+  </div>
+
+  <h2>Samples</h2>
+  <div class="grid" id="samples"></div>
+</main>
+<script type="module">
+  import * as E from './split-engine.js';
+  import { SAMPLES, loadScan, splitSample, renderReceipt, PEOPLE, CATEGORIES } from './receipts.js';
+  import { scan, normalizeScan, STAGES } from './scan-client.js';
+
+  const results = [];
+  const check = (name, fn) => {
+    try { const r = fn(); results.push([name, r === undefined || r === true, r === true || r === undefined ? '' : String(r)]); }
+    catch (e) { results.push([name, false, e.message]); }
+  };
+  const eq = (a, b) => { if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error(`${JSON.stringify(a)} ≠ ${JSON.stringify(b)}`); return true; };
+
+  check('6.49 three ways = 2.17 / 2.16 / 2.16', () => eq(E.distributeEqually(649, 3), [217, 216, 216]));
+  check('$32.00 towels four ways = $8.00 each', () => eq(E.distributeEqually(3200, 4), [800, 800, 800, 800]));
+  check('shares 2:1 of $10.00 = 6.67 / 3.33', () => eq(E.distributeByShares(1000, [2, 1]), [667, 333]));
+  check('percent 25/25/28/22 of $2,400', () => eq(E.distributeByPercentage(240000, [25, 25, 28, 22]), [60000, 60000, 67200, 52800]));
+  check('largest remainder goes to the biggest fraction', () => eq(E.distributeByWeights(10, [1, 1, 8.5]), [1, 1, 8]));
+
+  const raws = await Promise.all(SAMPLES.map((s) => loadScan(s.id)));
+  SAMPLES.forEach((sample, i) => {
+    const res = splitSample(sample, normalizeScan(raws[i]));
+    check(`${sample.title}: shares sum to ${sample.total} to the cent`, () => res.check.ok && E.centsToString(res.check.sumCents) === sample.total || JSON.stringify(res.check));
+    if (sample.expected) {
+      check(`${sample.title}: ${Object.entries(sample.expected).map(([k, v]) => `${k} ${v}`).join(', ')}`,
+        () => eq(Object.fromEntries(Object.keys(sample.expected).map((k) => [k, E.centsToString(res.people[k].cents)])), sample.expected));
+    }
+    if (sample.id === 'green-basket') {
+      check('Your $30.00 = groceries $22.00 + household $8.00', () => eq(res.people.you.byCategory, { groceries: 2200, household: 800 }));
+    }
+
+    const wrap = document.createElement('section');
+    wrap.className = 'sample';
+    wrap.append(renderReceipt(raws[i], { sample }));
+    const card = document.createElement('div');
+    card.className = 'card shares';
+    card.innerHTML = `<div><strong>${sample.blurb}</strong></div>` + Object.entries(res.people).map(([id, p]) => {
+      const cats = Object.entries(p.byCategory).map(([c, v]) => `${CATEGORIES[c]?.label || c} ${E.formatMoney(v)}`).join(' · ');
+      return `<div><span>${PEOPLE[id]?.name || id}<br><small>${cats}</small></span><span class="money">${E.formatMoney(p.cents)}</span></div>`;
+    }).join('') + `<div class="hairline-top"><span>Total</span><span class="money money-total">${E.formatMoney(res.check.sumCents)}</span></div>`;
+    wrap.append(card);
+    document.getElementById('samples').append(wrap);
+  });
+
+  check('fuzz: 2,000 random bills sum exactly', () => {
+    let seed = 7; const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
+    for (let n = 0; n < 2000; n += 1) {
+      const people = Array.from({ length: 1 + Math.floor(rnd() * 6) }, (_, i) => `p${i}`);
+      const items = Array.from({ length: 1 + Math.floor(rnd() * 10) }, (_, k) => ({
+        name: `i${k}`, amount: E.centsToString(1 + Math.floor(rnd() * 20000)),
+        split: rnd() < 0.5 ? { type: 'equal', people: people.filter(() => rnd() < 0.7).concat(people[0]).filter((v, j, a) => a.indexOf(v) === j) }
+          : { type: 'shares', shares: Object.fromEntries(people.map((p) => [p, Math.floor(rnd() * 4)])) },
+      }));
+      const sub = items.reduce((a, it) => a + E.toCents(it.amount), 0);
+      const tax = Math.floor(rnd() * sub * 0.1); const tip = Math.floor(rnd() * sub * 0.2);
+      const r = E.splitBill({ people, items, tax: E.centsToString(tax), tip: E.centsToString(tip), total: E.centsToString(sub + tax + tip) });
+      if (!r.check.ok) return `bill ${n}: ${JSON.stringify(r.check)}`;
+    }
+    return true;
+  });
+
+  const seen = [];
+  const out = await scan('green-basket', { instant: true, onStage: (s) => { if (seen.at(-1) !== s) seen.push(s); } });
+  check('scan(sample, instant) runs uploading → reading → checking → done', () => eq(seen, STAGES));
+  check('scan result is the normalised $100.00 bill', () => eq([out.source, out.bill.merchant, out.bill.total], ['sample', 'Green Basket Market', '100.00']));
+
+  const ul = document.getElementById('results');
+  results.forEach(([name, ok, msg]) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="${ok ? 'p' : 'f'}">${ok ? 'PASS' : 'FAIL'}</span><span>${name}${msg ? ` — ${msg}` : ''}</span>`;
+    ul.append(li);
+  });
+  const failed = results.filter((r) => !r[1]).length;
+  const summary = document.getElementById('summary');
+  summary.textContent = failed ? `${failed} of ${results.length} failed` : `All ${results.length} passed`;
+  summary.className = failed ? 'fail' : 'ok';
+  document.documentElement.dataset.tests = failed ? 'fail' : 'pass';
+
+  const stage = document.getElementById('stage');
+  const stageItems = document.getElementById('stage-items');
+  const onStage = (s, d) => { stage.textContent = s; if (d.items) stageItems.textContent = `${d.items.length} lines`; if (d.result?.notice) stageItems.textContent = d.result.notice; };
+  document.getElementById('scan-btn').addEventListener('click', () => scan('green-basket', { onStage }));
+  document.getElementById('file').addEventListener('change', (e) => { const f = e.target.files[0]; if (f) scan(f, { onStage }); });
+</script>
+</body>
+</html>

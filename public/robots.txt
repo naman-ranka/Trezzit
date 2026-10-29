@@ -8,5 +8,7 @@ User-agent: *
 Allow: /
 Disallow: /s/
 Disallow: /demo
+# Landing-page prototypes (also noindex)
+Disallow: /lab/
 
 Sitemap: https://trezzit.com/sitemap.xml

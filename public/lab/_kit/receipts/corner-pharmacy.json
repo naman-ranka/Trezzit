@@ -1,0 +1,198 @@
+{
+  "receipt": {
+    "storeInformation": {
+      "title": "CORNER PHARMACY",
+      "storeAddress": "45 Elm Avenue, Anytown, USA",
+      "dateTimeOfPurchase": "2026-10-20",
+      "currency": "USD"
+    },
+    "items": [
+      {
+        "name": "ALLERGY RELIEF 24CT",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "12.99",
+        "originalPrice": "12.99",
+        "itemType": "Item",
+        "tax": "8.00",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "1.04",
+        "itemTotalAfterTax": "14.03"
+      },
+      {
+        "name": "VITAMIN D3 2000IU",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "8.49",
+        "originalPrice": "8.49",
+        "itemType": "Item",
+        "tax": "8.00",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.68",
+        "itemTotalAfterTax": "9.17"
+      },
+      {
+        "name": "TOOTHPASTE 2PK",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "6.99",
+        "originalPrice": "6.99",
+        "itemType": "Item",
+        "tax": "8.00",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.56",
+        "itemTotalAfterTax": "7.55"
+      },
+      {
+        "name": "SUNSCREEN SPF50",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "9.99",
+        "originalPrice": "9.99",
+        "itemType": "Item",
+        "tax": "8.00",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.80",
+        "itemTotalAfterTax": "10.79"
+      },
+      {
+        "name": "GREETING CARD",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "4.99",
+        "originalPrice": "4.99",
+        "itemType": "Item",
+        "tax": "8.00",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.40",
+        "itemTotalAfterTax": "5.39"
+      },
+      {
+        "name": "SPARKLING WATER",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "1.29",
+        "originalPrice": "1.29",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "1.29"
+      }
+    ],
+    "discounts": [],
+    "tip": {
+      "amount": "0.00"
+    },
+    "taxSummary": {
+      "totalTaxAmount": "3.48",
+      "taxRate": "8.00",
+      "taxBreakdown": [
+        {
+          "rate": "8.00",
+          "amount": "3.48",
+          "description": "Tax"
+        }
+      ]
+    },
+    "taxMode": "single",
+    "taxRates": [
+      {
+        "rate": "8.00",
+        "description": "Tax",
+        "appliesTo": "Items marked T",
+        "sourceComponents": []
+      }
+    ],
+    "subtotalBeforeChargesAndTaxes": "44.74",
+    "grandTotal": "48.22",
+    "taxIncludedInPrices": false,
+    "paymentDetails": {
+      "paymentMethod": "DEBIT"
+    },
+    "warnings": [
+      "Sum of item prices (44.74) matches the printed subtotal."
+    ],
+    "backend_validations": [
+      {
+        "check": "items_total_check",
+        "expected": "44.74",
+        "actual": "44.74",
+        "passed": true,
+        "message": "Items included in subtotal match subtotalBeforeChargesAndTaxes"
+      },
+      {
+        "check": "grand_total_check",
+        "expected": "48.22",
+        "actual": "48.22",
+        "passed": true,
+        "message": "Grand total matches subtotal, charges, taxes, tip, and discounts"
+      },
+      {
+        "check": "tax_distribution_check",
+        "expected": "3.48",
+        "actual": "3.48",
+        "passed": true,
+        "message": "Per-item tax amounts sum to total tax"
+      }
+    ]
+  },
+  "backend_validations": [
+    {
+      "check": "items_total_check",
+      "expected": "44.74",
+      "actual": "44.74",
+      "passed": true,
+      "message": "Items included in subtotal match subtotalBeforeChargesAndTaxes"
+    },
+    {
+      "check": "grand_total_check",
+      "expected": "48.22",
+      "actual": "48.22",
+      "passed": true,
+      "message": "Grand total matches subtotal, charges, taxes, tip, and discounts"
+    },
+    {
+      "check": "tax_distribution_check",
+      "expected": "3.48",
+      "actual": "3.48",
+      "passed": true,
+      "message": "Per-item tax amounts sum to total tax"
+    }
+  ],
+  "tax_distribution": {
+    "total_tax": "3.48",
+    "items_taxed": 5
+  },
+  "discount_info": null,
+  "warnings": [],
+  "errors": [],
+  "provider": "gemini",
+  "model": "gemini-3.1-flash-lite",
+  "status": "completed",
+  "receipt_keys": []
+}

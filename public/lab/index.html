@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Trezzit landing lab</title>
+<meta name="description" content="Four landing-page prototypes for trezzit.com. Not linked from the site.">
+<link rel="icon" href="/lab/_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/lab/_kit/brand/favicon.ico" sizes="any">
+<link rel="stylesheet" href="/lab/_kit/tokens.css">
+<style>
+  main { max-width: 880px; margin: 0 auto; padding: 56px 16px 80px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--brand-navy); font-weight: 700; font-size: 18px; text-decoration: none; }
+  .brand img { width: 28px; height: 28px; }
+  h1 { font-size: clamp(32px, 6vw, 48px); margin: 40px 0 8px; }
+  .lede { color: var(--text-secondary); max-width: 34em; }
+  ol { list-style: none; padding: 0; margin: 40px 0 0; display: grid; gap: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { ol { grid-template-columns: 1fr 1fr; } }
+  li a {
+    display: grid; gap: 6px; padding: 24px; min-height: 148px; text-decoration: none; color: var(--text);
+    border: var(--hairline); border-radius: var(--radius-card); background: var(--surface);
+    transition: box-shadow var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+  }
+  li a:hover { box-shadow: var(--shadow-md); border-color: var(--line-strong); }
+  .letter { font-size: 14px; font-weight: 700; color: var(--link); letter-spacing: 0.08em; }
+  .name { font-size: 22px; font-weight: 700; color: var(--brand-navy); }
+  .what { font-size: 15px; color: var(--text-secondary); }
+  footer { margin-top: 56px; font-size: 14px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="/"><img src="/lab/_kit/brand/trezzit-mark.svg" alt="" width="28" height="28">Trezzit</a>
+  <h1>Landing lab</h1>
+  <p class="lede">Four directions for trezzit.com, built on one shared kit. Same story in each: a $100 grocery charge, and the $30 you actually spent.</p>
+  <ol>
+    <li><a href="/lab/a/"><span class="letter">A</span><span class="name">One receipt</span><span class="what">One $100 receipt, from paper to what you spent.</span></a></li>
+    <li><a href="/lab/b/"><span class="letter">B</span><span class="name">Bank vs Trezzit</span><span class="what">Every scenario side by side: the bank line, then the truth.</span></a></li>
+    <li><a href="/lab/c/"><span class="letter">C</span><span class="name">Notion-calm</span><span class="what">Capture, split, understand, with live mini-demos and scenario pages.</span></a></li>
+    <li><a href="/lab/d/"><span class="letter">D</span><span class="name">Ask your AI</span><span class="what">The page is a conversation that ends in your ledger.</span></a></li>
+  </ol>
+  <footer>Prototypes only, not indexed. Kit: <a href="/lab/_kit/test.html">tests and samples</a>.</footer>
+</main>
+</body>
+</html>

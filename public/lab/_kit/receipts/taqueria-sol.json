@@ -1,0 +1,214 @@
+{
+  "receipt": {
+    "storeInformation": {
+      "title": "TAQUERIA SOL",
+      "storeAddress": "8 Plaza Way, Anytown, USA",
+      "dateTimeOfPurchase": "2026-10-18",
+      "currency": "USD"
+    },
+    "items": [
+      {
+        "name": "BEAN & CHEESE BURRITO",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "11.50",
+        "originalPrice": "11.50",
+        "itemType": "Item",
+        "tax": "9.25",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "1.07",
+        "itemTotalAfterTax": "12.57"
+      },
+      {
+        "name": "VEGGIE FAJITA TACOS (3)",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "13.75",
+        "originalPrice": "13.75",
+        "itemType": "Item",
+        "tax": "9.25",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "1.27",
+        "itemTotalAfterTax": "15.02"
+      },
+      {
+        "name": "MUSHROOM QUESADILLA",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "12.25",
+        "originalPrice": "12.25",
+        "itemType": "Item",
+        "tax": "9.25",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "1.13",
+        "itemTotalAfterTax": "13.38"
+      },
+      {
+        "name": "CHIPS & GUACAMOLE",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "8.95",
+        "originalPrice": "8.95",
+        "itemType": "Item",
+        "tax": "9.25",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.83",
+        "itemTotalAfterTax": "9.78"
+      },
+      {
+        "name": "ELOTE",
+        "quantity": "2.000",
+        "unitPrice": "4.50",
+        "totalPrice": "9.00",
+        "originalPrice": "9.00",
+        "itemType": "Item",
+        "tax": "9.25",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.83",
+        "itemTotalAfterTax": "9.83"
+      },
+      {
+        "name": "HORCHATA",
+        "quantity": "2.000",
+        "unitPrice": "3.75",
+        "totalPrice": "7.50",
+        "originalPrice": "7.50",
+        "itemType": "Item",
+        "tax": "9.25",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.69",
+        "itemTotalAfterTax": "8.19"
+      },
+      {
+        "name": "JAMAICA AGUA FRESCA",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "3.75",
+        "originalPrice": "3.75",
+        "itemType": "Item",
+        "tax": "9.25",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.35",
+        "itemTotalAfterTax": "4.10"
+      }
+    ],
+    "discounts": [],
+    "tip": {
+      "amount": "12.00"
+    },
+    "taxSummary": {
+      "totalTaxAmount": "6.17",
+      "taxRate": "9.25",
+      "taxBreakdown": [
+        {
+          "rate": "9.25",
+          "amount": "6.17",
+          "description": "Tax"
+        }
+      ]
+    },
+    "taxMode": "single",
+    "taxRates": [
+      {
+        "rate": "9.25",
+        "description": "Tax",
+        "appliesTo": "Items marked T",
+        "sourceComponents": []
+      }
+    ],
+    "subtotalBeforeChargesAndTaxes": "66.70",
+    "grandTotal": "84.87",
+    "taxIncludedInPrices": false,
+    "paymentDetails": {
+      "paymentMethod": "MASTERCARD"
+    },
+    "warnings": [
+      "Sum of item prices (66.70) matches the printed subtotal."
+    ],
+    "backend_validations": [
+      {
+        "check": "items_total_check",
+        "expected": "66.70",
+        "actual": "66.70",
+        "passed": true,
+        "message": "Items included in subtotal match subtotalBeforeChargesAndTaxes"
+      },
+      {
+        "check": "grand_total_check",
+        "expected": "84.87",
+        "actual": "84.87",
+        "passed": true,
+        "message": "Grand total matches subtotal, charges, taxes, tip, and discounts"
+      },
+      {
+        "check": "tax_distribution_check",
+        "expected": "6.17",
+        "actual": "6.17",
+        "passed": true,
+        "message": "Per-item tax amounts sum to total tax"
+      }
+    ]
+  },
+  "backend_validations": [
+    {
+      "check": "items_total_check",
+      "expected": "66.70",
+      "actual": "66.70",
+      "passed": true,
+      "message": "Items included in subtotal match subtotalBeforeChargesAndTaxes"
+    },
+    {
+      "check": "grand_total_check",
+      "expected": "84.87",
+      "actual": "84.87",
+      "passed": true,
+      "message": "Grand total matches subtotal, charges, taxes, tip, and discounts"
+    },
+    {
+      "check": "tax_distribution_check",
+      "expected": "6.17",
+      "actual": "6.17",
+      "passed": true,
+      "message": "Per-item tax amounts sum to total tax"
+    }
+  ],
+  "tax_distribution": {
+    "total_tax": "6.17",
+    "items_taxed": 7
+  },
+  "discount_info": null,
+  "warnings": [],
+  "errors": [],
+  "provider": "gemini",
+  "model": "gemini-3.1-flash-lite",
+  "status": "completed",
+  "receipt_keys": []
+}
