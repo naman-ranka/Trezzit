@@ -53,7 +53,7 @@ document.fonts?.ready.then(placeSeam);
 /* ---------- everything that needs the scenarios ---------- */
 loadScenarios().then((list) => {
   const byId = Object.fromEntries(list.map((s) => [s.id, s]));
-  const scenarioForSample = { 'green-basket': byId.groceries, 'taqueria-sol': byId.dinner };
+  const scenarioForSample = { 'taqueria-sol': byId.dinner };
 
   /* snap it, split it */
   const snap = initSnapSplit($('[data-snap]'), (sampleId) => Promise.resolve(scenarioForSample[sampleId]));
@@ -98,7 +98,6 @@ loadScenarios().then((list) => {
     e.preventDefault();
     snap.load(a.dataset.splitIt);
     $(innerWidth < 900 ? '#snap .snap-grid' : '#snap [data-snap]').scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
-    $(`[data-sample="${a.dataset.splitIt}"]`)?.focus({ preventScroll: true });
   });
 
   // The footer is the month: what left your account vs your share of everything.

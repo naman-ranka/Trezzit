@@ -218,5 +218,6 @@ export function initChatDemo(section, scenarios) {
   if (reduced()) ctl.hidden = true;
   let lastW = innerWidth;
   addEventListener('resize', () => { if (innerWidth !== lastW && !playing) { lastW = innerWidth; tallest = 0; fit(current); } }, { passive: true });
+  document.fonts?.ready.then(() => { if (!playing) { tallest = 0; fit(current); } });
   watchVisible(root, (v) => { inView = v; if (v) wake?.(); }, { threshold: 0 });
 }
