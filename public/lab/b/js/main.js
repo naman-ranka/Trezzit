@@ -3,7 +3,7 @@
 import { loadScenarios, KINDS, PEOPLE } from './data.js';
 import { initSnapSplit } from './snap-split.js';
 import { initChatDemo } from './chat-demo.js';
-import { initViewToggle, initReveal, initNav, summaryHTML, bankAmt, itemIndex, wireSearch } from './shared.js';
+import { initReveal, initNav, summaryHTML, bankAmt, itemIndex, wireSearch } from './shared.js';
 import { tweenMoney, reduced, money, whenVisible } from './util.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -12,37 +12,70 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 initNav();
 initReveal();
 
-/* ---------- hero: the bank line becomes what you spent ----------
-   The count runs from the bank's $100.00 down to $30.00, once, when the card is
-   actually on screen (on a phone it can start below the fold). Switching back
-   from Bank view plays it again. */
-const proof = $('[data-proof]');
+/* ---------- hero: tap a bank line, see what you actually spent ----------
+   Each bank line is a tab; its Trezzit view counts down from the bank amount to your share.
+   All three views share one grid cell, so the card is as tall as the tallest and never
+   changes size when you switch. The first count runs once the card is fully on screen. */
 const hero = $('[data-hero]');
-const heroAmt = $('[data-hero-amt]');
+const tabs = $$('.pb-line', hero);
+const views = $$('.pt-view', hero);
 let heroTimer = 0;
-function playHero() {
+let current = tabs[0];
+function playHero(tab = current) {
   clearTimeout(heroTimer);
+  const view = $(`#${tab.getAttribute('aria-controls')}`);
+  const amt = $('[data-amt]', view);
+  const to = Number(amt.dataset.to);
   hero.classList.add('is-ready');
-  if (reduced()) { tweenMoney(heroAmt, 3000, { dur: 0 }); return; }
+  if (reduced()) { tweenMoney(amt, to, { dur: 0 }); return; }
   hero.classList.remove('play');
   void hero.offsetWidth;
-  tweenMoney(heroAmt, 10000, { dur: 0 });
+  const from = Number(tab.dataset.from);
+  tweenMoney(amt, from, { dur: 0 });
   hero.classList.add('play');
-  heroTimer = setTimeout(() => tweenMoney(heroAmt, 3000, { from: 10000, dur: 1100 }), 420);
+  if (from !== to) heroTimer = setTimeout(() => tweenMoney(amt, to, { from, dur: 1100 }), 420);
 }
+function select(tab, { focus = false } = {}) {
+  if (tab === current) { if (focus) tab.focus(); return; }
+  current = tab;
+  tabs.forEach((t) => {
+    const on = t === tab;
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+  });
+  views.forEach((v) => {
+    const on = v.id === tab.getAttribute('aria-controls');
+    v.classList.toggle('is-on', on);
+    v.inert = !on;
+  });
+  if (focus) tab.focus();
+  placeSeam();
+  playHero(tab);
+}
+views.forEach((v) => { v.inert = !v.classList.contains('is-on'); });
+tabs.forEach((t) => t.addEventListener('click', () => select(t)));
+$('.pb-lines', hero).addEventListener('keydown', (e) => {
+  const i = tabs.indexOf(current);
+  const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+  let next = null;
+  if (step) next = tabs[(i + step + tabs.length) % tabs.length];
+  else if (e.key === 'Home') next = tabs[0];
+  else if (e.key === 'End') next = tabs[tabs.length - 1];
+  if (!next) return;
+  e.preventDefault();
+  select(next, { focus: true });
+});
+const firstAmt = $('[data-amt]', views[0]);
 if (reduced()) playHero();
 else {
-  const r = heroAmt.getBoundingClientRect();
-  if (r.bottom > innerHeight) tweenMoney(heroAmt, 10000, { dur: 0 }); // off screen: hold at the bank amount
-  whenVisible(heroAmt, playHero, { threshold: 1 });
+  if (firstAmt.getBoundingClientRect().bottom > innerHeight) tweenMoney(firstAmt, 10000, { dur: 0 }); // off screen: hold at the bank amount
+  whenVisible(firstAmt, () => playHero(), { threshold: 1 });
 }
-initViewToggle(proof, { onChange: (v) => { if (v === 'trezzit') playHero(); } });
-/* the arrow sits on the bank line it comes from (layout decides where that is) */
+/* the arrow sits on the selected bank line (layout decides where that is) */
 const seam = $('.seam', hero);
-const focal = $('.pb-lines .focal', hero);
 function placeSeam() {
   if (innerWidth < 640) { seam.style.top = ''; return; }
-  const f = focal.getBoundingClientRect();
+  const f = current.getBoundingClientRect();
   const p = seam.offsetParent.getBoundingClientRect();
   seam.style.top = `${Math.round(f.top + f.height / 2 - p.top - 17)}px`;
 }
@@ -73,14 +106,14 @@ loadScenarios().then((list) => {
     $('.srow-btn', li).setAttribute('aria-label', `${sc.title}. ${KINDS[sc.kind].label}. ${bank}; ${share}.`);
   });
 
-  let index = null;
+  /* item search: one box under the month, over every line of every receipt */
+  wireSearch($('.ssearch', stmt), itemIndex(list));
+
   function toggleRow(li, open) {
     const btn = $('.srow-btn', li);
     const det = $('.sdetail', li);
     if (open && !det.dataset.built) {
-      const sc = byId[li.dataset.id];
-      det.innerHTML = summaryHTML(sc, { search: sc.people.length === 1 });
-      wireSearch(det, (index ||= itemIndex(list)));
+      det.innerHTML = summaryHTML(byId[li.dataset.id]);
       det.dataset.built = '1';
     }
     btn.setAttribute('aria-expanded', String(open));
@@ -92,12 +125,22 @@ loadScenarios().then((list) => {
     if (open) $$('.srows > .srow', stmt).forEach((o) => { if (o !== li && $('.srow-btn', o).getAttribute('aria-expanded') === 'true') toggleRow(o, false); });
     toggleRow(li, open);
   }));
+  // Escape closes the open row and puts focus back on it.
+  stmt.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const li = e.target.closest('.srows > .srow');
+    if (!li || $('.srow-btn', li).getAttribute('aria-expanded') !== 'true') return;
+    toggleRow(li, false);
+    $('.srow-btn', li).focus();
+  });
+  // "Change who had what" on the dinner row: land on the section heading and its hint,
+  // then hand focus to the open line's faces.
   stmt.addEventListener('click', (e) => {
     const a = e.target.closest('[data-split-it]');
     if (!a) return;
     e.preventDefault();
-    snap.load(a.dataset.splitIt);
-    $(innerWidth < 900 ? '#snap .snap-grid' : '#snap [data-snap]').scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+    $('#snap').scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+    snap.focusOpen();
   });
 
   // The footer is the month: what left your account vs your share of everything.
