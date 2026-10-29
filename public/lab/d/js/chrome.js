@@ -40,8 +40,9 @@ export function initChrome() {
       t.addEventListener('click', () => select(t));
       t.addEventListener('keydown', (e) => {
         const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
-        if (!d) return;
-        const n = tabs[(i + d + tabs.length) % tabs.length]; select(n); n.focus();
+        const n = e.key === 'Home' ? tabs[0] : e.key === 'End' ? tabs[tabs.length - 1] : d ? tabs[(i + d + tabs.length) % tabs.length] : null;
+        if (!n) return;
+        e.preventDefault(); select(n); n.focus();
       });
     });
   });

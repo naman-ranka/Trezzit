@@ -4,10 +4,8 @@
  * one, which can be paused. Reduced motion shows the finished conversation.
  */
 
-import { PEOPLE, CATEGORIES } from './data.js';
+import { PEOPLE } from './data.js';
 import { money, esc, ICON, avatar, reduced, watchVisible, bankAmt } from './util.js';
-
-const C = (k) => CATEGORIES[k] || CATEGORIES.other;
 
 function card(title, sub, rows, foot = '', note = '') {
   return `<div class="tzcard">
@@ -19,49 +17,28 @@ const row = (left, right, extra = '') => `<li><span>${left}</span><span class="m
 
 export function scripts(sc) {
   const byId = Object.fromEntries(sc.map((s) => [s.id, s]));
-  const paid = sc.filter((s) => s.bank).reduce((a, s) => a + s.sum.total, 0);
-  const spent = sc.reduce((a, s) => a + s.sum.mine, 0);
-  const cats = {};
-  sc.forEach((s) => Object.entries(s.sum.byCategory).forEach(([k, v]) => { cats[k] = (cats[k] || 0) + v; }));
-  // Every card's rows add up to its header: "everything else" is the exact remainder.
   const g = byId.groceries.sum;
-  const r = byId.rent.sum;
-  // Two charges from the same statement that are not in Trezzit yet (the table above shows only what is).
+  // Two November charges that are not in Trezzit yet. October stays exactly as the statement table shows it.
   const parking = { total: 600, mine: 600 };
   const cafe = { total: 970, mine: 485 };
-  // The month by the same names the statement uses: "Rent and bills" is one line there, so it is one here.
-  const bills = ['rent', 'utilities', 'internet', 'parking'];
-  const rentBills = bills.reduce((a, k) => a + (cats[k] || 0), 0);
-  const groceries = cats.groceries || 0;
-  const listed = [['Rent and bills', '#0f1f3d', rentBills, ''], ['Travel', C('travel').color, cats.travel || 0, ''],
-    ['Dining out', C('dining').color, cats.dining || 0, ''], ['Groceries', C('groceries').color, groceries, 'Green Basket and the pharmacy']];
-  const restKeys = Object.keys(cats).filter((k) => cats[k] > 0 && !bills.includes(k) && !['travel', 'dining', 'groceries'].includes(k)).sort((x, y) => cats[y] - cats[x]);
-  const restCents = spent - listed.reduce((a, l) => a + l[2], 0);
   const line = (d, m, c) => `<span class="bk">${d} ${m} ${bankAmt(c)}</span>`;
+  // The house balance: every Roommates expense you paid in October (groceries, rent and bills, streaming).
+  const house = ['groceries', 'rent', 'streaming'].map((id) => byId[id].sum.result.people);
+  const owes = (id) => house.reduce((a, p) => a + (p[id]?.cents || 0), 0);
+  const [maya, jordan, sam] = ['maya', 'jordan', 'sam'].map(owes);
+  const who = (id) => `${avatar(PEOPLE[id], { size: 'sm' })}${PEOPLE[id].name}`;
 
   return {
     match: {
-      chip: "What's on my statement but not in Trezzit?",
+      chip: "What's missing from Trezzit?",
       steps: [
-        { user: "Here's my October statement. Add what's not in Trezzit yet. The café was with Maya.", attach: { icon: 'doc', name: 'october-statement.pdf' } },
+        { user: "Here's my latest statement. Add what's not in Trezzit yet. The café was with Maya.", attach: { icon: 'doc', name: 'nov-statement.pdf' } },
         { tools: ['Added 2 expenses'] },
         { html: card('Added from your statement', '2 charges that weren’t in Trezzit',
-          row(`${line('OCT 23', 'CITY PARKING', parking.total)}<small>Just you</small>`, money(parking.mine))
-          + row(`${line('OCT 17', 'CORNER CAFE', cafe.total)}<small>You and Maya</small>`, money(cafe.mine)),
+          row(`${line('NOV 03', 'CITY PARKING', parking.total)}<small>Just you</small>`, money(parking.mine))
+          + row(`${line('NOV 06', 'CORNER CAFE', cafe.total)}<small>You and Maya</small>`, money(cafe.mine)),
           `<p class="tzcard-f">You spent <b class="money">${money(parking.mine + cafe.mine)}</b> of the <span class="money">${money(parking.total + cafe.total)}</span> you paid.</p>`) },
         { ai: `Saved. Maya owes you ${money(cafe.total - cafe.mine)}. Both show in your activity log.` },
-      ],
-    },
-    spent: {
-      chip: 'What did I actually spend in October?',
-      steps: [
-        { user: 'What did I actually spend in October?' },
-        { tools: ['Added up your shares'] },
-        { html: card('October, your share', `${money(spent)} of the <span class="money">${bankAmt(paid).replace('−', '$')}</span> you paid`,
-          listed.map(([label, color, v, note]) => row(`<span class="dot" style="--c:${color}"></span>${esc(label)}${note ? ` <small>${esc(note)}</small>` : ''}`, money(v))).join('')
-          + (restKeys.length ? row(`<span class="dot" style="--c:#94a3b8"></span>Everything else <small>${esc(restKeys.map((k) => C(k).label).join(', '))}</small>`, money(restCents)) : ''),
-          `<p class="tzcard-f">Total <b class="money">${money(spent)}</b></p>`) },
-        { ai: 'Rent was most of it. Dinner counts too, even though Alex paid.' },
       ],
     },
     split: {
@@ -70,21 +47,22 @@ export function scripts(sc) {
         { user: 'Split this with Maya, Jordan and Sam. Avocados and cold brew are mine, oat milk and kale chips are Maya\'s.', attach: { icon: 'image', name: 'green-basket.jpg' } },
         { tools: ['Read the receipt', 'Saved to Roommates'] },
         { html: card('Green Basket Market', `${byId.groceries.itemCount} items · ${money(g.total)} · Roommates`,
-          ['you', 'maya', 'jordan', 'sam'].map((id) => row(`${avatar(PEOPLE[id], { size: 'sm' })}${PEOPLE[id].name}`, money(g.result.people[id].cents))).join(''),
+          ['you', 'maya', 'jordan', 'sam'].map((id) => row(who(id), money(g.result.people[id].cents))).join(''),
           '', 'Avocados, cold brew &rarr; you · Oat milk, kale chips &rarr; Maya · the rest split 4 ways') },
         { ai: `Saved. You spent ${money(g.mine)}: ${money(g.byCategory.groceries)} on groceries, ${money(g.byCategory.household)} on household.` },
       ],
     },
-    rent: {
-      chip: 'Add our rent every month',
+    house: {
+      chip: 'Who owes who in the house?',
       steps: [
-        { user: 'Add our rent every month on the 1st. $2,400: Maya and I pay 25%, Jordan 28%, Sam 22%. Utilities and internet split four ways, parking is Jordan\'s.' },
-        { tools: ['Found Maya, Jordan and Sam', 'Saved a monthly expense'] },
-        { html: card('Rent and bills', `Every month on the 1st · ${money(r.total)}`,
-          row('Rent <small>Your 25%</small>', money(r.byCategory.rent || 0))
-          + row('Utilities and internet <small>Split 4 ways · parking is Jordan\'s</small>', money((r.byCategory.utilities || 0) + (r.byCategory.internet || 0))),
-          `<p class="tzcard-f"><span class="rec">${ICON.repeat}Next: Nov 1</span> · Your share <b class="money">${money(r.mine)}</b></p>`) },
-        { ai: `Done. It adds itself on the 1st. Your share is ${money(r.mine)} a month.` },
+        { user: 'Who owes who in the house? Sam just paid me back for October.' },
+        { tools: ['Checked Roommates balances', 'Recorded Sam’s payment'] },
+        { html: card('Roommates', 'Who owes you · October',
+          row(who('maya'), money(maya))
+          + row(who('jordan'), money(jordan))
+          + row(`${who('sam')}<small class="paid">Paid you ${money(sam)} · settled</small>`, money(0)),
+          `<p class="tzcard-f">Owed to you <b class="money">${money(maya + jordan)}</b></p>`) },
+        { ai: `Recorded Sam's ${money(sam)}. Sam is settled. Trezzit only records it; the money moved outside Trezzit.` },
       ],
     },
   };
@@ -146,17 +124,23 @@ export function initChatDemo(section, scenarios) {
       return h.replace('<p></p>', `<p>${esc(s.user ?? s.ai ?? '')}</p>`).replaceAll('class="tool"', 'class="tool is-done"');
     }).join('');
   }
-  /* The log is as tall as the finished conversation, so nothing hides in an inner
-     scroller and nothing below moves while it plays (messages fill it from the top).
-     Only on a short desktop window is it capped, and then it opens on the ending. */
-  const cap = () => (innerWidth < 640 ? Infinity : Math.max(360, Math.min(600, innerHeight - 220)));
-  function fit(key) {
-    renderAll(key);
+  /* The log is as tall as the longest finished conversation at this width, so switching
+     prompts never moves anything below it and nothing hides in an inner scroller (messages
+     fill it from the top). Only on a short desktop window is it capped. */
+  const cap = () => (innerWidth < 640 ? Infinity : Math.max(360, Math.min(660, innerHeight - 200)));
+  let tallest = 0;
+  function measure() {
     log.style.height = 'auto';
-    const full = log.scrollHeight;
-    log.style.height = `${Math.min(full, cap())}px`;
-    log.classList.toggle('is-capped', full > cap());
-    if (full > cap()) log.tabIndex = 0; else log.removeAttribute('tabindex');
+    tallest = Math.max(...Object.keys(S).map((k) => { renderAll(k); return log.scrollHeight; }));
+  }
+  function fit(key) {
+    if (!tallest) measure();
+    renderAll(key);
+    const h = Math.min(tallest, cap());
+    log.style.height = `${h}px`;
+    const over = log.scrollHeight > h + 1;
+    log.classList.toggle('is-capped', over);
+    if (over) log.tabIndex = 0; else log.removeAttribute('tabindex');
     log.scrollTop = log.scrollHeight;
   }
 
@@ -215,9 +199,9 @@ export function initChatDemo(section, scenarios) {
   }
 
   chips.forEach((c) => c.addEventListener('click', () => {
-    // On a phone the conversation sits below the prompts: bring it into view so the answer is seen.
+    // On a phone the conversation sits below the prompts: bring its top into view so the answer is seen.
     const r = root.getBoundingClientRect();
-    if (r.top > innerHeight * 0.55 || r.bottom < 80) root.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' });
+    if (r.top < 64 || r.top > innerHeight * 0.55) root.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
     play(c.dataset.script);
   }));
   ctl.addEventListener('click', () => {
@@ -233,6 +217,6 @@ export function initChatDemo(section, scenarios) {
   setCtl('replay');
   if (reduced()) ctl.hidden = true;
   let lastW = innerWidth;
-  addEventListener('resize', () => { if (innerWidth !== lastW && !playing) { lastW = innerWidth; fit(current); } }, { passive: true });
+  addEventListener('resize', () => { if (innerWidth !== lastW && !playing) { lastW = innerWidth; tallest = 0; fit(current); } }, { passive: true });
   watchVisible(root, (v) => { inView = v; if (v) wake?.(); }, { threshold: 0 });
 }

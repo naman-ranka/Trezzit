@@ -5,8 +5,8 @@ import { money, bankAmt, esc, ICON, avatar, listNames, reduced } from './util.js
 
 export { money, bankAmt };
 
-/* Rows whose receipt is one of the "Snap it. Split it." tabs. */
-export const SPLITTABLE = { groceries: 'green-basket', dinner: 'taqueria-sol' };
+/* Rows whose receipt is the home page's "Split it by the item." demo. */
+export const SPLITTABLE = { dinner: 'taqueria-sol' };
 
 /* ---------- Bank | Trezzit (scoped to one element, e.g. the hero figure) ---------- */
 export function initViewToggle(scope, { onChange } = {}) {
@@ -89,17 +89,41 @@ export function summaryHTML(sc, { base = 'scenarios/', search = false } = {}) {
       </div>`;
     }
   }
+  if (sc.inside) body += insideHTML(sc);
   const next = sc.next ? `<p class="sd-next">${ICON.repeat}<span>Adds itself ${esc(sc.next.join(' · '))}</span></p>` : '';
-  // One way on from here: split it yourself if it is a Snap tab, otherwise open it on the examples page.
+  // One way on, with one label: the home split demo if this is its receipt, otherwise the examples page.
+  const label = sc.people.length > 1 ? 'Change who had what' : 'Open the example';
   const link = SPLITTABLE[sc.id]
-    ? `<a class="sd-link" href="#snap" data-split-it="${SPLITTABLE[sc.id]}">Split it yourself<span aria-hidden="true">&darr;</span></a>`
-    : `<a class="sd-link" href="${base}#${sc.id}">${sc.people.length > 1 ? 'Change who had what' : 'Open the example'}<span aria-hidden="true">&rarr;</span></a>`;
+    ? `<a class="sd-link" href="#snap" data-split-it="${SPLITTABLE[sc.id]}">${label}<span aria-hidden="true">&darr;</span></a>`
+    : `<a class="sd-link" href="${base}#${sc.id}">${label}<span aria-hidden="true">&rarr;</span></a>`;
   return `<div class="sd-tz">
       <p class="sd-lesson">${esc(sc.lesson || '')}</p>
       ${body}
       ${next}
       <p class="sd-links">${link}</p>
     </div>`;
+}
+
+/* What was inside a shared receipt: lines grouped by who had them ("Avocados, cold brew · You"). */
+const shortName = (n) => n.split(' ').filter((w) => !/\d/.test(w)).join(' ') || n;
+function insideHTML(sc) {
+  const res = sc.sum.result;
+  const groups = new Map();
+  res.items.forEach((it) => {
+    if (it.isExtraCharge || it.itemType === 'Tip' || it.itemType === 'Fee') return;
+    const who = sc.people.filter((id) => it.shares?.[id]);
+    const key = who.join(',');
+    if (!groups.has(key)) groups.set(key, { who, names: [] });
+    groups.get(key).names.push(shortName(it.name));
+  });
+  const all = sc.people.join(',');
+  const rows = [...groups.values()].sort((x, y) => (x.who.join(',') === all) - (y.who.join(',') === all));
+  return `<ul class="sd-inside" role="list">${rows.map(({ who, names }) => {
+    const everyone = who.join(',') === all;
+    const what = everyone && names.length > 2 ? `The other ${names.length} items` : names.map((n, i) => (i ? n.toLowerCase() : n)).join(', ');
+    const whoTxt = everyone ? `All ${who.length}` : listNames(who.map((id) => PEOPLE[id].name));
+    return `<li><span>${esc(what)}</span><span class="sd-who"><span class="savs" aria-hidden="true">${who.map((id) => `<span class="sav" style="--c:${PEOPLE[id].color}">${id === 'you' ? 'Y' : esc(PEOPLE[id].initials)}</span>`).join('')}</span>${esc(whoTxt)}</span></li>`;
+  }).join('')}</ul>`;
 }
 
 /* ---------- item search over the month (every line of every expense) ---------- */

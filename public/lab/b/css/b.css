@@ -251,12 +251,12 @@ h2 { font-size: clamp(32px, 3.7vw, 52px); line-height: 1.05; letter-spacing: -0.
 .sfoot .st b { font-size: 26px; letter-spacing: -0.03em; }
 
 /* an opened row: one white band under the row; the bank cell keeps its one-line height
-   and the detail starts where the Trezzit text starts */
+   and the detail starts where the Trezzit column starts */
 .sdetail[hidden] { display: none; }
 .sd-tz { padding: 18px 22px; background: #fff; box-shadow: inset 0 1px 0 var(--divider); border-bottom: 1px solid var(--divider); }
-@media (min-width: 760px) { .sd-tz { padding-left: calc(var(--bank-col) + 22px + 36px + 14px); padding-right: 64px; } }
+@media (min-width: 760px) { .sd-tz { padding-left: calc(var(--bank-col) + 22px); padding-right: 22px; } }
 .sd-lesson { font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
-.sd-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.sd-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .sd-chips li { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 12px 0 5px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); font-size: 14.5px; color: var(--text); }
 .sd-chips li.is-you { box-shadow: inset 0 0 0 1.5px var(--ink); }
 .sd-chips b { color: var(--ink); font-weight: 700; }
@@ -544,7 +544,8 @@ ul.trust { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 15px; color
 .tzcard-f b { color: var(--ink); }
 .tzcard .rec { display: inline-flex; align-items: center; gap: 6px; color: var(--teal-text); font-weight: 600; vertical-align: -3px; }
 .tzcard .rec svg { width: 16px; height: 16px; }
-@media (max-width: 479px) { .chat-log { padding: 16px; } .chat-h { padding-left: 16px; } }
+@media (max-width: 479px) { .chat-log { padding: 16px; } .chat-h { padding-left: 16px; gap: 10px; } .chat-conn { white-space: nowrap; } }
+@media (max-width: 380px) { .chat-ctl span { display: none; } .chat-ctl { width: 44px; padding: 0; justify-content: center; } }
 
 /* ---------- close ---------- */
 .sec-close { text-align: center; }

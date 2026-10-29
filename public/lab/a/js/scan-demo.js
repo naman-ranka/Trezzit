@@ -15,10 +15,11 @@ export const STORE_ICON = {
   receipt: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4L6 21zM9 8h6M9 12h6M9 16h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
 
-export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabel = 'Split this receipt' } = {}) {
+export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabel = 'Split this receipt', exclude = [] } = {}) {
+  const samples = SAMPLES.filter((s) => !exclude.includes(s.id));
   root.innerHTML = `
     <div class="seg-ctl scan-picker" role="group" aria-label="Choose a receipt">
-      ${SAMPLES.map((s) => `<button type="button" data-id="${s.id}" aria-pressed="false">${SHORT[s.id].label}<span class="money">${money(toCents(s.total))}</span></button>`).join('')}
+      ${samples.map((s) => `<button type="button" data-id="${s.id}" aria-pressed="false">${SHORT[s.id].label}<span class="money">${money(toCents(s.total))}</span></button>`).join('')}
       <button type="button" class="file-pick" aria-pressed="false">${ICON.upload}Your photo</button>
       <input type="file" class="visually-hidden file-in" accept="image/*,application/pdf" tabindex="-1" aria-hidden="true">
     </div>
@@ -34,7 +35,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
         </div>
         <div class="status" role="status" aria-live="polite"><span class="spin" hidden></span><span class="ok-ico">${ICON.check}</span><span class="status-t">Waiting for a receipt</span></div>
         <div class="progress" aria-hidden="true"><i></i></div>
-        <ul class="items" role="list" tabindex="0" aria-label="Receipt items"></ul>
+        <ul class="items" role="list" tabindex="-1" aria-label="Receipt items"></ul>
         <button type="button" class="more-items is-off" tabindex="-1"></button>
         <div class="sums is-off">${SUMS_PLACEHOLDER}</div>
         <div class="result-cta is-off"><button type="button" class="btn btn-primary split-btn" tabindex="-1">${esc(splitLabel)}</button></div>
@@ -139,6 +140,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     const isFile = typeof input !== 'string';
     press(isFile ? 'file' : input);
     list.innerHTML = '';
+    list.tabIndex = -1; // an empty list is no tab stop (0px tall, so its focus ring would be invisible)
     list.classList.remove('is-open', 'is-six');
     more.hidden = false; more.classList.add('is-off'); more.tabIndex = -1;
     sums.classList.add('is-off'); sums.innerHTML = SUMS_PLACEHOLDER; showCta(false);
@@ -171,7 +173,8 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
         instant: instant || undefined,
         onStage(stage, detail) {
           if (signal.aborted) return;
-          if (stage === 'uploading') { setStatus('Uploading the photo'); bar.style.width = '12%'; }
+          // a sample has no photo to upload: it reads from the first moment
+          if (stage === 'uploading') { setStatus(isFile ? 'Uploading the photo' : 'Reading the receipt'); bar.style.width = '12%'; }
           if (stage === 'reading') {
             const items = detail.items || [];
             if (!items.length) { setStatus('Reading the receipt'); bar.style.width = '18%'; return; }
@@ -210,6 +213,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     // the read-line tint fades out once the scan is done (it marks progress, not a result)
     $$('.tz-r-line', paper).forEach((l) => l.classList.remove('is-read'));
     paper.style.transform = ''; list.scrollTop = 0;
+    list.tabIndex = 0;
     fold(false);
     header(model, result.sampleId);
     const b = result.bill;
@@ -251,7 +255,8 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   $('.split-btn', root).addEventListener('click', () => current && onSplit?.(current));
 
   // watch the stage, not the root: the landing lays the root out with display: contents (no box to observe)
-  if (autoStart) onceVisible($('.scan-stage', root), () => run('green-basket'), { threshold: 0.3 });
+  // phones start a little before the stage is in view, so a visitor scrolling at normal speed meets the end of the read
+  if (autoStart) onceVisible($('.scan-stage', root), () => run('green-basket'), compact() ? { threshold: 0, rootMargin: '0px 0px 120px 0px' } : { threshold: 0.3 });
   return { run, get model() { return current; } };
 }
 

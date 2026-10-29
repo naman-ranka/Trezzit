@@ -19,9 +19,15 @@ trustIcons();
 // sample, or your own photo, opens the full playground with that receipt.
 safe(() => mountScan($('#scan-demo'), {
   splitLabel: 'Split it',
+  // rent is not a receipt anyone snaps: the landing scan offers groceries, pharmacy and dinner (/scan/ keeps all four)
+  exclude: ['monthly-rent'],
   onSplit(model) {
     if (model.id === 'green-basket') {
-      $('#story').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      // land on the playground ("Tap to change who had what."): on desktop, the last scroll step under the reading line
+      const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      const last = $('#story .step[data-step="3"]');
+      if (innerWidth >= 900 && last) scrollTo({ top: last.getBoundingClientRect().top + scrollY - innerHeight * 0.4, behavior });
+      else $('#story').scrollIntoView({ behavior });
       return;
     }
     let id = model.id;

@@ -1,5 +1,5 @@
 /**
- * snap-split.js: "Snap it. Split it." One panel: the receipt is read line by
+ * snap-split.js: "Split it by the item." One receipt (Taqueria Sol). One panel: the receipt is read line by
  * line into a list, then each line gets its faces and the list becomes the
  * split. Every row is in the DOM from the start (pending rows show as quiet
  * placeholders), so nothing below moves while it plays. All maths goes
@@ -15,7 +15,7 @@
 import { loadScan, getSample, receiptHTML, ensureReceiptStyles } from '../../_kit/receipts.js';
 import { PEOPLE, CATEGORIES, summarise } from './data.js';
 import { shareText, splitPeople, isExtra, whoHTML, updateStack, openLine, toggleSplit } from './split-editor.js';
-import { money, bankAmt, esc, avatar, ICON, listNames, reduced, whenVisible } from './util.js';
+import { money, esc, avatar, ICON, listNames, reduced, whenVisible } from './util.js';
 
 const SHOWN_LINES = 5;
 const READ_MS = 1000; // all rows, whatever the receipt length
@@ -24,7 +24,6 @@ const CHECK_MS = 200; // "Checking the math" before the split shows
 export function initSnapSplit(root, scenarioFor) {
   ensureReceiptStyles();
   const $ = (s) => root.querySelector(s);
-  const picks = [...root.querySelectorAll('[data-sample]')];
   const card = $('[data-card]');
   const paper = $('[data-paper]');
   const paperTag = $('[data-paper-tag]');
@@ -34,8 +33,6 @@ export function initSnapSplit(root, scenarioFor) {
   const live = $('[data-live]');
   const peopleEl = $('[data-people]');
   const progress = $('[data-progress]');
-  const sumBank = $('[data-sum-bank]');
-  const sumBankAmt = $('[data-sum-bank-amt]');
   const sumMine = $('[data-sum-mine]');
 
   let sc = null;
@@ -102,8 +99,6 @@ export function initSnapSplit(root, scenarioFor) {
     list.innerHTML = shown.map((it) => rowHTML(it, !isExtra(it) && it.index === openAt)).join('');
     peopleEl.innerHTML = peopleHTML(res);
     root.classList.toggle('is-solo', order.length === 1);
-    sumBank.textContent = sc.bank ? `${sc.bank.date} ${sc.bank.merchant}` : 'Not on your statement';
-    sumBankAmt.textContent = sc.bank ? bankAmt(res.totalCents) : '';
     sumMine.dataset.cents = String(sum.mine);
     sumMine.textContent = money(sum.mine);
     foot.innerHTML = `
@@ -113,7 +108,7 @@ export function initSnapSplit(root, scenarioFor) {
     const hidden = res.items.length - SHOWN_LINES;
     list.classList.toggle('is-clipped', hidden > 0 && !expanded);
     more.hidden = !(hidden > 0 && !expanded);
-    more.textContent = `Show all ${res.items.length} lines`;
+    more.textContent = 'Show all';
   }
 
   function update() {
@@ -227,7 +222,6 @@ export function initSnapSplit(root, scenarioFor) {
     const my = ++run;
     sampleId = id;
     expanded = false;
-    picks.forEach((p) => p.setAttribute('aria-pressed', String(p.dataset.sample === id)));
     const [raw, scenario] = await Promise.all([loadScan(id), scenarioFor(id)]);
     if (my !== run) return;
     sc = scenario;
@@ -235,7 +229,7 @@ export function initSnapSplit(root, scenarioFor) {
     paper.innerHTML = receiptHTML(raw, { sample: getSample(id) });
     paper.querySelector('.tz-r-foot p')?.remove(); // its unit count ("ITEMS 19") reads as a mismatch next to the line count
     paper.style.transform = '';
-    paperTag.textContent = `${sc.itemCount} lines`;
+    paperTag.textContent = sc.day || '';
     render();
     if (wait) { pending(); return; }
     setPhase('split');
@@ -280,10 +274,9 @@ export function initSnapSplit(root, scenarioFor) {
     more.hidden = true;
     list.children[SHOWN_LINES]?.querySelector('button')?.focus?.({ preventScroll: true });
   });
-  picks.forEach((p) => p.addEventListener('click', () => { played = true; load(p.dataset.sample); }));
 
   // Until the list is well on screen it waits as placeholders; then the read plays once.
-  const first = picks.find((p) => p.getAttribute('aria-pressed') === 'true')?.dataset.sample || picks[0].dataset.sample;
+  const first = root.dataset.sample;
   let played = false;
   load(first, { play: false, wait: !reduced() }).then(() => {
     if (reduced()) return;

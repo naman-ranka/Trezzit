@@ -51,9 +51,12 @@ async function build() {
     scans[s.id] = { raw, bill, split: splitSample(s, bill) };
   }));
   const netflix = splitBill({ people: ['you', 'maya', 'jordan', 'sam'], items: [{ name: 'NETFLIX STANDARD', amount: '17.99', category: 'subscriptions' }] });
+  // The card charge that was missing from Trezzit until your AI checked the statement (the #ai demo).
+  const deli = splitBill({ people: ['you'], items: [{ name: 'LUNCH', amount: '11.40', category: 'dining' }] });
 
   // Your October, newest first. payer: who paid the bill.
   const bills = [
+    { id: 'juniper-deli', title: 'Juniper Deli', date: 'Oct 27', group: null, payer: 'you', byAI: true, split: deli },
     { id: 'green-basket', title: 'Green Basket Market', date: 'Oct 24', group: 'Flat 3B', payer: 'you', split: scans['green-basket'].split },
     { id: 'corner-pharmacy', title: 'Corner Pharmacy', date: 'Oct 20', group: null, payer: 'you', split: scans['corner-pharmacy'].split },
     { id: 'taqueria-sol', title: 'Taqueria Sol', date: 'Oct 18', group: 'Thursday dinners', payer: 'alex', split: scans['taqueria-sol'].split },
@@ -62,6 +65,7 @@ async function build() {
   ].map((b) => ({ ...b, totalCents: b.split.totalCents, youCents: b.split.people.you?.cents || 0 }));
 
   const bank = [
+    { date: 'Oct 27', text: 'JUNIPER DELI 0331', cents: -1140 },
     { date: 'Oct 24', text: 'GREEN BASKET MKT 0412', cents: -10000 },
     { date: 'Oct 20', text: 'CORNER PHARMACY 118', cents: -4822 },
     { date: 'Oct 1', text: 'ONLINE TRANSFER RENT', cents: -263240 },
@@ -78,9 +82,11 @@ async function build() {
   bills.forEach((b) => b.split.items.forEach((it) => {
     const mine = it.shares?.you || 0;
     const owners = Object.keys(it.shares || {}).filter((k) => it.shares[k]);
+    // Rent is split by room (percentages), so it never reads as an even "4 ways".
+    const how = getSample(b.id)?.lines?.[it.index]?.split?.type === 'percentage' ? 'by room' : `${owners.length} ways`;
     lines.push({
       name: it.itemType === 'Tip' ? 'Tip' : itemName(it.name), bill: b.title, date: b.date,
-      cents: mine, totalCents: it.totalCents, n: owners.length, owners, category: it.category || 'other',
+      cents: mine, totalCents: it.totalCents, n: owners.length, how, owners, category: it.category || 'other',
     });
   }));
   const items = lines.filter((l) => l.cents > 0);

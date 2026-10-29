@@ -168,5 +168,13 @@ export async function initSplit() {
   $('[data-split-reset]')?.addEventListener('click', () => load(state.id));
 
   load('green-basket');
-  return { show: (id) => { if (BILLS[id]) load(id); } };
+  // From the scan's "Split it": load that bill and put keyboard focus on its first row, where the tapping starts.
+  return {
+    show: (id) => {
+      if (!BILLS[id]) return;
+      load(id);
+      // After the link's own jump to #split, which would otherwise reset focus.
+      setTimeout(() => $('.who button[tabindex="0"]', host)?.focus({ preventScroll: true }), 0);
+    },
+  };
 }

@@ -26,7 +26,16 @@ const MAIN_CAT = (e) => {
 
 export async function mountLedger(root, opts = {}) {
   const data = await octoberLedger();
-  const { entries, byCat, spent, last } = data;
+  const { entries } = data;
+  // Rent is most of a month and drowns every other bar, so the month shows day-to-day
+  // spending and rent sits under it as one quiet "plus rent and bills" row (it has its own page).
+  const fixed = entries.find((e) => e.id === 'monthly-rent');
+  const dayToDay = entries.filter((e) => e !== fixed);
+  const byCat = {};
+  dayToDay.forEach((e) => e.lines.forEach((l) => { byCat[l.cat] = (byCat[l.cat] || 0) + l.cents; }));
+  const spent = dayToDay.reduce((a, e) => a + e.youCents, 0);
+  const FIXED_CATS = ['rent', 'utilities', 'internet'];
+  const last = Object.entries(LAST_MONTH).filter(([k]) => !FIXED_CATS.includes(k)).reduce((a, [, c]) => a + c, 0);
   const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
   const max = cats[0][1];
   const delta = spent - last;
@@ -55,6 +64,10 @@ export async function mountLedger(root, opts = {}) {
         }).join('')}
       </ul>
       <button type="button" class="c-link-btn lg-more">Show all ${cats.length} categories</button>
+      ${fixed ? `<a class="lg-fixed" href="${esc(opts.fixedHref || '../recurring/')}">
+        <span class="lg-ci" style="--c:${cat('rent').color}">${catIcon('rent')}</span>
+        <span class="lg-cn">Plus rent and bills <span class="lg-fx">every month</span></span>
+        <b class="money">${money(fixed.youCents)}</b><span class="lg-fgo" aria-hidden="true">→</span></a>` : ''}
     </div>
     <div class="lg-find">
       <label class="lg-search">${icon.search}<span class="visually-hidden">Search every item</span>

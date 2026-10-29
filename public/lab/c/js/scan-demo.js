@@ -14,9 +14,14 @@ const CHECK_LABEL = {
   tax_distribution_check: 'Tax',
 };
 
-/** The checks worth showing: no tax check on a receipt without tax. */
-const checksFor = (bill) => (bill?.backendValidations || [])
-  .filter((c) => c.check !== 'tax_distribution_check' || Number(bill.tax) > 0);
+/** One plain-words chip instead of three cryptic ones: the math was checked against the receipt.
+ *  (No tax check on a receipt without tax; a failed check says what failed.) */
+const checksFor = (bill) => {
+  const v = (bill?.backendValidations || []).filter((c) => c.check !== 'tax_distribution_check' || Number(bill.tax) > 0);
+  if (!v.length) return [];
+  const bad = v.find((c) => !c.passed);
+  return [bad ? { passed: false, message: `${CHECK_LABEL[bad.check] || 'Total'} doesn’t match the receipt` } : { passed: true, message: 'Adds up to the receipt total' }];
+};
 const checkLI = (c, i, pending) => `<li class="${c.passed ? 'ok' : 'warn'}${pending ? ' pending' : ''}" style="--i:${i}">${icon.check}<span>${esc(CHECK_LABEL[c.check] || c.message)}</span></li>`;
 
 /**

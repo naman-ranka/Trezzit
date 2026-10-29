@@ -1138,3 +1138,124 @@ ul.ways { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); margi
 .msg.u.brief .bub p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .msg.u.brief .bub { max-width: 100%; }
 .msg.u.brief { min-width: 0; }
+
+/* =====================================================================
+   Round 5 fixes
+   ===================================================================== */
+/* split totals: never wider than their tile; in a narrow column they stack like the phone layout */
+.sp-person { min-width: 0; }
+.sp-pa { font-variant-numeric: tabular-nums; }
+@container split (max-width: 720px) {
+  .sp-person { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 8px 4px; row-gap: 2px; }
+  .sp-person .av { grid-row: auto; width: 26px; height: 26px; font-size: 11px; }
+  .sp-pn { display: none; }
+  .sp-pa { font-size: 19px; }
+  .sp-person[data-p='you'] .av { box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .5); }
+}
+
+/* scenario pages: one hero template everywhere (copy 380px and sticky, the demo beside it) */
+.sc-hero-demo h1 { text-wrap: balance; }
+@media (min-width: 1000px) {
+  .sc-hero-demo .wrap { grid-template-columns: 380px minmax(0, 1fr); column-gap: 48px; }
+  .sc-hero-demo h1 { font-size: clamp(40px, 4.4vw, 58px); max-width: none; }
+  .sc-hero-demo .wrap > .sc-copy { top: 96px; }
+  /* just-me: the scan demo fits the right column (receipt left, items right, one column of items) */
+  .sc-side .scan-body { grid-template-columns: minmax(0, 250px) minmax(0, 1fr); gap: 22px; }
+  .sc-side .so-items { columns: 1; }
+  .sc-side .scan-stage { height: 420px; }
+}
+.sc-hero-demo + .sc-demo { padding-top: clamp(32px, 4vw, 56px); }
+.sc-demo .rec-compact { max-width: 820px; }
+
+/* recurring: one status pill, quiet labels after it; no gap after "$"; the ring wraps the whole field */
+.up-how { font-size: 14px; color: var(--muted); font-weight: 500; }
+.money-in-field input { padding: 0 0 0 1px; margin: 0; }
+.money-in-field input:focus-visible { box-shadow: none; border-radius: 0; }
+.money-in-field:focus-within { border-color: var(--accent); box-shadow: var(--focus-ring); }
+
+/* roommates: one running balance for the apartment, from both demos */
+.bal { margin-top: 16px; max-width: 820px; border-radius: 18px; background: var(--wash); padding: 16px 18px 10px; }
+.bal-t { font-weight: 700; color: var(--ink); font-size: 17px; }
+.bal-s { color: var(--muted); font-size: 14px; margin-top: 2px; }
+ul.bal-list { margin: 8px 0 0; padding: 0; list-style: none; }
+.bal-list li { display: flex; align-items: center; gap: 10px; padding: 9px 0; font-size: 16px; }
+.bal-list li + li { border-top: 1px solid var(--line); }
+.bal-list b { margin-left: auto; color: var(--ink); font-size: 18px; letter-spacing: -0.01em; }
+.bal-list li.neg b { color: var(--neg); }
+.bal-list li.pos b { color: var(--pos); }
+
+/* understand: rent is one quiet row under the month, not 80% of the bar */
+.lg-fixed { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto 18px; align-items: center; gap: 10px; min-height: 44px; margin-top: 8px; padding: 6px 8px 6px 4px; border-top: 1px dashed var(--line-strong); color: var(--muted); text-decoration: none; font-size: 15px; border-radius: 0 0 10px 10px; }
+.lg-fixed:hover { background: var(--wash); }
+.lg-fixed .lg-ci { opacity: .7; }
+.lg-fixed .lg-cn { color: var(--muted); }
+.lg-fx { font-size: 14px; }
+.lg-fixed b { color: var(--muted); font-weight: 600; }
+.lg-fgo { color: var(--accent); font-weight: 600; }
+.lg-fixed:focus-visible { box-shadow: var(--focus-ring); }
+
+/* chat: the panel fits its tallest conversation, so it never scrolls and never clips the question */
+.chat-win { position: relative; }
+.chat-log { height: auto; overflow: hidden; transition: opacity .2s var(--ease); }
+.chat-log.fading { opacity: 0; }
+.chat-probe { position: absolute; left: 0; right: 0; top: 0; height: auto !important; visibility: hidden; pointer-events: none; z-index: -1; }
+.msg.u .bub p { white-space: normal; }
+.chat-id > span.chat-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; }
+.chat-name span { font-size: 14px; color: var(--muted); }
+.att { padding: 3px 10px 3px 3px; margin-bottom: 6px; gap: 7px; }
+.att img { width: 20px; height: 28px; border-radius: 3px; }
+.att .doc-i { width: 22px; height: 26px; font-size: 8px; }
+ul.tc-people.tc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; }
+.tc-grid li + li { border-top: 0; }
+.tc-grid li:nth-child(n + 3) { border-top: 1px solid var(--divider); }
+.tc-rows li.more-ok { display: none; color: var(--muted); font-family: var(--font-sans); font-size: 14px; }
+@media (max-width: 639px) {
+  .tc-rows li.extra { display: none; }
+  .tc-rows li.more-ok { display: flex; }
+}
+.chat-try { padding-left: 14px; }
+#chat-demo { min-height: 0; }
+
+/* /ai: the ChatGPT fallback is one small line under the card */
+.cn-note { margin-top: 12px; font-size: 14px; color: var(--muted); }
+
+/* home close: less dead space before the footer; the one reassurance line under the buttons */
+.close { padding-bottom: clamp(56px, 6vw, 88px); }
+.close .close-sub { margin-top: 18px; font-size: 16px; }
+.close-sm { padding: clamp(48px, 6vw, 80px) 0; }
+
+/* footer: grouped, tight columns with quiet headings */
+.foot-h { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .03em; margin-bottom: 4px; }
+.foot nav a { font-size: 14px; padding: 0; line-height: 28px; min-height: 28px; }
+@media (max-width: 639px) {
+  .foot nav { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; }
+  .foot nav ul { display: grid; }
+  .foot nav a { min-height: 36px; padding: 0; }
+}
+/* step headings read as one line at desktop; rent card and its balance line up under their heading */
+.verb-copy { max-width: 940px; }
+#rent-demo, #rec-demo { max-width: 820px; margin-inline: 0; }
+.bal { margin-inline: 0; }
+
+/* no layout shift: reserves re-measured after the round 5 changes (smallest final height per range, 320-1440) */
+.verb-demo #ledger-demo { min-height: 673px; }
+#chat-demo { min-height: 644px; }
+.ai-hero-demo#chat-demo { min-height: 706px; }
+#split-demo.res-rm { min-height: 708px; }
+#split-demo.res-trips { min-height: 1630px; }
+#rent-demo, #rec-demo { min-height: 694px; }
+#rec-side { min-height: 654px; }
+.res-jm { min-height: 1252px; }
+.sc-demo #ledger-demo { min-height: 1032px; }
+@media (min-width: 640px) { #chat-demo { min-height: 660px; } }
+@media (min-width: 720px) { .res-jm { min-height: 803px; } }
+@media (min-width: 860px) { #split-demo.res-rm { min-height: 510px; } #split-demo.res-trips { min-height: 1127px; } }
+@media (min-width: 880px) { .verb-demo #ledger-demo { min-height: 466px; } .sc-demo #ledger-demo { min-height: 555px; } }
+@media (min-width: 980px) { #chat-demo { min-height: 683px; } }
+@media (min-width: 1000px) { #split-demo.res-rm { min-height: 674px; } #split-demo.res-trips { min-height: 1547px; } .res-jm { min-height: 795px; } }
+@media (min-width: 1024px) {
+  .ai-hero-demo#chat-demo { min-height: 714px; }
+  /* /ai: a wider chat column so the four prompts sit on one row */
+  .ai-hero .wrap { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
+}
+.verb-copy > p:not(.verb-k):not(.verb-hint) { max-width: 62ch; }

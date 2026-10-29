@@ -1,5 +1,6 @@
 /* rent-demo.js: an itemized monthly rent you can reprice; every share follows to the cent.
- * mountRent(root, { compact }) — compact (roommates page) shows the rent and the four shares only. */
+ * mountRent(root, { compact, sideRoot, onChange }) — compact (roommates page) shows the rent and the four shares only;
+ * sideRoot (recurring page) takes the 'Coming up' column, so it can lead the page; onChange(result) after every change. */
 import { splitBill, distributeEqually } from '../../_kit/split-engine.js';
 import { PEOPLE } from './data.js';
 import { money, countMoney, icon, esc } from './util.js';
@@ -27,22 +28,7 @@ function compute() {
 }
 
 const flix = distributeEqually(2499, 4);
-root.innerHTML = `<div class="rec${opts.compact ? ' rec-compact' : ''}">
-  <div class="rec-sched">
-    <div class="rec-top">
-      <p class="rec-name"><span class="ic">${icon.repeat}</span><span><b>Monthly rent</b><small>Apartment 3B · every month on the 1st · Maya pays</small></span></p>
-    </div>
-    <div class="rec-edit">
-      <label for="rent-in">Rent</label>
-      <span class="money-in-field">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-help"></span>
-      <span class="step-btns"><button type="button" data-step="-2500" aria-label="Lower rent by $25">−</button><button type="button" data-step="2500" aria-label="Raise rent by $25">+</button></span>
-      <span id="rent-help" class="muted small">Split 25 · 25 · 28 · 22 %</span>
-    </div>
-    <ul class="rec-lines" role="list"></ul>
-    <ul class="sp-people rec-shares" role="list" aria-live="polite">${ROOM.map((p) => `<li class="sp-person" data-p="${p}"><span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span><span class="sp-pn">${PEOPLE[p].name}</span><b class="money sp-pa"></b></li>`).join('')}</ul>
-    <p class="sp-check rec-check">${icon.check}<span></span></p>
-  </div>
-  ${opts.compact ? '' : `<div class="rec-side">
+const SIDE = `<div class="rec-side">
     <div class="rec-mode"><span id="mode-l">On the 1st</span>
       <div class="seg" role="radiogroup" aria-labelledby="mode-l">
         <button type="button" role="radio" aria-checked="true" data-mode="auto">Add automatically</button>
@@ -56,14 +42,32 @@ root.innerHTML = `<div class="rec${opts.compact ? ' rec-compact' : ''}">
       <div class="hist-bars" aria-hidden="true"></div>
       <div class="hist-lbl" aria-hidden="true">${MONTHS.map((m) => `<span>${m}</span>`).join('')}<span class="nx">Dec</span></div>
     </div>
-  </div>`}
+  </div>`;
+root.innerHTML = `<div class="rec${opts.compact || opts.sideRoot ? ' rec-compact' : ''}">
+  <div class="rec-sched">
+    <div class="rec-top">
+      <p class="rec-name"><span class="ic">${icon.repeat}</span><span><b>Monthly rent</b><small>Apartment 3B · on the 1st · Maya pays</small></span></p>
+    </div>
+    <div class="rec-edit">
+      <label for="rent-in">Rent</label>
+      <span class="money-in-field">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-help"></span>
+      <span class="step-btns"><button type="button" data-step="-2500" aria-label="Lower rent by $25">−</button><button type="button" data-step="2500" aria-label="Raise rent by $25">+</button></span>
+      <span id="rent-help" class="muted small">By room size · 25 · 25 · 28 · 22%</span>
+    </div>
+    <ul class="rec-lines" role="list"></ul>
+    <ul class="sp-people rec-shares" role="list" aria-live="polite">${ROOM.map((p) => `<li class="sp-person" data-p="${p}"><span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span><span class="sp-pn">${PEOPLE[p].name}</span><b class="money sp-pa"></b></li>`).join('')}</ul>
+    <p class="sp-check rec-check">${icon.check}<span></span></p>
+  </div>
+  ${opts.compact || opts.sideRoot ? '' : SIDE}
 </div>`;
+if (opts.sideRoot) opts.sideRoot.innerHTML = SIDE;
+const side = opts.sideRoot || root;
 
 const input = root.querySelector('#rent-in');
 const linesEl = root.querySelector('.rec-lines');
-const upEl = root.querySelector('.upcoming');
-const bars = root.querySelector('.hist-bars');
-const histEl = root.querySelector('[data-k="hist"]');
+const upEl = side.querySelector('.upcoming');
+const bars = side.querySelector('.hist-bars');
+const histEl = side.querySelector('[data-k="hist"]');
 let prev = null;
 
 function render() {
@@ -76,14 +80,17 @@ function render() {
     countMoney(b, prev ? prev.people[p].cents : r.people[p].cents, r.people[p].cents, prev ? 380 : 0);
   });
   root.querySelector('.rec-check span').innerHTML = `Shares add up to <b class="money">${money(r.check.sumCents)}</b>, exactly.`;
+  opts.onChange?.(r);
   if (opts.compact) { prev = r; return; }
   const you = r.people.you.cents;
+  // one status pill (the next rent); the rows after it just say how they arrive
   const st = mode === 'auto' ? '<span class="up-status auto">Adds automatically</span>' : '<span class="up-status review">You review it</span>';
+  const quiet = (m) => `<span class="up-how">${m === 'auto' ? 'Auto' : 'Review'}</span>`;
   upEl.innerHTML = [
-    ['Dec', 1, 'Monthly rent', `Your share of ${money(r.totalCents)}`, money(you), st],
-    ['Dec', 5, 'Netflix', 'Split 4 ways: $6.25, $6.25, $6.25, $6.24', money(flix[0]), '<span class="up-status auto">Adds automatically</span>'],
-    ['Dec', 15, 'Gym membership', 'Just you', '$39.00', '<span class="up-status auto">Adds automatically</span>'],
-    ['Jan', 1, 'Monthly rent', 'Same split', money(you), st],
+    ['Dec', 1, 'Monthly rent', 'Rent + utilities · your share', money(you), st],
+    ['Dec', 5, 'Netflix', 'Split 4 ways: $6.25, $6.25, $6.25, $6.24', money(flix[0]), quiet('auto')],
+    ['Dec', 15, 'Gym membership', 'Just you', '$39.00', quiet('auto')],
+    ['Jan', 1, 'Monthly rent', 'Same split', money(you), quiet(mode)],
   ].map(([m, d, t, s, a, status]) => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b><small>${s}</small></span><span class="up-r"><b class="money">${a}</b>${status}</span></li>`).join('');
   const vals = [...MONTHS.map(() => HIST), you];
   const max = Math.max(...vals) * 1.08;
@@ -118,10 +125,11 @@ input.addEventListener('input', () => {
   setRent(v, true);
 });
 input.addEventListener('blur', () => setRent(rent));
+input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); setRent(rent); } });
 root.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => setRent(rent + Number(b.dataset.step))));
-root.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
+side.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
   mode = b.dataset.mode;
-  root.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+  side.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
   render();
 }));
 render();

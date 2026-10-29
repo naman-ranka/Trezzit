@@ -10,5 +10,5 @@ initPage();
 initHero(document.querySelector('[data-hero]'));
 mountScan(document.getElementById('scan-demo'), { samples: ['green-basket', 'taqueria-sol', 'corner-pharmacy'], splitTarget: '#split', soloHref: 'just-me/' });
 mountSplit(document.getElementById('split-demo'), { sampleId: 'green-basket', listen: true, tipToggle: true, yours: false });
-mountLedger(document.getElementById('ledger-demo'), { compact: true });
+mountLedger(document.getElementById('ledger-demo'), { compact: true, fixedHref: 'recurring/' });
 mountChat(document.getElementById('chat-demo'));

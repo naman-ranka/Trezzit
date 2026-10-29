@@ -8,7 +8,7 @@ import { itemName, getWorld, getSample, loadScan } from './world.js';
 const CHECKS = ['items_total_check', 'grand_total_check', 'tax_distribution_check'];
 const NEXT = {
   'green-basket': ['Split it', '#split', 'green-basket'],
-  'taqueria-sol': ['Split it', '#split', 'taqueria-sol'],
+  'taqueria-sol': ['See it in October', '#october'],
   'corner-pharmacy': ['See it in October', '#october'],
   'monthly-rent': ['See it in October', '#october'],
 };
@@ -42,6 +42,8 @@ export function initScan(onSplitRequest) {
       paper.innerHTML = `<img class="user-photo" src="${photoUrl}" alt="">`;
     } else {
       paper.appendChild(renderReceipt(raw, { sample: getSample(sampleId) }));
+      // The paper counts units ("ITEMS 19"); the card counts lines (14). Drop the unit count so they never disagree.
+      $$('.tz-r-foot p', paper).find((x) => /^ITEMS \d+$/.test(x.textContent.trim()))?.remove();
     }
     const beam = document.createElement('div'); beam.className = 'beam'; paper.appendChild(beam);
     requestAnimationFrame(() => paper.style.setProperty('--sweep', Math.max(200, Math.min(paper.scrollHeight, paper.clientHeight) - 60) + 'px'));

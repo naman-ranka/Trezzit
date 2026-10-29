@@ -1,8 +1,8 @@
 /* chat.js: a scripted assistant exchange. Neutral chat styling (not a copy of any AI app),
- * Trezzit's own cards for tool results. Two prompts (a read, a write) and a Replay. The log is as tall
- * as the longest finished exchange, so nothing scrolls inside it or gets cut off. The panel opens on the
- * first exchange already finished (never an empty box, nothing moves on its own); a chip or Replay plays one,
- * and while it plays Replay becomes Skip. The last answer is announced politely when a run ends. */
+ * Trezzit's own cards for tool results. Two prompts (a read across the ledger, a write with a preview) and a Replay.
+ * The log is as tall as the longest finished exchange and its messages sit at the bottom, like a real chat, so any
+ * spare room is above the conversation, never an empty band under it. The panel opens on the read, finished;
+ * a chip or Replay plays one, and while it plays Replay becomes Skip. A one-line result is announced when a run ends. */
 import { $, $$, esc, money, ICON, reduced, avatar } from './util.js';
 import { loadModel, compute, PEOPLE } from './data.js';
 
@@ -12,28 +12,13 @@ async function scripts() {
   const gb = compute(await loadModel('green-basket'));
   const row = (p) => `<div class="r">${avatar(PEOPLE[p])}<span>${esc(PEOPLE[p].name)}</span><span class="money">${money(gb.people[p].cents)}</span></div>`;
   return {
-    // the write first: the page's own receipt, handed to the AI; a preview, a yes, then saved
-    split: {
-      chip: 'Split this receipt',
-      steps: [
-        { t: 'user', att: true, text: 'Split this with my roommates. Avocados and cold brew are mine, oat milk and kale chips are Maya’s.' },
-        { t: 'tool', label: 'Reading the receipt', done: 'Preview ready' },
-        { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Green Basket Market · Oct 24</strong><span class="money">${money(gb.totalCents)}</span></div>
-          <span class="tag">Preview · not saved yet</span>
-          <div class="rows rows-p">${['you', 'maya', 'jordan', 'sam'].map(row).join('')}</div></div>` },
-        { t: 'ai', text: 'Save it to Roommates?' },
-        { t: 'user', text: 'Yes' },
-        { t: 'tool', label: 'Saving', done: 'Saved to Roommates' },
-        { t: 'ai', text: 'Saved. It shows in everyone’s activity.' },
-      ],
-    },
-    // the read
+    // the read first: the shared-aware ledger, across every bill, that only an AI connected to it can answer
     ask: {
       chip: 'What did I spend?',
+      say: 'Groceries, October: $49.00, your share.',
       steps: [
         { t: 'user', text: 'What did I actually spend on groceries this month?' },
         { t: 'tool', label: 'Adding up your shares', done: 'Your shares, October' },
-        { t: 'ai', text: 'Your share: $49.00.' },
         { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Groceries · October</strong><span>your share</span></div>
           <p class="big money">$49.00</p>
           <div class="rows">
@@ -41,6 +26,21 @@ async function scripts() {
             <div class="r"><span class="dot" style="--c:var(--cat-groceries)"></span><span>Green Grocer</span><span class="money">$17.80 <small>yours</small></span></div>
             <div class="r"><span class="dot" style="--c:var(--cat-groceries)"></span><span>Farmers market</span><span class="money">$9.20 <small>of $32.25</small></span></div>
           </div></div>` },
+        { t: 'ai', text: 'Shared bills count only your share.' },
+      ],
+    },
+    // the write: the page's own receipt, handed to the AI; a preview, then saved only on a yes
+    split: {
+      chip: 'Split this receipt',
+      say: 'Saved to Roommates.',
+      steps: [
+        { t: 'user', att: true, text: 'Split this with my roommates. Avocados and cold brew are mine, oat milk and kale chips are Maya’s.' },
+        { t: 'tool', label: 'Reading the receipt', done: 'Preview ready' },
+        { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Green Basket Market · Oct 24</strong><span class="money">${money(gb.totalCents)}</span></div>
+          <span class="tag">Preview · not saved yet</span>
+          <div class="rows rows-p">${['you', 'maya', 'jordan', 'sam'].map(row).join('')}</div></div>` },
+        { t: 'user', text: 'Save it' },
+        { t: 'tool', label: 'Saving', done: 'Saved to Roommates' },
       ],
     },
   };
@@ -63,11 +63,11 @@ export async function initChat() {
   const chat = $('.chat', root);
   const rp = $('.rp', root);
   const live = $('[data-live]', root);
-  // Replay while idle; Skip (show the full answer) while an exchange is playing
+  // Replay while idle (icon, labelled); Skip while an exchange plays (its visible word is its name: WCAG 2.5.3)
   const setBtn = (playing) => {
     rp.classList.toggle('is-skip', playing);
-    rp.innerHTML = playing ? 'Skip' : ICON.replay;
-    rp.setAttribute('aria-label', playing ? 'Show full answer' : 'Replay');
+    if (playing) { rp.textContent = 'Skip'; rp.removeAttribute('aria-label'); }
+    else { rp.innerHTML = ICON.replay; rp.setAttribute('aria-label', 'Replay'); }
   };
   let token = 0;
   let paused = false;
@@ -136,10 +136,7 @@ export async function initChat() {
     running = false;
     setPaused(false);
     setBtn(false);
-    if (!instant) {
-      const last = [...S[key].steps].reverse().find((x) => x.t === 'ai');
-      live.textContent = last ? last.text : '';
-    }
+    if (!instant) live.textContent = S[key].say;
   }
 
   // bring the panel into view first, so a tap near the fold never plays off screen
@@ -153,7 +150,7 @@ export async function initChat() {
   rp.addEventListener('click', () => {
     if (running) {
       const k = active || keys[0];
-      play(k, { instant: true }).then(() => { live.textContent = [...S[k].steps].reverse().find((x) => x.t === 'ai')?.text || ''; });
+      play(k, { instant: true }).then(() => { live.textContent = S[k].say; });
       return;
     }
     start(active || keys[0]);
@@ -169,21 +166,9 @@ export async function initChat() {
     if (keep) await play(keep, { instant: true });
   }
   await fit();
-  // Never an empty panel. With motion allowed, it holds the first question (the receipt photo) and plays the
-  // answer once, the first time the panel is 40% in view; Skip shows the full answer. Otherwise it opens finished.
-  const auto = !reduced() && 'IntersectionObserver' in window;
-  if (auto) {
-    log.innerHTML = '';
-    log.appendChild(userNode(S[keys[0]].steps[0]));
-    active = keys[0];
-    $$('.chat-chips button', root).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.k === keys[0])));
-    const io = new IntersectionObserver((es) => {
-      if (!es.some((e) => e.isIntersecting)) return;
-      io.disconnect();
-      if (!running && log.childElementCount === 1) play(keys[0], { keep: true });
-    }, { threshold: 0.4 });
-    io.observe(chat);
-  } else await play(keys[0], { instant: true });
+  // Never an empty or half-played panel: it opens on the first exchange, finished, at every width (nothing plays on
+  // its own, so a fast scroll never passes a spinner in a tall empty box). A chip or Replay plays one, animated.
+  await play(keys[0], { instant: true });
   let w = innerWidth;
   addEventListener('resize', () => { if (innerWidth !== w && !running) { w = innerWidth; fit(); } }, { passive: true });
   if ('IntersectionObserver' in window) {

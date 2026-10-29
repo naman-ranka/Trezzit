@@ -3,7 +3,8 @@
  * Desktop: a sticky stage; the step nearest the reading line sets its state (native scroll).
  * Phones: no timed play. The stage arrives finished (step 3) and its dots pop in once it is in view,
  * so the payoff never depends on reading speed.
- * The stage footer carries "Roommates owe you", the "Adds up to" check and Reset, at every width.
+ * The stage footer ends on the hero's word: "You spent $X · roommates owe you $Y", then the "Adds up to" check and Reset.
+ * The nine plain shared groceries fold into one row (open on tap), so the grid is six rows, not fourteen.
  * At step 3 the stage is the playground: tap a dot to add or remove someone from an item, and the
  * kit's engine (integer cents) re-splits. Any tap or keyboard focus on a dot jumps straight to it.
  * Keyboard: the dots are one tab stop (roving tabindex, always present); arrows move between dots. */
@@ -27,20 +28,40 @@ export async function initStory() {
   const GROUP = (i) => groups[i];
 
   const CAPTION = { 0: `${model.lines.length} items · ${money(model.totalCents)}`, [LAST]: 'Tap to change who had what.' };
+  // The nine plain groceries everyone shares fold into one row ("Shared groceries · 9 items"), so the grid shows only
+  // what differs: your two, Maya's two, the taxed towels. The fold opens on tap; a dot on it changes all nine at once.
+  const fold = original.map((l, i) => i).filter((i) => groups[i] === 1 && !original[i].taxCents);
+  const folded = fold.length >= 3 ? fold : [];
+  const sumOf = (ix) => ix.reduce((a, i) => a + res.items[i].totalCents, 0);
+  const dots = (label) => `<span class="who" role="group" aria-label="Who had ${esc(label)}">${people.map((p) => `<button type="button" class="dot-b" data-p="${p}" aria-label="${esc(label)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button>`).join('')}</span>`;
+  const lineRow = (l, i, sub = false) => `
+      <div class="st-row${sub ? ' st-subrow' : ''}" data-i="${i}" data-g="${GROUP(i)}" style="--r:${i}">
+        <span class="nm">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">tax in</small>' : ''}</span><span class="money">${money(res.items[i].totalCents)}</span>
+        ${dots(l.pretty)}
+      </div>`;
+  const grpLabel = 'Shared groceries';
   stage.innerHTML = `
     <p class="st-cap" aria-hidden="true"><b></b><span></span></p>
-    <div class="st-people">${people.map((id) => `
+    <div class="st-people"><span class="st-sp" aria-hidden="true"></span><div class="st-pp">${people.map((id) => `
       <div class="st-p" data-p="${id}">${avatar(PEOPLE[id])}<span class="nm">${esc(PEOPLE[id].name)}</span><span class="amt money">$0.00</span></div>`).join('')}
-    </div>
-    <div class="st-items">${model.lines.map((l, i) => `
-      <div class="st-row" data-i="${i}" data-g="${GROUP(i)}" style="--c:${CATEGORIES[l.category].color};--r:${i}">
-        <span class="nm">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">tax in</small>' : ''}</span><span class="money">${money(res.items[i].totalCents)}</span>
-        <span class="who" role="group" aria-label="Who had ${esc(l.pretty)}">${people.map((p) => `<button type="button" class="dot-b" data-p="${p}" aria-label="${esc(l.pretty)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button>`).join('')}</span>
-      </div>`).join('')}</div>
-    <div class="st-foot"><p class="ss-owe">Roommates owe you <strong class="money"></strong></p><span class="ss-check"></span><button type="button" class="st-reset" tabindex="-1" aria-label="Reset the split" title="Reset">${ICON.replay}</button></div>
+    </div></div>
+    <div class="st-items">${folded.length ? `
+      <div class="st-row st-grp" data-lines="${folded.join(',')}" data-g="1" style="--r:0">
+        <span class="nm"><button type="button" class="st-exp" aria-expanded="false" aria-controls="st-sub"><span class="gl">${grpLabel}</span> <small>${folded.length} items</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span><span class="money">${money(sumOf(folded))}</span>
+        ${dots(grpLabel)}
+      </div>
+      <div class="st-sub" id="st-sub" hidden>${folded.map((i) => lineRow(model.lines[i], i, true)).join('')}</div>` : ''}
+      ${model.lines.map((l, i) => (folded.includes(i) ? '' : lineRow(l, i))).join('')}</div>
+    <div class="st-foot"><p class="ss-owe">You spent <strong class="money ss-you"></strong> <span class="ss-them">· roommates owe you <b class="money"></b></span></p><span class="ss-check"></span><button type="button" class="st-reset" tabindex="-1" aria-label="Reset the split" title="Reset">${ICON.replay}</button></div>
     <p class="visually-hidden" aria-live="polite" data-live></p>`;
 
-  const rows = $$('.st-row', stage);
+  const allRows = $$('.st-row', stage);
+  const grpRow = $('.st-grp', stage);
+  const sub = $('.st-sub', stage);
+  const expBtn = $('.st-exp', stage);
+  const linesOf = (row) => (row.dataset.lines ? row.dataset.lines.split(',').map(Number) : [+row.dataset.i]);
+  // the rows a keyboard can reach: the folded ones only while the fold is open
+  const visRows = () => allRows.filter((r) => !(sub?.hidden && sub.contains(r)));
   const live = $('[data-live]', stage);
   const amts = Object.fromEntries(people.map((p) => [p, $(`.st-p[data-p="${p}"] .amt`, stage)]));
   const avs = Object.fromEntries(people.map((p) => [p, $(`.st-p[data-p="${p}"]`, stage)]));
@@ -49,18 +70,16 @@ export async function initStory() {
   let current = -1;
   let edited = false;
   let pinned = false; // a dot was tapped or focused: keep the playground while the story is in view
-  let fr = 0; // roving focus: row
+  let focusRow = visRows()[0]; // roving focus: row element
   let fc = 0; // roving focus: person
   const capN = $('.st-cap b', stage);
   const capT = $('.st-cap span', stage);
   const footCheck = $('.st-foot .ss-check', stage);
   const footReset = $('.st-foot .st-reset', stage);
-  const footOwe = $('.st-foot .ss-owe strong', stage);
+  const footYou = $('.st-foot .ss-you', stage);
+  const footThem = $('.st-foot .ss-them b', stage);
   footReset.addEventListener('click', () => reset());
-  // the month's running tab: this receipt plus the month's other sample bills (live, follows every edit)
-  const tabEl = $('#story-tab');
-  const TAB_BASE = { maya: 8240, jordan: 4410, sam: 3875 };
-  // desktop: one caption beside the stage, cross-faded in place as each (invisible) scroll step activates
+  // desktop: one caption under the heading, cross-faded in place as each (invisible) scroll step activates
   const sideCap = $('.story-cap span', root);
   let capT0 = 0;
   function caption(step) {
@@ -74,17 +93,16 @@ export async function initStory() {
     sideCap.classList.add('is-out');
     capT0 = setTimeout(() => { sideCap.textContent = text; sideCap.classList.remove('is-out'); }, 200);
   }
-  function renderFoot() {
+  // the footer ends the split on the hero's word: what you spent (live), then what the others owe you
+  function renderFoot(t = totalsAt(current < 0 ? LAST : current)) {
     footCheck.className = `ss-check${res.check.ok ? '' : ' bad'}`;
     footCheck.innerHTML = res.check.ok ? `${ICON.check}Adds up to ${money(res.check.sumCents)}` : `Shares add up to ${money(res.check.sumCents)}, not ${money(res.check.expectedCents)}`;
     // Reset keeps its slot (visibility only), so it never reflows the footer
     footReset.classList.toggle('is-off', !edited);
     footReset.tabIndex = edited ? 0 : -1;
-    const others = people.filter((p) => p !== 'you');
-    footOwe.textContent = money(others.reduce((a, p) => a + (res.people[p]?.cents || 0), 0));
-    if (tabEl) {
-      tabEl.innerHTML = `<span class="nw">Owed to you this month:</span> ${others.map((p) => `<span class="nw">${esc(PEOPLE[p].name)} <b class="money">${money((TAB_BASE[p] || 0) + (res.people[p]?.cents || 0))}</b></span>`).join(' · ')}`;
-    }
+    footYou.textContent = money(t.you || 0);
+    footThem.textContent = money(people.filter((p) => p !== 'you').reduce((a, p) => a + (t[p] || 0), 0));
+    if (grpRow) $('.money', grpRow).textContent = money(sumOf(folded));
   }
 
   const totalsAt = (step) => {
@@ -97,16 +115,19 @@ export async function initStory() {
 
   /* ---------- dots + totals ---------- */
   function paintDots(step) {
-    rows.forEach((row) => {
-      const i = +row.dataset.i;
-      const assigned = step >= LAST || GROUP(i) <= step;
-      const shares = res.items[i].shares;
-      row.classList.toggle('mine', (shares.you || 0) > 0);
+    const vis = visRows();
+    if (!vis.includes(focusRow)) focusRow = grpRow || vis[0];
+    allRows.forEach((row) => {
+      const ix = linesOf(row);
+      const assigned = step >= LAST || +row.dataset.g <= step;
+      row.classList.toggle('mine', ix.some((i) => (res.items[i].shares.you || 0) > 0));
       $$('.dot-b', row).forEach((b, c) => {
-        const has = (shares[b.dataset.p] || 0) > 0;
-        b.classList.toggle('on', assigned && has);
-        b.setAttribute('aria-pressed', String(has));
-        b.tabIndex = i === fr && c === fc ? 0 : -1; // exactly one dot is always reachable by Tab
+        const n = ix.filter((i) => (res.items[i].shares[b.dataset.p] || 0) > 0).length;
+        const all = n === ix.length;
+        b.classList.toggle('on', assigned && all);
+        b.classList.toggle('part', assigned && n > 0 && !all);
+        b.setAttribute('aria-pressed', all ? 'true' : n ? 'mixed' : 'false');
+        b.tabIndex = row === focusRow && c === fc ? 0 : -1; // exactly one dot is always reachable by Tab
       });
     });
   }
@@ -119,6 +140,7 @@ export async function initStory() {
       people.forEach((p) => {
         if (shown[p] !== t[p]) { countTo(amts[p], shown[p], t[p], { dur: 600 }); shown[p] = t[p]; }
       });
+      renderFoot(t);
     };
     if (delay) totT = setTimeout(run, delay); else run();
   }
@@ -133,9 +155,9 @@ export async function initStory() {
     if (sr.top < -40 || sr.bottom > innerHeight + 80) return;
     let k = 0;
     rowsToFly.forEach((row) => {
-      const i = +row.dataset.i;
-      const from = row.querySelector('.money').getBoundingClientRect();
-      Object.keys(res.items[i].shares).forEach((p) => {
+      const from = row.querySelector(':scope > .money').getBoundingClientRect();
+      const who = people.filter((p) => linesOf(row).some((i) => (res.items[i].shares[p] || 0) > 0));
+      who.forEach((p) => {
         const to = avs[p].querySelector('.av').getBoundingClientRect();
         const dot = document.createElement('span');
         dot.className = 'flyer';
@@ -170,16 +192,15 @@ export async function initStory() {
     stage.dataset.step = String(step);
     stage.classList.toggle('is-play', step === LAST);
     root.classList.toggle('is-play', step === LAST);
-    tabEl?.classList.toggle('is-on', step === LAST);
     steps.forEach((s) => s.classList.toggle('is-active', +s.dataset.step === step));
     caption(step);
-    rows.forEach((row) => {
+    allRows.forEach((row) => {
       const g = +row.dataset.g;
       row.classList.toggle('is-hot', step < LAST && g === step);
       row.classList.toggle('is-dim', step < LAST && g > step && step > 0);
     });
     paintDots(step);
-    if (forward && step >= 1 && step < LAST) fly(rows.filter((r) => +r.dataset.g === step));
+    if (forward && step >= 1 && step < LAST) fly(visRows().filter((r) => +r.dataset.g === step));
     paintTotals(step, forward && !reduced() && step < LAST ? 520 : 0);
   }
 
@@ -188,56 +209,66 @@ export async function initStory() {
     res = compute(model);
     paintDots(LAST);
     paintTotals(LAST);
-    renderFoot();
-    live.textContent = people.map((p) => `${PEOPLE[p].name} ${money(res.people[p]?.cents || 0)}`).join(', ') + (res.check.ok ? '. Adds up exactly.' : '.');
+    live.textContent = `You spent ${money(res.people.you?.cents || 0)}. ` + people.filter((p) => p !== 'you').map((p) => `${PEOPLE[p].name} ${money(res.people[p]?.cents || 0)}`).join(', ') + (res.check.ok ? '. Adds up exactly.' : '.');
   }
   function reset() {
     model.lines = JSON.parse(JSON.stringify(original));
     edited = false;
     resplit();
   }
+  function toggleFold(open = sub.hidden) {
+    sub.hidden = !open;
+    expBtn.setAttribute('aria-expanded', String(open));
+    grpRow.classList.toggle('is-open', open);
+    paintDots(current < 0 ? 0 : current);
+  }
   stage.addEventListener('keydown', (e) => {
     const btn = e.target.closest?.('.dot-b');
     if (!btn) return;
+    const vis = visRows();
+    let r = Math.max(0, vis.indexOf(focusRow)); let c = fc;
     const mv = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] }[e.key];
-    let r = fr; let c = fc;
-    if (mv) { r = Math.max(0, Math.min(rows.length - 1, fr + mv[0])); c = Math.max(0, Math.min(people.length - 1, fc + mv[1])); }
+    if (mv) { r = Math.max(0, Math.min(vis.length - 1, r + mv[0])); c = Math.max(0, Math.min(people.length - 1, c + mv[1])); }
     else if (e.key === 'Home') c = 0;
     else if (e.key === 'End') c = people.length - 1;
     else return;
     e.preventDefault();
-    fr = r; fc = c;
+    focusRow = vis[r]; fc = c;
     paintDots(current);
-    $$('.dot-b', rows[fr])[fc]?.focus();
+    $$('.dot-b', focusRow)[fc]?.focus();
   });
   // a keyboard user who tabs into the dots gets the playground right away
   stage.addEventListener('focusin', (e) => {
     const btn = e.target.closest?.('.dot-b');
     if (!btn) return;
-    fr = +btn.closest('.st-row').dataset.i; fc = people.indexOf(btn.dataset.p);
+    focusRow = btn.closest('.st-row'); fc = people.indexOf(btn.dataset.p);
     pinned = true;
     if (current !== LAST) apply(LAST);
   });
   stage.addEventListener('click', (e) => {
+    if (e.target.closest('.st-exp')) { toggleFold(); return; }
     const btn = e.target.closest('.dot-b');
     if (!btn) return;
-    const i = +btn.closest('.st-row').dataset.i;
-    fr = i; fc = people.indexOf(btn.dataset.p);
+    const row = btn.closest('.st-row');
+    focusRow = row; fc = people.indexOf(btn.dataset.p);
     // a tap at any step jumps to the playground and still counts as the edit
     pinned = true;
     if (current !== LAST) apply(LAST);
-    const line = model.lines[i];
     const p = btn.dataset.p;
-    let members = lineMembers(line);
-    if (members.includes(p)) {
-      if (members.length === 1) {
-        btn.classList.remove('nope'); void btn.offsetWidth; btn.classList.add('nope');
+    const ix = linesOf(row);
+    const onAll = ix.every((i) => lineMembers(model.lines[i]).includes(p));
+    if (onAll) {
+      // someone has to have every item: refuse (with a nudge) rather than leave a line with nobody on it
+      if (ix.some((i) => lineMembers(model.lines[i]).length === 1)) {
+        const who = $('.who', row);
+        who.classList.remove('nope'); void who.offsetWidth; who.classList.add('nope');
         live.textContent = 'Someone has to have it. Add another person first.';
         return;
       }
-      members = members.filter((x) => x !== p);
-    } else members = [...members, p];
-    line.split = { type: 'equal', people: people.filter((x) => members.includes(x)) };
+      ix.forEach((i) => { const m = lineMembers(model.lines[i]).filter((x) => x !== p); model.lines[i].split = { type: 'equal', people: people.filter((x) => m.includes(x)) }; });
+    } else {
+      ix.forEach((i) => { const m = [...lineMembers(model.lines[i]), p]; model.lines[i].split = { type: 'equal', people: people.filter((x) => m.includes(x)) }; });
+    }
     // back to the original split (toggled off, then on again) means nothing is edited
     edited = JSON.stringify(model.lines.map((l) => l.split)) !== JSON.stringify(original.map((l) => l.split));
     resplit();
@@ -278,7 +309,6 @@ export async function initStory() {
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', onScroll, { passive: true });
 
-  renderFoot();
   if (compact()) {
     // the caption and footer have their final size at step 0 too, so arriving moves nothing
     apply(0);

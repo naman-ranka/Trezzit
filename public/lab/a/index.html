@@ -28,6 +28,9 @@
 <link rel="modulepreload" href="./js/data.js">
 <link rel="modulepreload" href="./js/scan-demo.js">
 <link rel="modulepreload" href="./js/story.js">
+<link rel="modulepreload" href="./js/hero.js">
+<link rel="modulepreload" href="./js/scenarios.js">
+<link rel="modulepreload" href="./js/chat.js">
 <link rel="modulepreload" href="../_kit/split-engine.js">
 <link rel="modulepreload" href="../_kit/receipts.js">
 <link rel="modulepreload" href="../_kit/scan-client.js">
@@ -127,7 +130,6 @@
     <div class="story-stage-wrap">
       <div class="story-pin" id="story-pin">
         <div class="story-stage" id="story-stage" role="group" aria-label="The Green Basket receipt, split four ways"></div>
-        <p class="story-tab" id="story-tab"></p>
       </div>
     </div>
     <!-- desktop: invisible scroll triggers (their headings stay in the reading order); the caption beside the stage cross-fades -->
@@ -147,26 +149,27 @@
       <h2 id="scen-title" class="h2">One place for everything you spend.</h2>
     </header>
 
-    <!-- Every month: rent -->
-    <article class="chapter" id="monthly" aria-labelledby="ch-monthly">
-      <div class="ch-copy" data-reveal>
-        <p class="eyebrow">Every month</p>
-        <h3 id="ch-monthly" class="h3">Rent by room. Bills four ways.</h3>
-      </div>
-      <div class="ch-visual" id="rent" data-reveal></div>
-    </article>
+    <div class="ledger">
+      <!-- the vision, shown: the real app's month, personal and shared rows in one list, only your share counted -->
+      <figure class="ledger-fig" data-reveal>
+        <div class="phone-wrap">
+          <div class="phone phone-crop">
+            <img src="./assets/app-ledger.webp" width="780" height="1688" loading="lazy" decoding="async" alt="The Trezzit app: Spent this month $1,253.26. Gym membership $39.00, personal, repeats monthly. Farmers market produce $9.20 of $32.25, with Flatmates. Corner Café $9.70, personal.">
+          </div>
+          <!-- pinned to real rows of the screenshot (row centre / cropped image height) -->
+          <ul class="callouts" role="list" aria-hidden="true">
+            <li style="--y:.556"><span>Repeats monthly</span></li>
+            <li style="--y:.669"><span>Your share of $32.25</span></li>
+            <li style="--y:.778"><span>Just you</span></li>
+          </ul>
+        </div>
+      </figure>
 
-    <!-- Personal -->
-    <article class="chapter ch-flip" id="personal" aria-labelledby="ch-personal">
-      <div class="ch-copy" data-reveal>
-        <p class="eyebrow">Just you</p>
-        <h3 id="ch-personal" class="h3">Find the sunscreen, not just the pharmacy.</h3>
-      </div>
-      <div class="ch-visual" data-reveal>
-        <div class="search-demo" id="search-demo"></div>
-      </div>
-    </article>
-
+      <article class="find" id="personal" aria-labelledby="ch-personal">
+        <h3 id="ch-personal" class="h3 find-h" data-reveal>Find the sunscreen, not just the pharmacy.</h3>
+        <div class="search-demo" id="search-demo" data-reveal></div>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -175,7 +178,7 @@
   <div class="wrap">
     <header class="sec-head sec-head-c" data-reveal>
       <h2 id="ai-title" class="h2 ai-h"><span>Or just ask</span> <span>your AI.</span></h2>
-      <p class="sub">In Claude or ChatGPT. It shows you before it saves.</p>
+      <p class="sub">It shows you before it saves.</p>
     </header>
     <div class="chat-wrap" id="chat-root" data-reveal></div>
     <p class="ai-log"><span class="ti" data-icon="list"></span>Everything your AI adds shows in your activity log.</p>
@@ -195,9 +198,6 @@
         <a class="btn btn-light btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
         <a class="btn btn-dark-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
       </div>
-    </div>
-    <div class="phone" id="phone" data-reveal>
-      <img src="./assets/app-ledger.webp" width="780" height="1688" loading="lazy" decoding="async" alt="The Trezzit app: Spent this month, $1,253.26, each row showing your share of the bill">
     </div>
   </div>
 </section>

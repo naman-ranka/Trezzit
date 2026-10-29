@@ -171,7 +171,7 @@ export function mountSplit(root, opts = {}) {
     if (!tip) { el.hidden = true; return; }
     el.hidden = false;
     el.innerHTML = `<div class="sp-line"><span class="sp-name">Tip</span><b class="money sp-price">${money(tip.totalCents)}</b>
-      <span class="sp-meta">${st.tipMode === 'equal' ? 'Split equally' : 'In proportion to what each person ordered'}</span></div>
+      <span class="sp-meta">${st.tipMode === 'equal' ? 'Equally' : ''}</span></div>
       <p class="sp-tipshares">${st.people.map((p) => `<span><span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span><b class="money">${money(tip.shares[p] || 0)}</b><span class="visually-hidden"> ${PEOPLE[p].name}</span></span>`).join('')}</p>`;
   }
 
@@ -191,6 +191,7 @@ export function mountSplit(root, opts = {}) {
       const owed = st.people.filter((p) => p !== payer).reduce((a, p) => a + (r.people[p]?.cents || 0), 0);
       root.querySelector('.sp-bal ul').innerHTML = rows.join('') + `<li class="sum"><span>${payer === 'you' ? 'Owed to you' : 'Owed'}</span><b class="money">${money(owed)}</b></li>`;
     }
+    opts.onChange?.(r, st);
   }
 
   function renderAll() {

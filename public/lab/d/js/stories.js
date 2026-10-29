@@ -19,8 +19,8 @@ export async function initLedger() {
           <button type="button" aria-pressed="false" data-v="bank">Your bank</button>
         </div>
       </div>
-      <label class="search" data-find>${icon('search')}<span class="visually-hidden">Search items, stores, categories</span><input type="search" placeholder="Search any item or store" data-q autocomplete="off"></label>
-      <div class="sugg" data-find>${['towels', 'avocados'].map((q) => `<button type="button" data-try="${q}">${q}</button>`).join('')}</div>
+      <label class="search" data-find>${icon('search')}<span class="visually-hidden">Search items, stores, categories</span><input type="search" placeholder="Search any item or store" aria-label="Search your expenses" data-q autocomplete="off"></label>
+      <div class="sugg" data-find>${['towels', 'avocados'].map((q) => `<button type="button" data-try="${q}" aria-pressed="false">${q}</button>`).join('')}</div>
       <div data-list aria-live="polite"></div>
     </div>
     <div class="panel sum-card">
@@ -37,10 +37,11 @@ export async function initLedger() {
 
   function render() {
     const term = q.value.trim().toLowerCase();
+    $$('button[data-try]', host).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.try === term)));
     if (term) {
       const hits = w.items.filter((it) => [it.name, it.bill, catOf(it.category).label].some((s) => s.toLowerCase().includes(term)));
       list.innerHTML = hits.length
-        ? hits.map((it) => `<div class="lrow"><span class="ic">${esc(it.name[0])}</span><span class="t"><b>${esc(it.name)}</b><span>${esc(it.bill)} · ${it.date}${it.n > 1 ? ` · split ${it.n} ways` : ''}</span></span><span class="v"><b class="money">${money(it.cents)}</b>${it.n > 1 ? `<span class="money">of ${money(it.totalCents)}</span>` : ''}</span></div>`).join('')
+        ? hits.map((it) => `<div class="lrow"><span class="ic">${esc(it.name[0])}</span><span class="t"><b>${esc(it.name)}</b><span>${esc(it.bill)} · ${it.date}${it.n > 1 ? ` · split ${it.how}` : ''}</span></span><span class="v"><b class="money">${money(it.cents)}</b>${it.n > 1 ? `<span class="money">of ${money(it.totalCents)}</span>` : ''}</span></div>`).join('')
           + `<div class="led-foot"><span>${hits.length} item${hits.length === 1 ? '' : 's'}</span><b class="money">${money(hits.reduce((a, h) => a + h.cents, 0))}</b></div>`
         : `<p class="noresult">Nothing called “${esc(q.value.trim())}” in October.</p>`;
       return;
@@ -51,7 +52,7 @@ export async function initLedger() {
         + `<div class="led-foot"><span>Left your account</span><b class="money">${money(w.paidCents)}</b></div>`;
       return;
     }
-    list.innerHTML = w.bills.map((b) => `<div class="lrow"><span class="ic"${b.recurring ? ' aria-label="Monthly" role="img"' : ''}>${b.recurring ? icon('repeat') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.date}${b.recurring ? ' · monthly' : ''} · ${b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('');
+    list.innerHTML = w.bills.map((b) => `<div class="lrow"><span class="ic"${b.recurring ? ' aria-label="Monthly" role="img"' : ''}>${b.recurring ? icon('repeat') : b.byAI ? icon('spark') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.date} · ${b.byAI ? 'added by your AI' : b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('');
   }
   render();
 

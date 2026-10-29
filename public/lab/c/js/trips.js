@@ -7,7 +7,7 @@ import { PEOPLE, getSample, sampleBill } from './data.js';
 import { money, countMoney, esc } from './util.js';
 
 initPage();
-mountSplit(document.getElementById('split-demo'), { sampleId: 'taqueria-sol', expanded: true, tipToggle: true, balances: true });
+mountSplit(document.getElementById('split-demo'), { sampleId: 'taqueria-sol', expanded: true, tipToggle: true, balances: true, yours: false });
 
 const TRIO = ['you', 'alex', 'priya'];
 const av = (p) => `<span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].name[0]}</span>`;
@@ -72,7 +72,7 @@ async function tripDemo(root) {
     ul.innerHTML = pays.length
       ? pays.map((x) => `<li>${av(x.from)}<span>${who(x.from)} ${x.from === 'you' ? 'pay' : 'pays'} ${x.to === 'you' ? 'you' : who(x.to)}</span><b class="money">${money(x.c)}</b></li>`).join('')
       : '<li>Everyone is even.</li>';
-    root.querySelector('.settle-n').textContent = pays.length ? `${pays.length} ${pays.length === 1 ? 'payment settles' : 'payments settle'} ${on.size === 1 ? 'this bill' : on.size === 2 ? 'both bills' : `all ${on.size} bills`}. You mark each one paid.` : '';
+    root.querySelector('.settle-n').textContent = pays.length ? `${pays.length} ${pays.length === 1 ? 'payment settles' : 'payments settle'} ${on.size === 1 ? 'this bill' : on.size === 2 ? 'both bills' : `all ${on.size} bills`}.` : '';
     const prevPaid = first ? paid : (Number(paidEl.dataset.c) || 0);
     const prevSpent = first ? spent : (Number(spentEl.dataset.c) || 0);
     paidEl.dataset.c = paid; spentEl.dataset.c = spent;

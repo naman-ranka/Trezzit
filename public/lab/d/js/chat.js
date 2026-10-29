@@ -1,8 +1,11 @@
 // Scripted AI conversations: a user message, Trezzit tool calls, a Trezzit card, the answer.
 import { $, $$, esc, money, icon, tmark, reducedMotion, Clock, announce } from './ui.js';
-import { getWorld, catOf, PEOPLE, tone, OTHER_TONE } from './world.js';
+import { getWorld, getSample, splitWith, catOf, PEOPLE, tone, OTHER_TONE } from './world.js';
 
 const okIcon = `<span class="st ok">${icon('check')}</span>`;
+// Nothing found is not a success: a neutral dot, not a green check.
+const noneIcon = '<span class="st none" aria-hidden="true"></span>';
+const gbOf = (w) => w.bills.find((b) => b.id === 'green-basket');
 
 function legend(list) {
   const entries = list.map((c, i) => ({ ...c, color: c.other ? OTHER_TONE : tone(i) }));
@@ -12,7 +15,7 @@ function legend(list) {
 
 /* ---------- the cards ---------- */
 function splitCard(w) {
-  const b = w.bills[0];
+  const b = gbOf(w);
   const you = b.split.people.you;
   const cats = Object.entries(you.byCategory).map(([id, cents]) => ({ cents, ...catOf(id) })).sort((a, b) => b.cents - a.cents);
   return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Green Basket Market</b><span>Oct 24 · Flat 3B · you paid</span></span></div>
@@ -55,7 +58,21 @@ function dinnerCard(w) {
     ${legend(cats)}</div>`;
 }
 
-function activityCard(label = 'Farmers market', cents = 1250) {
+/** The receipt split the way the chip asks: Sam skips the towels. Computed by the kit's split engine. */
+function chipSplit(w) {
+  const s = getSample('green-basket');
+  const sets = s.lines.map((l) => new Set(l.split.people));
+  sets[13] = new Set(['you', 'maya', 'jordan']); // hand towels: Sam skips them
+  return splitWith('green-basket', w.scans['green-basket'].bill, s.people, sets);
+}
+function chipSplitCard(w) {
+  const r = chipSplit(w);
+  return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Green Basket Market</b><span>Saved · 14 items · Flat 3B</span></span></div>
+    <div class="shares">${Object.keys(r.people).map((p) => `<div class="sh${p === 'you' ? ' you' : ''}"><span class="av" style="--c:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? 'You' : PEOPLE[p].initials}</span><span class="visually-hidden">${esc(PEOPLE[p].name)}</span><b class="money">${money(r.people[p].cents)}</b></div>`).join('')}</div>
+    <div class="row tot"><span class="n">${r.check.ok ? 'Adds up to' : 'Off by a cent:'} ${money(r.check.sumCents)}</span><span class="a">${r.check.ok ? `<span class="st ok">${icon('check')}</span>` : ''}</span></div></div>`;
+}
+
+function activityCard(label, cents) {
   return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Activity</b><span>Just now</span></span></div>
     <div class="rows"><div class="row"><span class="n"><b style="color:var(--ink)">${esc(label)}</b> · Personal</span><span class="a money">${money(cents)}</span></div>
     <div class="row" style="padding-top:0"><span class="n m">Added by your AI app</span></div></div></div>`;
@@ -98,8 +115,10 @@ const who = (ids) => {
 
 /* ---------- scripts ---------- */
 export function scripts(w) {
-  const gb = w.bills[0];
+  const gb = gbOf(w);
   const owed = money(gb.totalCents - gb.youCents);
+  const cs = chipSplit(w);
+  const deli = w.bills.find((b) => b.byAI);
   return {
     // The page opens on this one (static HTML in index.html): a read question that always works.
     spent: [
@@ -108,8 +127,17 @@ export function scripts(w) {
       { t: 'card', html: splitCard },
       { t: 'ai', text: `Maya, Jordan and Sam owe you ${owed}.` },
     ],
+    // The chip: a different split from the opening card, so the tap visibly does something.
     split: [
-      { t: 'user', thumb: 'assets/thumb-green-basket.webp', text: "Split this with Maya, Jordan and Sam. Avocados and cold brew are mine, oat milk and kale chips are Maya's." },
+      { t: 'user', thumb: 'assets/thumb-green-basket.webp', text: 'Split this with Maya, Jordan and Sam. Avocados and cold brew are mine. Sam skips the towels.' },
+      { t: 'tool', run: 'Reading the receipt', done: 'Read 14 items, $100.00', ms: 1100,
+        then: { run: 'Saving the split', done: 'Read 14 items and saved the split', ms: 800 } },
+      { t: 'card', html: chipSplitCard },
+      { t: 'ai', text: `Saved. Maya, Jordan and Sam owe you ${money(cs.totalCents - cs.people.you.cents)}.` },
+    ],
+    // A typed "split my receipt": the receipt's own split (the opening card).
+    splitTyped: [
+      { t: 'user', thumb: 'assets/thumb-green-basket.webp', text: '' },
       { t: 'tool', run: 'Reading the receipt', done: 'Read 14 items, $100.00', ms: 1100,
         then: { run: 'Saving the split', done: 'Read 14 items and saved the split', ms: 800 } },
       { t: 'card', html: splitCard },
@@ -140,13 +168,14 @@ export function scripts(w) {
       { t: 'card', html: towelsCard },
       { t: 'ai', text: '$8.00, split four ways with Maya, Jordan and Sam.' },
     ],
+    // The statement has one charge Trezzit lacks: your AI finds it and adds it (it is in the October list too).
     recon: [
       { t: 'user', attachLabel: 'october-statement.pdf', text: 'Is everything on my statement in Trezzit?' },
-      { t: 'tool', run: 'Listing what you paid', done: '3 payments, all matched', ms: 1000 },
-      { t: 'ai', text: 'Nothing missing.' },
-      { t: 'user', text: 'Add $12.50 at the farmers market. Cash, just mine.', pause: 900 },
-      { t: 'tool', run: 'Saving', done: 'Personal expense, $12.50', ms: 800 },
-      { t: 'card', html: () => activityCard() },
+      { t: 'tool', run: 'Matching your payments', done: `${w.bank.length} payments, ${w.bank.length - 1} matched`, ms: 1000 },
+      { t: 'ai', text: `${deli.title}, ${money(deli.totalCents)} on ${deli.date}, isn’t in Trezzit. Add it?` },
+      { t: 'user', text: 'Yes, just mine.', pause: 700 },
+      { t: 'tool', run: 'Saving', done: `Personal expense, ${money(deli.totalCents)}`, ms: 800 },
+      { t: 'card', html: () => activityCard(deli.title, deli.totalCents) },
     ],
   };
 }
@@ -165,8 +194,9 @@ const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 const DINING = /\b(eating|food|going)\s+out\b|\brestaurants?\b|\btake-?out\b|\bdinners?\b|\blunch(es)?\b/g;
 // "add $12 coffee", "log 8.50 for lunch": an amount and something to call it.
 const ADD = /\b(add|record|log)\b/;
-const DOLLARS = /\$\s*(\d{1,5}(?:\.\d{1,2})?)/;
-const NUMBER = /\b(\d{1,5}(?:\.\d{1,2})?)\b/;
+// The amount is taken whole: "$12.345" is never quietly cut to $12.34.
+const DOLLARS = /\$\s*(\d{1,5}(?:\.\d+)?)(?![\d.])/;
+const NUMBER = /(?<![\d.])(\d{1,5}(?:\.\d+)?)(?![\d.])/;
 // Everyday words for lines on the example receipts.
 const SYN = { coffee: 'brew', latte: 'brew', snack: 'chips', medicine: 'health', med: 'health' };
 const SYNONYMS = /\b(coffees?|lattes?|snacks?|medicine|meds)\b/g;
@@ -208,14 +238,15 @@ export function answer(q, w) {
   }
 
   // Only clear intents play a scripted answer; questions about things are searched instead.
-  const reuse = (id) => scripts(w)[id].map((st, i) => (i === 0 ? { ...st, text: q, thumb: id === 'split' ? st.thumb : undefined } : st));
+  const reuse = (id) => scripts(w)[id].map((st, i) => (i === 0 ? { ...st, text: q, thumb: id === 'splitTyped' ? st.thumb : undefined } : st));
   if (/\b(categor|breakdown|break\s+down|summar|overview)/.test(s)) return reuse('october');
   if (/\brent\b/.test(s) && /\b(add|every|monthly|recurr|repeat|schedule)/.test(s)) return reuse('rent');
   if (/\bsplit\b|\breceipt\b|\broommates?\b/.test(s)) {
-    return reuse(/\b(dinner|tacos?|taqueria|restaurant|alex|priya)\b/.test(s) ? 'dinner' : 'split');
+    return reuse(/\b(dinner|tacos?|taqueria|restaurant|alex|priya)\b/.test(s) ? 'dinner' : 'splitTyped');
   }
   // Adding is the point of an assistant: "add $12 coffee" records a personal expense.
   const amt = ADD.test(s) && (s.match(DOLLARS) || s.match(NUMBER));
+  if (amt && /\.\d{3,}/.test(amt[1])) return say('Amounts go to the cent. Try “add $12.35 coffee”.');
   if (amt) {
     const cents = Math.round(parseFloat(amt[1]) * 100);
     const label = cap(s.replace(amt[0], ' ').replace(FILLER, ' ').replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim()) || 'Expense';
@@ -226,7 +257,7 @@ export function answer(q, w) {
   if (ADD.test(s)) return say('How much was it? Try “add $12 coffee”.');
 
   const words = (s.replace(DINING, ' dining ').replace(SYNONYMS, (m) => SYN[m.replace(/s$/, '')] || m).match(/[a-z]+/g) || []).filter((x) => x.length >= 3 && !STOP.has(x));
-  const tool = (hits) => ({ t: 'tool', run: 'Searching your items', done: hits.length ? `Found ${countOf(hits)}` : 'No matching items', ms: 800 });
+  const tool = (hits) => ({ t: 'tool', run: 'Searching your items', done: hits.length ? `Found ${countOf(hits)}` : 'No matching items', none: !hits.length, ms: 800 });
   // A category you named: answer with its exact October total.
   const cat = words.map(stem).filter((x) => x.length >= 4).map((x) => w.cats.find((c) => c.label.toLowerCase().split(/\s+/).some((p) => p.startsWith(x)))).find(Boolean);
   if (cat) {
@@ -262,8 +293,8 @@ export function answer(q, w) {
 /* ---------- player ----------
    Each chat opens on its finished conversation (static HTML), so there is never an
    empty frame, and nothing moves until someone taps a chip, asks, or presses Replay.
-   A new exchange replaces the old one. Its finished height is reserved before it
-   plays, so the page moves once, at the tap, and never while it types. */
+   An answer that is cut short (a new tap, or the chat leaving the screen) is shown
+   finished at once: no question is ever left without its answer, no spinner survives. */
 const userHtml = (st) => {
   const att = st.attachLabel
     ? `<div class="attach">${st.attach ? `<img src="${st.attach}" alt="" width="38" height="56">` : ''}<span>${esc(st.attachLabel)}</span></div>` : '';
@@ -271,7 +302,7 @@ const userHtml = (st) => {
     ? `<div class="msg user has-thumb"><img class="thumb" src="${st.thumb}" alt="Receipt photo" width="40" height="58"><span>${esc(st.text)}</span></div>`
     : `<div class="msg user">${att}${esc(st.text)}</div>`;
 };
-const toolHtml = (text, done) => `<div class="tool">${done ? okIcon : '<span class="st spin" aria-hidden="true"></span>'}<b>Trezzit</b><span class="res">${esc(text)}</span></div>`;
+const toolHtml = (text, done, none = false) => `<div class="tool">${done ? (none ? noneIcon : okIcon) : '<span class="st spin" aria-hidden="true"></span>'}<b>Trezzit</b><span class="res">${esc(text)}</span></div>`;
 
 class Player {
   constructor(root, w, { script = 'split' } = {}) {
@@ -283,6 +314,8 @@ class Player {
     // A fixed-height chat (the hero) scrolls inside itself, so nothing outside it ever moves.
     this.fixed = root.classList.contains('is-fixed');
     this.state = 'static'; this.current = script;
+    this.pending = null; this.first = null;
+    this.anchor = this.fixed ? [...this.log.querySelectorAll('.msg.user')].pop() : null;
     this.ctl?.addEventListener('click', () => this.onCtl());
     this.chips.forEach((c) => c.addEventListener('click', () => this.run(c.dataset.script, this.s[c.dataset.script])));
     const form = $('[data-chat-form]', root);
@@ -295,55 +328,82 @@ class Player {
     });
     this.setCtl('replay');
     this.follow(true);
-    // Pause when off screen: nothing moves unseen.
+    // Nothing plays unseen: leaving the screen mid-answer shows the finished answer.
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(([e]) => {
-        if (!e.isIntersecting && this.state === 'playing') this.pause(true);
-        else if (e.isIntersecting && this.autoPaused) this.resume();
-      }).observe(root);
+      new IntersectionObserver(([e]) => { if (!e.isIntersecting && this.state === 'playing') this.complete(); }).observe(root);
     }
   }
 
   setCtl(kind) {
     if (!this.ctl) return;
-    const map = { pause: ['pause', 'Pause'], resume: ['play', 'Resume'], play: ['play', 'Play'], replay: ['replay', 'Replay'] };
+    const map = { skip: ['skip', 'Skip'], replay: ['replay', 'Replay'] };
     const [ic, label] = map[kind];
     this.ctl.innerHTML = `${icon(ic)}<span>${label}</span>`;
   }
   onCtl() {
-    if (this.state === 'playing') this.pause();
-    else if (this.state === 'paused') this.resume();
+    if (this.state === 'playing') this.complete();
     else this.run(this.current, this.s[this.current]);
   }
-  pause(auto = false) { this.clock.pause(); this.state = 'paused'; this.autoPaused = auto; this.root.classList.add('is-paused'); this.setCtl('resume'); }
-  resume() { this.clock.resume(); this.state = 'playing'; this.autoPaused = false; this.root.classList.remove('is-paused'); this.setCtl('pause'); }
+
+  /** Stop now and show the exchange as it ends. */
+  complete() {
+    if (this.state !== 'playing') return;
+    this.clock.cancel();
+    this.settle();
+    this.state = 'done'; this.setCtl('replay');
+    this.follow(true);
+  }
+
+  /** Swap a half-played exchange for its finished form. */
+  settle() {
+    if (!this.pending) return;
+    if (this.fixed) {
+      if (this.first?.parentNode === this.log) {
+        while (this.first.nextSibling) this.first.nextSibling.remove();
+        this.first.remove();
+      }
+      this.insertFinished(this.pending);
+    } else {
+      this.log.innerHTML = this.finished(this.pending);
+    }
+    this.log.style.minHeight = '';
+    this.pending = null; this.first = null;
+  }
+
+  insertFinished(steps) {
+    const n = this.log.children.length;
+    this.log.insertAdjacentHTML('beforeend', this.finished(steps));
+    [...this.log.children].slice(n).forEach((el) => { el.style.animation = 'none'; });
+    if (this.fixed) this.anchor = this.log.children[n];
+  }
 
   /** The exchange as it looks when finished (used to reserve its height). */
   finished(steps) {
     return steps.map((st) => {
       if (st.t === 'user') return userHtml(st);
-      if (st.t === 'tool') return toolHtml(st.then ? st.then.done : st.done, true);
+      if (st.t === 'tool') return toolHtml(st.then ? st.then.done : st.done, true, st.none);
       if (st.t === 'card') return st.html(this.w);
       return `<div class="msg ai">${esc(st.text)}</div>`;
     }).join('');
   }
 
-  async run(id, steps, { auto = false } = {}) {
+  async run(id, steps) {
+    // A new question while one is still answering: finish that one first.
+    if (this.state === 'playing') { this.clock.cancel(); this.settle(); }
     if (id) this.current = id;
     this.chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.script === id)));
     this.clock.cancel();
     const token = this.clock.token;
-    this.root.classList.remove('is-paused');
-    this.state = 'playing'; this.autoPaused = false; this.setCtl('pause');
+    this.state = 'playing'; this.setCtl('skip');
+    this.pending = steps; this.first = null;
     const instant = reducedMotion();
     if (this.fixed) {
-      // Like a real chat: the new exchange goes under the last ones, which scroll up out of the way.
+      // Like a real chat: the new exchange goes under the last one, which scrolls up out of the way.
       // Keep only the previous exchange above the new one.
       const prev = [...this.log.querySelectorAll('.msg.user')].pop();
       while (prev && this.log.firstElementChild !== prev) this.log.firstElementChild.remove();
       this.log.querySelectorAll('.msg, .tool, .tcard').forEach((el) => { el.style.animation = 'none'; });
-      if (instant) this.log.insertAdjacentHTML('beforeend', this.finished(steps));
-      this.follow(true);
+      if (instant) this.insertFinished(steps);
     } else {
       this.log.style.minHeight = '';
       this.log.innerHTML = this.finished(steps);
@@ -352,7 +412,7 @@ class Player {
     }
     // Keep the question in view: if the top of the chat sits under the header, bring it back.
     const top = this.log.getBoundingClientRect().top;
-    if (!auto && top < 72) this.root.scrollIntoView({ block: 'start', behavior: instant ? 'auto' : 'smooth' });
+    if (top < 72) this.root.scrollIntoView({ block: 'start', behavior: instant ? 'auto' : 'smooth' });
     try {
       if (!instant) {
         for (const st of steps) {
@@ -361,6 +421,8 @@ class Player {
         }
       }
       this.state = 'done'; this.setCtl('replay');
+      this.pending = null; this.first = null; this.log.style.minHeight = '';
+      this.follow();
       announce(this.log.lastElementChild?.textContent || '');
     } catch (e) { if (e.message !== 'cancelled') throw e; }
   }
@@ -370,15 +432,21 @@ class Player {
     t.innerHTML = html.trim();
     const el = t.content.firstElementChild;
     this.log.appendChild(el);
+    // The first line of an exchange is its question: the chat never scrolls it out of view.
+    if (!this.first) { this.first = el; if (this.fixed) this.anchor = el; }
     this.follow();
     return el;
   }
 
-  /** Fixed chats keep the newest line in view, like a real chat. */
+  /** Fixed chats follow the newest line, but the question's top stays 12px or more below the header. */
   follow(now = false) {
     if (!this.fixed) return;
-    const go = () => this.log.scrollTo({ top: this.log.scrollHeight, behavior: now || reducedMotion() ? 'auto' : 'smooth' });
-    requestAnimationFrame(go);
+    requestAnimationFrame(() => {
+      const log = this.log;
+      let top = log.scrollHeight - log.clientHeight;
+      if (this.anchor?.parentNode === log) top = Math.min(top, this.anchor.offsetTop - 12);
+      log.scrollTo({ top: Math.max(0, top), behavior: now || reducedMotion() ? 'auto' : 'smooth' });
+    });
   }
 
   async step(st, token) {
@@ -389,7 +457,7 @@ class Player {
     } else if (st.t === 'tool') {
       const el = this.add(toolHtml(st.run + '…', false));
       await wait(st.ms);
-      el.querySelector('.st').outerHTML = okIcon;
+      el.querySelector('.st').outerHTML = st.none && !st.then ? noneIcon : okIcon;
       el.querySelector('.res').textContent = st.done;
       this.follow();
       await wait(260);
@@ -422,17 +490,10 @@ export async function initChats() {
   const ai = document.getElementById('ai-chat');
   if (hero) players.push(new Player(hero, w, { script: 'spent' }));
   if (ai) {
+    // The statement check sits finished on the page (no empty box while it plays); Replay plays it.
     const p = new Player(ai, w, { script: 'recon' });
+    p.log.innerHTML = p.finished(p.s.recon);
     players.push(p);
-    // The statement check plays once, the first time most of it is on screen.
-    if (!reducedMotion() && 'IntersectionObserver' in window) {
-      const io = new IntersectionObserver(([e]) => {
-        if (!e.isIntersecting) return;
-        io.disconnect();
-        if (p.state === 'static') p.run('recon', p.s.recon, { auto: true });
-      }, { threshold: 0.6 });
-      io.observe(ai);
-    }
   }
   return players;
 }

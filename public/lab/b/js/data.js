@@ -53,15 +53,18 @@ const DEFS = [
   {
     id: 'groceries', kind: 'shared', title: 'Groceries with roommates', short: 'Groceries',
     sample: 'green-basket', payer: 'you', group: 'Roommates',
-    // The lines that make the shares differ come first (oat milk and kale chips are Maya's,
-    // avocados and cold brew are yours, towels are split 4 ways); oat milk opens.
-    lead: [11, 12, 9, 10, 13], open: 11,
+    // Examples page: a shared line opens first (towels, 4 ways), so the first tap takes someone
+    // off and the shares visibly change; then the lines that make the shares differ.
+    lead: [13, 0, 11, 12, 9, 10], open: 13, inside: true,
     bank: { date: 'OCT 24', merchant: 'GREEN BASKET MKT', cat: 'Shopping' }, day: 'Oct 24',
     lesson: 'One charge, four people.',
   },
   {
     id: 'dinner', kind: 'shared', title: 'Dinner a friend paid', short: 'Dinner',
     sample: 'taqueria-sol', payer: 'alex', group: 'Taco Thursday',
+    // Home split demo: the shared line opens, so the first tap removes someone (never the
+    // "someone has to have it" guard); the lines that make the shares differ follow.
+    lead: [3, 5, 0, 1, 2], open: 3,
     bank: null, day: 'Oct 18',
     lesson: 'Not on your statement. Still your dinner.',
   },
