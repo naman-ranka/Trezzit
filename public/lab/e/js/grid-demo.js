@@ -23,6 +23,9 @@ const members = (l) => {
   if (s.type === 'exact') return Object.keys(s.amounts || {});
   return [];
 };
+// phones: the name without its pack size ("Cold brew", not "Cold brew 32 oz"), so every row is one line
+const shortName = (n) => n.replace(/\s+\d[\d.,/]*\s*(oz|fl oz|pk|ct|lb|lbs|g|kg|l|ml|in|ft|pack|count)\b.*$/i, '').replace(/^Hand towels$/i, 'Towels');
+const nameHTML = (n) => { const s = shortName(n); return s === n ? `<span>${esc(n)}</span>` : `<span><span class="tg-long">${esc(n)}</span><span class="tg-short" aria-hidden="true">${esc(s)}</span></span>`; };
 const avatar = (p) => `<span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : esc(PEOPLE[p].name[0])}</span>`;
 
 /** A model from a scan result ({ sampleId, raw, bill }): A's modelFrom, kept to what the grid needs. */
@@ -78,11 +81,11 @@ export async function mountGrid(root, opts = {}) {
     const dots = (label) => people.map((p) => `<span class="tg-dc" role="gridcell"><button type="button" class="tg-dot" data-p="${p}" aria-label="${esc(label)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button></span>`).join('');
     const catDot = (l) => `<i class="tg-cat" style="--c:${(CATEGORIES[l.category] || CATEGORIES.other).color}" title="${esc((CATEGORIES[l.category] || CATEGORIES.other).label)}"></i>`;
     const row = (l, sub) => `<div class="tg-row${sub ? ' tg-sub-row' : ''}" role="row" data-lines="${l.index}">
-        <span class="tg-nm" role="rowheader">${sub ? '' : catDot(l)}<span>${esc(l.pretty)}${l.taxCents ? ' <small>with tax</small>' : ''}</span></span>
-        <span class="tg-pr money" role="gridcell" data-i="${l.index}"></span>${l.extra ? `<span class="tg-dc tg-prop" role="gridcell">By what each ordered</span>` : dots(l.pretty)}</div>`;
+        <span class="tg-nm" role="rowheader">${sub ? '' : catDot(l)}${nameHTML(l.pretty)}</span>
+        <span class="tg-pr money" role="gridcell" data-i="${l.index}"></span>${l.extra ? `<span class="tg-dc tg-prop" role="gridcell"><span class="visually-hidden">By what each ordered</span></span>` : dots(l.pretty)}</div>`;
     root.innerHTML = `
       <div class="tg-top">
-        <p class="tg-bill"><b>${esc(m.merchant)}</b><span><span class="money">${money(m.totalCents)}</span> · ${m.lines.length} items · ${paidBy}</span></p>
+        <p class="tg-bill"><b>${esc(m.merchant)}</b>${payer === 'you' ? '' : `<span>${paidBy}</span>`}</p>
         <button type="button" class="c-btn c-btn-sm c-btn-quiet tg-rcpt" aria-haspopup="dialog">${icon.receipt || ''}Receipt</button>
       </div>
       ${opts.tipToggle && m.bill.tip ? `<div class="tg-tip"><span id="tg-tip-l-${uid}">Tip</span>
@@ -93,13 +96,13 @@ export async function mountGrid(root, opts = {}) {
       <div class="tg-body">
         <div class="tg-grid" role="grid" aria-label="Who had what on ${esc(m.merchant)}" aria-describedby="tg-hint-${uid}" style="--n:${people.length}">
           <div class="tg-people" role="row">
-            <span class="tg-hint" role="columnheader"><span>${fine ? 'Click' : 'Tap'} any dot.</span><span hidden id="tg-hint-${uid}">${fine ? 'Click' : 'Tap'} a dot to change who had what.</span></span>
+            <span class="tg-hint" role="columnheader"><span>${fine ? 'Click' : 'Tap'} any dot.</span><small class="tg-tax">Prices include tax.</small><span hidden id="tg-hint-${uid}">${fine ? 'Click' : 'Tap'} a dot to change who had what.</span></span>
             <span class="tg-pr-h" role="columnheader"><span class="visually-hidden">Price</span></span>
             ${people.map((p) => `<span class="tg-p" role="columnheader" data-p="${p}">${avatar(p)}<span class="tg-pn">${esc(PEOPLE[p].name)}</span><b class="tg-pa money"></b></span>`).join('')}
           </div>
           <div class="tg-rows" role="rowgroup">
             ${folded.length ? `<div class="tg-row tg-grp" role="row" data-lines="${folded.join(',')}">
-              <span class="tg-nm" role="rowheader">${catDot(m.lines[folded[0]])}<button type="button" class="tg-exp" aria-expanded="false" aria-controls="tg-sub-${uid}"><span>${esc(foldCat)}</span><small>${folded.length} items</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span>
+              <span class="tg-nm" role="rowheader">${catDot(m.lines[folded[0]])}<button type="button" class="tg-exp" aria-expanded="false" aria-controls="tg-sub-${uid}"><span><span class="tg-long">${esc(foldCat)}</span><span class="tg-short" aria-hidden="true">${/^Shared /.test(foldCat) ? 'Shared' : esc(shortName(foldCat))}</span></span><small>×${folded.length}</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span>
               <span class="tg-pr money" role="gridcell" data-sum="${folded.join(',')}"></span>${dots(`${foldCat}, ${folded.length} items`)}</div>
             <div class="tg-sub" id="tg-sub-${uid}" role="none" hidden>${folded.map((i) => row(m.lines[i], true)).join('')}</div>` : ''}
             ${m.lines.filter((l) => !folded.includes(l.index)).map((l) => row(l, false)).join('')}
@@ -109,10 +112,10 @@ export async function mountGrid(root, opts = {}) {
         </div>
       </div>
       <div class="tg-foot">
-        <p class="tg-you">You spent <b class="money" data-you></b></p>
         <p class="tg-check" aria-hidden="true"></p>
-        <button type="button" class="tg-reset" aria-label="Reset the split" title="Reset">${icon.replay}</button>
+        <button type="button" class="tg-reset" aria-label="Reset the split">Reset</button>
       </div>
+      ${opts.note ? `<p class="tg-note">${esc(opts.note)}</p>` : ''}
       <p class="visually-hidden" aria-live="polite" data-say></p>
       <dialog class="tg-dlg" aria-label="${esc(m.merchant)} receipt"><div class="tg-dlg-in"><button type="button" class="tg-x" aria-label="Close">×</button><div class="tg-paper">${receiptHTML(m.raw, { sample: m.sample, shadow: false }).replace(/<p>ITEMS \d+<\/p>\s*/, '')}</div></div></dialog>`;
     uid += 1;
@@ -145,9 +148,7 @@ export async function mountGrid(root, opts = {}) {
     });
     $$('.tg-sub[hidden] .tg-dot').forEach((b) => { b.tabIndex = -1; });
     const how = root.querySelector('[data-tip-how]');
-    if (how) how.textContent = tipMode === 'equal' ? 'Equally' : 'By what each ordered';
-    const you = res.people.you?.cents || 0;
-    $('[data-you]').textContent = money(you);
+    if (how) how.innerHTML = tipMode === 'equal' ? 'Equally' : '<span class="visually-hidden">By what each ordered</span>';
     foot();
     $('.tg-reset').classList.toggle('is-off', !edited);
     $('.tg-reset').tabIndex = edited ? 0 : -1;
@@ -271,6 +272,20 @@ export async function mountGrid(root, opts = {}) {
 
   paint();
   opts.onChange?.(res, { tipMode });
+  // phones: the sticky people row lets go once the last item row has passed under it, so it never hangs
+  // under the nav as a clipped strip of totals after the grid has scrolled away
+  const phone = matchMedia('(max-width: 639px)');
+  let unT = 0;
+  const unstick = () => {
+    unT = 0;
+    const hdr = root.querySelector('.tg-people');
+    const grid = root.querySelector('.tg-grid');
+    if (!hdr || !grid) return;
+    const last = [...root.querySelectorAll('.tg-rows > .tg-row')].pop();
+    const gone = phone.matches && grid.getBoundingClientRect().bottom - 64 < hdr.offsetHeight + (last ? last.offsetHeight : 0) * 0.6;
+    hdr.classList.toggle('is-gone', gone);
+  };
+  addEventListener('scroll', () => { if (!unT) unT = requestAnimationFrame(unstick); }, { passive: true });
   // the dots pop in, row by row, the first time the grid is on screen
   if (!reduced()) {
     root.classList.add('pre');

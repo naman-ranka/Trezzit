@@ -163,3 +163,24 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !importa
 .tc-grid b { margin-left: 0 !important; font-size: var(--t-sm); white-space: nowrap; }
 /* the kit's generic .card styling must not wrap the chat's card in a second, lifted frame */
 .msg.card { border: 0; box-shadow: none; background: none; padding: 0; border-radius: 0; }
+/* E r3: the write-back reads like the rest of the site. "Not in Trezzit" and "Added by AI" are plain text
+   (no pills, no sparkle); the activity row is a white, hairline row (grey is the statement's colour only);
+   the result is the one "You spent" idiom: label, then the new figure with the old one struck through. */
+.tc-rows em.no, .tc-rows.mono em.no { background: none; padding: 0; color: var(--accent); font-weight: 600; }
+.msg.act { background: #fff; }
+.act-i { background: none; color: var(--pos); width: 18px; height: 18px; }
+.act-ai { background: none; padding: 0; gap: 0; color: var(--accent); font-weight: 600; font-size: var(--t-sm); line-height: inherit; }
+.msg.proof { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding: 2px 2px 0; }
+.msg.proof .spent > b { display: inline-flex; align-items: baseline; }
+.msg.proof .spent > b > span.money { color: var(--ink); font-weight: 700; }
+.msg.proof a { margin-left: auto; }
+.msg.proof .spent s, .msg.proof .spent s .money { color: var(--faint); font-size: var(--t-sm); font-weight: 500; margin-right: 8px; }
+/* E r5: the replay keeps the question and the statement; what replays fades out first, and the missing
+   line lights up once before your AI asks about it */
+.msg.leaving { opacity: 0; transition: opacity .2s var(--ease); }
+.tc-rows li.miss.hl { animation: tchl 1.4s var(--ease); }
+@keyframes tchl { 0%, 40% { background: var(--accent-soft); box-shadow: 0 0 0 6px var(--accent-soft); } 100% { background: transparent; box-shadow: 0 0 0 6px rgba(238, 244, 253, 0); } }
+.tc-stmt .tc-rows { margin-top: 0; }
+.msg.act .act-ai:only-child { font-size: var(--t-sm); }
+.msg.ghost { opacity: .14; transition: opacity .25s var(--ease); }
+.msg.ghost * { animation: none !important; }

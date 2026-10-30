@@ -3,4 +3,5 @@ import { initPage } from './page.js';
 import { mountChat } from './chat-demo.js';
 
 initPage();
-mountChat(document.getElementById('chat-demo'), { scripts: ['split', 'statement', 'groceries'] });
+// one exchange, no prompt chips and no tool lines: the draft and the saved total are the proof
+mountChat(document.getElementById('chat-demo'), { scripts: ['split'], tools: false });

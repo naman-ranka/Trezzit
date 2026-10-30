@@ -21,6 +21,8 @@ const PAY = [
   ['split', 'You split it', (e) => e.payer === 'you' && e.kind !== 'personal'],
   ['other', 'Someone else paid', (e) => e.payer !== 'you'],
 ];
+// a search hit names the bill it came from: the rent bill's utilities read as the apartment's bills, not "rent"
+const srcTitle = (e) => (e.id === 'monthly-rent' ? `${e.group || 'Apartment 3B'} bills` : e.title);
 const andList = (a) => (a.length < 3 ? a.join(' and ') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`);
 const reEsc = (q) => q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -28,16 +30,24 @@ export async function mountMonth(root, opts = {}) {
   const L = await octoberLedger();
   await Promise.all([css('ledger'), css('month')]);
   root.classList.add('ledger', 'compact', 'by-payer', 'mo');
-  const nBank = BANK.length;
+  // E r4: the payer rows are totals, not filters (search is step 3's one control); home hides them on phones
+  root.classList.toggle('mo-pays-wide', opts.payersOnPhone === false);
+  // E r5: home drops the payer rows at every width (the step's heading says "whoever paid"; /just-me keeps
+  // them), and on phones the search comes first, so its answer sits above the keyboard, not under the tiles
+  const payers = opts.payers !== false;
+  root.classList.toggle('mo-find-first', !!opts.findFirst);
+  // the gap between the two tiles, named in each: the rent transfer, and your share of it
+  const rentBank = BANK.find((b) => b.id === 'monthly-rent');
+  const rentMine = L.entries.find((e) => e.id === 'monthly-rent');
   root.innerHTML = `
     <div class="lg-sum lg-sum-pay mo-sum">
       <p class="lg-label">October</p>
       <div class="mo-vs">
-        <p class="mo-bank"><span class="mo-k">Your bank</span><b class="money">−${money(BANK_PAID)}</b><small>${nBank} payments</small></p>
-        <p class="mo-mine"><span class="mo-k">You spent</span><span class="visually-hidden" data-spent-sr></span><b class="money" data-spent aria-hidden="true"></b></p>
+        <p class="mo-bank"><span class="mo-k">Your bank</span><b class="money">−${money(BANK_PAID)}</b>${rentBank ? `<small class="mo-why mono">${esc(rentBank.text.split(' ')[0])} <span class="money">−${money(rentBank.cents)}</span></small>` : ''}</p>
+        <p class="mo-mine"><span class="mo-k">You spent</span><span class="visually-hidden" data-spent-sr></span><b class="money" data-spent aria-hidden="true"></b>${rentMine ? `<small class="mo-why">Rent, your share <span class="money">${money(rentMine.youCents)}</span></small>` : ''}</p>
       </div>
-      <ul class="lg-pays" role="list" aria-label="By who paid">${PAY.map(([k, label]) => `<li><button type="button" class="lg-pay" data-pay="${k}" aria-pressed="false">
-        <span class="lg-pk"><b>${label}</b></span><b class="money" data-paysum="${k}"></b></button></li>`).join('')}</ul>
+      ${payers ? `<ul class="lg-pays" role="list" aria-label="By who paid">${PAY.map(([k, label]) => `<li><span class="lg-pay is-static">
+        <span class="lg-pk"><b>${label}</b></span><b class="money" data-paysum="${k}"></b></span></li>`).join('')}</ul>` : ''}
     </div>
     <div class="lg-find">
       <label class="lg-search">${icon.search}<span class="visually-hidden">Search every item</span>
@@ -61,13 +71,13 @@ export async function mountMonth(root, opts = {}) {
   let flashAI = false;
 
   function sums() {
-    PAY.forEach(([k, , f]) => { root.querySelector(`[data-paysum="${k}"]`).textContent = money(L.entries.filter(f).reduce((a, e) => a + e.youCents, 0)); });
+    if (payers) PAY.forEach(([k, , f]) => { root.querySelector(`[data-paysum="${k}"]`).textContent = money(L.entries.filter(f).reduce((a, e) => a + e.youCents, 0)); });
     spentSr.textContent = money(L.spent);
   }
   const who = (e) => (e.payer === 'you' ? 'you paid' : `${e.payer} paid`);
   function entryRow(e) {
     const k = mainCat(e);
-    const sub = e.byAI ? `${esc(e.date)} · <span class="mo-ai">${icon.sparkle}Added by AI</span>`
+    const sub = e.byAI ? `${esc(e.date)} · <span class="mo-ai">Added by AI</span>`
       : e.kind === 'personal' ? `Just you · ${esc(e.date)}`
         : e.id === 'monthly-rent' ? `Repeats monthly · <span class="lg-who">${esc(who(e))}</span>`
           : `${esc(e.date)} · <span class="lg-who">${esc(who(e))}</span>`;
@@ -80,8 +90,8 @@ export async function mountMonth(root, opts = {}) {
     const name = q ? esc(l.name).replace(new RegExp(`(${reEsc(esc(q))})`, 'ig'), '<mark>$1</mark>') : esc(l.name);
     return `<li class="lg-row lg-item">
       <span class="lg-ri sm" style="--c:${cat(l.cat).color}">${catIcon(l.cat)}</span>
-      <span class="lg-rt"><b>${name}</b><small>${esc(l.entry.title)} · ${l.entry.date}</small></span>
-      <span class="lg-ra"><b class="money">${money(l.cents)}</b>${l.itemCents !== l.cents ? `<small class="money">of ${money(l.itemCents)}</small>` : ''}</span></li>`;
+      <span class="lg-rt"><b>${name}</b><small>${esc(srcTitle(l.entry))} · ${esc(l.entry.date).replace(' ', '&nbsp;')}</small></span>
+      <span class="lg-ra"><b class="money">${money(l.cents)}</b>${l.itemCents !== l.cents ? `<small class="money">of ${money(l.itemCents)}</small>` : l.taxCents ? `<small><span class="money">${money(l.priceCents)}</span> + tax</small>` : ''}</span></li>`;
   }
   // a search for something on a shared receipt that wasn't yours says whose it was, not "no match"
   const names = (ids) => ids.map((k) => (k === 'you' ? 'you' : PEOPLE[k]?.name || k));
@@ -94,7 +104,6 @@ export async function mountMonth(root, opts = {}) {
   function render() {
     const q = input.value.trim();
     const ql = q.toLowerCase();
-    root.querySelectorAll('.lg-pay').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pay === filterPay)));
     root.classList.toggle('filtered', !!filterPay);
     root.classList.toggle('searching', !!q);
     // the row your AI added reads like a search answer: your bank's line above, Trezzit's row below
@@ -130,23 +139,24 @@ export async function mountMonth(root, opts = {}) {
       ? hits.slice(0, cap).map((l) => lineRow(l, q)).join('') + (hits.length > cap ? `<li class="lg-moreline">and ${hits.length - cap} more items</li>` : '')
       : `<li class="lg-empty">${emptyText(q, ql)}</li>`;
     countEl.innerHTML = hits.length
-      ? `<span class="mo-tz">Trezzit</span> ${hits.length} ${hits.length === 1 ? 'item' : 'items'} <span aria-hidden="true">·</span> your share <b class="money">${money(hits.reduce((a, l) => a + l.cents, 0))}</b>`
+      ? `<span class="mo-tz">Trezzit</span><b class="money">${money(hits.reduce((a, l) => a + l.cents, 0))}</b>`
       : '<span class="mo-tz">Trezzit</span>';
   }
 
   input.addEventListener('input', () => { if (input.value.trim()) { filterPay = null; showAI = false; } render(); });
   // a click into a field that still holds text replaces it, never appends to it
   input.addEventListener('focus', () => input.select());
-  root.querySelectorAll('.lg-pay').forEach((b) => b.addEventListener('click', () => {
-    filterPay = filterPay === b.dataset.pay ? null : b.dataset.pay;
-    showAI = false;
-    input.value = '';
-    render();
-    if (filterPay && matchMedia('(max-width: 879px)').matches) {
-      const r = listEl.getBoundingClientRect();
-      if (r.top > innerHeight * 0.72) scrollBy({ top: r.top - innerHeight * 0.45, behavior: reduced() ? 'auto' : 'smooth' });
-    }
-  }));
+  // phones: focusing the field brings it up under the nav, so the bank's answer and the first hits stay
+  // above the keyboard (decided on the visual viewport, which the keyboard shrinks)
+  input.addEventListener('focus', () => {
+    if (!matchMedia('(max-width: 767px)').matches) return;
+    setTimeout(() => {
+      const vh = window.visualViewport?.height || innerHeight;
+      const top = input.getBoundingClientRect().top;
+      if (top >= 64 && top <= Math.min(160, vh * 0.3)) return;
+      scrollBy({ top: top - 72, behavior: reduced() ? 'auto' : 'smooth' });
+    }, 80);
+  });
   // the list area keeps the height of the demo's answer (bank foil plus a few items), measured with the
   // real markup, so the demo typing, a search or the AI's row never moves anything below the month
   const findEl = root.querySelector('.lg-find');
@@ -191,12 +201,14 @@ export async function mountMonth(root, opts = {}) {
     input.value = '';
     render();
   };
-  const onAdded = () => {
+  // the tiles move only where they can be seen: if the month is off screen when the AI writes back, the
+  // change waits and plays when you scroll back to it (or follow "See it in October"), never silently
+  const onAdded = () => onVisible(root.querySelector('.mo-vs'), () => {
     const before = L.spent - AI_ENTRY.youCents;
     sums();
     if (!input.value.trim() && !filterPay && !root.classList.contains('demoing')) showRow();
-    countMoney(spentEl, before, L.spent, reduced() ? 0 : 600);
-  };
+    countMoney(spentEl, before, L.spent, reduced() ? 0 : 900);
+  }, { threshold: 0.9 });
   bus.on('ai-added', onAdded);
   bus.on('ai-show', showRow);
 

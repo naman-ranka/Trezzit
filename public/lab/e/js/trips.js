@@ -36,10 +36,6 @@ async function tripDemo(root) {
 
   root.innerHTML = `<div class="trip">
     <p class="trip-h">Weekend at the lake <span>you, Alex and Priya</span></p>
-    <div class="trip-you">
-      <p><span>You paid</span><b class="money" data-k="paid"></b></p>
-      <p><span>You spent</span><b class="money" data-k="spent"></b></p>
-    </div>
     <div>
       <ul class="trip-bills" role="list">${bills.map((b) => `<li>
         <label class="tb-on"><input type="checkbox" checked data-id="${b.id}"><span class="visually-hidden">Include ${esc(b.title)}</span><span class="tick" aria-hidden="true"></span></label>
@@ -47,6 +43,10 @@ async function tripDemo(root) {
         <b class="money">${money(b.cents)}</b></li>`).join('')}</ul>
     </div>
     <div class="trip-side">
+      <div class="trip-you">
+        <p><span>You paid</span><b class="money" data-k="paid"></b></p>
+        <p><span>You spent</span><b class="money" data-k="spent"></b></p>
+      </div>
       <div class="settle">
         <h3>Settle up</h3>
         <ul role="list" aria-live="polite"></ul>
@@ -80,7 +80,8 @@ async function tripDemo(root) {
     }
     // at least one bill always stays ticked, so there is always someone to pay
     ul.innerHTML = pays.map((x) => `<li>${av(x.from)}<span>${who(x.from)} ${x.from === 'you' ? 'pay' : 'pays'} ${x.to === 'you' ? 'you' : who(x.to)}</span><b class="money">${money(x.c)}</b></li>`).join('');
-    noteEl.textContent = noteEl.dataset.txt = `${pays.length} ${pays.length === 1 ? 'payment settles' : 'payments settle'} ${on.size === 1 ? 'this bill' : on.size === 2 ? 'both bills' : `all ${on.size} bills`}.`;
+    // the settle-up rows say it; the note line only speaks up when a tap is refused
+    noteEl.textContent = noteEl.dataset.txt = '';
     // the last ticked bill can't be unticked (the split's "someone has to pay" rule)
     root.querySelectorAll('input[type=checkbox]').forEach((x) => {
       if (on.size === 1 && x.checked) x.setAttribute('aria-disabled', 'true'); else x.removeAttribute('aria-disabled');

@@ -39,18 +39,18 @@ async function buildScripts() {
     statement: {
       chip: 'Check my statement', short: 'Statement',
       steps: [
-        { t: 'user', attach: { label: 'october-statement.pdf', doc: true }, text: 'Here’s my October card statement. What’s missing from Trezzit?', narrow: { text: 'What’s missing from Trezzit?' } },
+        { t: 'user', attach: { label: 'october-statement.pdf', doc: true }, text: 'What’s missing from Trezzit?' },
         { t: 'tool', name: 'Read your payments', wide: true },
-        { t: 'card', html: `<div class="tc">
-          <div class="tc-h"><span class="tc-k">Statement vs Trezzit</span></div>
-          <ul class="tc-rows tight mono" role="list">
+        // the file chip already names the statement: the card is just its four lines, checked against Trezzit
+        { t: 'card', html: `<div class="tc tc-stmt">
+          <ul class="tc-rows tight mono" role="list" aria-label="October statement, checked against Trezzit">
             ${charges.map(([n, a, ok]) => `<li class="${ok ? '' : 'miss'}"><span>${n}</span><span class="r">−$${a} ${ok ? `<em class="ok" role="img" aria-label="In Trezzit">${icon.check}</em>` : '<em class="no">Not in Trezzit</em>'}</span></li>`).join('')}
           </ul></div>` },
-        { t: 'ai', html: `Juniper Deli, <b class="money">${money(AI_ENTRY.totalCents)}</b> on ${AI_ENTRY.date}, isn’t in Trezzit. Add it as lunch?` },
+        { t: 'ai', html: 'Add <b>Juniper Deli</b> as lunch?' },
         { t: 'user', text: 'Yes, add it.', wait: 900 },
         { t: 'tool', name: 'Add the expense', wide: true },
         // the proof behind "everything your AI adds shows in your activity": the row it just added
-        { t: 'act', added: true, html: `<b>Juniper Deli</b> <span class="money">${money(AI_ENTRY.totalCents)}</span> <span aria-hidden="true">·</span> <span class="act-ai">${icon.sparkle}Added by AI</span>` },
+        { t: 'act', added: true, html: `<b>Juniper Deli</b> <span class="money">${money(AI_ENTRY.totalCents)}</span> <span class="act-ai">Added by AI</span>` },
         // the write-back, where the eye already is: October's total moves, and a link to see it in the month
         { t: 'proof', from: before, to: after },
       ],
@@ -68,7 +68,7 @@ async function buildScripts() {
         // every width shows the whole consent beat: the draft, the question, your yes, then the save
         { t: 'ai', html: `Saved. Maya, Jordan and Sam owe you <b class="money">${money(owed)}</b>.` },
         // the proof behind "you see everything it adds": the row the app's activity feed shows
-        { t: 'act', html: '<b>Activity</b> <span aria-hidden="true">·</span> Added by your AI <span aria-hidden="true">·</span> just now' },
+        { t: 'act', html: '<span class="act-ai">Added by your AI</span>' },
       ],
     },
     groceries: {
@@ -103,7 +103,7 @@ export async function mountChat(root, opts = {}) {
   root.innerHTML = `
     <div class="chat-win">
       <div class="chat-bar">
-        <span class="chat-id"><span class="chat-glyph" aria-hidden="true">${icon.sparkle}</span><span class="chat-name"><b>Your AI</b> <span>with Trezzit</span></span></span>
+        <span class="chat-id"><span class="chat-glyph" aria-hidden="true">${icon.sparkle}</span><span class="chat-name"><b>Your AI</b></span></span>
         <button type="button" class="chat-ctl" aria-label="Replay">${icon.replay}</button>
       </div>
       <div class="chat-log" role="log" aria-live="off" aria-label="Conversation"></div>
@@ -130,6 +130,8 @@ export async function mountChat(root, opts = {}) {
     ctl.dataset.mode = mode;
   };
 
+  // preview: the finished exchange drawn before it plays (for a reader who scrolls past); it adds nothing
+  let preview = false;
   function add(step, instant, target = log) {
     let el;
     if (step.t === 'user') {
@@ -148,13 +150,16 @@ export async function mountChat(root, opts = {}) {
     } else if (step.t === 'act') {
       el = h(`<div class="msg act"><span class="act-i">${icon.check}</span><span><span class="visually-hidden">Your activity: </span>${step.html}</span></div>`);
       // the conversation really adds it: the month above gets the row (once; never from the off-screen measure)
-      if (step.added && target === log) L.addAI();
+      if (step.added && target === log && !preview) L.addAI();
     } else if (step.t === 'proof') {
       const month = document.getElementById('understand');
-      el = h(`<p class="msg proof"><span>October</span> <s class="money">${money(step.from)}</s> <span aria-hidden="true">→</span> <b class="money" data-to>${money(step.to)}</b>${month ? ' <a href="#understand">See it in October <span aria-hidden="true">↑</span></a>' : ''}</p>`);
+      // "You spent", drawn the site's one way: the label, then the new figure with the old one struck through
+      el = h(`<div class="msg proof"><p class="spent"><span>October</span><b><s class="money"><span class="visually-hidden">was </span>${money(step.from)}</s><span class="money" data-to>${money(step.to)}</span></b></p>${month ? '<a href="#understand">See it <span aria-hidden="true">↑</span></a>' : ''}</div>`);
       if (!instant && target === log) countMoney(el.querySelector('[data-to]'), step.from, step.to, 700);
       el.querySelector('a')?.addEventListener('click', (e) => {
         e.preventDefault();
+        L.addAI(); // from the preview, following the link is the yes
+        run += 1; state = 'done'; setCtl();
         bus.emit('ai-show');
         month.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
       });
@@ -206,6 +211,8 @@ export async function mountChat(root, opts = {}) {
     if (my !== run) throw new Error('stale');
   }
 
+  // home keeps everything before the AI's first reply when it replays
+  const keepN = (steps) => (opts.preview ? Math.max(0, steps.findIndex((st) => st.t === 'ai')) : 0);
   async function play(k, { instant = reduced(), from = 0 } = {}) {
     run += 1;
     const my = run;
@@ -226,6 +233,21 @@ export async function mountChat(root, opts = {}) {
     try {
       // the old exchange fades out first, then the new question starts at the top
       // (from > 0: the question is already on screen, the answer carries on under it)
+      // home: the question and the statement stay on screen (the frame is never empty); only the last beat
+      // replays: the missing line lights up, then the question, your yes, the added row and October's new total
+      // The later messages stay in place, faded to a ghost, and come back one by one: the frame never empties.
+      const k = keepN(steps);
+      let ghosts = null;
+      if (!from && k && log.children.length === steps.length && log.firstElementChild?.classList.contains('u')) {
+        ghosts = [...log.children].slice(k);
+        ghosts.forEach((c) => { c.classList.remove('enter'); c.classList.add('ghost'); });
+        const to = log.querySelector('.msg.proof [data-to]');
+        const pf = steps.find((st) => st.t === 'proof');
+        if (to && pf) to.textContent = money(pf.from);
+        from = k;
+        const miss = log.querySelector('.tc-rows li.miss');
+        if (miss) { miss.classList.remove('hl'); void miss.offsetWidth; miss.classList.add('hl'); await wait(500, my); }
+      }
       if (!from) {
         if (log.children.length) {
           log.classList.add('fading');
@@ -241,11 +263,21 @@ export async function mountChat(root, opts = {}) {
         if (s.t === 'ai') await wait(320, my);
         if (s.t === 'act') await wait(500, my);
         if (s.t === 'proof') await wait(350, my);
+        if (ghosts) {
+          const el = ghosts.shift();
+          el.classList.remove('ghost');
+          void el.offsetWidth;
+          el.classList.add('enter');
+          if (s.t === 'act' && s.added) L.addAI();
+          if (s.t === 'proof') countMoney(el.querySelector('[data-to]'), s.from, s.to, 700);
+          continue;
+        }
         const el = add(s, false);
         if (s.t === 'tool') { await wait(280, my); el.classList.add('done'); }
       }
       state = 'done'; setCtl();
     } catch { /* superseded */ }
+    if (my !== run) log.querySelectorAll('.ghost').forEach((c) => c.classList.remove('ghost'));
     if (my === run) { log.classList.remove('fading'); log.setAttribute('aria-busy', 'false'); }
   }
 
@@ -261,35 +293,40 @@ export async function mountChat(root, opts = {}) {
   ctl.addEventListener('click', () => {
     touched = true;
     if (ctl.dataset.mode === 'replay') { play(current, { instant: false }); return; }
-    if (state === 'idle') { play(current, { instant: false, from: 1 }); return; }
+    if (state === 'idle') { play(current, { instant: false, from: log.children.length === 1 ? 1 : 0 }); return; }
     paused = !paused;
     state = paused ? 'paused' : 'playing';
     if (!paused) gate?.();
     setCtl();
   });
 
-  // First state: the first question is already asked (never an empty box). Its answer plays once a
-  // quarter of the panel is on screen; with reduced motion the whole exchange is simply shown.
+  // First state: the finished exchange, drawn statically, so a reader scrolling past sees the whole idea
+  // (statement, the missing charge, "Added by AI", October's new total). Once 60% of the chat is on screen it
+  // plays from the start, and only then does the month above get the row. Reduced motion: it simply stays.
   if (reduced() || opts.autoplay === false || !('IntersectionObserver' in window)) play(keys[0], { instant: true });
-  else {
+  else if (opts.preview) {
+    preview = true;
+    stepsOf(keys[0]).forEach((st) => add(st, true));
+    preview = false;
+    state = 'idle';
+    // the replay starts once the whole chat is on screen (under the nav), so its payoff, October's new total
+    // at the bottom, is never played below the fold; a chat taller than the screen starts at 60%
+    const io = new IntersectionObserver(([e]) => {
+      const need = win.offsetHeight <= innerHeight - 72 ? 0.97 : 0.6;
+      if (e.intersectionRatio < need) return;
+      io.disconnect();
+      if (!touched && state === 'idle') play(keys[0], { instant: false });
+    }, { threshold: [0, 0.6, 0.8, 0.9, 0.97, 1], rootMargin: '-64px 0px 0px 0px' });
+    io.observe(win);
+  } else {
+    // /ai: the chat is the page's hero, so it opens on the question already asked and answers at once
     add(stepsOf(keys[0])[0], true);
     state = 'idle';
-    // home: the answer waits until most of the chat is on screen and the month above has mostly scrolled
-    // away (or the chat has been in view a moment), so the month's search proof is read first
-    const above = opts.after ? document.querySelector(opts.after) : null;
-    let aboveRatio = 0;
-    let chatRatio = 0;
-    let dwell = 0;
-    const go = () => { io.disconnect(); aio?.disconnect(); clearTimeout(dwell); if (!touched && state === 'idle') play(keys[0], { instant: false, from: 1 }); };
-    const aio = above ? new IntersectionObserver(([e]) => { aboveRatio = e.intersectionRatio; if (aboveRatio < 0.3 && chatRatio >= 0.6) go(); }, { threshold: [0, 0.15, 0.3, 0.5, 0.75, 1] }) : null;
-    aio?.observe(above);
     const io = new IntersectionObserver(([e]) => {
-      clearTimeout(dwell);
-      chatRatio = e.intersectionRatio;
-      if (e.intersectionRatio < (above ? 0.6 : 0.25)) return;
-      if (!above || aboveRatio < 0.3) go();
-      else dwell = setTimeout(go, 2200);
-    }, { threshold: above ? [0, 0.6, 0.8, 1] : 0.25 });
+      if (e.intersectionRatio < 0.25) return;
+      io.disconnect();
+      if (!touched && state === 'idle') play(keys[0], { instant: false, from: 1 });
+    }, { threshold: 0.25 });
     io.observe(win);
   }
   setCtl();

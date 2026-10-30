@@ -19,25 +19,17 @@ export function initHero(root) {
   const bank = root.querySelector('.bank');
   const join = root.querySelector('.hero-join');
   const tzc = root.querySelector('.tzc');
-  const owe = root.querySelector('.tzc-owe');
-  const who = root.querySelector('.tzc-who');
   const animated = () => !reduced() && document.documentElement.classList.contains('anim');
   let cur = 0;
   let run = 0;
 
-  const setOpen = (open) => { owe?.setAttribute('aria-expanded', String(open)); if (who) who.hidden = !open; pin(); };
-
-  /* desktop: both cards share a top line: the bank's first line sits level with the card's "You spent"
-     label, and the arrow points at the selected line */
+  /* desktop: the bank card is centred against the Trezzit card (CSS); the arrow meets the selected line */
   const wide = matchMedia('(min-width: 900px)');
   function pin() {
-    if (!wide.matches) { bank.style.marginTop = ''; join.style.marginTop = ''; return; }
+    if (!wide.matches) { join.style.marginTop = ''; return; }
     // layout offsets, not screen boxes: the card may still be sliding in (a transform) when this runs
-    const label = views[cur].querySelector('[data-label]');
-    const top = Math.max(0, Math.round(label.offsetTop - tzc.offsetTop - tabs[0].offsetTop + (label.offsetHeight - tabs[0].offsetHeight) / 2));
-    bank.style.marginTop = `${top}px`;
     const t = tabs[cur];
-    const y = top + t.offsetTop + t.offsetHeight / 2 - join.offsetHeight / 2;
+    const y = bank.offsetTop - tzc.offsetTop + t.offsetTop + t.offsetHeight / 2 - join.offsetHeight / 2;
     join.style.marginTop = `${Math.round(Math.max(0, y))}px`;
   }
   root.classList.add('pinned');
@@ -76,7 +68,6 @@ export function initHero(root) {
     cur = i;
     tabs.forEach((t, k) => { const on = k === i; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
     views.forEach((v, k) => { const on = k === i; v.classList.toggle('is-on', on); v.inert = !on; });
-    if (who && !who.hidden) setOpen(false);
     if (focus) tabs[i].focus();
     pin();
     if (play) beat(i);
@@ -147,7 +138,6 @@ export function initHero(root) {
   hoverZone.addEventListener('pointerleave', () => { hovered = false; });
   hoverZone.addEventListener('focusin', (e) => { if (e.target !== pauseBtn) focused = true; });
   hoverZone.addEventListener('focusout', () => { focused = false; });
-  owe?.addEventListener('click', () => { endTour(); setOpen(owe.getAttribute('aria-expanded') !== 'true'); });
 
   // the first beat plays at once (the card arrives with it); the tour starts once the bank lines are on screen
   root.classList.add('s1');

@@ -2,7 +2,7 @@
  * Demo styles live in demo-<name>.css, loaded by the page (subpages) or just before the demo mounts (home). */
 :root { --ink: var(--brand-navy); --muted: #566176; --faint: #8a94a6; --accent: var(--link); --accent-soft: #eef4fd; --wash: #f5f6f8; --fill: #f5f6f8; --wash-blue: #f2f6fc; --wash-violet: #f6f4fc; --wash-green: #f1f8f4; --pos: #047857; --neg: #b91c1c; --amber: #b45309; --r-xl: 28px; --gutter: 20px; --ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* E's one type scale (7 steps) and one corner scale (3 + pill + circle; 3px for bars). Nothing else. */
-  --t-xs: 13px; --t-sm: 15px; --t-md: 17px; --t-lg: clamp(19px, 1.6vw, 22px); --t-xl: clamp(26px, 2.5vw, 36px); --t-2xl: clamp(34px, 4vw, 56px); --t-display: clamp(42px, 6.4vw, 74px);
+  --t-xs: 13px; --t-sm: 15px; --t-md: 17px; --t-lg: 19px; --t-xl: 26px; --t-2xl: 34px; --t-display: 42px;
   --text-body: var(--t-md); --text-small: var(--t-sm);
   --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --radius-xs: 3px; --radius-sm: var(--r-sm); --radius-control: var(--r-sm); --radius-card: var(--r-md); --radius-window: var(--r-lg); --radius-xl: var(--r-lg); --r-xl: var(--r-lg);
   /* people: the same colours everywhere (js/data.js PEOPLE matches these) */
@@ -12,6 +12,16 @@
 }
 @media (min-width: 768px) {
   :root { --gutter: 32px; }
+}
+/* E r4: the scale resolves to whole pixels at every width (stepped, never a vw multiplier) */
+@media (min-width: 600px) {
+  :root { --t-display: 49px; }
+}
+@media (min-width: 980px) {
+  :root { --t-xl: 30px; --t-2xl: 48px; --t-display: 66px; }
+}
+@media (min-width: 1200px) {
+  :root { --t-lg: 22px; --t-xl: 36px; --t-2xl: 56px; --t-display: 74px; }
 }
 html { scroll-padding-top: 80px; }
 [hidden] { display: none !important; }
@@ -111,14 +121,7 @@ ul.tzc-cats { margin-top: 14px; display: grid; gap: 2px; }
 .anim .hero-viz .tzc { transition: opacity .6s var(--ease), transform .7s var(--ease); }
 .anim .hero-viz .hero-join path { stroke-dasharray: 1; transition: stroke-dashoffset .6s .1s var(--ease); }
 .verbs { padding: clamp(80px, 11vw, 144px) 0 clamp(40px, 6vw, 80px); }
-.verb-copy { display: grid; gap: 10px; }
-@media (min-width: 900px) {
-  .verb-copy { column-gap: 48px; align-items: end; }
-  .verb-copy h3 { grid-column: 1; }
-  .verb-copy p:not(.verb-k):not(.verb-hint) { grid-column: 2; grid-row: 2; }
-}
 .verb-n { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); display: grid; place-items: center; font-size: var(--t-sm); }
-.verb-copy > p:not(.verb-k):not(.verb-hint) { color: var(--muted); font-size: var(--t-md); }
 #split .verb-demo { background: var(--wash-violet); }
 #understand .verb-demo { background: var(--wash-green); }
 .demo-frame { background: #fff; border-radius: var(--r-lg); border: 1px solid rgba(15, 31, 61, .07); box-shadow: 0 1px 2px rgba(15, 31, 61, .04), 0 18px 48px -24px rgba(22, 45, 89, .25); padding: clamp(14px, 2.4vw, 28px); margin-inline: auto; }
@@ -400,13 +403,9 @@ ul.cat-list { display: grid; gap: 4px 28px; }
   .sc-hero-demo .wrap > .sc-side { grid-column: 2; grid-row: 1; }
 }
 .nav { -webkit-backdrop-filter: none; backdrop-filter: none; }
-.sh, .verb-copy { display: grid; gap: 10px; max-width: 760px; margin-bottom: clamp(20px, 2.6vw, 32px); text-align: left; }
-.sh h2, .verb-copy h3 { font-size: var(--t-xl); letter-spacing: -0.035em; line-height: 1.06; font-weight: 700; text-wrap: balance; }
-.sh p, .verb-copy > p:not(.verb-k) { color: var(--muted); font-size: var(--t-lg); line-height: 1.45; max-width: none; text-wrap: pretty; }
-@media (min-width: 900px) {
-  .verb-copy { grid-template-columns: none; }
-  .verb-copy > * { grid-column: auto !important; grid-row: auto !important; }
-}
+.sh { display: grid; gap: 10px; max-width: 760px; margin-bottom: clamp(20px, 2.6vw, 32px); text-align: left; }
+.sh h2 { font-size: var(--t-xl); letter-spacing: -0.035em; line-height: 1.06; font-weight: 700; text-wrap: balance; }
+.sh p { color: var(--muted); font-size: var(--t-lg); line-height: 1.45; max-width: none; text-wrap: pretty; }
 @media (min-width: 900px) {
   .hero-viz { align-items: center; }
   .bank { margin-top: 0; }
@@ -421,7 +420,6 @@ ul.cat-list { display: grid; gap: 4px 28px; }
   .tzc-owe { margin-top: 6px; padding: 10px 12px; font-size: var(--t-sm); }
   .tzc-amt b { font-size: var(--t-2xl); }
 }
-.verb-copy h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
 .verb-demo { background: none !important; padding: 0; border-radius: 0; }
 .demo-frame { max-width: none; }
@@ -527,22 +525,12 @@ ul.bal-list { margin: 8px 0 0; padding: 0; list-style: none; }
   .foot nav ul { display: grid; }
   .foot nav a { padding: 0; }
 }
-.verb-copy { max-width: 940px; }
 #rent-demo { max-width: 820px; margin-inline: 0; }
 .bal { margin-inline: 0; }
 #rent-demo { min-height: 694px; }
-.res-jm { min-height: 1202px; }
-.sc-demo #ledger-demo { min-height: 668px; }
-@media (min-width: 340px) { .sc-demo #ledger-demo { min-height: 646px; } }
-@media (min-width: 360px) { .res-jm { min-height: 1203px; } }
-@media (min-width: 720px) { .res-jm { min-height: 996px; } }
-@media (min-width: 740px) { .res-jm { min-height: 854px; } }
-@media (min-width: 880px) { .sc-demo #ledger-demo { min-height: 393px; } }
-@media (min-width: 1000px) { .res-jm { min-height: 959px; } }
 @media (min-width: 1024px) {
   .ai-hero .wrap { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
 }
-.verb-copy > p:not(.verb-k):not(.verb-hint) { max-width: 62ch; }
 @media (max-width: 859px) {
   .nav-login { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; }
 }
@@ -591,11 +579,6 @@ ul.bal-list { margin: 8px 0 0; padding: 0; list-style: none; }
 @media (max-width: 480px) {
   .ai-chip { font-size: var(--t-sm); padding-inline: 10px 12px; }
 }
-.verb-copy h3 { display: flex; align-items: flex-start; gap: 14px; }
-.verb-copy h3 .verb-n { flex: none; font-weight: 700; color: var(--accent); letter-spacing: 0; }
-@media (max-width: 719px) {
-  .verb-copy h3 { gap: 10px; }
-}
 @media (max-width: 400px) {
   .sp-person { column-gap: 4px; }
   .sp-person .av { width: 18px; height: 18px; font-size: var(--t-xs); }
@@ -625,17 +608,11 @@ html { scroll-behavior: auto; }
   .nav-links { display: none; }
   .nav-cta { margin-left: auto; }
 }
-.verb-copy h3 { --h3: var(--t-xl); font-size: var(--h3); letter-spacing: -0.03em; line-height: 1.1; }
-.verb-copy h3 .verb-n { width: 30px; height: 30px; font-size: var(--t-sm); margin-top: calc((1.1 * var(--h3) - 30px) / 2); }
-@media (max-width: 719px) {
-  .verb-copy h3 .verb-n { width: 26px; height: 26px; font-size: var(--t-xs); margin-top: calc((1.1 * var(--h3) - 26px) / 2); }
-}
 .sh h2 { font-size: var(--t-xl); letter-spacing: -0.03em; line-height: 1.1; }
 .close { padding: clamp(64px, 9vw, 128px) 0; }
 .verb { padding-top: clamp(48px, 6vw, 88px); }
 .verb:first-of-type { padding-top: 0; }
 .verb-demo .demo-frame { box-shadow: none; border-color: var(--line); }
-#split .verb-copy { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 16px; max-width: none; }
 .verb-more { margin: 0; }
 .verb-more a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--accent); font-weight: 600; font-size: var(--t-md); text-decoration: none; }
 .verb-more a:hover { text-decoration: underline; }
@@ -723,7 +700,6 @@ button.tzc-owe:focus-visible { box-shadow: var(--focus-ring); }
 }
 .pick small { display: none; }
 #split .demo-frame, #understand .demo-frame { border: 0; box-shadow: none; border-radius: 0; padding: 0; background: none; }
-.verb-copy { margin-bottom: clamp(16px, 2vw, 24px); }
 @keyframes lgflash { 0%, 40% { background: var(--accent-soft); box-shadow: 0 0 0 6px var(--accent-soft); } 100% { background: transparent; box-shadow: 0 0 0 6px transparent; } }
 @media (max-width: 720px) {
   .foot nav { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; }
@@ -874,7 +850,15 @@ button.tzc-owe:focus-visible { box-shadow: var(--focus-ring); }
 .sp-person[data-p='you'] .sp-pn { color: var(--ink); font-weight: 600; }
 .sp-person[data-p='you'] .sp-pa, .sp-person .sp-pa { color: var(--ink); }
 /* home: the three steps and the AI section share one content edge */
-.verbs .verb-copy, .verbs .verb-demo, .ai .ai-grid { max-width: 960px; margin-inline: auto; }
+.verbs .verb-demo, .ai .ai-grid { max-width: 960px; margin-inline: auto; }
+/* E r3: the step heading, in one place (it used to be redefined nine times, which let step 2 drift 68px left) */
+.verb-copy { max-width: 960px; margin: 0 auto clamp(16px, 2vw, 24px); text-align: left; }
+.verb-copy h3 { --h3: var(--t-xl); display: flex; align-items: flex-start; gap: 14px; font-size: var(--h3); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; }
+.verb-copy h3 .verb-n { flex: none; width: 30px; height: 30px; font-size: var(--t-sm); font-weight: 700; color: var(--accent); letter-spacing: 0; margin-top: calc((1.1 * var(--h3) - 30px) / 2); }
+@media (max-width: 719px) {
+  .verb-copy h3 { gap: 10px; }
+  .verb-copy h3 .verb-n { width: 26px; height: 26px; font-size: var(--t-xs); margin-top: calc((1.1 * var(--h3) - 26px) / 2); }
+}
 @media (min-width: 980px) {
   /* the AI headline is level with the chat's top and stays in view while the chat plays */
   .ai-grid { align-items: start; }
@@ -890,27 +874,164 @@ button.tzc-owe:focus-visible { box-shadow: var(--focus-ring); }
 .close-end { padding: clamp(24px, 3vw, 40px) 0 clamp(28px, 3.5vw, 44px); }
 .close-end .close-h { margin-bottom: 22px; }
 
-/* E r2: /trips reserved heights (the tap grid and the weekend, measured 320-1920) */
-#split-demo.res-trips { min-height: 924px; }
-@media (min-width: 330px) { #split-demo.res-trips { min-height: 887px; } }
-@media (min-width: 350px) { #split-demo.res-trips { min-height: 868px; } }
-@media (min-width: 380px) { #split-demo.res-trips { min-height: 845px; } }
-@media (min-width: 400px) { #split-demo.res-trips { min-height: 828px; } }
-@media (min-width: 410px) { #split-demo.res-trips { min-height: 780px; } }
-@media (min-width: 440px) { #split-demo.res-trips { min-height: 764px; } }
-@media (min-width: 490px) { #split-demo.res-trips { min-height: 756px; } }
-@media (min-width: 600px) { #split-demo.res-trips { min-height: 772px; } }
+
+/* ======================================================================================
+   E r3: one voice per source, one meaning per colour.
+   - Mono is one face (the receipt's), for every outside document: bank lines, statements, receipts.
+   - Saturated hues are people only. Categories are one ink ramp; their marks stay square.
+   - Grey fill (--fill) means "what your bank or statement shows". Everything Trezzit says is white.
+   ====================================================================================== */
+@font-face { font-family: 'Receipt Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../_kit/fonts/plex-mono-400-latin.woff2') format('woff2'); }
+@font-face { font-family: 'Receipt Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../_kit/fonts/plex-mono-600-latin.woff2') format('woff2'); }
+:root {
+  --font-mono: 'Receipt Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --cat-1: var(--ink); --cat-2: color-mix(in srgb, var(--ink) 70%, #fff); --cat-3: color-mix(in srgb, var(--ink) 45%, #fff); --cat-4: color-mix(in srgb, var(--ink) 25%, #fff);
+  --cat-groceries: var(--cat-1); --cat-health: var(--cat-2); --cat-dining: var(--cat-2); --cat-personal-care: var(--cat-3);
+  --cat-household: var(--cat-3); --cat-gifts: var(--cat-4); --cat-other: var(--cat-4);
+}
+/* "You spent", drawn one way: a muted label on its own line, a bold tabular number, then a muted "of $X" */
+.spent { display: grid; justify-items: start; gap: 2px; margin: 0; }
+.spent > span { font-size: var(--t-sm); color: var(--muted); font-weight: 500; }
+.spent > b { font-size: var(--t-lg); color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1.15; }
+.spent > b s { color: var(--faint); font-weight: 500; font-size: var(--t-sm); margin-right: 6px; text-decoration-thickness: 1px; }
+.spent > small { font-size: var(--t-sm); color: var(--muted); }
+/* /trips: the weekend's two figures sit over the settle-up (right column), the bills fill the left; "You paid"
+   is the bank's view (grey), "You spent" is Trezzit's (white, hairline): no selected outline where nothing is selectable */
+.trip-side .trip-you { max-width: none; }
+.trip-you p:last-child { box-shadow: inset 0 0 0 1px var(--line); }
+.trip-you p:last-child span { color: var(--muted); }
+.trip-you span { font-weight: 500; }
+/* the apartment's balance, /ai's setup cards and the subpage link cards are Trezzit's, not the bank's: white, hairline */
+.bal, .cn-card, .next a, .ways a { background: #fff; border: 1px solid var(--line); }
+.next a:hover, .ways a:hover { background: #fff; border-color: var(--line-strong); }
+.bal-sub { margin: -2px 0 6px; font-size: var(--t-sm); color: var(--muted); }
+
+/* E r3: subpage reserved heights (re-measured 320-1920: /trips grid and weekend, /just-me scan and month) */
+#split-demo.res-trips { min-height: 892px; }
+@media (min-width: 330px) { #split-demo.res-trips { min-height: 854px; } }
+@media (min-width: 350px) { #split-demo.res-trips { min-height: 835px; } }
+@media (min-width: 370px) { #split-demo.res-trips { min-height: 828px; } }
+@media (min-width: 400px) { #split-demo.res-trips { min-height: 811px; } }
+@media (min-width: 410px) { #split-demo.res-trips { min-height: 761px; } }
+@media (min-width: 420px) { #split-demo.res-trips { min-height: 763px; } }
+@media (min-width: 440px) { #split-demo.res-trips { min-height: 746px; } }
+@media (min-width: 600px) { #split-demo.res-trips { min-height: 762px; } }
 @media (min-width: 640px) { #split-demo.res-trips { min-height: 725px; } }
-@media (min-width: 1000px) { #split-demo.res-trips { min-height: 763px; } }
-@media (min-width: 1024px) { #split-demo.res-trips { min-height: 725px; } }
-#trip-demo { min-height: 855px; }
-@media (min-width: 330px) { #trip-demo { min-height: 806px; } }
-@media (min-width: 350px) { #trip-demo { min-height: 782px; } }
-@media (min-width: 360px) { #trip-demo { min-height: 756px; } }
-@media (min-width: 370px) { #trip-demo { min-height: 709px; } }
-@media (min-width: 410px) { #trip-demo { min-height: 682px; } }
-@media (min-width: 450px) { #trip-demo { min-height: 659px; } }
-@media (min-width: 600px) { #trip-demo { min-height: 675px; } }
-@media (min-width: 900px) { #trip-demo { min-height: 503px; } }
-@media (min-width: 1200px) { #trip-demo { min-height: 504px; } }
-@media (min-width: 1440px) { #trip-demo { min-height: 512px; } }
+#trip-demo { min-height: 847px; }
+@media (min-width: 330px) { #trip-demo { min-height: 798px; } }
+@media (min-width: 350px) { #trip-demo { min-height: 774px; } }
+@media (min-width: 360px) { #trip-demo { min-height: 748px; } }
+@media (min-width: 370px) { #trip-demo { min-height: 701px; } }
+@media (min-width: 410px) { #trip-demo { min-height: 674px; } }
+@media (min-width: 450px) { #trip-demo { min-height: 651px; } }
+@media (min-width: 600px) { #trip-demo { min-height: 667px; } }
+@media (min-width: 900px) { #trip-demo { min-height: 390px; } }
+@media (min-width: 1200px) { #trip-demo { min-height: 394px; } }
+@media (min-width: 1440px) { #trip-demo { min-height: 395px; } }
+.res-jm { min-height: 1214px; }
+@media (min-width: 490px) { .res-jm { min-height: 1225px; } }
+@media (min-width: 600px) { .res-jm { min-height: 1241px; } }
+@media (min-width: 720px) { .res-jm { min-height: 870px; } }
+@media (min-width: 740px) { .res-jm { min-height: 811px; } }
+@media (min-width: 1000px) { .res-jm { min-height: 869px; } }
+@media (min-width: 1100px) { .res-jm { min-height: 830px; } }
+@media (min-width: 1440px) { .res-jm { min-height: 839px; } }
+.sc-demo #ledger-demo { min-height: 712px; }
+@media (min-width: 336px) { .sc-demo #ledger-demo { min-height: 693px; } }
+@media (min-width: 342px) { .sc-demo #ledger-demo { min-height: 673px; } }
+@media (min-width: 380px) { .sc-demo #ledger-demo { min-height: 679px; } }
+@media (min-width: 395px) { .sc-demo #ledger-demo { min-height: 662px; } }
+@media (min-width: 445px) { .sc-demo #ledger-demo { min-height: 645px; } }
+@media (min-width: 600px) { .sc-demo #ledger-demo { min-height: 661px; } }
+@media (min-width: 880px) { .sc-demo #ledger-demo { min-height: 395px; } }
+@media (min-width: 980px) { .sc-demo #ledger-demo { min-height: 399px; } }
+@media (min-width: 1200px) { .sc-demo #ledger-demo { min-height: 405px; } }
+
+/* E r4: in a chat thread, everything the assistant hands you (a card, the row it added, the result) spans the
+   thread to the same right edge as your own bubbles; only text bubbles shrink to their words. */
+.msg.card, .msg.act, .msg.proof { align-self: stretch; max-width: none; width: auto; }
+@media (min-width: 640px) {
+  .msg.card { max-width: none; }
+}
+/* /trips: the settle-up note only speaks when a tap is refused; it keeps its line so nothing moves when it does */
+.settle-n { min-height: 1.45em; }
+.settle-n:empty { margin-top: 0; }
+
+/* E r4: /just-me scans one receipt (the pharmacy), so its frame reserves the pharmacy's height, not the
+   taller shared receipt's (re-measured 320-1920) */
+#cat-demo { min-height: 261px; }
+@media (min-width: 740px) { #cat-demo { min-height: 166px; } }
+@media (min-width: 1000px) { #cat-demo { min-height: 261px; } }
+.res-jm { min-height: 891px; }
+@media (min-width: 481px) { .res-jm { min-height: 902px; } }
+@media (min-width: 600px) { .res-jm { min-height: 918px; } }
+@media (min-width: 720px) { .res-jm { min-height: 793px; } }
+@media (min-width: 740px) { .res-jm { min-height: 698px; } }
+@media (min-width: 1000px) { .res-jm { min-height: 788px; } }
+@media (min-width: 1044px) { .res-jm { min-height: 762px; } }
+@media (min-width: 1064px) { .res-jm { min-height: 753px; } }
+
+/* E r4: /ai chat and /roommates rent card reserve exactly what they mount to (re-measured 320-1920) */
+.ai-hero-demo#chat-demo { min-height: 847px; }
+@media (min-width: 337px) { .ai-hero-demo#chat-demo { min-height: 825px; } }
+@media (min-width: 340px) { .ai-hero-demo#chat-demo { min-height: 808px; } }
+@media (min-width: 356px) { .ai-hero-demo#chat-demo { min-height: 781px; } }
+@media (min-width: 360px) { .ai-hero-demo#chat-demo { min-height: 731px; } }
+@media (min-width: 371px) { .ai-hero-demo#chat-demo { min-height: 709px; } }
+@media (min-width: 381px) { .ai-hero-demo#chat-demo { min-height: 716px; } }
+@media (min-width: 469px) { .ai-hero-demo#chat-demo { min-height: 691px; } }
+@media (min-width: 480px) { .ai-hero-demo#chat-demo { min-height: 783px; } }
+@media (min-width: 546px) { .ai-hero-demo#chat-demo { min-height: 733px; } }
+@media (min-width: 550px) { .ai-hero-demo#chat-demo { min-height: 708px; } }
+@media (min-width: 640px) { .ai-hero-demo#chat-demo { min-height: 716px; } }
+#rent-demo { min-height: 802px; }
+@media (min-width: 361px) { #rent-demo { min-height: 779px; } }
+@media (min-width: 370px) { #rent-demo { min-height: 725px; } }
+@media (min-width: 401px) { #rent-demo { min-height: 727px; } }
+@media (min-width: 560px) { #rent-demo { min-height: 717px; } }
+@media (min-width: 600px) { #rent-demo { min-height: 733px; } }
+@media (min-width: 860px) { #rent-demo { min-height: 735px; } }
+@media (min-width: 1000px) { #rent-demo { min-height: 719px; } }
+@media (min-width: 1120px) { #rent-demo { min-height: 735px; } }
+@media (min-width: 1200px) { #rent-demo { min-height: 739px; } }
+
+/* ---------- E r5: reserved heights re-measured 320-1920 after this round (each frame mounts into exactly
+   its final height: home without the sample tiles and payer rows, /ai without chips, /just-me without the
+   item list, the inline rent row, the one-line rent history) ---------- */
+.ai-hero-demo#chat-demo { min-height: 631px; }
+@media (min-width: 360px) { .ai-hero-demo#chat-demo { min-height: 604px; } }
+@media (min-width: 380px) { .ai-hero-demo#chat-demo { min-height: 583px; } }
+@media (min-width: 390px) { .ai-hero-demo#chat-demo { min-height: 588px; } }
+@media (min-width: 480px) { .ai-hero-demo#chat-demo { min-height: 598px; } }
+@media (min-width: 560px) { .ai-hero-demo#chat-demo { min-height: 573px; } }
+@media (min-width: 640px) { .ai-hero-demo#chat-demo { min-height: 581px; } }
+.demo-frame.res-jm { min-height: 616px; }
+@media (min-width: 600px) { .demo-frame.res-jm { min-height: 632px; } }
+@media (min-width: 720px) { .demo-frame.res-jm { min-height: 510px; } }
+@media (min-width: 1000px) { .demo-frame.res-jm { min-height: 470px; } }
+.sc-demo #ledger-demo { min-height: 712px; }
+@media (min-width: 340px) { .sc-demo #ledger-demo { min-height: 693px; } }
+@media (min-width: 350px) { .sc-demo #ledger-demo { min-height: 673px; } }
+@media (min-width: 380px) { .sc-demo #ledger-demo { min-height: 679px; } }
+@media (min-width: 400px) { .sc-demo #ledger-demo { min-height: 662px; } }
+@media (min-width: 460px) { .sc-demo #ledger-demo { min-height: 646px; } }
+@media (min-width: 600px) { .sc-demo #ledger-demo { min-height: 662px; } }
+@media (min-width: 880px) { .sc-demo #ledger-demo { min-height: 396px; } }
+@media (min-width: 980px) { .sc-demo #ledger-demo { min-height: 399px; } }
+@media (min-width: 1200px) { .sc-demo #ledger-demo { min-height: 406px; } }
+#rent-demo { min-height: 680px; }
+@media (min-width: 390px) { #rent-demo { min-height: 657px; } }
+@media (min-width: 410px) { #rent-demo { min-height: 659px; } }
+@media (min-width: 600px) { #rent-demo { min-height: 675px; } }
+@media (min-width: 860px) { #rent-demo { min-height: 677px; } }
+@media (min-width: 1000px) { #rent-demo { min-height: 661px; } }
+@media (min-width: 1199px) { #rent-demo { min-height: 677px; } }
+@media (min-width: 1200px) { #rent-demo { min-height: 682px; } }
+#rec-side { min-height: 691px; }
+@media (min-width: 340px) { #rec-side { min-height: 668px; } }
+@media (min-width: 350px) { #rec-side { min-height: 616px; } }
+@media (min-width: 380px) { #rec-side { min-height: 587px; } }
+@media (min-width: 390px) { #rec-side { min-height: 564px; } }
+@media (min-width: 420px) { #rec-side { min-height: 541px; } }
+@media (min-width: 490px) { #rec-side { min-height: 510px; } }
+@media (min-width: 600px) { #rec-side { min-height: 526px; } }

@@ -10,7 +10,6 @@ const PCT = { you: 25, maya: 25, jordan: 28, sam: 22 };
 const eq = { type: 'equal', people: ROOM };
 // the site's "now" is late October: Jun to Oct are history, Nov is next
 const MONTHS = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
-const NEXT = 'Nov';
 const MIN = 10000; // $100.00: a rent below that is a typo, not a rent
 const HIST = 63935; // your share each month so far
 
@@ -41,23 +40,19 @@ const MODE = `<li class="rec-mode"><span id="mode-l">Rent on the 1st</span>
 const SIDE = `<div class="rec-side">
     <p class="rec-sub">Coming up</p>
     <ul class="upcoming" role="list"></ul>
-    <div class="hist">
-      <div class="hist-top"><span>Your rent share since June</span><b class="money" data-k="hist"></b></div>
-      <div class="hist-bars" aria-hidden="true"></div>
-      <div class="hist-lbl" aria-hidden="true">${MONTHS.map((m) => `<span>${m}</span>`).join('')}<span class="nx">${NEXT}</span></div>
-    </div>
+    <p class="hist-row"><span>Your rent share since June</span><b class="money" data-k="hist"></b></p>
     ${opts.moreHref ? `<a class="rec-more" href="${esc(opts.moreHref)}">Split rent by room size <span aria-hidden="true">→</span> Roommates</a>` : ''}
   </div>`;
 root.innerHTML = `<div class="rec${opts.compact || opts.sideRoot ? ' rec-compact' : ''}">
   <div class="rec-sched">
     <div class="rec-top">
-      <p class="rec-name"><span class="ic">${icon.repeat}</span><span><b>Monthly rent</b><small>Apartment 3B · on the 1st · you pay</small></span></p>
+      <p class="rec-name"><span class="ic">${icon.repeat}</span><span><b>Monthly rent</b><small>Apartment 3B · on the 1st</small></span></p>
     </div>
     <div class="rec-edit">
       <label for="rent-in">Rent</label>
-      <label class="money-in-field" for="rent-in">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-help"></label>
-      <span class="step-btns"><button type="button" data-step="-2500" aria-label="Lower rent by $25">−</button><button type="button" data-step="2500" aria-label="Raise rent by $25">+</button></span>
-      <span id="rent-help" class="muted small" aria-live="polite"></span>
+      <label class="money-in-field" for="rent-in">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-sub rent-help"></label>
+      <span id="rent-sub" class="rec-rsub"></span>
+      <span id="rent-help" class="rec-help" aria-live="polite"></span>
     </div>
     <ul class="rec-lines" role="list"></ul>
     <ul class="sp-people rec-shares" role="list" aria-live="polite">${ROOM.map((p) => `<li class="sp-person" data-p="${p}"><span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span><span class="sp-pn">${PEOPLE[p].name}</span><b class="money sp-pa"></b></li>`).join('')}</ul>
@@ -69,17 +64,26 @@ if (opts.sideRoot) opts.sideRoot.innerHTML = SIDE;
 const side = opts.sideRoot || root;
 
 const input = root.querySelector('#rent-in');
+// the field is as wide as its amount, so "$" sits against the figure like every other amount in the card
+const mirror = document.createElement('span');
+mirror.setAttribute('aria-hidden', 'true');
+mirror.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;pointer-events:none;left:0;top:0';
+input.parentElement.appendChild(mirror);
+const fitInput = () => { const cs = getComputedStyle(input); mirror.style.font = cs.font; mirror.style.fontVariantNumeric = cs.fontVariantNumeric; mirror.style.letterSpacing = cs.letterSpacing; mirror.textContent = input.value || '0'; input.style.width = `${Math.ceil(mirror.getBoundingClientRect().width) + 4}px`; };
+input.addEventListener('input', fitInput);
+fitInput();
 const linesEl = root.querySelector('.rec-lines');
 const upEl = side.querySelector('.upcoming');
-const bars = side.querySelector('.hist-bars');
 const histEl = side.querySelector('[data-k="hist"]');
 let prev = null;
 
 function render() {
   const r = compute();
   // one name for the rent's split, said once, on its own line: by room size, with your percent beside your share
+  // the rent itself is the editable row (its split on one sub-line under the amount); the bills follow
   const method = { 0: 'By room size', 1: 'Equally', 2: 'Equally', 3: 'Equally', 4: 'Just Jordan' };
-  linesEl.innerHTML = r.items.map((it, i) => `<li><span>${esc(it.name)}</span><b class="money">${money(it.totalCents)}</b><span>${method[i]}${it.shares.you ? ` · you ${i === 0 ? `${PCT.you}% · ` : ''}${money(it.shares.you)}` : ''}</span></li>`).join('')
+  root.querySelector('#rent-sub').textContent = `${method[0]} · you ${money(r.items[0].shares.you)}`;
+  linesEl.innerHTML = r.items.slice(1).map((it, j) => `<li><span>${esc(it.name)}</span><b class="money">${money(it.totalCents)}</b><span>${method[j + 1]}${it.shares.you ? ` · you ${money(it.shares.you)}` : ''}</span></li>`).join('')
     + `<li class="rec-total"><span>Each month</span><b class="money">${money(r.totalCents)}</b></li>`;
   ROOM.forEach((p) => {
     const b = root.querySelector(`.sp-person[data-p="${p}"] .sp-pa`);
@@ -89,14 +93,13 @@ function render() {
   opts.onChange?.(r);
   if (opts.compact) { prev = r; return; }
   const you = r.people.you.cents;
-  // one status pill (the next rent); the rows after it just say how they arrive
-  const quiet = (m) => `<span class="up-how">${m === 'auto' ? 'Auto' : 'Review'}</span>`;
+  // the control under Nov 1 says how rent arrives; the rows after it carry no repeated status
   const rows = [
-    ['Nov', 1, 'Monthly rent', 'Rent + utilities · your share', money(you), ''],
-    ['Nov', 12, 'Netflix', 'Maya pays · split 4 ways', money(flix[0]), quiet('auto')],
-    ['Nov', 15, 'Gym membership', 'Just you', '$39.00', quiet('auto')],
-    ['Dec', 1, 'Monthly rent', 'Same split', money(you), quiet(mode)],
-  ].map(([m, d, t, s, a, status]) => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b><small>${s}</small></span><span class="up-r"><b class="money">${a}</b>${status}</span></li>`);
+    ['Nov', 1, 'Monthly rent', 'Rent + utilities · your share', money(you)],
+    ['Nov', 12, 'Netflix', 'Maya pays · split 4 ways', money(flix[0])],
+    ['Nov', 15, 'Gym membership', 'Just you', '$39.00'],
+    ['Dec', 1, 'Monthly rent', '', money(you)],
+  ].map(([m, d, t, s, a]) => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><span class="up-r"><b class="money">${a}</b></span></li>`);
   // the toggle is drawn once, then kept (re-rendering it would drop keyboard focus)
   if (!upEl.querySelector('.rec-mode')) {
     upEl.innerHTML = rows[0] + MODE + rows.slice(1).join('');
@@ -105,11 +108,8 @@ function render() {
     const live = [...upEl.querySelectorAll('.up-row')];
     rows.forEach((html, i) => { live[i].outerHTML = html; });
   }
-  const vals = [...MONTHS.map(() => HIST), you];
-  const max = Math.max(...vals) * 1.08;
-  bars.innerHTML = vals.map((v, i) => `<i class="${i === vals.length - 1 ? 'nx' : i === vals.length - 2 ? 'now' : ''}" style="--h:${(v / max) * 100}%"></i>`).join('');
-  // history only: Jun to Oct is what you spent; Nov is the next one, drawn as an outline
-  const total = vals.slice(0, -1).reduce((a, b) => a + b, 0);
+  // history only: Jun to Oct is what you spent (Nov is still to come)
+  const total = MONTHS.length * HIST;
   countMoney(histEl, prev ? Number(histEl.dataset.c) : total, total, prev ? 380 : 0);
   histEl.dataset.c = total;
   prev = r;
@@ -127,6 +127,7 @@ function flashHelp(msg) {
 function setRent(cents, fromInput = false) {
   rent = Math.max(MIN, Math.min(1000000, Math.round(cents)));
   if (!fromInput) { input.value = (rent / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); lastText = input.value; }
+  fitInput();
   render();
 }
 // the field and the math never disagree: only a well-formed amount changes the rent;
@@ -156,11 +157,6 @@ function commit() {
 }
 input.addEventListener('blur', commit);
 input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
-root.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => {
-  const next = rent + Number(b.dataset.step);
-  if (next < MIN || next > 1000000) flashHelp(RANGE);
-  setRent(next);
-}));
 function bindMode() {
   const radios = [...side.querySelectorAll('[data-mode]')];
   const pick = (b, focus) => {

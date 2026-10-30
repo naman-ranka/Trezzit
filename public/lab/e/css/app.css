@@ -53,3 +53,6 @@
   .tour-copy h2 { text-wrap: balance; max-width: 14ch; }
 }
 .tour-hero h1 { margin-inline: auto; }
+/* E r3: the hero card is the site's one lifted object; the phones are flat (a dark frame is edge enough) */
+.tphone { box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .12); }
+.tour-play { box-shadow: inset 0 0 0 1px var(--line-strong); }

@@ -11,10 +11,13 @@ import { itemName, storeName, bus } from './util.js';
 // E r2: no person shares a colour with the accent or a category (Priya was the link blue), and people are
 // round while categories are square. These match the --p-* and --cat-* tokens in c.css.
 export const PEOPLE = { ...KIT_PEOPLE, maya: { ...KIT_PEOPLE.maya, color: '#0f766e' }, priya: { ...KIT_PEOPLE.priya, color: '#0e7490' } };
-const CAT_COLOR = { groceries: '#059669', household: '#475569', health: '#dc2626', 'personal-care': '#a21caf', gifts: '#db2777', dining: '#ea580c', internet: '#4f46e5' };
+// E r3: saturated hues belong to people only. Categories are one ink ramp (--cat-1..4 in c.css: ink at
+// 100/70/45/25%), assigned so no two categories on one receipt share a step; their marks stay square.
+const RAMP = { groceries: 1, rent: 1, health: 2, dining: 2, utilities: 2, 'personal-care': 3, household: 3, internet: 3, subscriptions: 3, gifts: 4, parking: 4, other: 4 };
+const CAT_COLOR = Object.fromEntries(Object.entries(RAMP).map(([k, n]) => [k, `var(--cat-${n})`]));
 export const CATEGORIES = {
   ...Object.fromEntries(Object.entries(KIT_CATS).map(([k, v]) => [k, CAT_COLOR[k] ? { ...v, color: CAT_COLOR[k] } : v])),
-  subscriptions: { label: 'Subscriptions', color: '#9333ea' },
+  subscriptions: { label: 'Subscriptions', color: 'var(--cat-3)' },
 };
 export { SAMPLES, getSample };
 
@@ -73,7 +76,7 @@ async function sampleEntry(sampleId, { title, group, date, payer, kind }) {
   const lines = you.lines.filter((l) => l.cents).map((l) => {
     const item = r.items.find((it) => it.index === l.itemIndex) || {};
     const cat = l.category || (item.itemType === 'Tip' ? 'dining' : 'other');
-    return { name: item.itemType === 'Tip' ? 'Tip' : itemName(l.name), cat, cents: l.cents, itemCents: item.totalCents ?? l.cents };
+    return { name: item.itemType === 'Tip' ? 'Tip' : itemName(l.name), cat, cents: l.cents, itemCents: item.totalCents ?? l.cents, priceCents: item.priceCents, taxCents: item.taxCents || 0 };
   });
   // lines that were someone else's (so a search for them can say whose they were)
   const others = r.items.filter((it) => it.itemType !== 'Tip' && !(it.shares?.you > 0))

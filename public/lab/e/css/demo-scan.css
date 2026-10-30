@@ -213,3 +213,50 @@ ul.so-checks { display: none; }
 .verb-demo .so-sum { display: none !important; }
 /* the total counts up in a box as wide as the printed total, so nothing beside it reflows while it counts */
 .so-total b { display: inline-block; min-width: 4.3em; }
+/* ---------- E r3: the result reads top to bottom: store, a few items, then the total with its check
+   under it (the same place step 2 says "Adds up"). Two sample tiles; "Your photo" only where it is real.
+   Step 2 is right below, so "Split this receipt" is a quiet link, not another dark button. ---------- */
+.scan.no-own .scan-pick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.so-head { min-height: 0; }
+.so-store { margin-top: 10px; }
+.so-foot { align-items: flex-end; }
+.so-sumup { display: grid; gap: 4px; }
+.so-sumup .so-status { min-height: 22px; }
+.so-split.c-link-btn { margin-left: auto; font-size: var(--t-md); }
+.so-split.c-link-btn svg { width: 16px; height: 16px; }
+.verb-demo .scan.short .so-item:nth-child(n + 5) { display: none; }
+.verb-demo .so-more { display: none !important; }
+@media (min-width: 720px) {
+  /* the total and its check sit on the receipt's bottom line */
+  .verb-demo .scan-out { display: flex; flex-direction: column; }
+  .verb-demo .so-foot { margin-top: auto !important; padding-top: 12px !important; }
+}
+/* the receipt's subtotal line never shows (the total and its check say it), so nothing moves when the read ends */
+.so-sum { display: none !important; }
+/* ---------- E r4: the visible figures add up. The lines folded away are one muted row ("+ 10 more items
+   and tax  $82.84"), and in the step frame the total and its check sit on the receipt's bottom edge, so the
+   space falls above the total, not under it. ---------- */
+.so-rest { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; font-size: var(--t-sm); color: var(--muted); border-bottom: 1px solid var(--divider); }
+.so-rest[hidden] { display: none; }
+.so-rest .money { font-variant-numeric: tabular-nums; }
+.scan:not(.is-done) .so-rest { visibility: hidden; }
+@media (min-width: 720px) {
+  .verb-demo .scan-body { align-items: stretch; }
+  .verb-demo .scan-out { display: flex; flex-direction: column; }
+  .verb-demo .so-foot { margin-top: auto !important; }
+}
+.scan-pick[hidden] { display: none !important; }
+.scan-pick[hidden] + .scan-body { margin-top: 0; }
+/* the "+ N more items" row carries the rest (and the paper shows every line), so no "Show all" link */
+.scan .so-more { display: none !important; }
+/* ---------- E r5: while reading, the list is a window on the last lines read (it follows the beam); it
+   folds to the first lines and "+ N more items and tax" when the total lands. Same rows, same height. ---------- */
+.scan.rolling .so-item { display: none !important; }
+.scan.rolling .so-item.win { display: flex !important; }
+/* /just-me: the read ends on your categories and one check (no item list, no separate total) */
+.scan.no-total .so-total { display: none; }
+.scan.is-done.has-cats .so-rest { display: none !important; }
+.scan.has-cats .so-cats { margin-top: 18px; }
+.scan.has-cats .so-leg { display: grid; gap: 0; }
+.scan.has-cats .so-leg li { display: flex; padding: 8px 0; border-bottom: 1px solid var(--divider); }
+.scan.has-cats .so-leg b { margin-left: auto; }

@@ -127,3 +127,25 @@
 @media (max-width: 639px) {
   .tg-prop { grid-column: 2 / -1; grid-row: 1 / span 2; text-align: center; font-size: var(--t-xs); }
 }
+/* E r3: the header is the store and who paid (step 1 already shows the rest); the footer is only the proof,
+   right-aligned to the price edge, with reset on the left so the check never moves; phones use short names */
+.tg-foot { grid-template-columns: 44px minmax(0, 1fr) !important; grid-template-areas: 'reset check' !important; }
+.tg-check { justify-self: end; }
+.tg-short { display: none; }
+@media (max-width: 479px) {
+  .tg-long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .tg-short { display: inline; }
+  .tg-exp small, .tg-nm small { display: inline; font-size: var(--t-xs); font-weight: 500; }
+}
+/* ---------- E r5: the hint says the one thing the receipt check would raise (prices include tax); reset is a
+   word, not an icon; one muted line answers "do they all have to join?"; on phones the sticky people row
+   fades once the last item has passed under it. ---------- */
+.tg-hint { display: grid; gap: 1px; }
+.tg-tax { font-size: var(--t-xs); font-weight: 400; color: var(--muted); }
+.tg-foot { grid-template-columns: auto minmax(0, 1fr) !important; }
+.tg-reset { width: auto; height: 36px; padding: 0 14px; border-radius: 999px; font-size: var(--t-sm); font-weight: 500; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); position: relative; }
+.tg-reset::after { content: ''; position: absolute; inset: -4px 0; }
+.tg-reset:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.tg-note { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--divider); font-size: var(--t-sm); color: var(--muted); }
+.tg-people { transition: opacity .18s var(--ease); }
+.tg-people.is-gone { opacity: 0; pointer-events: none; }

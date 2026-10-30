@@ -30,17 +30,17 @@ const arm = once(() => {
 ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach((t) => addEventListener(t, arm, { passive: true }));
 
 const splitEl = document.getElementById('split-demo');
-// the scan's "Split this receipt" hands its result to the grid, so the grid is mounted no later than the scan
-const mountGrid = once(() => Promise.all([import('./grid-demo.js'), css('grid')]).then(([m]) => m.mountGrid(splitEl, { sampleId: 'green-basket', listen: true })));
+// the grid mounts with the scan, so step 2 is ready by the time the scan finishes
+const mountGrid = once(() => Promise.all([import('./grid-demo.js'), css('grid')]).then(([m]) => m.mountGrid(splitEl, { sampleId: 'green-basket', listen: true, note: 'Add roommates by name. They join when they want.' })));
 // the AI adds a charge to the month: the month is mounted no later than the chat
 const monthEl = document.getElementById('ledger-demo');
-const mountMonth = once(() => Promise.all([import('./month-demo.js'), css('ledger'), css('month')]).then(([m]) => m.mountMonth(monthEl, { demoSearch: 'water' })));
-// home keeps to the apartment story: the shared groceries and one receipt that is just yours.
-// The pharmacy receipt answers in place (all yours, by category); only the shared one moves on, to the split.
-lazy('scan-demo', (el) => { mountGrid(); return Promise.all([import('./scan-demo.js'), css('scan')]).then(([m]) => m.mountScan(el, { samples: ['green-basket', 'corner-pharmacy'], splitTarget: '#split', soloSummary: true, cats: false })); });
+const mountMonth = once(() => Promise.all([import('./month-demo.js'), css('ledger'), css('month')]).then(([m]) => m.mountMonth(monthEl, { demoSearch: 'water', payers: false, findFirst: true })));
+// one receipt runs through the page: step 1 reads Green Basket, step 2 splits it, step 3 counts your share
+// (the pharmacy, just yours, is the hero's second case and /just-me's scan)
+lazy('scan-demo', (el) => { mountGrid(); return Promise.all([import('./scan-demo.js'), css('scan')]).then(([m]) => m.mountScan(el, { samples: ['green-basket'], cats: false })); });
 lazy('split-demo', () => mountGrid());
 lazy('ledger-demo', () => mountMonth());
-lazy('chat-demo', (el) => { mountMonth(); return Promise.all([import('./chat-demo.js'), css('chat')]).then(([m]) => m.mountChat(el, { scripts: ['statement'], tools: false, after: '#ledger-demo' })); });
+lazy('chat-demo', (el) => { mountMonth(); return Promise.all([import('./chat-demo.js'), css('chat')]).then(([m]) => m.mountChat(el, { scripts: ['statement'], tools: false, preview: true })); });
 // keyboard visitors tab faster than the lazy loaders can see: on the first Tab (or focus inside a section), mount everything
 const mountAll = once(() => lazies.forEach(({ go }) => go()));
 addEventListener('keydown', (e) => { if (e.key === 'Tab') mountAll(); });

@@ -12,7 +12,7 @@ import { toCents } from '../../_kit/split-engine.js';
 import { SAMPLE_META, CATEGORIES, getSample, sampleBill } from './data.js';
 import { h, esc, money, reduced, onVisible, itemName, storeName, prettyDate, icon, bus, css, countMoney } from './util.js';
 
-const STAGE_LABEL = { idle: 'Ready', uploading: 'Uploading', reading: 'Reading items', checking: 'Checking the math', done: 'Done' };
+const STAGE_LABEL = { idle: 'Ready', uploading: 'Uploading', reading: 'Reading items', checking: 'Checking the math', done: 'Checking the math' }; // never "Done" beside a total still counting
 // one line of compact chips: the list's label says what they mean
 const CHECK_LABEL = {
   items_total_check: 'Subtotal',
@@ -42,14 +42,18 @@ export function mountScan(root, opts = {}) {
   ensureReceiptStyles();
   const ids = opts.samples || ['green-basket', 'taqueria-sol', 'corner-pharmacy', 'monthly-rent'];
   const base = new URL('../assets/', import.meta.url).href;
+  // "Your photo" only where it is real (trezzit.com): elsewhere it could only replay a sample
+  const own = isLive() && opts.own !== false;
   root.classList.add('scan', 'booting'); // hidden until the first receipt is laid out at its final size
+  root.classList.toggle('no-own', !own);
+  root.classList.toggle('no-total', opts.total === false);
   root.innerHTML = `
-    <div class="scan-pick" role="group" aria-label="Pick a receipt to scan">
+    <div class="scan-pick" role="group" aria-label="Pick a receipt to scan"${ids.length < 2 && !own ? ' hidden' : ''}>
       ${ids.map((id) => `<button type="button" class="pick" data-id="${id}" aria-pressed="false">
         <img src="${base}thumb-${id}.webp" alt="" width="36" height="52" loading="lazy" decoding="async">
         <span><b>${esc(SAMPLE_META[id].short)}</b><small>${esc(SAMPLE_META[id].kind)}</small></span></button>`).join('')}
-      <button type="button" class="pick pick-own" data-own aria-expanded="false">
-        <span class="pick-ico">${icon.upload}</span><span><b>Your photo</b><small>Photo or PDF</small></span></button>
+      ${own ? `<button type="button" class="pick pick-own" data-own aria-expanded="false">
+        <span class="pick-ico">${icon.upload}</span><span><b>Your photo</b><small>Photo or PDF</small></span></button>` : ''}
     </div>
     <div class="scan-body">
       <div class="scan-stage" aria-hidden="true">
@@ -59,20 +63,21 @@ export function mountScan(root, opts = {}) {
       </div>
       <div class="scan-out">
         <div class="so-head">
-          <p class="so-status" aria-live="polite"><span class="dot"></span><span class="txt"></span></p>
           <div class="so-prog" aria-hidden="true"><i></i></div>
           <p class="so-store"></p>
         </div>
         <div class="so-mid">
           <ol class="so-items" aria-label="Items read from the receipt"></ol>
+          <p class="so-rest"><span></span><span class="money"></span></p>
           <button type="button" class="c-link-btn so-more" hidden></button>
           <p class="so-sum"></p>
           <div class="so-cats" hidden></div>
         </div>
         <div class="so-foot">
-          <p class="so-total"><span>Total</span><b class="money"></b></p>
+          <div class="so-sumup"><p class="so-total"><span>Total</span><b class="money"></b></p>
+          <p class="so-status" aria-live="polite"><span class="dot"></span><span class="txt"></span></p></div>
           <ul class="so-checks" aria-label="Checked against the receipt"></ul>
-          ${opts.splitTarget ? `<button type="button" class="c-btn c-btn-sm c-btn-primary so-split">Split this receipt ${icon.arrow}</button>` : ''}
+          ${opts.splitTarget ? `<button type="button" class="c-link-btn so-split">Split this receipt ${icon.arrow}</button>` : ''}
           ${opts.soloSummary ? '<p class="so-mine" hidden></p>' : opts.soloHref ? `<a class="c-btn c-btn-sm c-btn-quiet so-split so-solo" href="${esc(opts.soloHref)}" hidden>See your share ${icon.arrow}</a>` : ''}
         </div>
         <p class="so-notice" hidden></p>
@@ -144,7 +149,7 @@ export function mountScan(root, opts = {}) {
     moreBtn.textContent = root.classList.contains('short') ? `Show all ${n} items` : 'Show fewer items';
   };
   root.classList.add('short');
-  moreBtn.addEventListener('click', () => { root.classList.toggle('short'); syncMore(); });
+  moreBtn.addEventListener('click', () => { root.classList.toggle('short'); syncMore(); setRest(); });
   const consent = root.querySelector('.scan-consent');
   const ownBtn = root.querySelector('[data-own]');
   const fileInput = consent.querySelector('input[type=file]');
@@ -161,9 +166,17 @@ export function mountScan(root, opts = {}) {
   };
   const press = (id) => root.querySelectorAll('.pick[data-id]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
 
+  // phones: the window opens at the first item line (the store's address and register lines are noise there)
+  const phoneMQ = matchMedia('(max-width: 719px)');
+  const top0 = () => {
+    if (!phoneMQ.matches) return 0;
+    const first = paper.querySelector('.tz-r-line');
+    return first ? Math.max(0, Math.round(first.getBoundingClientRect().top - paper.getBoundingClientRect().top) - 10) : 0;
+  };
+  const rest0 = () => { paper.style.transform = `translateY(${-top0()}px)`; };
   function showPaper(html) {
     paper.innerHTML = html;
-    paper.style.transform = 'translateY(0)';
+    rest0();
   }
   function follow(index) {
     const line = paper.querySelector(`.tz-r-line[data-index="${index}"]`);
@@ -171,7 +184,7 @@ export function mountScan(root, opts = {}) {
     if (!line) return;
     line.classList.add('is-active');
     const max = Math.max(0, paper.scrollHeight - stage.clientHeight);
-    const y = Math.min(max, Math.max(0, line.offsetTop - stage.clientHeight * 0.42));
+    const y = Math.min(max, Math.max(top0(), line.offsetTop - stage.clientHeight * 0.42));
     paper.style.transform = `translateY(${-y}px)`;
   }
   function settlePaper() {
@@ -189,7 +202,9 @@ export function mountScan(root, opts = {}) {
     sumEl.innerHTML = '';
     storeEl.innerHTML = store || '';
     notice.hidden = true;
-    root.classList.remove('is-done', 'is-note', 'is-bad', 'has-cats');
+    root.classList.remove('is-done', 'is-note', 'is-bad', 'has-cats', 'rolling');
+    winK = 0;
+    setRest(null);
     setCats(null);
     root.classList.add('short');
     setProg(0);
@@ -197,6 +212,34 @@ export function mountScan(root, opts = {}) {
   }
 
   const itemLI = (it, i, pending) => `<li class="so-item${pending ? ' pending' : ''}" style="--i:${i}"><span>${esc(itemName(it.name))}${Number(it.quantity) > 1 && Number.isInteger(+it.quantity) ? ` <small>×${+it.quantity}</small>` : ''}</span><span class="money">${money(toCents(it.amount))}</span></li>`;
+  // the lines the list folds away, as one muted row, so the visible figures add up to the total on screen
+  const restEl = root.querySelector('.so-rest');
+  let restBill = null;
+  function setRest(bill = restBill) {
+    restBill = bill;
+    if (!bill) { restEl.hidden = true; return; }
+    const rows = [...list.children];
+    const shown = rows.map((li, i) => [li, i]).filter(([li]) => getComputedStyle(li).display !== 'none');
+    const n = rows.length - shown.length;
+    const shownC = shown.reduce((a, [, i]) => a + toCents(bill.items[i]?.amount || 0), 0);
+    const rest = toCents(bill.total) - shownC;
+    restEl.hidden = rest <= 0;
+    const extra = toCents(bill.tax) > 0 ? 'tax' : toCents(bill.tip) > 0 ? 'tip' : '';
+    restEl.firstChild.textContent = n ? `+ ${n} more item${n === 1 ? '' : 's'}${extra ? ` and ${extra}` : ''}` : extra.replace(/^./, (c) => c.toUpperCase()) || 'Other';
+    restEl.lastChild.textContent = money(rest, bill.currency || 'USD');
+  }
+  // while the beam reads, the list shows the last lines read (a window that follows the beam), so the list
+  // and the paper never disagree; once the total lands it folds back to the first lines plus "+ N more"
+  let winK = 0;
+  function roll(shown) {
+    if (!winK) { root.classList.remove('rolling'); winK = [...list.children].filter((li) => getComputedStyle(li).display !== 'none').length; }
+    const n = list.children.length;
+    if (!winK || n <= winK) return;
+    const lo = Math.max(0, Math.min(shown, n) - winK);
+    [...list.children].forEach((li, i) => li.classList.toggle('win', i >= lo && i < lo + winK));
+    root.classList.add('rolling');
+  }
+  const unroll = () => { root.classList.remove('rolling'); list.querySelectorAll('.win').forEach((li) => li.classList.remove('win')); winK = 0; };
   function addItem(it, i) {
     const row = list.children[i];
     if (row?.classList.contains('pending')) { row.classList.remove('pending'); return; }
@@ -211,6 +254,7 @@ export function mountScan(root, opts = {}) {
     totalEl.textContent = money(0, bill.currency || 'USD');
     setSum(bill);
     syncMore();
+    setRest(bill);
   }
 
   async function run(input, { instant = false, note = '' } = {}) {
@@ -250,7 +294,7 @@ export function mountScan(root, opts = {}) {
           if (stage === 'uploading') setProg(0.06);
           if (stage === 'reading' && detail.items) {
             for (; shown < detail.items.length; shown += 1) addItem(detail.items[shown], shown);
-            if (shown) follow(shown - 1);
+            if (shown) { follow(shown - 1); roll(shown); }
             const n = nItems || detail.items.length;
             if (shown) txt.textContent = `Reading items ${shown} of ${n}`;
             if (shown) totalEl.textContent = money(detail.items.slice(0, shown).reduce((a, it) => a + toCents(it.amount), 0));
@@ -291,10 +335,12 @@ export function mountScan(root, opts = {}) {
         const v = checksFor(result.bill);
         checks.innerHTML = v.map((c, i) => checkLI(c, i, false)).join('');
       }
+      unroll();
       root.classList.add('is-done');
       paper.querySelectorAll('.tz-r-line.is-active').forEach((l) => l.classList.remove('is-active'));
-      paper.style.transform = 'translateY(0)';
+      rest0();
       syncMore();
+      setRest(result.bill);
       setStage('done');
       setProg(1);
       // the read ends on the check, in plain words: the lines (plus tax and tip) make the printed total
@@ -313,14 +359,14 @@ export function mountScan(root, opts = {}) {
   function storeLine(r) {
     const s = r?.storeInformation || {};
     const n = (r?.items || []).length;
-    return `<b>${esc(storeName(s.title))}</b><span>${esc(prettyDate(s.dateTimeOfPurchase))}${n ? ` · ${n} items` : ''}</span>`;
+    return `<b>${esc(storeName(s.title))}</b><span>${esc(prettyDate(s.dateTimeOfPurchase))}${n && opts.count ? ` · ${n} items` : ''}</span>`;
   }
 
   root.querySelectorAll('.pick[data-id]').forEach((b) => b.addEventListener('click', () => { closeConsent(); run(b.dataset.id); }));
   const openConsent = () => { consent.hidden = false; ownBtn?.setAttribute('aria-expanded', 'true'); consent.querySelector('label').focus?.(); };
   const closeConsent = () => { consent.hidden = true; ownBtn?.setAttribute('aria-expanded', 'false'); };
   ownBtn?.addEventListener('click', () => (consent.hidden ? openConsent() : closeConsent()));
-  consent.querySelector('.sc-cancel').addEventListener('click', () => { closeConsent(); ownBtn?.focus(); });
+  consent.querySelector('.sc-cancel')?.addEventListener('click', () => { closeConsent(); ownBtn?.focus(); });
   consent.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeConsent(); ownBtn?.focus(); } });
   fileInput.addEventListener('change', () => {
     const f = fileInput.files?.[0];
@@ -376,6 +422,8 @@ export function mountScan(root, opts = {}) {
       ghost.querySelector('.so-items').innerHTML = bill.items.map((it, i) => itemLI(it, i, true)).join('');
       ghost.querySelector('.so-status .txt').innerHTML = `${icon.check}Adds up to ${money(toCents(bill.total))}`;
       ghost.querySelector('.so-total b').textContent = money(toCents(bill.total));
+      const gr = ghost.querySelector('.so-rest');
+      if (gr) { gr.hidden = false; gr.firstChild.textContent = '+ 10 more items and tax'; gr.lastChild.textContent = '$00.00'; }
       ghost.querySelectorAll('button.so-split:not(.so-solo)').forEach((x) => { x.hidden = getSample(id)?.people?.length === 1; });
       max = Math.max(max, ghost.offsetHeight);
     }
@@ -384,7 +432,7 @@ export function mountScan(root, opts = {}) {
   }
   sampleBill(first).then(() => document.fonts?.ready).then(() => lockHeight());
   let rz = 0;
-  addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => lockHeight()); });
+  addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => { lockHeight(); setRest(); if (['idle', 'done'].includes(root.dataset.stage)) rest0(); }); });
 
   root._scan = { run, get last() { return last; } };
   return root._scan;
