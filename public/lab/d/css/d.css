@@ -352,6 +352,15 @@ svg.i { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor;
   .sbar .av { width: 22px; height: 22px; font-size: 10px; }
   .sbar .sp:first-child .av { font-size: 8.5px; }
 }
+/* 320-359: the four shares were 13px wider than the card and pushed the page sideways */
+@media (max-width: 359px) {
+  .sbar { padding: 7px 6px; margin: 8px 4px 2px; }
+  .sbar-row { gap: 2px; }
+  .sbar .sp { gap: 2px; }
+  .sbar .sp b { font-size: 12px; letter-spacing: -0.03em; }
+  .sbar .av { width: 20px; height: 20px; font-size: 9px; }
+  .sbar .sp:first-child .av { font-size: 7.5px; }
+}
 @keyframes pulse { 50% { transform: scale(1.06); } }
 
 /* ---------- mine ---------- */
@@ -1020,4 +1029,12 @@ button.prompt:hover q { background: #e4e9f2; }
   .chapters { align-items: start; }
   .chapters .chapter { align-content: start; align-items: start; }
   .chapters .chapter h2 { max-width: none; font-size: clamp(26px, 2.3vw, 34px); white-space: nowrap; }
+}
+
+/* app/ 1024+: the two stages in a row end on one line (the short review screen sat in a box ~190px shorter than its
+   neighbour, leaving a bare corner); headings stay top-aligned, each phone stays centred in its stage */
+@media (min-width: 1024px) {
+  .chapters { align-items: stretch; }
+  .chapters .chapter { grid-template-rows: auto 1fr; align-content: stretch; }
+  .chapters .chapter > .stage { align-self: stretch; }
 }
