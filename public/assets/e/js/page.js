@@ -3,7 +3,7 @@ import { reduced, icon } from './util.js';
 
 /* Dark theme: the OS decides until the visitor presses the nav toggle; the choice is stored and the inline
  * script in <head> applies it before first paint on the next page. */
-const THEME_KEY = 'trezzit-lab-e-theme';
+const THEME_KEY = 'trezzit-theme';
 const GROUND = { light: '#ffffff', dark: '#151517' };
 function initTheme() {
   const root = document.documentElement;

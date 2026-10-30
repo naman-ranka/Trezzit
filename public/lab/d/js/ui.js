@@ -1,5 +1,5 @@
 // Small helpers shared by the D demos.
-import { formatMoney } from '../../_kit/split-engine.js';
+import { formatMoney } from '/assets/_kit/split-engine.js';
 
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -19,7 +19,7 @@ export function sentence(raw) {
 }
 
 export const icon = (id, cls = 'i') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
-export const tmark = () => '<span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt=""></span>';
+export const tmark = () => '<span class="tmark" aria-hidden="true"><img src="/assets/_kit/brand/mark-white-128.png" alt=""></span>';
 
 /** Run cb once when el is at least `ratio` visible (rootMargin can start it early). */
 export function onVisible(el, cb, ratio = 0.35, rootMargin = '0px') {

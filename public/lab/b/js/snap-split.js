@@ -12,11 +12,11 @@
  * on the receipt.
  */
 
-import { loadScan, getSample, receiptHTML, ensureReceiptStyles } from '../../_kit/receipts.js';
+import { loadScan, getSample, receiptHTML, ensureReceiptStyles } from '/assets/_kit/receipts.js';
 import { PEOPLE, summarise } from './data.js';
 import { shareText, splitPeople, isExtra, facesHTML, toggleSplit, wireFaceKeys } from './split-editor.js';
 import { money, esc, avatar, ICON, reduced, whenVisible } from './util.js';
-import { splitAmount } from '../../_kit/split-engine.js';
+import { splitAmount } from '/assets/_kit/split-engine.js';
 
 const SWEEP_MS = 600;
 

@@ -1,7 +1,7 @@
 /* split-demo.js: a playable itemized split. Tap who shares each line; every
  * share is recomputed by the kit's split engine (integer cents, largest
  * remainder), so the totals always add up to the receipt exactly. */
-import { billFromScan, splitBill, toCents } from '../../_kit/split-engine.js';
+import { billFromScan, splitBill, toCents } from '/assets/_kit/split-engine.js';
 import { PEOPLE, CATEGORIES, SAMPLE_META, getSample, sampleBill } from './data.js';
 import { esc, money, countMoney, itemName, storeName, icon, bus, reduced, YOU_GLYPH, css } from './util.js';
 

@@ -1,7 +1,7 @@
 /* data.js: one receipt model shared by the scan, story and split demos. */
-import { SAMPLES, getSample, loadScan, PEOPLE, CATEGORIES } from '../../_kit/receipts.js';
-import { normalizeScan } from '../../_kit/scan-client.js';
-import { billFromScan, splitBill, toCents } from '../../_kit/split-engine.js';
+import { SAMPLES, getSample, loadScan, PEOPLE, CATEGORIES } from '/assets/_kit/receipts.js';
+import { normalizeScan } from '/assets/_kit/scan-client.js';
+import { billFromScan, splitBill, toCents } from '/assets/_kit/split-engine.js';
 import { prettyName } from './util.js';
 
 export { SAMPLES, PEOPLE, CATEGORIES, getSample };

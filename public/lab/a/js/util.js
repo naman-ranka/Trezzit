@@ -1,5 +1,5 @@
 /* util.js: small shared helpers for prototype A. */
-import { formatMoney } from '../../_kit/split-engine.js';
+import { formatMoney } from '/assets/_kit/split-engine.js';
 
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];

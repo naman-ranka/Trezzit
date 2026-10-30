@@ -2,18 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+  // Vercel (trailingSlash: false) serves this page without the slash; relative links need it.
+  if (!/\/$/.test(location.pathname)) history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Trezzit in Claude and ChatGPT</title>
 <meta name="description" content="Connect Trezzit to Claude or ChatGPT: scan, split, record and total what you spent in plain words. Never moves money.">
 <meta name="theme-color" content="#ffffff">
-<link rel="icon" href="../../_kit/brand/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="../../_kit/brand/favicon.ico" sizes="any">
-<link rel="apple-touch-icon" href="../../_kit/brand/apple-touch-icon.png">
-<link rel="preload" href="../../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../../_kit/tokens.css">
-<link rel="stylesheet" href="../css/d.css">
-<script type="module" src="../js/sub.js"></script>
+<link rel="icon" href="/assets/_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="/assets/_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/_kit/tokens.css">
+<link rel="stylesheet" href="/lab/d/css/d.css">
+<script type="module" src="/lab/d/js/sub.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -44,10 +48,10 @@
 
 <header class="top" id="top">
   <div class="wrap">
-    <a class="brand" href="../" aria-label="Trezzit home"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
+    <a class="brand" href="/lab/d" aria-label="Trezzit home"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
     <nav class="main-nav" aria-label="Main">
-      <a class="nav-link nav-tour" href="../app/">See the app</a>
-      <a class="nav-link show-sm" href="../connect/" aria-current="page" aria-label="Use with AI"><span class="nav-long">Use with&nbsp;</span>AI</a>
+      <a class="nav-link nav-tour" href="/lab/d/app">See the app</a>
+      <a class="nav-link show-sm" href="/lab/d/connect" aria-current="page" aria-label="Use with AI"><span class="nav-long">Use with&nbsp;</span>AI</a>
       <a class="nav-link show-sm" href="https://app.trezzit.com/login">Log in</a>
       <a class="btn btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
     </nav>
@@ -132,12 +136,12 @@
 <footer class="foot">
   <div class="wrap">
     <div class="row1">
-      <a class="brand" href="../"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
+      <a class="brand" href="/lab/d"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
       <span>Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></span>
     </div>
     <nav aria-label="Footer">
-      <a href="../app/">See the app</a>
-      <a href="../connect/">Use with AI</a>
+      <a href="/lab/d/app">See the app</a>
+      <a href="/lab/d/connect">Use with AI</a>
       <a href="https://app.trezzit.com/login">Log in</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>

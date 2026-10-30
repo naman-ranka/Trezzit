@@ -1,7 +1,7 @@
 /* rent-demo.js: an itemized monthly rent you can reprice; every share follows to the cent.
  * mountRent(root, { compact, sideRoot, onChange }) — compact (roommates page) shows the rent and the four shares only;
  * sideRoot (recurring page) takes the 'Coming up' column, so it can lead the page; onChange(result) after every change. */
-import { splitBill, distributeEqually } from '../../_kit/split-engine.js';
+import { splitBill, distributeEqually } from '/assets/_kit/split-engine.js';
 import { PEOPLE } from './data.js';
 import { money, countMoney, icon, esc, YOU_GLYPH, css } from './util.js';
 

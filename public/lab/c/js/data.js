@@ -2,9 +2,9 @@
  * Apartment 3B: you, Maya, Jordan and Sam. Weekend at the lake: you, Alex, Priya.
  * Every amount is computed by the kit's split engine from the kit's recorded
  * scans, so the ledger, the split playground and the AI answers agree to the cent. */
-import { PEOPLE as KIT_PEOPLE, CATEGORIES as KIT_CATS, SAMPLES, getSample, loadScan, splitSample } from '../../_kit/receipts.js';
-import { normalizeScan } from '../../_kit/scan-client.js';
-import { distributeEqually } from '../../_kit/split-engine.js';
+import { PEOPLE as KIT_PEOPLE, CATEGORIES as KIT_CATS, SAMPLES, getSample, loadScan, splitSample } from '/assets/_kit/receipts.js';
+import { normalizeScan } from '/assets/_kit/scan-client.js';
+import { distributeEqually } from '/assets/_kit/split-engine.js';
 import { itemName, storeName } from './util.js';
 
 // Maya's teal darkened (#0d9488 -> #0f766e) so white initials pass WCAG AA (5.5:1); the others already pass

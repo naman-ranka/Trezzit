@@ -2,13 +2,12 @@
 #
 # The marketing site is fully crawlable. /s/ and /demo only redirect
 # (to the app's shared-bill pages, which are private by design), so
-# there is nothing there for a crawler to fetch.
+# there is nothing there for a crawler to fetch. /lab/ (old landing-page
+# prototypes) stays crawlable so crawlers can read its noindex.
 
 User-agent: *
 Allow: /
 Disallow: /s/
 Disallow: /demo
-# Landing-page prototypes (also noindex)
-Disallow: /lab/
 
 Sitemap: https://trezzit.com/sitemap.xml

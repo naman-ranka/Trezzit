@@ -1,10 +1,10 @@
 /* scan-demo.js: tap a sample receipt (recorded scan) or use your own photo
  * (live on trezzit.com only, via the kit's scan-client) and watch it read. */
-import { scan, isLive } from '../../_kit/scan-client.js';
-import { receiptHTML as kitReceiptHTML, ensureReceiptStyles, splitSample } from '../../_kit/receipts.js';
+import { scan, isLive } from '/assets/_kit/scan-client.js';
+import { receiptHTML as kitReceiptHTML, ensureReceiptStyles, splitSample } from '/assets/_kit/receipts.js';
 // the printed "ITEMS 19" counts units; every label on the page counts lines (14), so the footer line goes
 const receiptHTML = (raw, o) => kitReceiptHTML(raw, o).replace(/<p>ITEMS \d+<\/p>\s*/, '');
-import { toCents } from '../../_kit/split-engine.js';
+import { toCents } from '/assets/_kit/split-engine.js';
 import { SAMPLE_META, CATEGORIES, getSample, sampleBill } from './data.js';
 import { h, esc, money, reduced, onVisible, itemName, storeName, prettyDate, icon, bus, css } from './util.js';
 

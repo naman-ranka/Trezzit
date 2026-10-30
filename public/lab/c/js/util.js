@@ -1,5 +1,5 @@
 /* util.js: small DOM + money helpers shared by every demo on lab C. */
-import { formatMoney, toCents } from '../../_kit/split-engine.js';
+import { formatMoney, toCents } from '/assets/_kit/split-engine.js';
 
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];

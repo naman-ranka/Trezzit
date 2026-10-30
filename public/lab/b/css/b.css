@@ -2,8 +2,8 @@
    Visual grammar: grey + mono = what your bank knows. White + colour = what Trezzit records.
    One pass per section (round 5 folded five rounds of overrides into their final values). */
 
-@font-face { font-family: 'Bank Mono'; font-weight: 400; font-display: swap; src: url('../../_kit/fonts/plex-mono-400-latin.woff2') format('woff2'); }
-@font-face { font-family: 'Bank Mono'; font-weight: 600; font-display: swap; src: url('../../_kit/fonts/plex-mono-600-latin.woff2') format('woff2'); }
+@font-face { font-family: 'Bank Mono'; font-weight: 400; font-display: swap; src: url('/assets/_kit/fonts/plex-mono-400-latin.woff2') format('woff2'); }
+@font-face { font-family: 'Bank Mono'; font-weight: 600; font-display: swap; src: url('/assets/_kit/fonts/plex-mono-600-latin.woff2') format('woff2'); }
 
 :root {
   --mono: 'Bank Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -490,7 +490,7 @@ button.av.nope { animation: nope .35s; }
 .tzcard-h b { color: var(--ink); }
 .tzcard-h small { color: var(--text-secondary); }
 .tzcard-mark { position: relative; width: 28px; height: 28px; border-radius: 8px; background: var(--ink); flex: none; }
-.tzcard-mark::after { content: ''; position: absolute; inset: 6px; background: #fff; -webkit-mask: url('../../_kit/brand/trezzit-mark-currentcolor.svg') center / contain no-repeat; mask: url('../../_kit/brand/trezzit-mark-currentcolor.svg') center / contain no-repeat; }
+.tzcard-mark::after { content: ''; position: absolute; inset: 6px; background: #fff; -webkit-mask: url('/assets/_kit/brand/trezzit-mark-currentcolor.svg') center / contain no-repeat; mask: url('/assets/_kit/brand/trezzit-mark-currentcolor.svg') center / contain no-repeat; }
 .tzcard-note { padding: 10px 16px 0; font-size: 14px; line-height: 1.45; color: var(--text-secondary); }
 .tzcard ul { padding: 4px 16px; }
 .tzcard li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--divider); font-size: 16px; line-height: 26px; }

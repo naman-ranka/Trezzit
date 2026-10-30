@@ -1,6 +1,6 @@
 /* util.js: small shared helpers for prototype B. */
 
-import { formatMoney, centsToString } from '../../_kit/split-engine.js';
+import { formatMoney, centsToString } from '/assets/_kit/split-engine.js';
 
 export const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 

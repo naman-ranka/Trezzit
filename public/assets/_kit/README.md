@@ -1,4 +1,4 @@
-# Landing lab kit (`/lab/_kit/`)
+# Landing lab kit (`/assets/_kit/`)
 
 Vanilla ES modules, no build. Import by relative path (`../_kit/split-engine.js`); works on any static server and on Vercel `cleanUrls`. Open `test.html` for in-browser tests plus all samples rendered.
 

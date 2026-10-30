@@ -7,8 +7,8 @@
  * written out here. Every figure is computed by the kit's split engine.
  */
 
-import { PEOPLE as KIT_PEOPLE, CATEGORIES as KIT_CATEGORIES, SAMPLES, loadScan, getSample } from '../../_kit/receipts.js';
-import { splitBill, billFromScan, toCents } from '../../_kit/split-engine.js';
+import { PEOPLE as KIT_PEOPLE, CATEGORIES as KIT_CATEGORIES, SAMPLES, loadScan, getSample } from '/assets/_kit/receipts.js';
+import { splitBill, billFromScan, toCents } from '/assets/_kit/split-engine.js';
 
 /* Maya's teal is darkened to #0f766e so a white initial on it passes AA (5.5:1). */
 export const PEOPLE = { ...KIT_PEOPLE, maya: { ...KIT_PEOPLE.maya, color: '#0f766e' } };
@@ -22,7 +22,7 @@ export const CATEGORIES = {
   clothing: { label: 'Clothing', color: '#9333ea' },
 };
 
-/* normalizeScan: copied from ../../_kit/scan-client.js so the landing page doesn't download the
+/* normalizeScan: copied from /assets/_kit/scan-client.js so the landing page doesn't download the
    whole scan client (nothing on it scans; "Scan your own receipt" links to /split). */
 const has = (v) => v !== null && v !== undefined && v !== '';
 const fix2 = (v, fb = '0.00') => (!has(v) ? fb : (Number.isNaN(Number(v)) ? String(v) : Number(v).toFixed(2)));

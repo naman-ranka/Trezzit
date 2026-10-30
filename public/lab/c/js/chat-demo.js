@@ -8,7 +8,7 @@
  * anything else (matching, comparing) is the AI's own reply. Every figure comes
  * from the same data as the demos. */
 import { PEOPLE, CATEGORIES, getSample, sampleBill, octoberLedger } from './data.js';
-import { splitSample } from '../../_kit/receipts.js';
+import { splitSample } from '/assets/_kit/receipts.js';
 import { esc, money, icon, sleep, reduced, h, YOU_GLYPH, css } from './util.js';
 
 const av = (p, sz = 'sm') => `<span class="av av-${sz}" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span>`;

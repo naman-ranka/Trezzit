@@ -2,7 +2,7 @@
 import { initPage } from './page.js';
 import { mountScan } from './scan-demo.js';
 import { mountLedger } from './ledger-demo.js';
-import { splitSample } from '../../_kit/receipts.js';
+import { splitSample } from '/assets/_kit/receipts.js';
 import { CATEGORIES, getSample, SAMPLE_META, sampleBill } from './data.js';
 import { money, itemName, esc, reduced } from './util.js';
 

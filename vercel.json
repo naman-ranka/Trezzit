@@ -1,6 +1,7 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "trailingSlash": false,
   "redirects": [
     {
       "source": "/demo",
@@ -11,6 +12,21 @@
       "source": "/s/:token",
       "destination": "https://app.trezzit.com/s/:token",
       "permanent": true
+    },
+    {
+      "source": "/lab/e",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/lab/e/ai",
+      "destination": "/mcp",
+      "statusCode": 301
+    },
+    {
+      "source": "/lab/e/:path*",
+      "destination": "/",
+      "statusCode": 301
     }
   ],
   "headers": [

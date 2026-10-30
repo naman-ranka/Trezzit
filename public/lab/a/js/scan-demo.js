@@ -1,9 +1,9 @@
 /* scan-demo.js: tap a sample receipt (or use your own photo) and watch it read, line by line.
  * Samples replay the kit's recorded scans. A photo is scanned for real only on https://trezzit.com
  * (scan-client decides), after the AI disclosure; anywhere else it falls back to a sample, with a notice. */
-import { scan, isLive, closestSample, normalizeScan } from '../../_kit/scan-client.js';
-import { loadScan, receiptHTML, getSample, SAMPLES, CATEGORIES } from '../../_kit/receipts.js';
-import { toCents } from '../../_kit/split-engine.js';
+import { scan, isLive, closestSample, normalizeScan } from '/assets/_kit/scan-client.js';
+import { loadScan, receiptHTML, getSample, SAMPLES, CATEGORIES } from '/assets/_kit/receipts.js';
+import { toCents } from '/assets/_kit/split-engine.js';
 import { $, $$, esc, money, ICON, onceVisible, reduced, prettyName, paper as clean } from './util.js';
 import { modelFrom, SHORT, dateLabel } from './data.js';
 

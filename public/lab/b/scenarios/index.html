@@ -2,30 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+  // Vercel (trailingSlash: false) serves this page without the slash; relative links need it.
+  if (!/\/$/.test(location.pathname)) history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Examples: your bank line vs what you spent | Trezzit</title>
 <meta name="description" content="Seven everyday charges: what your bank statement shows, and what you actually spent, item by item.">
 <meta name="theme-color" content="#ffffff">
-<link rel="icon" href="../../_kit/brand/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="../../_kit/brand/favicon.ico" sizes="any">
-<link rel="apple-touch-icon" href="../../_kit/brand/apple-touch-icon.png">
-<link rel="preload" href="../../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="../../_kit/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../../_kit/tokens.css">
-<link rel="stylesheet" href="../css/b.css">
+<link rel="icon" href="/assets/_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="/assets/_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/_kit/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/_kit/tokens.css">
+<link rel="stylesheet" href="/lab/b/css/b.css">
 <script>document.documentElement.classList.add('js');</script>
-<script type="module" src="../js/scenarios.js"></script>
+<script type="module" src="/lab/b/js/scenarios.js"></script>
 </head>
 <body class="page-scn">
 <a class="skip" href="#main">Skip to content</a>
 <header class="nav" data-nav>
   <div class="wrap nav-in">
-    <a class="brand" href="../" aria-label="Trezzit home">
-      <img src="../../_kit/brand/trezzit-mark.svg" alt="" width="28" height="28"><span>Trezzit</span>
+    <a class="brand" href="/lab/b" aria-label="Trezzit home">
+      <img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="28" height="28"><span>Trezzit</span>
     </a>
     <nav class="nav-links" aria-label="Main">
-      <a href="../#ai" class="hide-sm">Claude &amp; ChatGPT</a>
+      <a href="/lab/b#ai" class="hide-sm">Claude &amp; ChatGPT</a>
       <a href="https://app.trezzit.com/login">Log in</a>
       <a href="https://app.trezzit.com/signup" class="btn btn-primary btn-sm">Sign up</a>
     </nav>
@@ -42,7 +46,7 @@
     </div>
   </section>
   <div class="wrap scn-list scn-col" data-list>
-    <noscript><p class="lede">Turn on JavaScript to play with these scenarios. The <a href="../">home page</a> lists all of them.</p></noscript>
+    <noscript><p class="lede">Turn on JavaScript to play with these scenarios. The <a href="/lab/b">home page</a> lists all of them.</p></noscript>
   </div>
   <section class="sec sec-close sec-close-sm" aria-label="Get started">
     <div class="wrap close-in">
@@ -57,7 +61,7 @@
 <footer class="foot">
   <div class="wrap foot-in">
     <div class="foot-brand">
-      <a class="brand" href="../"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24"><span>Trezzit</span></a>
+      <a class="brand" href="/lab/b"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="24" height="24"><span>Trezzit</span></a>
     </div>
     <nav aria-label="Footer" class="foot-links">
       <a href="https://app.trezzit.com/split">Split a bill</a>

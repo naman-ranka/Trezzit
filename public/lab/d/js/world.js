@@ -1,7 +1,7 @@
 // One made-up October for "you": every number on the page is computed here
 // with the kit's split engine from the kit's recorded scans.
-import { SAMPLES, PEOPLE as KIT_PEOPLE, CATEGORIES, getSample, loadScan as kitLoadScan, splitSample } from '../../_kit/receipts.js';
-import { splitBill, toCents } from '../../_kit/split-engine.js';
+import { SAMPLES, PEOPLE as KIT_PEOPLE, CATEGORIES, getSample, loadScan as kitLoadScan, splitSample } from '/assets/_kit/receipts.js';
+import { splitBill, toCents } from '/assets/_kit/split-engine.js';
 import { sentence } from './ui.js';
 
 export { SAMPLES, getSample };

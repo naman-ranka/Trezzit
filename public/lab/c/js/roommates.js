@@ -3,9 +3,9 @@
  * groceries (home's default split, from the kit engine), Netflix and pizza night: per person, from your side. */
 import { initPage } from './page.js';
 import { mountRent } from './rent-demo.js';
-import { distributeEqually } from '../../_kit/split-engine.js';
+import { distributeEqually } from '/assets/_kit/split-engine.js';
 import { PEOPLE, getSample, sampleBill } from './data.js';
-import { splitSample } from '../../_kit/receipts.js';
+import { splitSample } from '/assets/_kit/receipts.js';
 import { money, countMoney } from './util.js';
 
 initPage();

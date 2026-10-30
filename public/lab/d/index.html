@@ -2,29 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+  // Vercel (trailingSlash: false) serves this page without the slash; relative links need it.
+  if (!/\/$/.test(location.pathname)) history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Trezzit: see what you actually spent</title>
 <meta name="description" content="Your bank shows what you paid. Trezzit shows what you spent: every item, alone or shared. Ask Claude or ChatGPT, or use the app.">
 <meta name="theme-color" content="#ffffff">
-<link rel="icon" href="../_kit/brand/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="../_kit/brand/favicon.ico" sizes="any">
-<link rel="apple-touch-icon" href="../_kit/brand/apple-touch-icon.png">
-<link rel="preload" href="../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../_kit/tokens.css">
-<link rel="stylesheet" href="css/d.css">
+<link rel="icon" href="/assets/_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="/assets/_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/_kit/tokens.css">
+<link rel="stylesheet" href="/lab/d/css/d.css">
 <script>
   document.documentElement.classList.add('js');
   /* If the page script never boots, show the static end states. */
   window.__dBoot = setTimeout(function () { document.documentElement.classList.remove('js'); }, 3500);
 </script>
-<link rel="modulepreload" href="js/ui.js">
-<link rel="modulepreload" href="js/chat.js">
-<link rel="modulepreload" href="js/world.js">
-<link rel="modulepreload" href="../_kit/receipts.js">
-<link rel="modulepreload" href="../_kit/split-engine.js">
-<link rel="preload" href="../_kit/receipts/green-basket.json" as="fetch" crossorigin>
-<script type="module" src="js/main.js"></script>
+<link rel="modulepreload" href="/lab/d/js/ui.js">
+<link rel="modulepreload" href="/lab/d/js/chat.js">
+<link rel="modulepreload" href="/lab/d/js/world.js">
+<link rel="modulepreload" href="/assets/_kit/receipts.js">
+<link rel="modulepreload" href="/assets/_kit/split-engine.js">
+<link rel="preload" href="/assets/_kit/receipts/green-basket.json" as="fetch" crossorigin>
+<script type="module" src="/lab/d/js/main.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -56,10 +60,10 @@
 
 <header class="top" id="top">
   <div class="wrap">
-    <a class="brand" href="./" aria-label="Trezzit home"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
+    <a class="brand" href="/lab/d" aria-label="Trezzit home"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
     <nav class="main-nav" aria-label="Main">
-      <a class="nav-link nav-tour" href="app/">See the app</a>
-      <a class="nav-link show-sm" href="connect/" aria-label="Use with AI"><span class="nav-long">Use with&nbsp;</span>AI</a>
+      <a class="nav-link nav-tour" href="/lab/d/app">See the app</a>
+      <a class="nav-link show-sm" href="/lab/d/connect" aria-label="Use with AI"><span class="nav-long">Use with&nbsp;</span>AI</a>
       <a class="nav-link show-sm" href="https://app.trezzit.com/login">Log in</a>
       <a class="btn btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
     </nav>
@@ -84,11 +88,11 @@
       <div class="chat-head">
         <span class="ai-avatar" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="#i-spark"/></svg></span>
         <span class="chat-title"><b>Claude or ChatGPT</b><span>Example</span></span>
-        <a class="chat-cta" href="connect/">Connect yours <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="chat-cta" href="/lab/d/connect">Connect yours <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
       <div class="chat-log" data-chat-log tabindex="0" role="log" aria-label="Example conversation">
         <!-- finished conversation: the page opens on this and stays on it until someone asks -->
-        <div class="msg user">What did I spend at Green Basket?</div><div class="tool"><span class="st ok"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><b>Trezzit</b><span class="res">Read 14 items</span></div><div class="tcard"><div class="tcard-head"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt></span><span class="t"><b>Green Basket Market</b><span>Oct 24 · you paid</span></span><span class="faces" aria-hidden="true"><i style="--c:#162d59">Y</i><i style="--c:#0f766e">M</i><i style="--c:#b45309">J</i><i style="--c:#7c3aed">S</i></span></div>
+        <div class="msg user">What did I spend at Green Basket?</div><div class="tool"><span class="st ok"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><b>Trezzit</b><span class="res">Read 14 items</span></div><div class="tcard"><div class="tcard-head"><span class="tmark" aria-hidden="true"><img src="/assets/_kit/brand/mark-white-128.png" alt></span><span class="t"><b>Green Basket Market</b><span>Oct 24 · you paid</span></span><span class="faces" aria-hidden="true"><i style="--c:#162d59">Y</i><i style="--c:#0f766e">M</i><i style="--c:#b45309">J</i><i style="--c:#7c3aed">S</i></span></div>
     <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v money">−$100.00</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">$30.00</span></div></div>
     <div class="catbar" aria-hidden="true"><i style="flex-grow:2200;background:#0f1f3d"></i><i style="flex-grow:800;background:#3f5b8c"></i></div>
   <div class="legend"><span><i style="background:#0f1f3d"></i>Groceries <b class="money">$22.00</b></span><span><i style="background:#3f5b8c"></i>Household <b class="money">$8.00</b></span></div></div><div class="msg ai">Maya, Jordan and Sam owe you $70.00.</div>
@@ -116,7 +120,7 @@
         <h2 id="ai-h">Your AI adds what’s missing.</h2>
         <p class="trust-line">No bank login. Never moves money.</p>
         <div class="connect-go">
-          <a class="btn btn-light btn-lg" href="connect/">Connect Claude or ChatGPT <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-light btn-lg" href="/lab/d/connect">Connect Claude or ChatGPT <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
         </div>
       </div>
       <div class="thread" data-thread role="region" aria-label="Example: your AI app checks a bank statement against Trezzit and adds the one missing charge">
@@ -124,7 +128,7 @@
         <div class="tool"><span class="st ok"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><b>Trezzit</b><span class="res">Checked 4 payments</span></div>
         <div class="msg ai">Juniper Deli, $11.40 on Oct 27, isn’t in Trezzit. Add it?</div>
         <div class="msg user">Yes, just mine.</div>
-        <div class="tcard"><div class="tcard-head"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt=""></span><span class="t"><b>Activity</b><span>Just now</span></span></div>
+        <div class="tcard"><div class="tcard-head"><span class="tmark" aria-hidden="true"><img src="/assets/_kit/brand/mark-white-128.png" alt=""></span><span class="t"><b>Activity</b><span>Just now</span></span></div>
           <div class="rows"><div class="row"><span class="n"><b style="color:var(--ink)">Juniper Deli</b> · Personal</span><span class="a money">$11.40</span></div>
           <div class="row" style="padding-top:0"><span class="ai-pill"><svg class="i" aria-hidden="true"><use href="#i-spark"/></svg>Added by AI</span></div></div></div>
       </div>
@@ -168,12 +172,12 @@
 <footer class="foot">
   <div class="wrap">
     <div class="row1">
-      <a class="brand" href="./"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
+      <a class="brand" href="/lab/d"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
       <span>Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></span>
     </div>
     <nav aria-label="Footer">
-      <a href="app/">See the app</a>
-      <a href="connect/">Use with AI</a>
+      <a href="/lab/d/app">See the app</a>
+      <a href="/lab/d/connect">Use with AI</a>
       <a href="https://app.trezzit.com/login">Log in</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>

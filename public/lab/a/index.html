@@ -2,18 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+  // Vercel (trailingSlash: false) serves this page without the slash; relative links need it.
+  if (!/\/$/.test(location.pathname)) history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Trezzit: see what you actually spent, item by item</title>
 <meta name="description" content="Your bank shows what you paid. Trezzit shows what you spent: every item, alone or shared. Split any bill in a minute.">
 <meta name="theme-color" content="#ffffff">
-<link rel="icon" href="../_kit/brand/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="../_kit/brand/favicon.ico" sizes="any">
-<link rel="apple-touch-icon" href="../_kit/brand/apple-touch-icon.png">
-<link rel="preload" href="../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../_kit/tokens.css">
-<link rel="stylesheet" href="./css/receipt.css" data-tz-receipt>
-<link rel="stylesheet" href="./css/a.css">
+<link rel="icon" href="/assets/_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="/assets/_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/_kit/tokens.css">
+<link rel="stylesheet" href="/lab/a/css/receipt.css" data-tz-receipt>
+<link rel="stylesheet" href="/lab/a/css/a.css">
 <script>
   // Hide the hero visual only until its one-time intro runs (JS + motion allowed).
   (function () {
@@ -24,17 +28,17 @@
     }
   })();
 </script>
-<link rel="modulepreload" href="./js/util.js">
-<link rel="modulepreload" href="./js/hero.js">
-<link rel="modulepreload" href="./js/scan-demo.js">
-<script type="module" src="./js/main.js"></script>
+<link rel="modulepreload" href="/lab/a/js/util.js">
+<link rel="modulepreload" href="/lab/a/js/hero.js">
+<link rel="modulepreload" href="/lab/a/js/scan-demo.js">
+<script type="module" src="/lab/a/js/main.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="nav" id="nav">
   <div class="nav-in">
-    <a class="brand" href="./" aria-label="Trezzit home">
+    <a class="brand" href="/lab/a" aria-label="Trezzit home">
       <svg viewBox="0 0 120 120" width="26" height="26" aria-hidden="true" fill="currentColor"><polygon points="10.56,85.55 109.44,24.22 109.44,35.03 10.56,96.58" fill-opacity=".64"/><path d="M10 8.8h100v10.26H10zM45.42 8.8h9.07v81.23h-9.07zM64.69 30.01h9.08v81.17h-9.08zM10 100.92h100v10.26H10z"/></svg>
       <span>Trezzit</span>
     </a>

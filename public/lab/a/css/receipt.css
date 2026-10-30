@@ -1,4 +1,4 @@
-/* Prototype A's copy of ../../_kit/receipts/receipt.css: one mono face (400) instead of two, about 15 KB less for
+/* Prototype A's copy of /assets/_kit/receipts/receipt.css: one mono face (400) instead of two, about 15 KB less for
    decoration that screen readers skip. The store name and total keep their size, not a second weight. */
 /* Paper receipt look for receipts.js receiptHTML(). Self-contained: works with or without tokens.css. */
 @font-face {
@@ -6,7 +6,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../../_kit/fonts/plex-mono-400-latin.woff2') format('woff2');
+  src: url('/assets/_kit/fonts/plex-mono-400-latin.woff2') format('woff2');
 }
 
 .tz-receipt {

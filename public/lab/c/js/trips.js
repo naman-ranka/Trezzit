@@ -1,8 +1,8 @@
 /* trips page: the taqueria split with a tip toggle, and a whole weekend settled */
 import { initPage } from './page.js';
 import { mountSplit } from './split-demo.js';
-import { splitAmount } from '../../_kit/split-engine.js';
-import { splitSample } from '../../_kit/receipts.js';
+import { splitAmount } from '/assets/_kit/split-engine.js';
+import { splitSample } from '/assets/_kit/receipts.js';
 import { PEOPLE, getSample, sampleBill } from './data.js';
 import { money, countMoney, esc, YOU_GLYPH } from './util.js';
 

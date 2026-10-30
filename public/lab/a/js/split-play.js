@@ -2,10 +2,10 @@
  * same everywhere: people across the top with live totals, one dot per person on every line, the shared lines folded
  * into one row, and a footer that ends on what you spent. Tap a dot to add or remove someone from a line; the kit's
  * engine (integer cents, largest remainder) re-splits. Keyboard: the dots are one tab stop; arrows move between them. */
-import { PEOPLE, CATEGORIES } from '../../_kit/receipts.js';
+import { PEOPLE, CATEGORIES } from '/assets/_kit/receipts.js';
 import { $, $$, esc, money, ICON, avatar } from './util.js';
 import { loadModel, compute, lineMembers } from './data.js';
-import { toCents } from '../../_kit/split-engine.js';
+import { toCents } from '/assets/_kit/split-engine.js';
 
 // who paid each sample: dinner is Maya's (the same roommates as the landing story); the rest you paid
 const PAYER = { 'taqueria-sol': 'maya' };

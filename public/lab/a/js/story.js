@@ -8,7 +8,7 @@
  * At step 3 the stage is the playground: tap a dot to add or remove someone from an item, and the
  * kit's engine (integer cents) re-splits. Any tap or keyboard focus on a dot jumps straight to it.
  * Keyboard: the dots are one tab stop (roving tabindex, always present); arrows move between dots. */
-import { PEOPLE, CATEGORIES } from '../../_kit/receipts.js';
+import { PEOPLE, CATEGORIES } from '/assets/_kit/receipts.js';
 import { $, $$, esc, money, reduced, avatar, onceVisible, ICON } from './util.js';
 import { loadModel, compute, lineMembers } from './data.js';
 
