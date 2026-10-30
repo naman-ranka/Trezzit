@@ -13,7 +13,7 @@
  * staged timing; instant with prefers-reduced-motion or { instant: true }).
  *
  * A File is scanned for real ONLY when location.origin is https://trezzit.com
- * (the API's CORS allows that origin alone): shrink to <= 2048 px / 4.5 MB,
+ * (the API's CORS allows that origin alone), or on a Vercel preview of this site against the staging API: shrink to <= 2048 px / 4.5 MB,
  * POST multipart files[] + ai_consent=2026-10 + follow=1 to
  * https://api.trezzit.com/api/demo/scan/, follow a 202 by polling its
  * status_url with X-Scan-Token. Anywhere else, or on any error or timeout,
@@ -27,7 +27,12 @@
 import { SAMPLES, getSample, loadScan } from './receipts.js';
 
 export const LIVE_ORIGIN = 'https://trezzit.com';
-export const API = 'https://api.trezzit.com';
+/* Vercel previews of this site (trezzit-<hash>-… and trezzit-git-<branch>-…) talk to the staging API, which
+ * trusts them (TrezzitBackend settings: VERCEL_LANDING_PREVIEW_ORIGIN_REGEX); the app links go to staging too. */
+const PREVIEW_HOST = /^trezzit-(?:git-[a-z0-9-]+|[a-z0-9]+)-namanrankas-projects\.vercel\.app$/;
+export const isStagingPreview = () => typeof location !== 'undefined' && location.protocol === 'https:' && PREVIEW_HOST.test(location.hostname);
+export const API = isStagingPreview() ? 'https://api.staging.trezzit.com' : 'https://api.trezzit.com';
+export const APP = isStagingPreview() ? 'https://app.staging.trezzit.com' : 'https://app.trezzit.com';
 export const AI_CONSENT_VERSION = '2026-10';
 export const STAGES = ['uploading', 'reading', 'checking', 'done'];
 const MAX_EDGE = 2048;
@@ -35,7 +40,7 @@ const BUDGET_BYTES = 4.5 * 1024 * 1024;
 const TIMEOUT_MS = 60000;
 const POLL_MS = 1500;
 
-export const isLive = () => typeof location !== 'undefined' && location.origin === LIVE_ORIGIN;
+export const isLive = () => typeof location !== 'undefined' && (location.origin === LIVE_ORIGIN || isStagingPreview());
 export const prefersReducedMotion = () => typeof matchMedia === 'function'
   && matchMedia('(prefers-reduced-motion: reduce)').matches;
 

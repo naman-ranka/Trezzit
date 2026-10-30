@@ -6,11 +6,11 @@
  * The API's CORS allows https://trezzit.com only, so anywhere else (a preview, localhost) the page says so
  * and sends nothing. */
 import { splitBill, toCents, centsToString, distributeByWeights } from '../../_kit/split-engine.js';
-import { isLive, API } from '../../_kit/scan-client.js';
+import { isLive, API, APP } from '../../_kit/scan-client.js';
 import { esc, money, itemName, storeName, icon } from './util.js';
 import { PEOPLE, getSample } from './data.js';
 
-export const APP = 'https://app.trezzit.com';
+export { APP };
 const MAX_PEOPLE = 20;
 const MAX_ITEMS = 200;
 /* The server stores money in 10 digits (up to 99,999,999.99); 200 items at this cap stay well under it. */
