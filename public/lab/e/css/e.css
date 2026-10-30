@@ -1,0 +1,168 @@
+/* e.css: what E adds on top of C's core (c.css): the three-case hero, the honest microline, the close.
+ * Demo styles stay in demo-<name>.css (loaded just before each demo mounts). */
+
+/* ---------- hero microline: "No bank login needed." beside the AI link ---------- */
+.hero .micro { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0 22px; margin-top: 12px; }
+.nobank { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: var(--text); font-weight: 500; font-size: var(--t-sm); }
+.nobank::before { content: ''; flex: none; width: 18px; height: 18px; border-radius: 50%; background: #ecfdf5 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 10.5l2.6 2.6L14 7.5' fill='none' stroke='%23047857' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 16px no-repeat; }
+@media (max-width: 599px) {
+  /* phones: two centred lines, the honest one first, then the AI pillar (no icon) */
+  .hero .micro { display: flex; flex-direction: column; gap: 0; margin-top: 2px; }
+  .hero .micro .nobank { min-height: 30px; }
+  .hero .micro .ai-chip { min-height: 30px; }
+  .hero .micro .ai-chip svg { display: none; }
+}
+
+/* ---------- hero: bank lines (tabs) ---------- */
+.bank { position: relative; border-radius: var(--r-md); background: var(--fill); border: 1px solid var(--line); padding: 14px 12px 12px; }
+.bank figcaption { padding: 0 6px; min-height: 32px; margin-bottom: 6px; }
+.hero-pause { position: relative; margin-left: auto; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); background: #fff; box-shadow: inset 0 0 0 1px var(--line); transition: color .2s var(--ease), box-shadow .2s var(--ease); }
+.hero-pause::after { content: ''; position: absolute; inset: -6px; }
+.hero-pause:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.hero-pause:focus-visible { box-shadow: inset 0 0 0 1px var(--line-strong), var(--focus-ring); }
+.hero-pause .i-play, .hero-pause.is-held .i-pause { display: none; }
+.hero-pause.is-held .i-play { display: block; }
+.bank-rows { display: grid; gap: 2px; font-family: var(--font-mono); font-size: var(--t-sm); }
+.brow { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; min-height: 48px; padding: 9px 12px; border-radius: var(--r-sm); text-align: left; font: inherit; color: #4b5563; cursor: pointer; transition: background-color .35s var(--ease), color .35s var(--ease), box-shadow .35s var(--ease); }
+.brow + .brow::before { content: ''; position: absolute; left: 12px; right: 12px; top: -1px; border-top: 1px dashed #dde1e7; transition: opacity .2s var(--ease); }
+.brow[aria-selected='true']::before, .brow[aria-selected='true'] + .brow::before { opacity: 0; }
+.brow:hover:not([aria-selected='true']) { background: rgba(255, 255, 255, .6); }
+.brow[aria-selected='true'] { background: #fff; color: var(--text); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.brow[aria-selected='true'] .ba { font-weight: 600; color: var(--text); }
+.brow:focus-visible { box-shadow: inset 0 0 0 1.5px var(--ink), var(--focus-ring); }
+.brow .bd { color: #5f6878; }
+.brow .bn { min-width: 0; overflow-wrap: anywhere; }
+.brow em { display: block; width: max-content; max-width: 100%; font-style: normal; font-family: var(--font-sans); font-size: var(--t-xs); font-weight: 600; color: #4b5563; background: var(--line); border-radius: var(--r-sm); padding: 0 6px; margin-top: 3px; letter-spacing: 0; }
+/* the dinner Alex paid is an absence, not a statement line: dashed outline, app type, no amount */
+.brow-none { font-family: var(--font-sans); box-shadow: inset 0 0 0 1px #cdd3dc; background: none; margin-top: 6px; }
+.brow-none:not([aria-selected='true']) { background-image: none; outline: 1px dashed #b9c2d0; outline-offset: -1px; box-shadow: none; }
+.brow-none .bd { font-family: var(--font-mono); }
+.brow-none .bn { color: #5f6878; }
+.brow-none .ba { color: #8a94a6; }
+.brow + .brow-none::before { display: none; }
+.brow-none em { background: #fdf0e6; color: #9a4a0b; }
+.brow .ba { white-space: nowrap; }
+.btime { position: absolute; left: 12px; right: 12px; bottom: 4px; height: 2px; border-radius: 3px; background: var(--ink); transform: scaleX(var(--p, 0)); transform-origin: left; opacity: 0; transition: opacity .3s var(--ease); }
+.hero-viz.touring .brow[aria-selected='true'] .btime { opacity: .3; }
+
+/* ---------- hero: the Trezzit card (three views in one grid cell, so it never resizes) ---------- */
+.tzc { display: grid; padding: 18px 20px; }
+.tzv { grid-area: 1 / 1; display: flex; flex-direction: column; min-width: 0; transition: opacity .35s var(--ease), visibility 0s linear 0s; }
+.tzv:not(.is-on) { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s var(--ease), visibility 0s linear .25s; }
+.tzc-head small { overflow-wrap: anywhere; }
+.tzc-amt span.money { color: var(--muted); font-size: var(--t-md); }
+.tzc-bar { display: flex; margin-top: 16px; height: 8px; }
+.tzc-bar i { flex: var(--w) 1 0; min-width: 0; height: 8px; background: var(--seg); transition: flex-grow .6s var(--ease), opacity .4s var(--ease), margin .6s var(--ease); }
+.tzc-bar i + i { margin-left: 3px; }
+.tzc-bar i:first-child { border-radius: 3px 0 0 3px; }
+.tzc-bar i:last-child { border-radius: 0 3px 3px 0; }
+.tzc-bar i:only-child { border-radius: 3px; }
+.tzc-legend { display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 8px 0 0; padding: 0; list-style: none; font-size: var(--t-xs); color: var(--muted); line-height: 1.35; }
+.tzc-legend li { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.tzc-legend li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.tzc-legend .me { color: var(--ink); font-weight: 600; }
+.tzc-end { margin-top: auto; padding-top: 10px; }
+.tzc-note { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--r-sm); background: var(--fill); color: var(--muted); font-size: var(--t-sm); font-weight: 500; }
+.tzc-note-owe { color: var(--text); }
+.tzc-note-owe b { font-size: var(--t-md); color: var(--ink); }
+.tzc-owe { margin-top: 0; }
+.tzc-cats small { display: block; }
+
+/* pre-states (animated pages only): the card arrives, then each view's bar splits */
+.anim .hero-viz:not(.s1) .tzc { opacity: 0; transform: translateY(18px) scale(.985); }
+.anim .tzv:not(.is-split) .tzc-bar i:first-child { flex-grow: 100; border-radius: 3px; }
+.anim .tzv:not(.is-split) .tzc-bar i:not(:first-child) { flex-grow: 0; opacity: 0; margin-left: 0; }
+.anim .tzv:not(.is-split) .tzc-amt span.money, .anim .tzv:not(.is-split) .tzc-legend li:not(.me) { opacity: 0; }
+.tzc-amt span.money, .tzc-legend li { transition: opacity .4s var(--ease); }
+.tzv.swap .tzc-label, .tzv.swap .tzc-amt b { opacity: 0; }
+
+@media (min-width: 900px) {
+  /* the pair sits inside the gutter with air on both sides; the bank's first line shares the card's "You spent" line */
+  .hero-viz { max-width: min(960px, calc(100% - 32px)); grid-template-columns: minmax(0, 1fr) 80px minmax(0, 1.08fr); }
+  .hero-viz.pinned { align-items: start; }
+  .hero-join { align-self: start; }
+}
+@media (max-width: 899px) {
+  .hero-viz { max-width: 460px; }
+  .hero-join { height: 36px; }
+}
+@media (max-width: 599px) {
+  /* phones: every bank line is one line (date, merchant, amount), so the card never changes height */
+  .bank { padding: 8px 6px 6px; border-radius: var(--r-md); }
+  .bank figcaption { font-size: var(--t-xs); margin-bottom: 2px; min-height: 32px; }
+  .bank-rows { font-size: var(--t-xs); }
+  .brow { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 6px; padding: 6px 8px; min-height: 44px; }
+  .brow .bn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brow em { display: none; }
+  .brow-none em { display: inline; margin: 0 0 0 6px; }
+  .hero-join { height: 18px; }
+  .tzc { padding: 10px 16px 14px; }
+  .tzc-cats small { display: none; }
+  .tzc-cats li { padding: 7px 0; }
+}
+@media (forced-colors: active) {
+  .tzc-bar i { forced-color-adjust: none; background: Canvas; border: 1px solid CanvasText; }
+  .tzc-bar i:first-child { background: Highlight; }
+}
+
+/* ---------- close ---------- */
+.close-end .close-h { font-size: var(--t-display); letter-spacing: -0.04em; line-height: 1.04; margin-bottom: 28px; }
+
+/* ---------- reserved demo heights (measured 320-1920 after E r2; each frame mounts into its final height,
+   and drops the reservation once mounted below the screen; the scan then locks to its tallest sample) ---------- */
+.verb-demo #scan-demo { min-height: 721px; }
+@media (min-width: 370px) { .verb-demo #scan-demo { min-height: 679px; } }
+@media (min-width: 390px) { .verb-demo #scan-demo { min-height: 657px; } }
+@media (min-width: 600px) { .verb-demo #scan-demo { min-height: 673px; } }
+@media (min-width: 720px) { .verb-demo #scan-demo { min-height: 617px; } }
+@media (min-width: 800px) { .verb-demo #scan-demo { min-height: 595px; } }
+@media (min-width: 810px) { .verb-demo #scan-demo { min-height: 543px; } }
+@media (min-width: 1100px) { .verb-demo #scan-demo { min-height: 487px; } }
+.verb-demo #split-demo { min-height: 769px; }
+@media (min-width: 350px) { .verb-demo #split-demo { min-height: 752px; } }
+@media (min-width: 370px) { .verb-demo #split-demo { min-height: 690px; } }
+@media (min-width: 390px) { .verb-demo #split-demo { min-height: 648px; } }
+@media (min-width: 420px) { .verb-demo #split-demo { min-height: 651px; } }
+@media (min-width: 430px) { .verb-demo #split-demo { min-height: 634px; } }
+@media (min-width: 440px) { .verb-demo #split-demo { min-height: 617px; } }
+@media (min-width: 470px) { .verb-demo #split-demo { min-height: 599px; } }
+@media (min-width: 570px) { .verb-demo #split-demo { min-height: 591px; } }
+@media (min-width: 600px) { .verb-demo #split-demo { min-height: 607px; } }
+@media (min-width: 640px) { .verb-demo #split-demo { min-height: 567px; } }
+.verb-demo #ledger-demo { min-height: 767px; }
+@media (min-width: 330px) { .verb-demo #ledger-demo { min-height: 748px; } }
+@media (min-width: 340px) { .verb-demo #ledger-demo { min-height: 731px; } }
+@media (min-width: 350px) { .verb-demo #ledger-demo { min-height: 704px; } }
+@media (min-width: 360px) { .verb-demo #ledger-demo { min-height: 684px; } }
+@media (min-width: 380px) { .verb-demo #ledger-demo { min-height: 693px; } }
+@media (min-width: 600px) { .verb-demo #ledger-demo { min-height: 709px; } }
+@media (min-width: 880px) { .verb-demo #ledger-demo { min-height: 390px; } }
+@media (min-width: 1280px) { .verb-demo #ledger-demo { min-height: 392px; } }
+@media (min-width: 1440px) { .verb-demo #ledger-demo { min-height: 394px; } }
+#chat-demo { min-height: 694px; }
+@media (min-width: 330px) { #chat-demo { min-height: 672px; } }
+@media (min-width: 340px) { #chat-demo { min-height: 629px; } }
+@media (min-width: 350px) { #chat-demo { min-height: 613px; } }
+@media (min-width: 360px) { #chat-demo { min-height: 596px; } }
+@media (min-width: 370px) { #chat-demo { min-height: 580px; } }
+@media (min-width: 390px) { #chat-demo { min-height: 585px; } }
+@media (min-width: 410px) { #chat-demo { min-height: 595px; } }
+@media (min-width: 430px) { #chat-demo { min-height: 570px; } }
+@media (min-width: 480px) { #chat-demo { min-height: 624px; } }
+@media (min-width: 600px) { #chat-demo { min-height: 599px; } }
+@media (min-width: 640px) { #chat-demo { min-height: 607px; } }
+@media (min-width: 700px) { #chat-demo { min-height: 582px; } }
+@media (min-width: 980px) { #chat-demo { min-height: 632px; } }
+#chat-demo.chat:not(.ai-hero-demo) { min-height: 0; }
+@media (min-width: 900px) {
+  .hero-viz:not(.joined) .hero-join { visibility: hidden; }
+}
+
+/* E r2: the pair is top-aligned before any script runs (pin() then only corrects sub-pixels), so the
+   bank card never moves on load */
+@media (min-width: 900px) {
+  .hero-viz, .hero-viz.pinned { align-items: start; }
+}
+/* the pharmacy's four categories sit a little tighter, so no view is taller than the dinner's */
+#tv-ph .tzc-cats li { padding-block: 6px; }
+#tv-ph ul.tzc-cats { margin-top: 10px; }

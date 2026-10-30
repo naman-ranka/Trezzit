@@ -1,0 +1,55 @@
+/* app.css: the /app tour (real app recordings), in C's system. */
+.tour-hero { padding: clamp(32px, 6vh, 72px) 0 clamp(8px, 2vw, 24px); text-align: center; }
+.tour-hero h1 { font-size: var(--t-display); letter-spacing: -0.042em; line-height: 1.02; font-weight: 700; color: var(--ink); }
+.tour-hero .lede { margin-top: 14px; }
+.tour { display: grid; gap: clamp(56px, 8vw, 112px); padding-block: clamp(32px, 5vw, 64px) clamp(24px, 4vw, 48px); max-width: 1000px; }
+.tour-ch { display: grid; gap: 24px; align-items: center; }
+@media (min-width: 820px) {
+  .tour-ch { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; }
+  .tour-ch.flip .tour-copy { order: 2; }
+}
+.tour-copy { display: grid; gap: 14px; justify-items: start; }
+.tour-copy h2 { font-size: var(--t-xl); letter-spacing: -0.035em; line-height: 1.08; text-wrap: balance; }
+.tour-copy .verb-n { width: 30px; height: 30px; font-size: var(--t-sm); font-weight: 700; color: var(--accent); }
+.tour-copy p { color: var(--muted); font-size: var(--t-md); }
+@media (max-width: 819px) { .tour-copy { justify-items: center; text-align: center; } }
+.tour-stage { position: relative; justify-self: center; width: min(340px, 100%); }
+.tphone { border-radius: 40px; padding: 9px; background: #0f1f3d; box-shadow: 0 40px 80px -30px rgba(15, 31, 61, .45), inset 0 0 0 1.5px rgba(255, 255, 255, .12); aspect-ratio: 600 / 1220; }
+.tphone.crop { aspect-ratio: 600 / 990; }
+.tphone.short { aspect-ratio: auto; border-radius: 30px; }
+.tphone video, .tphone img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 31px; background: #fff; }
+.tphone.crop video { object-position: 50% 100%; }
+.tphone.short img { height: auto; border-radius: var(--r-lg); }
+.tour-play { position: absolute; right: -8px; bottom: 24px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: var(--ink); box-shadow: 0 6px 18px -6px rgba(15, 31, 61, .4), inset 0 0 0 1px var(--line); }
+.tour-play:hover { color: var(--accent); }
+.tour-play:focus-visible { box-shadow: 0 6px 18px -6px rgba(15, 31, 61, .4), var(--focus-ring); }
+@media (max-width: 420px) { .tour-play { right: 4px; } }
+.close-end .close-h { font-size: var(--t-display); letter-spacing: -0.04em; line-height: 1.04; margin-bottom: 28px; }
+/* E r1: home's three steps, word for word, side by side on wide screens (no zigzag of empty halves);
+   the phones carry the site's one elevation */
+.tour { max-width: 1160px; gap: 56px; }
+.tphone { box-shadow: var(--lift), inset 0 0 0 1.5px rgba(255, 255, 255, .12); }
+.tour-ch { grid-template-columns: minmax(0, 1fr) !important; gap: 20px; align-content: start; }
+.tour-copy { justify-items: center; text-align: center; }
+.tour-stage { width: min(300px, 100%); }
+.tphone:not(.crop) video { object-position: 50% 0; }
+@media (min-width: 900px) {
+  /* the three titles share one row, so the three phones start on one line */
+  .tour { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto; column-gap: 40px; }
+  .tour-ch { grid-row: span 2; grid-template-rows: subgrid; row-gap: 28px; }
+  .tour-copy { align-self: end; }
+}
+/* E r2: the three steps line up. Titles top-aligned on one row (at most two lines), and all three phones
+   are one frame size starting on one line; the shorter ledger clip is cropped from the top to fit. */
+.tour-copy { align-self: start !important; }
+.tour-stage { align-self: start; }
+/* one frame size: the ledger clip's own (600 x 990); the two taller clips keep their bottom (the list and
+   the action button) and lose a little of their top */
+.tphone, .tphone.crop { aspect-ratio: 600 / 990; }
+.tphone:not(.crop) video { object-position: 50% 100%; }
+.tphone.crop video { object-position: 50% 0; }
+@media (min-width: 900px) {
+  .tour { column-gap: 28px; max-width: 1200px; }
+  .tour-copy h2 { text-wrap: balance; max-width: 14ch; }
+}
+.tour-hero h1 { margin-inline: auto; }

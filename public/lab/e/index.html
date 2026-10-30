@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+  // Vercel (trailingSlash: false) serves this page at /lab/e; relative links need the slash.
+  if (!/\/$/.test(location.pathname)) history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
+  (function (d) {
+    d.classList.add('js');
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      d.classList.add('anim');
+      // safety net: never leave the hero in its pre-animation state
+      setTimeout(function () { var v = document.querySelector('.hero-viz'); if (v && !v.classList.contains('s1')) v.classList.add('s1', 's2', 's3', 's4'); }, 2000);
+    }
+  })(document.documentElement);
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Trezzit: see what you actually spent, item by item</title>
+<meta name="description" content="Your bank shows what you paid. Trezzit shows what you spent, item by item, alone or shared.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="../_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../_kit/tokens.css">
+<link rel="stylesheet" href="css/c.css">
+<link rel="stylesheet" href="css/e.css">
+<link rel="modulepreload" href="js/util.js">
+<link rel="modulepreload" href="js/hero.js">
+<link rel="modulepreload" href="js/page.js">
+<script type="module" src="js/home.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="./" aria-label="Trezzit home"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="26" height="26"><span>Trezzit</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a class="nav-rm" href="roommates/">Roommates</a>
+      <a href="#how">How it works</a>
+      <a href="app/">See the app</a>
+      <a href="ai/">With AI</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
+      <a class="c-btn c-btn-sm c-btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="hero" aria-labelledby="hero-t">
+  <div class="wrap">
+    <h1 id="hero-t" class="display">See what you <span class="ink-mark">actually<svg class="ink-line" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 12 C 60 4, 120 4, 170 9 S 260 15, 296 6" /></svg></span> spent.</h1>
+    <p class="lede">Your bank shows what you&nbsp;paid.</p>
+    <div class="cta-row">
+      <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+      <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
+    </div>
+    <p class="micro"><span class="nobank">No bank login needed.</span> <a class="ai-chip" href="ai/"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z" fill="currentColor"/></svg>Works with Claude and ChatGPT <span aria-hidden="true">→</span></a></p>
+
+    <div class="hero-viz" data-hero>
+      <figure class="bank" aria-labelledby="bank-cap">
+        <figcaption><span class="bank-i" aria-hidden="true"></span><span id="bank-cap">Your bank</span>
+          <button type="button" class="hero-pause" data-pause aria-label="Pause" hidden><svg class="i-pause" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M6 4.5h2.6v11H6zM11.4 4.5H14v11h-2.6z" fill="currentColor"/></svg><svg class="i-play" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M6 4.5v11l9-5.5z" fill="currentColor"/></svg></button>
+        </figcaption>
+        <div class="bank-rows" role="tablist" aria-label="October charges" aria-orientation="vertical">
+          <button type="button" class="brow" role="tab" id="bt-gb" aria-controls="tv-gb" aria-selected="true"><span class="bd">Oct 24</span><span class="bn">GREEN BASKET MARKET <em>Shopping</em></span><span class="ba">−$100.00</span><i class="btime" aria-hidden="true"></i></button>
+          <button type="button" class="brow" role="tab" id="bt-ph" aria-controls="tv-ph" aria-selected="false" tabindex="-1"><span class="bd">Oct 20</span><span class="bn">CORNER PHARMACY <em>Health</em></span><span class="ba">−$48.22</span><i class="btime" aria-hidden="true"></i></button>
+          <button type="button" class="brow brow-none" role="tab" id="bt-tq" aria-controls="tv-tq" aria-selected="false" tabindex="-1"><span class="bd">Oct 18</span><span class="bn">Not on your card <em>Alex paid</em></span><span class="ba"><span aria-hidden="true">—</span><span class="visually-hidden">no charge</span></span><i class="btime" aria-hidden="true"></i></button>
+        </div>
+      </figure>
+
+      <div class="hero-join" aria-hidden="true">
+        <svg viewBox="0 0 120 40" preserveAspectRatio="none"><path pathLength="1" d="M2 20 H 112" /><path pathLength="1" d="M104 12 L 114 20 L 104 28" /></svg>
+      </div>
+
+      <div class="tzc" role="group" aria-label="The same purchase in Trezzit">
+        <div class="tzv is-on" id="tv-gb" role="tabpanel" aria-labelledby="bt-gb" data-paid="10000" data-spent="3000">
+          <div class="tzc-head">
+            <img src="../_kit/brand/trezzit-mark.svg" alt="" width="22" height="22">
+            <span><b>Green Basket Market</b><small>Oct 24 · Apartment 3B · you paid</small></span>
+          </div>
+          <p class="tzc-label" data-label>You spent</p>
+          <p class="tzc-amt"><span class="visually-hidden">$30.00 of $100.00</span><b class="money" data-amt aria-hidden="true">$30.00</b> <span class="money" aria-hidden="true">of $100.00</span></p>
+          <div class="tzc-bar" aria-hidden="true"><i style="--w:30;--seg:var(--p-you)"></i><i style="--w:30;--seg:var(--p-maya)"></i><i style="--w:20;--seg:var(--p-jordan)"></i><i style="--w:20;--seg:var(--p-sam)"></i></div>
+          <ul class="tzc-legend" aria-hidden="true"><li style="--c:var(--p-you)" class="me">You</li><li style="--c:var(--p-maya)">Maya</li><li style="--c:var(--p-jordan)">Jordan</li><li style="--c:var(--p-sam)">Sam</li></ul>
+          <ul class="tzc-cats" role="list">
+            <li><i style="--c:var(--cat-groceries)"></i><span><b>Groceries</b></span><b class="money">$22.00</b></li>
+            <li><i style="--c:var(--cat-household)"></i><span><b>Household</b></span><b class="money">$8.00</b></li>
+          </ul>
+          <div class="tzc-end">
+            <button type="button" class="tzc-owe" aria-expanded="false" aria-controls="tzc-who"><span>Owed to you</span><b class="money">$70.00</b><i class="tzc-chev" aria-hidden="true"></i></button>
+            <div class="tzc-who" id="tzc-who" hidden>
+              <ul role="list">
+                <li><span class="av av-sm" style="--av:var(--p-maya)" aria-hidden="true">M</span><span>Maya</span><b class="money">$30.00</b></li>
+                <li><span class="av av-sm" style="--av:var(--p-jordan)" aria-hidden="true">J</span><span>Jordan</span><b class="money">$20.00</b></li>
+                <li><span class="av av-sm" style="--av:var(--p-sam)" aria-hidden="true">S</span><span>Sam</span><b class="money">$20.00</b></li>
+              </ul>
+              <p>Pay any way. Mark it settled.</p>
+            </div>
+          </div>
+        </div>
+        <div class="tzv" id="tv-ph" role="tabpanel" aria-labelledby="bt-ph" data-paid="4822" data-spent="4822">
+          <div class="tzc-head">
+            <img src="../_kit/brand/trezzit-mark.svg" alt="" width="22" height="22">
+            <span><b>Corner Pharmacy</b><small>Oct 20 · Just you</small></span>
+          </div>
+          <p class="tzc-label" data-label>You spent</p>
+          <p class="tzc-amt"><span class="visually-hidden">$48.22 of $48.22</span><b class="money" data-amt aria-hidden="true">$48.22</b> <span class="money" aria-hidden="true">of $48.22</span></p>
+          <div class="tzc-bar" aria-hidden="true"><i style="--w:100;--seg:var(--p-you)"></i></div>
+          <ul class="tzc-legend" aria-hidden="true"><li style="--c:var(--p-you)" class="me">You</li></ul>
+          <ul class="tzc-cats" role="list">
+            <li><i style="--c:var(--cat-health)"></i><span><b>Health</b><small>Allergy relief, vitamin D3</small></span><b class="money">$23.20</b></li>
+            <li><i style="--c:var(--cat-personal-care)"></i><span><b>Personal care</b><small>Toothpaste, sunscreen</small></span><b class="money">$18.34</b></li>
+            <li><i style="--c:var(--cat-gifts)"></i><span><b>Gifts</b></span><b class="money">$5.39</b></li>
+            <li><i style="--c:var(--cat-groceries)"></i><span><b>Groceries</b></span><b class="money">$1.29</b></li>
+          </ul>
+        </div>
+        <div class="tzv" id="tv-tq" role="tabpanel" aria-labelledby="bt-tq" data-paid="0" data-spent="2703">
+          <div class="tzc-head">
+            <img src="../_kit/brand/trezzit-mark.svg" alt="" width="22" height="22">
+            <span><b>Taqueria Sol</b><small>Oct 18 · Weekend at the lake · Alex paid</small></span>
+          </div>
+          <p class="tzc-label" data-label>You spent</p>
+          <p class="tzc-amt"><span class="visually-hidden">$27.03 of $84.87</span><b class="money" data-amt aria-hidden="true">$27.03</b> <span class="money" aria-hidden="true">of $84.87</span></p>
+          <div class="tzc-bar" aria-hidden="true"><i style="--w:27.03;--seg:var(--p-you)"></i><i style="--w:29.88;--seg:var(--p-alex)"></i><i style="--w:27.96;--seg:var(--p-priya)"></i></div>
+          <ul class="tzc-legend" aria-hidden="true"><li style="--c:var(--p-you)" class="me">You</li><li style="--c:var(--p-alex)">Alex</li><li style="--c:var(--p-priya)">Priya</li></ul>
+          <ul class="tzc-cats" role="list">
+            <li><i style="--c:var(--cat-dining)"></i><span><b>Your burrito</b></span><b class="money">$12.57</b></li>
+            <li><i style="--c:var(--cat-dining)"></i><span><b>Shared plates</b></span><b class="money">$10.64</b></li>
+            <li><i style="--c:var(--cat-dining)"></i><span><b>Tip, by what you ordered</b></span><b class="money">$3.82</b></li>
+          </ul>
+          <div class="tzc-end"><p class="tzc-note tzc-note-owe"><span>You owe Alex</span><b class="money">$27.03</b></p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THREE VERBS ============ -->
+<section class="verbs" id="how" aria-labelledby="how-t">
+  <div class="wrap">
+    <h2 id="how-t" class="visually-hidden">How it works</h2>
+
+    <article class="verb" id="capture" aria-labelledby="capture-t">
+      <div class="verb-copy rv">
+        <h3 id="capture-t"><span class="verb-n" aria-hidden="true">1</span>Scan a receipt.</h3>
+      </div>
+      <div class="verb-demo rv">
+        <div class="demo-frame" id="scan-demo">
+          <noscript><img src="../_kit/receipts/green-basket.png" alt="Sample receipt from Green Basket Market, 14 items, total $100.00" width="364" height="855"></noscript>
+        </div>
+      </div>
+    </article>
+
+    <article class="verb" id="split" aria-labelledby="split-t">
+      <div class="verb-copy rv">
+        <h3 id="split-t"><span class="verb-n" aria-hidden="true">2</span>Split by item.</h3>
+      </div>
+      <div class="verb-demo rv">
+        <div class="demo-frame" id="split-demo">
+          <noscript><p class="nojs">Green Basket Market, $100.00: You $30.00, Maya $30.00, Jordan $20.00, Sam $20.00. Adds up to $100.00.</p></noscript>
+        </div>
+      </div>
+    </article>
+
+    <article class="verb" id="understand" aria-labelledby="understand-t">
+      <div class="verb-copy rv">
+        <h3 id="understand-t"><span class="verb-n" aria-hidden="true">3</span>Everything you spent, whoever&nbsp;paid.</h3>
+      </div>
+      <div class="verb-demo rv">
+        <div class="demo-frame" id="ledger-demo">
+          <noscript><p class="nojs">October. Your bank: −$2,792.02 in 4 payments. You spent $749.10: you paid alone $48.22, you split it $669.35, someone else paid $31.53.</p></noscript>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ AI ============ -->
+<section class="ai" id="ai" aria-labelledby="ai-t">
+  <div class="wrap">
+    <div class="ai-grid">
+      <header class="ai-copy rv">
+        <h2 id="ai-t">Or just ask Claude or&nbsp;ChatGPT.</h2>
+        <ul class="trust" role="list">
+          <li>Trezzit never moves money.</li>
+        </ul>
+        <p class="ai-links"><a class="c-btn c-btn-primary" href="ai/">Connect Claude or ChatGPT</a></p>
+      </header>
+      <div class="ai-demo rv" id="chat-demo">
+        <noscript><p class="nojs">You: Here’s my October card statement. What’s missing from Trezzit? Your AI: Juniper Deli, $11.40 on Oct 27, isn’t in Trezzit. Add it as lunch? You: Yes, add it. Added by AI: Juniper Deli, $11.40.</p></noscript>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLOSE ============ -->
+<section class="close close-end" aria-label="Get started">
+  <div class="wrap">
+    <h2 class="close-h rv">See what you actually spent.</h2>
+    <div class="cta-row rv">
+      <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="./"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="22" height="22"><span>Trezzit</span></a>
+      <nav aria-label="Footer">
+        <div><p class="foot-h">Use cases</p><ul role="list"><li><a href="roommates/">Roommates</a></li><li><a href="trips/">Trips</a></li><li><a href="just-me/">Just me</a></li><li><a href="recurring/">Every month</a></li><li><a href="ai/">With AI</a></li></ul></div>
+        <div><p class="foot-h">App</p><ul role="list"><li><a href="app/">See the app</a></li><li><a href="https://app.trezzit.com/split">Split a bill</a></li><li><a href="https://app.trezzit.com/login">Log in</a></li><li><a href="/support">Support</a></li></ul></div>
+        <div><p class="foot-h">Legal</p><ul role="list"><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="/your-data">Your data</a></li><li><a href="/delete-account">Delete account</a></li></ul></div>
+      </nav>
+    </div>
+    <p class="foot-legal">Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></p>
+    <p class="foot-legal">Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
+  </div>
+</footer>
+</body>
+</html>

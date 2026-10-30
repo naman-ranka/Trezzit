@@ -1,0 +1,215 @@
+/* demo-scan.css: styles for js/scan-demo.js only. */
+.scan-pick { display: grid; gap: 8px; }
+.pick-own { grid-column: 1 / -1; justify-content: center; border-style: dashed; min-height: 48px; }
+@media (min-width: 720px) {
+  .pick-own { grid-column: auto; padding-inline: 14px; }
+}
+.pick-ico { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid !important; place-items: center; }
+.scan-body { display: grid; gap: 18px; margin-top: 16px; }
+@media (min-width: 720px) {
+  .scan-body { grid-template-columns: minmax(280px, 340px) 1fr; gap: 28px; align-items: start; }
+}
+.scan-stage { position: relative; height: 300px; overflow: hidden; border-radius: var(--r-md); background: linear-gradient(180deg, var(--fill), var(--fill)); }
+@media (min-width: 720px) {
+  .scan-stage { height: 460px; }
+}
+.scan-paper { position: absolute; left: 0; right: 0; top: 0; padding: 22px 0 40px; display: flex; justify-content: center; transition: transform .45s var(--ease); will-change: transform; }
+.scan-paper .tz-receipt { --tz-receipt-width: 270px; font-size: var(--t-xs); filter: drop-shadow(0 10px 18px rgba(15, 31, 61, .14)); }
+.scan-photo { width: 82%; border-radius: var(--r-sm); box-shadow: 0 10px 24px rgba(15, 31, 61, .2); }
+.scan-pdf { width: 60%; aspect-ratio: 3 / 4; background: #fff; border-radius: var(--r-sm); display: grid; place-items: center; font-weight: 700; color: var(--muted); }
+.scan-beam { position: absolute; left: 6%; right: 6%; top: 42%; height: 2px; background: var(--accent); border-radius: 3px; box-shadow: 0 0 14px 3px rgba(36, 97, 189, .45); opacity: 0; transition: opacity .25s var(--ease); }
+.scan-beam::before { content: ''; position: absolute; left: 0; right: 0; bottom: 2px; height: 70px; background: linear-gradient(0deg, rgba(36, 97, 189, .16), transparent); }
+.scan[data-stage='uploading'] .scan-beam, .scan[data-stage='reading'] .scan-beam { opacity: 1; }
+.scan[data-stage='uploading'] .scan-beam { animation: beam-pulse 1s var(--ease) infinite; }
+.scan-fade { position: absolute; inset: auto 0 0; height: 48px; background: linear-gradient(180deg, transparent, var(--fill)); pointer-events: none; }
+.so-status { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-sm); font-weight: 600; color: var(--muted); background: var(--wash); border-radius: 999px; padding: 5px 12px 5px 10px; }
+.so-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.scan[data-stage='uploading'] .so-status .dot, .scan[data-stage='reading'] .so-status .dot { background: var(--accent); animation: beam-pulse 1s infinite; }
+.scan[data-stage='checking'] .so-status .dot { background: #d97706; }
+.scan[data-stage='done'] .so-status { color: var(--pos); background: #ecfdf5; }
+.scan[data-stage='done'] .so-status .dot { background: var(--pos); }
+.so-store { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; min-height: 30px; }
+.so-store b { font-size: var(--t-lg); color: var(--ink); letter-spacing: -0.02em; }
+.so-store span { color: var(--muted); font-size: var(--t-sm); }
+.so-items { margin: 10px 0 0; padding: 0; list-style: none; columns: 1; }
+@media (min-width: 1100px) {
+  .so-items { columns: 2; column-gap: 24px; }
+}
+.so-item { display: flex; justify-content: space-between; gap: 12px; font-size: var(--t-sm); padding: 6px 0; border-bottom: 1px solid var(--divider); break-inside: avoid; }
+.so-item small { color: var(--muted); font-size: var(--t-sm); }
+.so-item .money { color: var(--ink); font-weight: 500; }
+.so-checks { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.so-checks li { display: flex; align-items: center; color: var(--pos); }
+.so-checks li.warn { color: var(--amber); }
+.anim .so-checks li { animation-delay: calc(var(--i) * 120ms); }
+.so-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.so-total { display: flex; align-items: baseline; gap: 10px; font-size: var(--t-sm); color: var(--muted); }
+.so-total b { font-size: var(--t-xl); color: var(--ink); letter-spacing: -0.02em; }
+.so-notice { margin-top: 12px; font-size: var(--t-sm); background: #fffbeb; color: #78350f; border-radius: var(--r-sm); padding: 10px 12px; }
+.scan-consent { margin-top: 12px; border: 1px solid var(--accent); background: var(--fill); border-radius: var(--r-md); padding: 16px; font-size: var(--t-sm); color: var(--text); }
+.scan-consent .sc-t { font-weight: 700; color: var(--ink); font-size: var(--t-md); margin-bottom: 4px; }
+.sc-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.sc-actions label:focus-within { box-shadow: var(--focus-ring); }
+.so-more { margin-top: 2px; }
+.scan.short .so-item:nth-child(n + 7) { display: none; }
+@media (max-width: 719px) {
+  .scan-pick { overflow-x: auto; scroll-snap-type: x mandatory; gap: 8px; scrollbar-width: none; }
+  .scan-pick::-webkit-scrollbar { display: none; }
+}
+@media (min-width: 720px) {
+  .scan.no-own .scan-pick { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+}
+.scan-consent p:first-child { margin: 0; }
+.so-item.pending > *, .so-checks li.pending > * { color: transparent; background: var(--fill); border-radius: var(--r-sm); }
+.so-checks li.pending svg { visibility: hidden; }
+.anim .so-item { animation: none; }
+.anim .so-item:not(.pending) { animation: rise .32s var(--ease) both; }
+.anim .so-checks li { animation: none; }
+.anim .so-checks li:not(.pending) { animation: rise .3s var(--ease) both; animation-delay: calc(var(--i) * 120ms); }
+.scan:not(.is-done) .so-total b, .scan:not(.is-done) .so-split { visibility: hidden; }
+.so-head { min-height: 74px; }
+@media (max-width: 719px) {
+  .scan-pick { display: grid; overflow: visible; margin-inline: 0; padding: 0; }
+  .pick-own { grid-column: 1 / -1; }
+  .scan-stage { height: 240px; }
+  .scan.short .so-item:nth-child(n + 5) { display: none; }
+}
+ul.so-checks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.so-checks li { gap: 4px; font-size: var(--t-sm); font-weight: 600; background: #ecfdf5; border-radius: 999px; padding: 3px 10px 3px 6px; }
+.so-checks li.warn { background: #fffbeb; }
+.so-checks li.pending > * { background: none; }
+.so-checks li.pending { background: var(--fill); color: transparent; }
+.scan-pick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 719px) {
+  .scan.no-own .pick b { white-space: normal; font-size: var(--t-sm); line-height: 1.2; }
+}
+@media (max-width: 419px) {
+  .scan.no-own .pick img { display: none; }
+  .scan.no-own .pick { text-align: center; padding: 6px 4px; }
+}
+@media (min-width: 1000px) {
+  .sc-side .scan-body { grid-template-columns: minmax(0, 250px) minmax(0, 1fr); gap: 22px; }
+  .sc-side .so-items { columns: 1; }
+  .sc-side .scan-stage { height: 420px; }
+}
+.so-sum { margin-top: 10px; font-size: var(--t-sm); color: var(--muted); min-height: 21px; }
+.so-sum .money { color: var(--text); font-weight: 500; }
+.scan:not(.is-done) .so-sum { visibility: hidden; }
+.scan:not([data-stage]) .so-status, .scan[data-stage='idle'] .so-status { visibility: hidden; }
+.so-foot ul.so-checks { margin: 0 auto 0 0; }
+.so-foot .so-solo { margin-left: auto; }
+.scan:not(.is-done) .so-total span { visibility: visible; }
+.scan:not(.is-done) .so-total b { visibility: visible; color: transparent; position: relative; }
+.scan:not(.is-done) .so-total b::after { content: '—'; position: absolute; left: 0; color: var(--faint, #9aa3b2); }
+.scan:not(.is-done) .so-split { visibility: visible; opacity: .4; pointer-events: none; }
+.so-split { transition: opacity .3s var(--ease); }
+.so-sum { display: block; }
+.scan:not(.is-done) .so-checks { visibility: hidden; }
+@media (min-width: 720px) {
+  .verb-demo .scan-stage { height: 400px; }
+}
+@media (max-width: 719px) {
+  .scan.no-own .scan-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .scan.no-own .pick { padding: 6px 16px 6px 10px; justify-content: flex-start; gap: 10px; }
+}
+@media (max-width: 419px) {
+  .scan.no-own .pick { justify-content: center; padding-inline: 16px; }
+}
+@media (max-width: 480px) {
+  .so-foot { column-gap: 8px; }
+  .so-total { gap: 8px; }
+  .so-total b { font-size: var(--t-lg); }
+  .so-foot .so-checks li { font-size: var(--t-xs); padding: 2px 8px 2px 5px; }
+  .so-sum { margin-top: 6px; }
+}
+.so-mine { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px 12px; margin: 0 0 0 auto; font-size: var(--t-sm); color: var(--muted); }
+.so-mine[hidden] { display: none; }
+.so-mine .cat { display: inline-flex; align-items: center; gap: 6px; color: var(--text); }
+.so-mine i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); display: inline-block; }
+.so-mine b { color: var(--ink); }
+.scan:not(.is-done) .so-mine { visibility: hidden; }
+@media (max-width: 719px) {
+  .so-mine { flex-basis: 100%; justify-content: flex-start; }
+}
+/* ---------- E: A's read (progress, read-line tint, plain-words result) ---------- */
+.so-prog { height: 2px; margin-top: 10px; border-radius: 3px; background: var(--divider); overflow: hidden; }
+.so-prog i { display: block; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease), background-color .3s var(--ease); }
+.scan.is-done .so-prog i { background: var(--pos); }
+.scan.is-bad .so-prog i { background: var(--amber); }
+.scan[data-stage='idle'] .so-prog { visibility: hidden; }
+.so-status .txt { font-variant-numeric: tabular-nums; }
+.scan.is-bad[data-stage='done'] .so-status { color: var(--amber); background: #fffbeb; }
+.scan.is-bad[data-stage='done'] .so-status .dot { background: var(--amber); }
+.scan-paper .tz-r-line { transition: background-color .4s var(--ease); }
+.scan-paper .tz-r-line.is-read { background: rgba(36, 97, 189, .06); }
+.scan-paper .tz-r-line.is-active { background: rgba(36, 97, 189, .14); }
+ul.so-checks { display: none; }
+.pick-own { border-style: dashed; }
+.pick-own[aria-pressed='true'] { border-style: solid; }
+.so-head { min-height: 86px; }
+/* E: two samples and "Your photo", one row at every width */
+.scan .scan-pick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; overflow: visible; }
+.scan .pick-own { grid-column: auto; justify-content: flex-start; padding-inline: 8px 12px; min-height: 60px; }
+@media (max-width: 719px) {
+  .scan .pick, .scan .pick-own { min-height: 52px; padding: 6px 8px; gap: 8px; justify-content: center; }
+  .scan .pick b { white-space: normal; font-size: var(--t-sm); line-height: 1.2; }
+  .scan .pick-ico { width: 26px; height: 26px; flex: none; }
+}
+@media (max-width: 439px) {
+  .scan .pick img, .scan .pick-ico { display: none !important; }
+  .scan .pick { text-align: center; }
+}
+.scan.booting > * { visibility: hidden; }
+/* ---------- E r1: one idea per step. The read fills in line by line, then the list folds into one
+   picture (the receipt by category); the items themselves are step 2's job. The total counts up as
+   lines are read and sits at the bottom of a column as tall as the receipt. ---------- */
+.scan:not(.is-done) .so-total b { color: var(--ink); }
+.scan:not(.is-done) .so-total b::after { content: none; }
+.scan.is-done.has-cats .so-items, .scan.is-done.has-cats .so-more, .scan.is-done .so-sum { display: none; }
+.so-cats { display: grid; gap: 10px; margin-top: 14px; }
+.anim .so-cats:not([hidden]) { animation: rise .4s var(--ease) both; }
+.so-ck { font-size: var(--t-sm); font-weight: 600; color: var(--muted); }
+.so-bar { display: flex; gap: 3px; height: 10px; }
+.so-bar i { flex: var(--w) 1 0; min-width: 6px; background: var(--c); border-radius: 3px; }
+.so-leg { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0; padding: 0; list-style: none; font-size: var(--t-sm); color: var(--text); }
+.so-leg li { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.so-leg i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.so-leg b { color: var(--ink); font-weight: 600; }
+.so-mid { min-height: 0; }
+@media (min-width: 720px) {
+  .verb-demo .scan-stage { height: 360px; }
+  .verb-demo .scan-out { display: flex; flex-direction: column; min-height: 360px; }
+  .verb-demo .so-foot { margin-top: auto; padding-top: 16px; }
+}
+@media (max-width: 719px) {
+  .verb-demo .so-mid { min-height: 146px; }
+}
+.scan-paper .tz-receipt { font-size: var(--t-xs); --tz-receipt-width: 290px; }
+.scan-paper .tz-r-total { font-size: var(--t-sm); }
+.scan-paper .tz-receipt h3, .scan-paper .tz-r-store, .scan-paper .tz-r-head > :first-child { font-size: var(--t-md); }
+@media (max-width: 439px) {
+  /* narrow phones: tile names break between words only ("Pharmacy", never "Pharmac-y") */
+  .scan .pick { padding-inline: 4px; }
+  .scan .pick b { font-size: var(--t-xs); overflow-wrap: normal; word-break: normal; }
+}
+/* ---------- E r2: the read ends on what it read. The items stay (4 on phones, 6 on wider screens), the
+   total sits right under them, and the result is the site's one proof idiom: a check and plain text.
+   Both samples end at the same height, so switching receipts never moves the page. Flat surfaces only. ---------- */
+.scan-stage { background: var(--fill); }
+.scan-fade { background: linear-gradient(180deg, rgba(245, 246, 248, 0), var(--fill)); }
+.scan-beam { box-shadow: none; }
+.scan-beam::before { display: none; }
+.so-status, .scan[data-stage='done'] .so-status, .scan.is-bad[data-stage='done'] .so-status { background: none; padding: 0; border-radius: 0; }
+.scan[data-stage='done'] .so-status .dot { display: none; }
+.so-status .txt { display: inline-flex; align-items: center; gap: 6px; }
+.so-status .txt svg { width: 16px; height: 16px; flex: none; }
+.scan.is-done .so-prog { visibility: hidden; }
+.verb-demo .scan-out { min-height: 0 !important; }
+.verb-demo .so-foot { margin-top: 12px !important; padding-top: 0 !important; }
+.verb-demo .so-mid { min-height: 0 !important; }
+@media (max-width: 719px) {
+  .verb-demo .so-more { display: none !important; }
+}
+.verb-demo .so-sum { display: none !important; }
+/* the total counts up in a box as wide as the printed total, so nothing beside it reflows while it counts */
+.so-total b { display: inline-block; min-width: 4.3em; }

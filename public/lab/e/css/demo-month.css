@@ -1,0 +1,49 @@
+/* demo-month.css: styles for js/month-demo.js (home step 3), on top of demo-ledger.css. */
+.mo-vs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 12px; }
+.mo-vs p { display: grid; align-content: start; gap: 2px; min-width: 0; padding: 14px 16px 16px; border-radius: var(--r-md); }
+.mo-k { font-size: var(--t-sm); font-weight: 600; }
+.mo-vs small { font-size: var(--t-xs); line-height: 1.3; }
+.mo-bank { background: var(--fill); box-shadow: inset 0 0 0 1px var(--line); }
+.mo-bank .mo-k, .mo-bank small { color: var(--muted); }
+.mo-bank b { font-family: var(--font-mono); font-size: var(--t-lg); font-weight: 500; color: #4b5563; letter-spacing: -0.02em; line-height: 1.35; margin-top: 6px; white-space: nowrap; }
+/* Trezzit's tile is the page's one selected state (white, 1.5px ink line): the contrast is in the type, not a black block */
+.mo-mine { background: #fff; box-shadow: inset 0 0 0 1.5px var(--ink); }
+.mo-mine .mo-k { color: var(--ink); }
+.mo-mine b { font-size: var(--t-xl); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; margin-top: 4px; color: var(--ink); white-space: nowrap; }
+.mo .lg-pays { margin-top: 14px; }
+.mo-foil { margin-top: 12px; padding: 10px 14px 12px; border-radius: var(--r-md); background: var(--fill); box-shadow: inset 0 0 0 1px var(--line); }
+.mo-fk { display: flex; align-items: center; gap: 8px; font-size: var(--t-xs); font-weight: 600; color: var(--muted); }
+.mo-fk .bank-i { width: 16px; height: 12px; border-radius: 3px; border: 1.5px solid currentColor; position: relative; flex: none; }
+.mo-fk .bank-i::after { content: ''; position: absolute; left: 0; right: 0; top: 2px; height: 1.5px; background: currentColor; }
+.mo-fq { font-weight: 500; color: #4b5563; }
+.mo-fr { margin-top: 4px; font-family: var(--font-mono); font-size: var(--t-sm); color: #4b5563; }
+.mo-none { color: #8a94a6; }
+.mo-bl { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 8px; }
+.mo .lg-count { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 14px; }
+.mo-tz { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-xs); font-weight: 700; color: var(--ink); }
+.mo-tz::before { content: ''; width: 14px; height: 14px; background: url("../../_kit/brand/trezzit-mark.svg") center / contain no-repeat; }
+.mo-ai { display: inline-flex; align-items: center; gap: 4px; padding: 0 7px 0 5px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: var(--t-xs); line-height: 20px; vertical-align: 1px; }
+.mo-ai svg { width: 12px; height: 12px; }
+.mo .lg-row.lg-ai { border-radius: var(--r-sm); }
+.anim .mo .lg-row { animation: none; }
+.anim .mo.searching .lg-row { animation: rise .3s var(--ease) both; }
+@media (max-width: 879px) {
+  .mo.compact > .lg-sum-pay { border-top: 0; padding-top: 0; }
+}
+@media (max-width: 379px) {
+  .mo-vs p { padding: 12px; }
+  .mo-bank b { font-size: var(--t-md); }
+  .mo-mine b { font-size: var(--t-xl); }
+}
+/* E r1: payer rows and "Try" words use the one selected state too */
+.mo .lg-pay[aria-pressed='true'] { background: #fff; box-shadow: inset 0 0 0 1.5px var(--ink); }
+.mo .lg-pay[aria-pressed='true']::after { border-color: var(--ink); }
+.mo-try { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; font-size: var(--t-sm); color: var(--muted); }
+.mo-try > span { margin-right: 2px; }
+.mo-q { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font: inherit; font-size: var(--t-sm); color: var(--text); cursor: pointer; transition: border-color .2s var(--ease); }
+.mo-q:hover { border-color: var(--ink); }
+.mo-q:focus-visible { box-shadow: var(--focus-ring); }
+.mo .lg-search { background: #fff; border: 1px solid var(--line); }
+.ledger.demoing .lg-search { border-color: var(--ink); background: #fff; box-shadow: none; }
+.mo .lg-search:focus-within { border-color: var(--ink); background: #fff; box-shadow: 0 0 0 1px var(--ink); }
+.mo .lg-list:empty { display: none; }

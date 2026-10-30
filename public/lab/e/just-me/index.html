@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+  // Vercel (trailingSlash: false) serves this page without the slash; relative links need it.
+  if (!/\/$/.test(location.pathname)) history.replaceState(null, '', location.pathname + '/' + location.search + location.hash);
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('anim');
+  document.documentElement.classList.add('js');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Just me: your own spending, item by item | Trezzit</title>
+<meta name="description" content="A pharmacy run is not one category. Trezzit sorts each item, so you see what your money was really for.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="../../_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../../_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="../../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../_kit/tokens.css">
+<link rel="stylesheet" href="../../_kit/receipts/receipt.css" data-tz-receipt>
+<link rel="stylesheet" href="../css/c.css">
+<link rel="stylesheet" href="../css/demo-scan.css">
+<link rel="stylesheet" href="../css/demo-ledger.css">
+<link rel="modulepreload" href="../js/util.js">
+<link rel="modulepreload" href="../js/data.js">
+<link rel="modulepreload" href="../js/page.js">
+<link rel="modulepreload" href="../../_kit/split-engine.js">
+<link rel="modulepreload" href="../../_kit/scan-client.js">
+<link rel="modulepreload" href="../../_kit/receipts.js">
+<script type="module" src="../js/just-me.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="../" aria-label="Trezzit home"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="26" height="26"><span>Trezzit</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a class="nav-rm" href="../roommates/">Roommates</a>
+      <a href="../#how">How it works</a>
+      <a href="../app/">See the app</a>
+      <a href="../ai/">With AI</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
+      <a class="c-btn c-btn-sm c-btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+    </div>
+  </div>
+</header>
+<main id="main">
+<section class="sc-hero sc-hero-demo" aria-labelledby="sc-t">
+  <div class="wrap">
+    <div class="sc-copy">
+      <h1 id="sc-t">Just yours, item by item.</h1>
+      <p class="lede">A pharmacy run isn’t one category.</p>
+      <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a></div>
+    </div>
+    <div class="sc-side"><div class="demo-frame res-jm">
+      <div id="scan-demo"><noscript><p class="nojs">Corner Pharmacy, $48.22: health $23.20, personal care $18.34, gifts $5.39, groceries $1.29.</p></noscript></div>
+      <div id="cat-demo" class="cats" aria-live="polite"></div>
+    </div></div>
+  </div>
+</section>
+
+<section class="sc-demo" aria-labelledby="find-t">
+  <div class="wrap">
+    <header class="sh rv"><h2 id="find-t">Your month, personal and shared.</h2></header>
+    <div class="rv"><div class="demo-frame" id="ledger-demo"></div></div>
+  </div>
+</section>
+
+<section class="close close-cta" aria-label="Get started">
+  <div class="wrap">
+    <div class="cta-row">
+      <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
+      <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="../"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="22" height="22"><span>Trezzit</span></a>
+      <nav aria-label="Footer">
+        <div><p class="foot-h">Use cases</p><ul role="list"><li><a href="../roommates/">Roommates</a></li><li><a href="../trips/">Trips</a></li><li><a href="../just-me/">Just me</a></li><li><a href="../recurring/">Every month</a></li><li><a href="../ai/">With AI</a></li></ul></div>
+        <div><p class="foot-h">App</p><ul role="list"><li><a href="../app/">See the app</a></li><li><a href="https://app.trezzit.com/split">Split a bill</a></li><li><a href="https://app.trezzit.com/login">Log in</a></li><li><a href="/support">Support</a></li></ul></div>
+        <div><p class="foot-h">Legal</p><ul role="list"><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="/your-data">Your data</a></li><li><a href="/delete-account">Delete account</a></li></ul></div>
+      </nav>
+    </div>
+    <p class="foot-legal">Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></p>
+    <p class="foot-legal">Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
+  </div>
+</footer>
+</body>
+</html>
