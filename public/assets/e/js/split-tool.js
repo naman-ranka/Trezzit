@@ -13,6 +13,9 @@ import { PEOPLE, getSample } from './data.js';
 export const APP = 'https://app.trezzit.com';
 const MAX_PEOPLE = 20;
 const MAX_ITEMS = 200;
+/* The server stores money in 10 digits (up to 99,999,999.99); 200 items at this cap stay well under it. */
+const MAX_CENTS = 9999999;
+const capCents = (c) => Math.min(MAX_CENTS, Math.max(0, c));
 const COLORS = ['var(--p-you)', 'var(--p-maya)', 'var(--p-jordan)', 'var(--p-sam)', 'var(--p-alex)', 'var(--p-priya)'];
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`);
 const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
@@ -88,7 +91,7 @@ export function compute(st) {
 }
 
 /** The exact POST /api/demo/bills/ body (02-live-apis.md 1.2): each price folds its tax in, the tip is one
- *  extra line split by PERCENTAGE (percentages to 2dp that sum to exactly 100), and the bill total equals
+ *  extra line split by EXACT amounts (a 2dp percentage drifts past the server's 1-cent check on big tips), and the bill total equals
  *  the sum of prices, of payments and of the people's totals, to the cent. */
 export function buildPublishBody(st, res, clientRef) {
   const pid = new Map(st.people.map((p, i) => [p.id, `p${i + 1}`]));
@@ -107,7 +110,7 @@ export function buildPublishBody(st, res, clientRef) {
     const bp = distributeByWeights(10000, base);
     items.push({ name: 'Tip', price: twoDp(tip.totalCents), quantity: '1', tax_percent: '0', is_extra_charge: true,
       shares: ids.map((id, k) => ({ id, k })).filter(({ id, k }) => bp[k] > 0 || (tip.shares[id] || 0) > 0).map(({ id, k }) => ({
-        participant: pid.get(id), split_type: 'PERCENTAGE', share_amount: twoDp(tip.shares[id] || 0), percentage: twoDp(bp[k]) })) });
+        participant: pid.get(id), split_type: 'EXACT', share_amount: twoDp(tip.shares[id] || 0), exact_amount: twoDp(tip.shares[id] || 0) })) });
   }
   const total = res.totalCents;
   const body = {
@@ -144,8 +147,8 @@ export function mountSplitTool(root, opts = {}) {
       <ol class="st-items" aria-label="Items"></ol>
       <button type="button" class="c-btn c-btn-sm c-btn-quiet st-add-item">${icon.plus} Add an item</button>
       <div class="st-extras">
-        <label class="st-amt"><span>Tax</span><span class="st-money"><span aria-hidden="true">$</span><input inputmode="decimal" autocomplete="off" data-extra="taxCents" aria-label="Tax"></span></label>
-        <label class="st-amt"><span>Tip</span><span class="st-money"><span aria-hidden="true">$</span><input inputmode="decimal" autocomplete="off" data-extra="tipCents" aria-label="Tip"></span></label>
+        <label class="st-amt"><span>Tax</span><span class="st-money"><span aria-hidden="true" data-sym>$</span><input inputmode="decimal" autocomplete="off" data-extra="taxCents" aria-label="Tax"></span></label>
+        <label class="st-amt"><span>Tip</span><span class="st-money"><span aria-hidden="true" data-sym>$</span><input inputmode="decimal" autocomplete="off" data-extra="tipCents" aria-label="Tip"></span></label>
         <p class="st-prop">Tax and tip are split in proportion to what each person had.</p>
       </div>
     </div>
@@ -173,6 +176,7 @@ export function mountSplitTool(root, opts = {}) {
   const out = $('.st-out');
   const say = (t) => { $('[data-say]').textContent = t; };
   const cur = () => st.currency;
+  const sym = () => { try { return new Intl.NumberFormat('en-US', { style: 'currency', currency: st.currency }).formatToParts(0).find((x) => x.type === 'currency')?.value || '$'; } catch { return '$'; } };
 
   function renderPeople() {
     peopleEl.innerHTML = st.people.map((p, i) => `
@@ -185,11 +189,12 @@ export function mountSplitTool(root, opts = {}) {
     sel.innerHTML = st.people.map((p, i) => `<option value="${p.id}"${p.id === st.payer ? ' selected' : ''}>${esc(p.name.trim() || `Person ${i + 1}`)}</option>`).join('');
   }
   function renderItems() {
+    root.querySelectorAll('[data-sym]').forEach((el) => { el.textContent = sym(); });
     itemsEl.innerHTML = st.items.map((it, n) => `
       <li class="st-item" data-item="${it.id}">
         <div class="st-line">
           <input class="st-name" value="${esc(it.name)}" placeholder="Item ${n + 1}" maxlength="200" aria-label="Item ${n + 1} name" data-name autocomplete="off">
-          <span class="st-money"><span aria-hidden="true">$</span><input class="st-price" value="${it.cents ? twoDp(it.cents) : ''}" placeholder="0.00" inputmode="decimal" aria-label="Item ${n + 1} price" data-price autocomplete="off"></span>
+          <span class="st-money"><span aria-hidden="true">${esc(sym())}</span><input class="st-price" value="${it.cents ? twoDp(it.cents) : ''}" placeholder="0.00" inputmode="decimal" aria-label="Item ${n + 1} price" data-price autocomplete="off"></span>
           <button type="button" class="st-x" data-rm-item aria-label="Remove item ${n + 1}"${st.items.length < 2 ? ' disabled' : ''}>×</button>
         </div>
         <div class="st-who" role="group" aria-label="Who had item ${n + 1}">${st.people.map((p, i) => `<button type="button" class="st-chip" data-p="${p.id}" aria-pressed="${it.who.includes(p.id)}" style="--c:${color(i)}"><i aria-hidden="true"></i><span>${esc(p.name.trim() || `Person ${i + 1}`)}</span></button>`).join('')}</div>
@@ -281,7 +286,7 @@ export function mountSplitTool(root, opts = {}) {
     if (!it) return;
     edit();
     if (e.target.matches('[data-name]')) it.name = e.target.value;
-    if (e.target.matches('[data-price]')) it.cents = Math.max(0, toCents(e.target.value));
+    if (e.target.matches('[data-price]')) it.cents = capCents(toCents(e.target.value));
     paint();
   });
   itemsEl.addEventListener('change', (e) => {
@@ -318,7 +323,7 @@ export function mountSplitTool(root, opts = {}) {
     itemsEl.lastElementChild.querySelector('[data-name]').focus();
   });
   root.querySelectorAll('[data-extra]').forEach((el) => {
-    el.addEventListener('input', () => { edit(); st[el.dataset.extra] = Math.max(0, toCents(el.value)); paint(); });
+    el.addEventListener('input', () => { edit(); st[el.dataset.extra] = capCents(toCents(el.value)); paint(); });
     el.addEventListener('change', () => { el.value = st[el.dataset.extra] ? twoDp(st[el.dataset.extra]) : ''; });
   });
   $('.st-blank').addEventListener('click', () => {
