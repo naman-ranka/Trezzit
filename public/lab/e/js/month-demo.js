@@ -24,6 +24,8 @@ const PAY = [
 // a search hit names the bill it came from: the rent bill's utilities read as the apartment's bills, not "rent"
 const srcTitle = (e) => (e.id === 'monthly-rent' ? `${e.group || 'Apartment 3B'} bills` : e.title);
 const andList = (a) => (a.length < 3 ? a.join(' and ') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`);
+// the words people type first, mapped to the items that answer them (the bank can still only match store names)
+const ALIAS = { coffee: 'cold brew', snack: 'kale chips', snacks: 'kale chips', chips: 'kale chips', paper: 'hand towels', 'paper towels': 'hand towels', dinner: 'taqueria', burrito: 'burrito', tacos: 'taqueria' };
 const reEsc = (q) => q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export async function mountMonth(root, opts = {}) {
@@ -96,9 +98,11 @@ export async function mountMonth(root, opts = {}) {
   // a search for something on a shared receipt that wasn't yours says whose it was, not "no match"
   const names = (ids) => ids.map((k) => (k === 'you' ? 'you' : PEOPLE[k]?.name || k));
   function emptyText(q, ql) {
-    const o = ql.length > 2 && L.entries.flatMap((e) => e.others || []).find((l) => l.name.toLowerCase().includes(ql) && l.people.length);
+    const al = ALIAS[ql];
+    const o = ql.length > 2 && L.entries.flatMap((e) => e.others || []).find((l) => (l.name.toLowerCase().includes(ql) || (al && l.name.toLowerCase().includes(al))) && l.people.length);
     if (!o) return `Nothing called “${esc(q)}” in October.`;
-    return `${esc(o.name)} was ${esc(andList(names(o.people)))}’s, so it isn’t in your spending.`;
+    const pl = /[^s]s$/i.test(o.name.trim());
+    return `${esc(o.name)} ${pl ? 'were' : 'was'} ${esc(andList(names(o.people)))}’s, so ${pl ? 'they aren’t' : 'it isn’t'} in your spending.`;
   }
 
   function render() {
@@ -112,7 +116,7 @@ export async function mountMonth(root, opts = {}) {
     if (!q) {
       const pf = filterPay && PAY.find(([k]) => k === filterPay)[2];
       const rows = filterPay ? L.entries.filter(pf) : showAI ? L.entries.filter((e) => e.byAI) : [];
-      listEl.innerHTML = rows.map(entryRow).join('');
+      listEl.innerHTML = rows.map(entryRow).join('') + (aiView ? '<li class="lg-empty mo-ainote">Everything your AI adds shows in your activity.</li>' : '');
       countEl.innerHTML = aiView ? '<span class="mo-tz">Trezzit</span>' : '';
       if (aiView) {
         const b = BANK.find((x) => x.id === AI_ENTRY.id);
@@ -127,19 +131,22 @@ export async function mountMonth(root, opts = {}) {
     }
     // your bank can only search what it has: store names
     const bankHits = BANK.filter((b) => b.text.toLowerCase().includes(ql));
-    root.querySelector('.mo-fq').textContent = `“${q}”`;
+    root.querySelector('.mo-fq').textContent = `“${q}”${bankHits.length > 1 ? ` · ${bankHits.length} charges` : ''}`;
     root.querySelector('.mo-fr').innerHTML = bankHits.length
-      ? bankHits.map((b) => `<p class="mo-bl"><span>${esc(b.date)}</span><span>${esc(b.text)}</span><span class="money">−${money(b.cents)}</span></p>`).join('')
+      ? bankHits.slice(0, 1).map((b) => `<p class="mo-bl"><span>${esc(b.date)}</span><span>${esc(b.text)}</span><span class="money">−${money(b.cents)}</span></p>`).join('')
       : '<p class="mo-none">No results</p>';
     const all = L.entries.flatMap((e) => e.lines.map((l) => ({ ...l, entry: e })));
-    const hits = all.filter((l) => l.name.toLowerCase().includes(ql) || l.entry.title.toLowerCase().includes(ql) || cat(l.cat).label.toLowerCase().includes(ql))
+    const al = ALIAS[ql];
+    const has = (t) => t.toLowerCase().includes(ql) || (al && t.toLowerCase().includes(al));
+    const hits = all.filter((l) => has(l.name) || has(l.entry.title) || cat(l.cat).label.toLowerCase().includes(ql))
       .sort((a, b) => b.cents - a.cents);
-    const cap = 4;
+    // the answer area holds two rows (the demo's answer), so a longer answer never moves the page: the rest is a count
+    const cap = 2;
     listEl.innerHTML = hits.length
-      ? hits.slice(0, cap).map((l) => lineRow(l, q)).join('') + (hits.length > cap ? `<li class="lg-moreline">and ${hits.length - cap} more items</li>` : '')
+      ? hits.slice(0, cap).map((l) => lineRow(l, q)).join('')
       : `<li class="lg-empty">${emptyText(q, ql)}</li>`;
     countEl.innerHTML = hits.length
-      ? `<span class="mo-tz">Trezzit</span><b class="money">${money(hits.reduce((a, l) => a + l.cents, 0))}</b>`
+      ? `<span class="mo-tz">Trezzit${hits.length > cap ? ` <span class="mo-n">· ${hits.length} items</span>` : ''}</span><b class="money">${money(hits.reduce((a, l) => a + l.cents, 0))}</b>`
       : '<span class="mo-tz">Trezzit</span>';
   }
 
@@ -168,9 +175,14 @@ export async function mountMonth(root, opts = {}) {
     lockedW = root.clientWidth;
     const keep = input.value;
     findEl.style.minHeight = '';
-    input.value = sample;
-    render();
-    findEl.style.minHeight = `${findEl.offsetHeight}px`;
+    // the tallest of the answers people try first (two rows each), so none of them moves the page
+    let max = 0;
+    [sample, 'rent', 'dinner', 'milk'].forEach((q) => { input.value = q; render(); max = Math.max(max, findEl.offsetHeight); });
+    // and the row your AI adds, with its note (home)
+    const ai = showAI; const fl = flashAI; const fp = filterPay;
+    showAI = true; flashAI = false; filterPay = null; input.value = ''; render(); max = Math.max(max, findEl.offsetHeight);
+    showAI = ai; flashAI = fl; filterPay = fp;
+    findEl.style.minHeight = `${max}px`;
     input.value = keep;
     render();
   };

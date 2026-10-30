@@ -23,7 +23,7 @@
 .brow { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; min-height: 48px; padding: 9px 12px; border-radius: var(--r-sm); text-align: left; font: inherit; color: #4b5563; cursor: pointer; transition: background-color .35s var(--ease), color .35s var(--ease), box-shadow .35s var(--ease); }
 .brow + .brow::before { content: ''; position: absolute; left: 12px; right: 12px; top: -1px; border-top: 1px dashed #dde1e7; transition: opacity .2s var(--ease); }
 .brow[aria-selected='true']::before, .brow[aria-selected='true'] + .brow::before { opacity: 0; }
-.brow:hover:not([aria-selected='true']) { background: rgba(255, 255, 255, .6); }
+@media (hover: hover) { .brow:hover:not([aria-selected="true"]) { background: rgba(255, 255, 255, .6); } }
 .brow[aria-selected='true'] { background: #fff; color: var(--text); box-shadow: inset 0 0 0 1.5px var(--ink); }
 .brow[aria-selected='true'] .ba { font-weight: 600; color: var(--text); }
 .brow:focus-visible { box-shadow: inset 0 0 0 1.5px var(--ink), var(--focus-ring); }
@@ -242,3 +242,66 @@
 @media (min-width: 480px) { #chat-demo:not(.ai-hero-demo) { min-height: 561px; } }
 @media (min-width: 640px) { #chat-demo:not(.ai-hero-demo) { min-height: 569px; } }
 @media (min-width: 1200px) { #chat-demo:not(.ai-hero-demo) { min-height: 572px; } }
+
+/* ======================================================================================
+   E r6: every view of the hero card fills the same height with content (groceries 2 rows + owed, pharmacy
+   3 rows, dinner 2 rows + you owe), so no view shows a band of empty space. "Owed to you" is the way to the
+   roommates page. The "You spent" line fades as one unit. One ask in the hero: the split link lives in the
+   footer. The close says the idea the page has shown: one place, whoever paid, that your AI can read.
+   ====================================================================================== */
+a.tzc-go { text-decoration: none; min-height: 44px; align-items: center; padding-top: 10px; transition: color .2s var(--ease); }
+a.tzc-go > span:first-child { margin-right: auto; }
+a.tzc-go .tzc-arr { color: var(--accent); font-weight: 600; margin-left: 8px; transition: transform .2s var(--ease); }
+@media (hover: hover) { a.tzc-go:hover > span:first-child { text-decoration: underline; } a.tzc-go:hover .tzc-arr { transform: translateX(3px); } }
+a.tzc-go:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 2px; }
+.tzv.swap .tzc-amt span.money { opacity: 0; }
+.close-end .close-h { margin-bottom: 14px; }
+.close-end .close-sub { margin: 0 auto 28px; max-width: 44ch; font-size: var(--t-lg); line-height: 1.4; color: var(--muted); text-wrap: balance; }
+@media (max-width: 599px) {
+  .hero-join { height: 8px; }
+}
+@media (max-width: 599px) { .br-wide { display: none; } }
+
+/* ---------- E r6: reserved heights re-measured 320-1920 (10px steps) after the scan, grid and month changes;
+   each range reserves the larger neighbour at a boundary, so a frame never grows after it mounts ---------- */
+.verb-demo #scan-demo { min-height: 631px; }
+@media (min-width: 380px) { .verb-demo #scan-demo { min-height: 618px; } }
+@media (min-width: 481px) { .verb-demo #scan-demo { min-height: 629px; } }
+@media (min-width: 591px) { .verb-demo #scan-demo { min-height: 645px; } }
+@media (min-width: 720px) { .verb-demo #scan-demo { min-height: 402px; } }
+@media (min-width: 900px) { .verb-demo #scan-demo { min-height: 389px; } }
+@media (min-width: 980px) { .verb-demo #scan-demo { min-height: 395px; } }
+@media (min-width: 1100px) { .verb-demo #scan-demo { min-height: 359px; } }
+@media (min-width: 1200px) { .verb-demo #scan-demo { min-height: 368px; } }
+.verb-demo #split-demo { min-height: 691px; }
+@media (min-width: 350px) { .verb-demo #split-demo { min-height: 674px; } }
+@media (min-width: 370px) { .verb-demo #split-demo { min-height: 632px; } }
+@media (min-width: 411px) { .verb-demo #split-demo { min-height: 634px; } }
+@media (min-width: 460px) { .verb-demo #split-demo { min-height: 623px; } }
+@media (min-width: 591px) { .verb-demo #split-demo { min-height: 639px; } }
+@media (min-width: 640px) { .verb-demo #split-demo { min-height: 609px; } }
+.verb-demo #ledger-demo { min-height: 540px; }
+@media (min-width: 371px) { .verb-demo #ledger-demo { min-height: 546px; } }
+@media (min-width: 450px) { .verb-demo #ledger-demo { min-height: 529px; } }
+@media (min-width: 591px) { .verb-demo #ledger-demo { min-height: 545px; } }
+@media (min-width: 770px) { .verb-demo #ledger-demo { min-height: 527px; } }
+@media (min-width: 880px) { .verb-demo #ledger-demo { min-height: 347px; } }
+/* sweep: at 900-919 the side-by-side bank card is at its narrowest and "GREEN BASKET MARKET" wrapped to two
+   lines once its amount went bold; a slightly tighter row keeps every bank line on one line */
+@media (min-width: 900px) and (max-width: 979px) {
+  .brow { gap: 6px; padding-inline: 10px; }
+}
+/* sweep: below 420 the grid hint has its own line above the people, so step 2's reserved height grew
+   (re-measured per pixel 320-700, home and /trips) */
+.verb-demo #split-demo { min-height: 699px; }
+@media (min-width: 322px) { .verb-demo #split-demo { min-height: 688px; } }
+@media (min-width: 333px) { .verb-demo #split-demo { min-height: 676px; } }
+@media (min-width: 334px) { .verb-demo #split-demo { min-height: 664px; } }
+@media (min-width: 340px) { .verb-demo #split-demo { min-height: 700px; } }
+@media (min-width: 349px) { .verb-demo #split-demo { min-height: 691px; } }
+@media (min-width: 351px) { .verb-demo #split-demo { min-height: 657px; } }
+@media (min-width: 380px) { .verb-demo #split-demo { min-height: 660px; } }
+@media (min-width: 420px) { .verb-demo #split-demo { min-height: 635px; } }
+@media (min-width: 457px) { .verb-demo #split-demo { min-height: 624px; } }
+@media (min-width: 591px) { .verb-demo #split-demo { min-height: 640px; } }
+@media (min-width: 640px) { .verb-demo #split-demo { min-height: 609px; } }

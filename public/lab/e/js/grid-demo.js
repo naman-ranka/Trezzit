@@ -113,9 +113,10 @@ export async function mountGrid(root, opts = {}) {
       </div>
       <div class="tg-foot">
         <p class="tg-check" aria-hidden="true"></p>
+        <p class="tg-why" aria-hidden="true"></p>
         <button type="button" class="tg-reset" aria-label="Reset the split">Reset</button>
       </div>
-      ${opts.note ? `<p class="tg-note">${esc(opts.note)}</p>` : ''}
+      ${opts.note ? `<p class="tg-note">${opts.noteHref ? `<a href="${esc(opts.noteHref)}">${esc(opts.note)} <span aria-hidden="true">→</span></a>` : esc(opts.note)}</p>` : ''}
       <p class="visually-hidden" aria-live="polite" data-say></p>
       <dialog class="tg-dlg" aria-label="${esc(m.merchant)} receipt"><div class="tg-dlg-in"><button type="button" class="tg-x" aria-label="Close">×</button><div class="tg-paper">${receiptHTML(m.raw, { sample: m.sample, shadow: false }).replace(/<p>ITEMS \d+<\/p>\s*/, '')}</div></div></dialog>`;
     uid += 1;
@@ -155,6 +156,8 @@ export async function mountGrid(root, opts = {}) {
   }
   function foot() {
     clearTimeout(whyT);
+    $('.tg-why')?.classList.remove('on');
+    root.classList.remove('why-on');
     const el = $('.tg-check');
     el.className = `tg-check${res.check.ok ? '' : ' bad'}`;
     el.innerHTML = res.check.ok ? `${icon.check}Adds up to <b class="money">${money(res.check.sumCents)}</b>` : `Shares add up to ${money(res.check.sumCents)}, not ${money(res.check.expectedCents)}`;
@@ -169,11 +172,14 @@ export async function mountGrid(root, opts = {}) {
   function why(row) {
     const who = row.querySelector('.tg-dc:last-child')?.parentElement;
     row.classList.remove('nope'); void row.offsetWidth; row.classList.add('nope');
-    const el = $('.tg-check');
-    el.className = 'tg-check is-why';
-    el.textContent = 'Someone has to have it.';
-    say('Someone has to have it. Add another person first.');
-    whyT = setTimeout(foot, 2000);
+    // the proof line stays put; the reason shows beside it for a moment, in the same words a screen reader hears
+    const el = $('.tg-why');
+    const msg = `${fine ? 'Click' : 'Tap'} someone else first.`;
+    el.textContent = msg;
+    el.classList.add('on');
+    root.classList.add('why-on');
+    say(msg);
+    whyT = setTimeout(() => { el.classList.remove('on'); root.classList.remove('why-on'); }, 2200);
     return who;
   }
   function toggle(btn) {

@@ -260,3 +260,30 @@ ul.so-checks { display: none; }
 .scan.has-cats .so-leg { display: grid; gap: 0; }
 .scan.has-cats .so-leg li { display: flex; padding: 8px 0; border-bottom: 1px solid var(--divider); }
 .scan.has-cats .so-leg b { margin-left: auto; }
+/* ---------- E r6: the receipt is the control (a replay button, or a tap on the paper, reads it again), and the
+   frame is as tall as what it shows: the total sits right under the items, and the receipt window is no taller
+   than the result beside it (no band of empty space above the total). Phones open on the store's header. ---------- */
+.so-head { position: relative; }
+.so-store { padding-right: 56px; min-height: 44px; align-content: center; }
+.so-again { position: absolute; right: 0; top: 8px; width: 44px; height: 44px; border-radius: var(--r-sm); display: grid; place-items: center; color: var(--muted); border: 1px solid var(--line); background: #fff; transition: color .2s var(--ease), border-color .2s var(--ease); }
+.so-again:focus-visible { box-shadow: var(--focus-ring); }
+@media (hover: hover) { .so-again:hover { color: var(--ink); border-color: var(--line-strong); } }
+.scan:not(.is-done) .so-again { opacity: .45; }
+.scan-stage { cursor: pointer; }
+@media (min-width: 720px) {
+  .verb-demo .scan-body { align-items: start; }
+  .verb-demo .so-foot { margin-top: 14px !important; padding-top: 0 !important; }
+  .verb-demo .scan-stage { height: 290px; }
+}
+@media (min-width: 1100px) {
+  /* two columns of three: the list fills the width beside the receipt */
+  .verb-demo .scan.short .so-item:nth-child(-n + 6) { display: flex; }
+  .verb-demo .scan-stage { height: 270px; }
+}
+@media (min-width: 720px) {
+  /* the receipt window is exactly as tall as the result beside it */
+  .verb-demo .scan-body { align-items: stretch; }
+  .verb-demo .scan-stage, .verb-demo .scan-stage { height: auto; min-height: 250px; }
+}
+.so-again svg { width: 16px; height: 16px; }
+@media (min-width: 720px) and (max-width: 899px) { .verb-demo .so-store { min-height: 57px; } }

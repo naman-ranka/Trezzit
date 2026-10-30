@@ -23,7 +23,7 @@
 .tg-pr { text-align: right; padding-right: 12px; font-size: var(--t-md); font-weight: 500; color: var(--ink); }
 .tg-dc { display: grid; place-items: center; min-width: 0; }
 .tg-dot { width: 100%; max-width: 64px; height: 44px; display: grid; place-items: center; border-radius: var(--r-sm); cursor: pointer; transition: background-color .15s var(--ease); }
-.tg-dot:hover { background: var(--wash); }
+@media (hover: hover) { .tg-dot:hover { background: var(--wash); } }
 .tg-dot i { width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 2px #b9c2d0; transition: background-color 180ms var(--ease), box-shadow 180ms var(--ease), transform 180ms var(--ease); }
 .tg-dot.on i { background: var(--c); box-shadow: inset 0 0 0 2px var(--c); }
 .tg-dot.part i { background: radial-gradient(circle, var(--c) 0 4px, #fff 4.5px); box-shadow: inset 0 0 0 2px var(--c); }
@@ -50,7 +50,7 @@
 .tg-sub-row .tg-nm { padding-left: 18px; font-size: var(--t-sm); color: var(--muted); }
 .tg-sub-row .tg-pr { font-size: var(--t-sm); color: var(--text); }
 .tg-sub-row .tg-dot { height: 40px; }
-.tg-sub-row .tg-dot:hover { background: var(--line); }
+@media (hover: hover) { .tg-sub-row .tg-dot:hover { background: var(--line); } }
 .tg-foot { display: grid; grid-template-columns: minmax(0, 1fr) auto 44px; grid-template-areas: 'you check reset'; align-items: center; gap: 4px 16px; padding-top: 14px; }
 .tg-you { grid-area: you; font-size: var(--t-md); color: var(--ink); letter-spacing: -0.01em; }
 .tg-you > b { font-weight: 700; }
@@ -68,7 +68,7 @@
 .tg-dlg::backdrop { background: rgba(15, 31, 61, .45); }
 .tg-dlg-in { position: relative; padding: 48px 20px 24px; }
 .tg-x { position: absolute; top: 6px; right: 6px; width: 44px; height: 44px; border-radius: var(--r-sm); font-size: var(--t-xl); line-height: 1; color: var(--ink); }
-.tg-x:hover { background: #fff; }
+@media (hover: hover) { .tg-x:hover { background: #fff; } }
 .tg-x:focus-visible { box-shadow: var(--focus-ring); }
 .tg-paper { display: flex; justify-content: center; }
 .tg-paper .tz-receipt { --tz-receipt-width: 300px; font-size: var(--t-xs); filter: drop-shadow(0 10px 18px rgba(15, 31, 61, .14)); }
@@ -149,3 +149,43 @@
 .tg-note { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--divider); font-size: var(--t-sm); color: var(--muted); }
 .tg-people { transition: opacity .18s var(--ease); }
 .tg-people.is-gone { opacity: 0; pointer-events: none; }
+/* ---------- E r6: hover washes only where there is a pointer to hover with (a tapped dot never keeps a grey
+   square on phones); the last-person guard speaks beside the proof, which never leaves; the note is the way
+   to the roommates page ---------- */
+@media (hover: none) {
+  .tg-reset:hover { background: none; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+}
+.tg-foot { position: relative; }
+.tg-why { grid-area: check; justify-self: start; align-self: center; font-size: var(--t-sm); font-weight: 500; color: var(--muted); opacity: 0; transition: opacity .2s var(--ease); pointer-events: none; white-space: nowrap; }
+.tg-why.on { opacity: 1; }
+.tg-note a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin: -12px 0 -12px; }
+.tg-note a:hover { color: var(--ink); text-decoration: underline; }
+.tg-note a span { color: var(--accent); }
+@media (max-width: 599px) {
+  /* phones: no room beside the proof, so the reason takes the note's line for a moment */
+  .tg-why { position: absolute; left: 0; right: 0; top: calc(100% + 26px); min-height: 22px; white-space: normal; }
+  .tg-note a { transition: opacity .2s var(--ease); }
+  .why-on .tg-note a { opacity: 0; }
+}
+/* ---------- E sweep (320-419): the hint gets its own line above the people (it overflowed the name column and
+   ran under "You" / "$30.00"); the fold count hides so "Shared" and its chevron stay out of the dot column ---------- */
+@media (max-width: 419px) {
+  .tg-hint { grid-column: 1 / -1; grid-row: 1; display: flex; flex-wrap: wrap; gap: 0 6px; white-space: normal; padding: 0 0 8px; }
+  .tg-people > .tg-p { grid-row: 2; }
+  .tg-people > .tg-pr-h { display: block; grid-row: 2; grid-column: 1; }
+  .tg-exp small, .tg-nm .tg-exp small { display: none; }
+}
+@media (max-width: 379px) {
+  #split .demo-frame.tg, .verb-demo > .demo-frame.tg { padding-inline: 10px; }
+  .tg-exp { gap: 4px; }
+  .tg-exp svg { width: 12px; height: 12px; }
+}
+@media (max-width: 339px) {
+  .tg-nm { gap: 6px; padding-right: 4px; }
+  .tg-row .tg-nm { font-size: var(--t-xs); }
+  .tg-exp svg { display: none; }
+}
+/* 420-639: the per-person totals ("$30.00$30.00") sat 3px apart in 54px columns; 58px gives them air */
+@media (min-width: 420px) and (max-width: 639px) {
+  .tg { --col: 58px; }
+}

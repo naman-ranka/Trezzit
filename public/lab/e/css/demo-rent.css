@@ -119,3 +119,8 @@ ul.rec-shares { grid-template-columns: repeat(2, 1fr) !important; }
 .rec-edit { padding-bottom: 12px; }
 .rec-edit .rec-rsub { margin-top: -4px; }
 .rec-edit .money-in-field { position: relative; }
+/* sweep: below 360 the four rent shares ("$639.35$639.35…") ran into each other */
+@media (max-width: 359px) {
+  .rent-card ul.rec-shares { gap: 4px; }
+  .rent-card .rec-shares .sp-pa { font-size: var(--t-sm); letter-spacing: -0.02em; }
+}

@@ -58,7 +58,7 @@
     <div class="cta-row">
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
     </div>
-    <p class="micro"><span class="nobank">No bank login needed.</span><a class="split-link" href="https://app.trezzit.com/split">or split one bill without an account <span aria-hidden="true">→</span></a></p>
+    <p class="micro"><span class="nobank">No bank login needed.</span></p>
 
     <div class="hero-viz" data-hero>
       <figure class="bank" aria-labelledby="bank-cap">
@@ -68,7 +68,7 @@
         <div class="bank-rows" role="tablist" aria-label="October charges" aria-orientation="vertical">
           <button type="button" class="brow" role="tab" id="bt-gb" aria-controls="tv-gb" aria-selected="true"><span class="bd">Oct 24</span><span class="bn">GREEN BASKET MARKET</span><span class="ba">−$100.00</span><i class="btime" aria-hidden="true"></i></button>
           <button type="button" class="brow" role="tab" id="bt-ph" aria-controls="tv-ph" aria-selected="false" tabindex="-1"><span class="bd">Oct 20</span><span class="bn">CORNER PHARMACY</span><span class="ba">−$48.22</span><i class="btime" aria-hidden="true"></i></button>
-          <button type="button" class="brow brow-none" role="tab" id="bt-tq" aria-controls="tv-tq" aria-selected="false" tabindex="-1"><span class="bd">Oct 18</span><span class="bn">Not on your card <em>Alex paid</em></span><span class="ba"><span aria-hidden="true">—</span><span class="visually-hidden">no charge</span></span><i class="btime" aria-hidden="true"></i></button>
+          <button type="button" class="brow brow-none" role="tab" id="bt-tq" aria-controls="tv-tq" aria-selected="false" tabindex="-1"><span class="bd">Oct 18</span><span class="bn">Taqueria Sol <em>Alex paid</em></span><span class="ba">$0.00</span><i class="btime" aria-hidden="true"></i></button>
         </div>
       </figure>
 
@@ -90,7 +90,7 @@
             <li><i style="--c:var(--cat-groceries)"></i><span><b>Groceries</b></span><b class="money">$22.00</b></li>
             <li><i style="--c:var(--cat-household)"></i><span><b>Household</b></span><b class="money">$8.00</b></li>
           </ul>
-          <div class="tzc-end"><p class="tzc-due"><span>Owed to you</span><b class="money">$70.00</b></p></div>
+          <div class="tzc-end"><a class="tzc-due tzc-go" href="roommates/"><span>Owed to you</span><b class="money">$70.00</b><span class="tzc-arr" aria-hidden="true">→</span></a></div>
         </div>
         <div class="tzv" id="tv-ph" role="tabpanel" aria-labelledby="bt-ph" data-paid="4822" data-spent="4822">
           <div class="tzc-head">
@@ -104,8 +104,7 @@
           <ul class="tzc-cats" role="list">
             <li><i style="--c:var(--cat-health)"></i><span><b>Health</b></span><b class="money">$23.20</b></li>
             <li><i style="--c:var(--cat-personal-care)"></i><span><b>Personal care</b></span><b class="money">$18.34</b></li>
-            <li><i style="--c:var(--cat-gifts)"></i><span><b>Gifts</b></span><b class="money">$5.39</b></li>
-            <li><i style="--c:var(--cat-groceries)"></i><span><b>Groceries</b></span><b class="money">$1.29</b></li>
+            <li><i style="--c:var(--cat-gifts)"></i><span><b>Gifts and groceries</b></span><b class="money">$6.68</b></li>
           </ul>
         </div>
         <div class="tzv" id="tv-tq" role="tabpanel" aria-labelledby="bt-tq" data-paid="0" data-spent="2703">
@@ -119,8 +118,7 @@
           <ul class="tzc-legend" aria-hidden="true"><li style="--c:var(--p-you)" class="me">You</li><li style="--c:var(--p-alex)">Alex</li><li style="--c:var(--p-priya)">Priya</li></ul>
           <ul class="tzc-cats tzc-items" role="list">
             <li><span><b>Your burrito</b></span><b class="money">$12.57</b></li>
-            <li><span><b>Shared plates</b></span><b class="money">$10.64</b></li>
-            <li><span><b>Tip</b></span><b class="money">$3.82</b></li>
+            <li><span><b>Shared plates and tip</b></span><b class="money">$14.46</b></li>
           </ul>
           <div class="tzc-end"><p class="tzc-due"><span>You owe Alex</span><b class="money">$27.03</b></p></div>
         </div>
@@ -189,6 +187,7 @@
 <section class="close close-end" aria-label="Get started">
   <div class="wrap">
     <h2 class="close-h rv">See what you actually spent.</h2>
+    <p class="close-sub rv">Every purchase, every split, every bill.<br class="br-wide"> In one place your AI can&nbsp;read.</p>
     <div class="cta-row rv">
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
     </div>

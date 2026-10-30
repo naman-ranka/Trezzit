@@ -184,3 +184,8 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !importa
 .msg.act .act-ai:only-child { font-size: var(--t-sm); }
 .msg.ghost { opacity: .14; transition: opacity .25s var(--ease); }
 .msg.ghost * { animation: none !important; }
+/* ---------- E r6: the write-back is the section's payoff: October's new figure at heading weight, and the link
+   back to the month is a full 44px target ---------- */
+.msg.proof .spent > b > span.money { font-size: var(--t-lg); letter-spacing: -0.02em; }
+.msg.proof a { min-height: 44px; padding: 0 8px; margin-right: -8px; }
+@media (hover: none) { .prompt:hover { border-color: var(--line); } .chat-ctl:hover { color: var(--muted); border-color: var(--line); } }

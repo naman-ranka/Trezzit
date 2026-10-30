@@ -65,6 +65,7 @@ export function mountScan(root, opts = {}) {
         <div class="so-head">
           <div class="so-prog" aria-hidden="true"><i></i></div>
           <p class="so-store"></p>
+          <button type="button" class="chat-ctl so-again" aria-label="Scan again" title="Scan again">${icon.replay}</button>
         </div>
         <div class="so-mid">
           <ol class="so-items" aria-label="Items read from the receipt"></ol>
@@ -169,7 +170,7 @@ export function mountScan(root, opts = {}) {
   // phones: the window opens at the first item line (the store's address and register lines are noise there)
   const phoneMQ = matchMedia('(max-width: 719px)');
   const top0 = () => {
-    if (!phoneMQ.matches) return 0;
+    if (!phoneMQ.matches || opts.fromTop) return 0;
     const first = paper.querySelector('.tz-r-line');
     return first ? Math.max(0, Math.round(first.getBoundingClientRect().top - paper.getBoundingClientRect().top) - 10) : 0;
   };
@@ -363,6 +364,10 @@ export function mountScan(root, opts = {}) {
   }
 
   root.querySelectorAll('.pick[data-id]').forEach((b) => b.addEventListener('click', () => { closeConsent(); run(b.dataset.id); }));
+  // the receipt is the control: the replay button, or a tap on the paper itself, reads it again
+  const again = () => { const id = last?.sampleId || root.querySelector('.pick[aria-pressed="true"]')?.dataset.id || opts.initial || ids[0]; closeConsent(); run(id); };
+  root.querySelector('.so-again').addEventListener('click', again);
+  stage.addEventListener('click', again);
   const openConsent = () => { consent.hidden = false; ownBtn?.setAttribute('aria-expanded', 'true'); consent.querySelector('label').focus?.(); };
   const closeConsent = () => { consent.hidden = true; ownBtn?.setAttribute('aria-expanded', 'false'); };
   ownBtn?.addEventListener('click', () => (consent.hidden ? openConsent() : closeConsent()));
@@ -395,7 +400,8 @@ export function mountScan(root, opts = {}) {
     root.classList.remove('booting');
     setStage('idle');
     txt.textContent = '';
-    if (opts.autoplay !== false) onVisible(root, () => { if (root.dataset.stage === 'idle') run(first); }, { threshold: 0.3 });
+    // it reads once most of the frame is on screen, so a visitor scrolling past still sees it happen
+    if (opts.autoplay !== false) onVisible(root, () => { if (root.dataset.stage === 'idle') run(first); }, { threshold: opts.threshold ?? 0.3 });
   });
 
   // the frame is as tall as the tallest sample's finished read, measured with the real markup on a hidden

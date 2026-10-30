@@ -914,7 +914,6 @@ button.tzc-owe:focus-visible { box-shadow: var(--focus-ring); }
 @media (min-width: 400px) { #split-demo.res-trips { min-height: 811px; } }
 @media (min-width: 410px) { #split-demo.res-trips { min-height: 761px; } }
 @media (min-width: 420px) { #split-demo.res-trips { min-height: 763px; } }
-@media (min-width: 440px) { #split-demo.res-trips { min-height: 746px; } }
 @media (min-width: 600px) { #split-demo.res-trips { min-height: 762px; } }
 @media (min-width: 640px) { #split-demo.res-trips { min-height: 725px; } }
 #trip-demo { min-height: 847px; }
@@ -1035,3 +1034,20 @@ button.tzc-owe:focus-visible { box-shadow: var(--focus-ring); }
 @media (min-width: 420px) { #rec-side { min-height: 541px; } }
 @media (min-width: 490px) { #rec-side { min-height: 510px; } }
 @media (min-width: 600px) { #rec-side { min-height: 526px; } }
+/* sweep: /trips grid hint has its own line below 420 (re-measured per pixel 320-700) */
+#split-demo.res-trips { min-height: 844px; }
+@media (min-width: 324px) { #split-demo.res-trips { min-height: 827px; } }
+@media (min-width: 340px) { #split-demo.res-trips { min-height: 871px; } }
+@media (min-width: 350px) { #split-demo.res-trips { min-height: 852px; } }
+@media (min-width: 364px) { #split-demo.res-trips { min-height: 847px; } }
+@media (min-width: 398px) { #split-demo.res-trips { min-height: 831px; } }
+@media (min-width: 404px) { #split-demo.res-trips { min-height: 814px; } }
+@media (min-width: 407px) { #split-demo.res-trips { min-height: 797px; } }
+@media (min-width: 408px) { #split-demo.res-trips { min-height: 780px; } }
+@media (min-width: 420px) { #split-demo.res-trips { min-height: 805px; } }
+@media (min-width: 422px) { #split-demo.res-trips { min-height: 789px; } }
+@media (min-width: 425px) { #split-demo.res-trips { min-height: 772px; } }
+@media (min-width: 426px) { #split-demo.res-trips { min-height: 763px; } }
+@media (min-width: 445px) { #split-demo.res-trips { min-height: 746px; } }
+@media (min-width: 600px) { #split-demo.res-trips { min-height: 762px; } }
+@media (min-width: 640px) { #split-demo.res-trips { min-height: 725px; } }

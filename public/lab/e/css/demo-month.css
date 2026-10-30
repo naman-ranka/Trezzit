@@ -79,3 +79,35 @@
   .ledger.mo.mo-find-first > .lg-find { order: -2; border-top: 0; padding-top: 0; }
   .ledger.mo.mo-find-first > .lg-sum-pay { order: -1; border-top: 1px solid var(--divider); padding-top: 18px; margin-top: 18px; }
 }
+/* ---------- E r6 (home): at two columns the October tiles stack (your bank above what you spent, like the
+   hero) and stretch to the search column's locked height, so neither column ends in empty space. A search
+   answer holds two rows; a longer answer says how many items it found. ---------- */
+@media (min-width: 880px) {
+  .ledger.mo.mo-find-first { align-items: stretch; }
+  .ledger.mo.mo-find-first > .lg-sum-pay { display: flex; flex-direction: column; }
+  .ledger.mo.mo-find-first .mo-vs { flex: 1; grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr 1fr; }
+  .ledger.mo.mo-find-first .mo-vs p { align-content: center; }
+}
+.mo-n { font-weight: 500; color: var(--muted); }
+/* every answer row is one line of name and one of source (ellipsis on phones), so two rows are always the same height */
+.mo .lg-list .lg-rt b, .mo .lg-list .lg-rt small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mo .lg-list .lg-rt { min-width: 0; }
+.mo .lg-list .lg-empty { white-space: normal; }
+.mo-fk { white-space: nowrap; overflow: hidden; min-width: 0; } .mo-fq { overflow: hidden; text-overflow: ellipsis; }
+.mo-bl > span:nth-child(2) { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mo .lg-list .mo-ainote { padding: 10px 0 8px 52px; font-size: var(--t-xs); line-height: 1.4; }
+/* sweep: at 880-899 the side-by-side tiles (just-me) cut "Rent, your share $639.35" by 3px */
+@media (min-width: 880px) and (max-width: 919px) {
+  .mo-vs p { padding-inline: 14px; }
+}
+/* sweep: on narrow phones the search answer's own name was cut ("Sunscreen S…" at 320, the price column
+   carries "$9.99 + tax"); a smaller icon column gives the name the room */
+@media (max-width: 399px) {
+  .mo .lg-row { grid-template-columns: 32px minmax(0, 1fr) auto; gap: 8px; }
+  .mo .lg-ri { width: 32px; height: 32px; }
+}
+@media (max-width: 359px) {
+  .mo .lg-row { grid-template-columns: 28px minmax(0, 1fr) auto; gap: 6px; }
+  .mo .lg-ri { width: 28px; height: 28px; }
+  .mo .lg-ri svg { width: 14px; height: 14px; }
+}
