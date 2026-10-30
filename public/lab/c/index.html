@@ -37,11 +37,11 @@
   <div class="wrap nav-in">
     <a class="brand" href="./" aria-label="Trezzit home"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="26" height="26"><span>Trezzit</span></a>
     <nav class="nav-links" aria-label="Main">
+      <a class="nav-rm" href="roommates/">Roommates</a>
       <a href="#how">How it works</a>
       <a href="ai/">With AI</a>
     </nav>
     <div class="nav-cta">
-      <a class="nav-ai" href="ai/">With AI</a>
       <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
       <a class="c-btn c-btn-sm c-btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
     </div>
@@ -54,12 +54,12 @@
 <section class="hero" aria-labelledby="hero-t">
   <div class="wrap">
     <h1 id="hero-t" class="display">See what you <span class="ink-mark">actually<svg class="ink-line" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 12 C 60 4, 120 4, 170 9 S 260 15, 296 6" /></svg></span> spent.</h1>
-    <p class="lede">Your bank shows what you paid. Split apps show who owes&nbsp;whom.</p>
+    <p class="lede">Your bank shows what you paid. Trezzit shows what you&nbsp;spent.</p>
     <div class="cta-row">
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
       <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no sign-up</a>
     </div>
-    <p class="micro"><a class="ai-chip" href="ai/"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z" fill="currentColor"/></svg>Ask Claude or ChatGPT<span class="chip-more"> about your spending</span> <span aria-hidden="true">→</span></a></p>
+    <p class="micro"><a class="ai-chip" href="ai/"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 2.5l1.6 4.4 4.4 1.6-4.4 1.6L10 14.5l-1.6-4.4L4 8.5l4.4-1.6zM15.5 13l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z" fill="currentColor"/></svg>Works with Claude and ChatGPT <span aria-hidden="true">→</span></a></p>
 
     <div class="hero-viz" data-hero>
       <figure class="bank">
@@ -82,7 +82,7 @@
           <button type="button" class="tzc-replay" data-replay aria-label="Replay animation"><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M4.5 10a5.5 5.5 0 1 0 1.7-4M4.5 3.5V7h3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
         <p class="tzc-label" data-label>You spent</p>
-        <p class="tzc-amt"><b class="money" data-amt>$30.00</b> <span class="money">of $100.00</span></p>
+        <p class="tzc-amt"><span class="visually-hidden">$30.00 of $100.00</span><b class="money" data-amt aria-hidden="true">$30.00</b> <span class="money" aria-hidden="true">of $100.00</span></p>
         <div class="tzc-bar" aria-hidden="true">
           <i class="you" style="--w:30"><span>You</span></i><i class="maya" style="--w:30"><span>Maya</span></i><i class="jordan" style="--w:20"><span>Jordan</span></i><i class="sam" style="--w:20"><span>Sam</span></i>
         </div>
@@ -115,6 +115,7 @@
     <article class="verb" id="split" aria-labelledby="split-t">
       <div class="verb-copy rv">
         <h3 id="split-t"><span class="verb-n" aria-hidden="true">2</span>Split by item.</h3>
+        <p class="verb-more"><a href="roommates/#rent">Rent too <span aria-hidden="true">→</span></a></p>
       </div>
       <div class="verb-demo rv">
         <div class="demo-frame" id="split-demo">
@@ -125,11 +126,11 @@
 
     <article class="verb" id="understand" aria-labelledby="understand-t">
       <div class="verb-copy rv">
-        <h3 id="understand-t"><span class="verb-n" aria-hidden="true">3</span>Your $9.50, even when Jordan&nbsp;paid.</h3>
+        <h3 id="understand-t"><span class="verb-n" aria-hidden="true">3</span>Your share, whoever&nbsp;paid.</h3>
       </div>
       <div class="verb-demo rv">
         <div class="demo-frame" id="ledger-demo">
-          <noscript><p class="nojs">Spent in October, your share only: $121.00, plus $639.35 of rent and bills.</p></noscript>
+          <noscript><p class="nojs">October, your share: $760.35. You paid alone $48.22, you split it $63.28, someone else paid $648.85.</p></noscript>
         </div>
       </div>
     </article>
@@ -141,16 +142,16 @@
   <div class="wrap">
     <div class="ai-grid">
       <header class="ai-copy rv">
-        <h2 id="ai-t">Ask Claude or ChatGPT about your&nbsp;spending.</h2>
+        <h2 id="ai-t">Or ask Claude or ChatGPT to add&nbsp;it.</h2>
         <ul class="trust" role="list">
-          <li>You see everything it adds</li>
-          <li>Never moves money. No bank access.</li>
+          <li>Every change it makes is in your log</li>
+          <li>Never moves money</li>
           <li>Disconnect any time</li>
         </ul>
         <p class="ai-links"><a class="c-btn c-btn-primary" href="ai/#connect">Connect your AI</a></p>
       </header>
       <div class="ai-demo rv" id="chat-demo">
-        <noscript><p class="nojs">You: Here’s my October card statement. What’s missing from Trezzit? Assistant: Two charges aren’t in Trezzit yet.</p></noscript>
+        <noscript><p class="nojs">You: Split this with my roommates. Assistant: Saved. Maya, Jordan and Sam owe you $70.00.</p></noscript>
       </div>
     </div>
   </div>
@@ -164,7 +165,7 @@
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
       <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no sign-up</a>
     </div>
-    <p class="close-sub rv">No bank login needed. Friends don’t need an account.</p>
+    <p class="close-sub rv">No bank login needed.</p>
   </div>
 </section>
 

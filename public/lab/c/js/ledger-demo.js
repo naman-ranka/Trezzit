@@ -27,21 +27,22 @@ const MAIN_CAT = (e) => {
 export async function mountLedger(root, opts = {}) {
   const data = await octoberLedger();
   const { entries } = data;
-  // Rent is most of a month and drowns every other bar, so the month shows day-to-day
-  // spending and rent sits under it as one quiet "plus rent and bills" row (it has its own page).
+  // One total for the month, rent included: the headline is everything you spent, your share only.
+  // Rent leads the category list as one row (it links to its own page) and is left out of the
+  // per-category bars, so it doesn't flatten the day-to-day ones.
   const fixed = entries.find((e) => e.id === 'monthly-rent');
   const dayToDay = entries.filter((e) => e !== fixed);
   const byCat = {};
   dayToDay.forEach((e) => e.lines.forEach((l) => { byCat[l.cat] = (byCat[l.cat] || 0) + l.cents; }));
-  const spent = dayToDay.reduce((a, e) => a + e.youCents, 0);
-  const FIXED_CATS = ['rent', 'utilities', 'internet'];
-  const last = Object.entries(LAST_MONTH).filter(([k]) => !FIXED_CATS.includes(k)).reduce((a, [, c]) => a + c, 0);
+  const spent = entries.reduce((a, e) => a + e.youCents, 0);
+  const last = Object.values(LAST_MONTH).reduce((a, c) => a + c, 0);
   const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
   const max = cats[0][1];
   const delta = spent - last;
-  // colour means one thing at a time: the bar shows the top 4 categories in their hue and one grey "Other"
-  const rest = cats.slice(4).reduce((a, [, c]) => a + c, 0);
-  const barParts = cats.slice(0, 4).map(([k, c]) => [c, cat(k).color]).concat(rest ? [[rest, '#cbd2dc']] : []);
+  // colour means one thing at a time: rent, the top 3 categories in their hue, and one grey "Other"
+  const rest = cats.slice(3).reduce((a, [, c]) => a + c, 0);
+  const barParts = (fixed ? [[fixed.youCents, cat('rent').color]] : []).concat(cats.slice(0, 3).map(([k, c]) => [c, cat(k).color]), rest ? [[rest, '#cbd2dc']] : []);
+  const nRows = cats.length + (fixed ? 1 : 0);
   root.classList.add('ledger');
   // compact (home): fewer categories and rows on phones, so the demo stays one screen tall
   if (opts.compact) root.classList.add('compact');
@@ -49,18 +50,37 @@ export async function mountLedger(root, opts = {}) {
   const findHTML = `
     <div class="lg-find">
       <label class="lg-search">${icon.search}<span class="visually-hidden">Search every item</span>
-        <input type="search" placeholder="${opts.compact ? 'Search any item, like “towels”' : 'Search items, stores, categories'}" autocomplete="off" spellcheck="false"></label>
+        <input type="search" placeholder="${opts.compact ? 'Search items, like “towels”' : 'Search items, stores, categories'}" autocomplete="off" spellcheck="false"></label>
       ${opts.compact ? '' : `<p class="lg-try"><span>Try</span>${chips.map((q) => `<button type="button" class="chip-q" data-q="${q}" aria-pressed="false">${q}</button>`).join('')}</p>`}
       <p class="lg-count" aria-live="polite"></p>
       <ul class="lg-list" role="list"></ul>
     </div>`;
-  root.innerHTML = `${findHTML}
+  // home (byPayer): the month is one total split by who paid, the heading's promise ("your share, whoever paid");
+  // each row filters the list beside it. No categories, bar or deltas here: /just-me has those.
+  const PAY = [
+    ['alone', 'You paid alone', 'Corner Pharmacy', (e) => e.payer === 'you' && e.kind === 'personal'],
+    ['split', 'You split it', 'Groceries, a trip dinner, Netflix', (e) => e.payer === 'you' && e.kind !== 'personal'],
+    ['other', 'Someone else paid', 'Rent (Maya), pizza night (Jordan)', (e) => e.payer !== 'you'],
+  ];
+  const payHTML = `<div class="lg-sum lg-sum-pay">
+      <p class="lg-label">October, your share</p>
+      <p class="lg-total money"><span class="visually-hidden">${money(spent)}</span><span class="lg-n" aria-hidden="true">${money(spent)}</span></p>
+      <ul class="lg-pays" role="list" aria-label="By who paid">${PAY.map(([k, label, sub, f]) => `<li><button type="button" class="lg-pay" data-pay="${k}" aria-pressed="false">
+        <span class="lg-pk"><b>${label}</b><small>${sub}</small></span><b class="money">${money(entries.filter(f).reduce((a, e) => a + e.youCents, 0))}</b></button></li>`).join('')}</ul>
+    </div>`;
+  root.innerHTML = opts.byPayer ? `${findHTML}${payHTML}` : `${findHTML}
     <div class="lg-sum">
       <p class="lg-label">Spent in October <span class="lg-tag">Your share only</span></p>
       <p class="lg-total money"><span class="visually-hidden">${money(spent)}</span><span class="lg-n" aria-hidden="true">${money(spent)}</span></p>
       <p class="lg-sub"><span class="${delta < 0 ? 'down' : 'up'}">${money(Math.abs(delta))} ${delta < 0 ? 'less' : 'more'} than September</span></p>
       <div class="lg-bar" aria-hidden="true">${barParts.map(([c, color]) => `<i style="--c:${color};--w:${(c / spent) * 100}%"></i>`).join('')}</div>
       <ul class="lg-cats short" role="list" aria-label="By category">
+        ${fixed ? `<li><a class="lg-cat lg-fixed" href="${esc(opts.fixedHref || '../recurring/')}">
+            <span class="lg-ci" style="--c:${cat('rent').color}">${catIcon('rent')}</span>
+            <span class="lg-cn">Rent and bills</span>
+            <span class="lg-cb lg-rtag" aria-hidden="true">${icon.repeat}Monthly</span>
+            <b class="money">${money(fixed.youCents)}</b>
+            <span class="lg-cd lg-fgo"><span aria-hidden="true">→</span><span class="visually-hidden">Repeats every month</span></span></a></li>` : ''}
         ${cats.map(([k, c]) => {
           const prev = LAST_MONTH[k] || 0;
           const d = c - prev;
@@ -75,17 +95,14 @@ export async function mountLedger(root, opts = {}) {
           </button></li>`;
         }).join('')}
       </ul>
-      <button type="button" class="c-link-btn lg-more">Show all ${cats.length} categories</button>
-      ${fixed ? `<a class="lg-fixed" href="${esc(opts.fixedHref || '../recurring/')}">
-        <span class="lg-ci" style="--c:${cat('rent').color}">${catIcon('rent')}</span>
-        <span class="lg-cn">Rent and bills, monthly</span>
-        <b class="money">${money(fixed.youCents)}</b><span class="lg-fgo" aria-hidden="true">→</span></a>` : ''}
+      <button type="button" class="c-link-btn lg-more">Show all ${nRows} categories</button>
     </div>`;
 
   const input = root.querySelector('input') || { value: '', addEventListener() {}, focus() {} };
   const listEl = root.querySelector('.lg-list');
   const countEl = root.querySelector('.lg-count');
   let filterCat = null;
+  let filterPay = null;
 
   const allLines = entries.flatMap((e) => e.lines.map((l) => ({ ...l, entry: e })));
 
@@ -94,7 +111,7 @@ export async function mountLedger(root, opts = {}) {
     const who = e.payer === 'you' ? 'you paid' : `${e.payer} paid`;
     // say what a row is in the words a visitor already has: just you, who paid, what the rent covers
     const sub = e.kind === 'personal' ? `Just you · ${esc(e.date)}`
-      : e.id === 'monthly-rent' ? `${esc(e.date)} · ${esc(who)} · rent, utilities, internet`
+      : e.id === 'monthly-rent' ? (opts.byPayer ? `${esc(e.group)} · <span class="lg-who">${esc(who)}</span> · adds on the 1st` : `${esc(e.date)} · ${esc(who)} · rent, utilities, internet`)
         : `${esc(e.group)} · ${esc(e.date)} · <span class="lg-who">${esc(who)}</span>`;
     return `<li class="lg-row" data-id="${esc(e.id)}">
       <span class="lg-ri" style="--c:${cat(k).color}">${e.kind === 'recurring' ? `<span class="lg-rec" title="Recurring">${icon.repeat}</span>` : ''}${catIcon(k)}</span>
@@ -123,11 +140,15 @@ export async function mountLedger(root, opts = {}) {
   function render() {
     const q = input.value.trim();
     const ql = q.toLowerCase();
-    root.querySelectorAll('.lg-cat').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cat === filterCat)));
+    root.querySelectorAll('button.lg-cat').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cat === filterCat)));
     root.querySelectorAll('.chip-q').forEach((b) => b.setAttribute('aria-pressed', String(!!q && b.dataset.q === q)));
+    root.querySelectorAll('.lg-pay').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pay === filterPay)));
+    root.classList.toggle('filtered', !!filterPay);
     if (!q && !filterCat) {
-      listEl.innerHTML = entries.map(entryRow).join('');
-      countEl.textContent = opts.compact ? 'Latest' : `${entries.length} expenses this month`;
+      const pf = filterPay && PAY.find(([k]) => k === filterPay)[3];
+      listEl.innerHTML = entries.filter((e) => !pf || pf(e)).map(entryRow).join('')
+        + (filterPay === 'other' && opts.rentHref ? `<li class="lg-rentlink"><a href="${esc(opts.rentHref)}">Split rent by room size <span aria-hidden="true">→</span></a></li>` : '');
+      countEl.textContent = opts.compact ? '' : `${entries.length} expenses this month`;
       return;
     }
     const hits = allLines.filter((l) => (!filterCat || l.cat === filterCat)
@@ -143,26 +164,31 @@ export async function mountLedger(root, opts = {}) {
   }
 
   const moreCats = root.querySelector('.lg-more');
-  moreCats.addEventListener('click', () => {
+  moreCats?.addEventListener('click', () => {
     const ul = root.querySelector('.lg-cats');
     ul.classList.toggle('short');
-    moreCats.textContent = ul.classList.contains('short') ? `Show all ${cats.length} categories` : 'Show fewer';
+    moreCats.textContent = ul.classList.contains('short') ? `Show all ${nRows} categories` : 'Show fewer';
   });
-  input.addEventListener('input', () => { if (input.value.trim()) filterCat = null; render(); });
+  input.addEventListener('input', () => { if (input.value.trim()) { filterCat = null; filterPay = null; } render(); });
+  root.querySelectorAll('.lg-pay').forEach((b) => b.addEventListener('click', () => {
+    filterPay = filterPay === b.dataset.pay ? null : b.dataset.pay;
+    input.value = '';
+    render();
+  }));
   // a tapped chip shows its results; only keyboard or mouse users get the caret (no soft keyboard over the results)
   const finePointer = matchMedia('(pointer: fine)');
   root.querySelectorAll('.chip-q').forEach((b) => b.addEventListener('click', (e) => {
     input.value = b.dataset.q; filterCat = null; render();
     if (e.detail === 0 || finePointer.matches) input.focus({ preventScroll: true });
   }));
-  root.querySelectorAll('.lg-cat').forEach((b) => b.addEventListener('click', () => {
+  root.querySelectorAll('button.lg-cat').forEach((b) => b.addEventListener('click', () => {
     filterCat = filterCat === b.dataset.cat ? null : b.dataset.cat;
     if (filterCat) input.value = '';
     render();
   }));
   render();
 
-  // home: the row that proves the step's heading ("Your $9.50, even when Jordan paid.") is pointed out once seen
+  // home: the row that proves the step's heading ("Your share, whoever paid.") is pointed out once seen
   if (opts.highlight) {
     onVisible(root, () => root.classList.add('point'), { threshold: 0.3 });
   }

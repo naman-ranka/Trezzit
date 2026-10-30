@@ -1,11 +1,11 @@
 /**
  * chat-demo.js: a scripted exchange with an AI app that has Trezzit
- * connected. It opens on a finished conversation; a prompt (or Replay) plays
- * one, which can be paused. Reduced motion shows the finished conversation.
+ * connected. It opens on a finished conversation and plays once when first in
+ * view; a suggestion (the active one again replays it) plays one. Reduced motion
+ * shows the finished conversation.
  */
 
-import { PEOPLE } from './data.js';
-import { money, esc, ICON, avatar, reduced, watchVisible, whenVisible, bankAmt } from './util.js';
+import { money, esc, ICON, reduced, watchVisible, whenVisible, bankAmt } from './util.js';
 
 function card(title, sub, rows, foot = '', note = '') {
   return `<div class="tzcard">
@@ -16,39 +16,39 @@ function card(title, sub, rows, foot = '', note = '') {
 const row = (left, right, extra = '') => `<li><span>${left}</span><span class="money">${right}</span>${extra}</li>`;
 
 export function scripts(sc) {
-  const byId = Object.fromEntries(sc.map((s) => [s.id, s]));
-  // Two November charges that are not in Trezzit yet. October stays exactly as the statement table shows it.
+  // Two November charges that are not in Trezzit yet. October stays exactly as the search section shows it.
   const parking = { total: 600, mine: 600 };
   const cafe = { total: 970, mine: 485 };
   const line = (d, m, c) => `<span class="bk">${d} ${m} ${bankAmt(c)}</span>`;
-  // The house balance: every Roommates expense you paid in October (groceries, rent and bills, streaming).
-  const house = ['groceries', 'rent', 'streaming'].map((id) => byId[id].sum.result.people);
-  const owes = (id) => house.reduce((a, p) => a + (p[id]?.cents || 0), 0);
-  const [maya, jordan, sam] = ['maya', 'jordan', 'sam'].map(owes);
-  const who = (id) => `${avatar(PEOPLE[id], { size: 'sm' })}${PEOPLE[id].name}`;
+  // Groceries in October: your share of every grocery item, per expense (the same numbers as
+  // the hero's Green Basket legend and the search section's "groceries" total).
+  const groc = sc.map((s) => {
+    const items = s.sum.result.items.filter((it) => it.category === 'groceries' && (it.shares?.you || 0) > 0);
+    return { s, n: items.length, one: items.length === 1 ? items[0].name : '', cents: items.reduce((a, it) => a + it.shares.you, 0) };
+  }).filter((g) => g.cents > 0).sort((a, b) => b.cents - a.cents);
+  const grocTotal = groc.reduce((a, g) => a + g.cents, 0);
+  const store = (s) => s.store || s.merchant || s.title;
 
   return {
     match: {
       steps: [
         { user: "Add what's missing from my statement. The café was with Maya.", attach: { icon: 'doc', name: 'nov-statement.pdf' } },
         { tools: ['Added 2 expenses'] },
-        { html: card('Added from your statement', '',
+        { html: card('From nov-statement.pdf', '',
           row(`${line('NOV 03', 'CITY PARKING', parking.total)}<small>Just you</small>`, money(parking.mine))
           + row(`${line('NOV 06', 'CORNER CAFE', cafe.total)}<small>You and Maya</small>`, money(cafe.mine)),
-          '<p class="tzcard-by">Added by Claude · in your activity log</p>') },
-        { ai: `Saved. Maya owes you ${money(cafe.total - cafe.mine)}.` },
+          '<p class="tzcard-by">Added by Claude</p>') },
+        { ai: `Maya owes you ${money(cafe.total - cafe.mine)}.` },
       ],
     },
-    house: {
+    groceries: {
       steps: [
-        { user: 'Who owes who? Sam paid me back for October.' },
-        { tools: ['Noted that Sam paid you'] },
-        { html: card('Roommates', 'Rent, bills and groceries · October',
-          row(who('maya'), money(maya))
-          + row(who('jordan'), money(jordan))
-          + row(`${who('sam')}<small class="paid">Paid ${money(sam)}</small>`, money(0)),
-          `<p class="tzcard-f">Still owed to you <b class="money">${money(maya + jordan)}</b></p>`) },
-        { ai: 'Noted. Sam paid you back outside Trezzit, so Sam is settled.' },
+        { user: 'What did I spend on groceries in October?' },
+        { tools: ['Searched October'] },
+        { html: card('Groceries · October', 'Your share',
+          groc.map((g) => row(`${esc(store(g.s))}<small>${esc(g.s.day)} · ${g.one ? esc(g.one) : `${g.n} items`}</small>`, money(g.cents))).join(''),
+          `<p class="tzcard-f">Total <b class="money">${money(grocTotal)}</b></p>`) },
+        { ai: `${money(grocTotal)}, mostly at ${store(groc[0].s).replace(/ Market$/, '')}.` },
       ],
     },
   };
@@ -59,21 +59,19 @@ export function initChatDemo(section, scenarios) {
   const root = section.querySelector('[data-chat]');
   const log = root.querySelector('[data-log]');
   const chips = section.querySelectorAll('[data-script]');
-  const ctl = root.querySelector('[data-ctl]');
   const live = root.querySelector('[data-chat-live]');
   // Follow the newest message unless the visitor has scrolled up to read.
   let stick = true;
   log.addEventListener('scroll', () => { stick = log.scrollHeight - log.scrollTop - log.clientHeight < 40; }, { passive: true });
   const toEnd = () => { if (stick) log.scrollTop = log.scrollHeight; };
   let run = 0;
-  let paused = false;
   let wake = null;
   let playing = false;
   let current = 'match';
   let inView = true;
 
   const gate = async (id) => {
-    while (paused || !inView) {
+    while (!inView) {
       await new Promise((r) => { wake = r; });
       if (id !== run) throw new Error('stale');
     }
@@ -86,13 +84,6 @@ export function initChatDemo(section, scenarios) {
       await gate(id);
     }
   };
-
-  function setCtl(state) {
-    ctl.dataset.state = state;
-    const label = { pause: 'Pause', play: 'Play', replay: 'Replay' }[state];
-    ctl.innerHTML = `${ICON[state === 'replay' ? 'replay' : state]}<span>${label}</span>`;
-    ctl.setAttribute('aria-label', `${label} the conversation`);
-  }
 
   const bubble = (step) => {
     if (step.user !== undefined) {
@@ -138,9 +129,9 @@ export function initChatDemo(section, scenarios) {
     current = key;
     chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.script === key)));
     fit(key);
-    if (reduced()) { setCtl('replay'); ctl.hidden = true; return; }
-    paused = false; wake?.();
-    playing = true; setCtl('pause');
+    if (reduced()) return;
+    wake?.();
+    playing = true;
     const msgs = [...log.children];
     log.classList.add('is-playing');
     log.scrollTop = 0;
@@ -159,7 +150,7 @@ export function initChatDemo(section, scenarios) {
           await wait(m.classList.contains('msg-user') ? 200 : 320, id);
         }
       }
-      playing = false; setCtl('replay');
+      playing = false;
       log.classList.remove('is-playing');
       const last = S[key].steps[S[key].steps.length - 1];
       if (live) live.textContent = last.ai || '';
@@ -172,20 +163,11 @@ export function initChatDemo(section, scenarios) {
     if (r.top < 64 || r.top > innerHeight * 0.55) root.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
     play(c.dataset.script);
   }));
-  ctl.addEventListener('click', () => {
-    const st = ctl.dataset.state;
-    if (st === 'replay') { play(current); return; }
-    paused = st === 'pause';
-    setCtl(paused ? 'play' : 'pause');
-    if (!paused) wake?.();
-  });
 
   // Opens finished (so nothing is ever half-drawn); the first time it comes into view it
-  // plays once. A prompt (or Replay) plays a conversation.
+  // plays once. A suggestion plays its conversation (tapping the active one replays it).
   fit('match');
-  setCtl('replay');
-  if (reduced()) ctl.hidden = true;
-  else whenVisible(log, () => { if (!playing && run === 0) play('match'); }, { threshold: 0.5 });
+  if (!reduced()) whenVisible(log, () => { if (!playing && run === 0) play('match'); }, { threshold: 0.5 });
   let lastW = innerWidth;
   addEventListener('resize', () => { if (innerWidth !== lastW && !playing) { lastW = innerWidth; tallest = 0; fit(current); } }, { passive: true });
   document.fonts?.ready.then(() => { if (!playing) { tallest = 0; fit(current); } });

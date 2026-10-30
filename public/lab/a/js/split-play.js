@@ -23,6 +23,7 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
   let focusRow = null;
   let fc = 0;
   let announceT = 0;
+  let whyT = 0;
   let el = {};
 
   const items = (r) => r.items;
@@ -48,25 +49,28 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
     folded = plain.length >= 3 ? plain : [];
     const cats = new Set(folded.map((i) => model.lines[i].category));
     const grpName = cats.size === 1 ? (CATEGORIES[[...cats][0]]?.label || 'Shared') : 'Shared';
-    const dots = (label) => `<span class="who" role="group" aria-label="Who had ${esc(label)}">${people.map((p) => `<button type="button" class="dot-b" data-p="${p}" aria-label="${esc(label)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button>`).join('')}</span>`;
+    // the same grid semantics as the landing story: a row per line, its name the row header, a cell per person
+    const dots = (label) => `<span class="who" role="none">${people.map((p) => `<span class="dc" role="gridcell"><button type="button" class="dot-b" data-p="${p}" aria-label="${esc(label)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button></span>`).join('')}</span>`;
+    const xcell = '<span class="who who-x" role="gridcell">Follows each share</span>';
     const row = (l, sub = false) => {
       const it = itemAt(res, l.index);
-      if (l.extra) return `<div class="st-row st-x"><span class="nm">${esc(l.pretty)}</span><span class="money" data-n="by share">${money(it.totalCents)}</span><span class="who who-x">Follows each share</span></div>`;
-      return `<div class="st-row${sub ? ' st-subrow' : ''}" data-i="${l.index}"><span class="nm">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">+ tax</small>' : ''}</span><span class="money"${l.taxCents ? ' data-n="with tax"' : ''}>${money(it.totalCents)}</span>${dots(l.pretty)}</div>`;
+      if (l.extra) return `<div class="st-row st-x" role="row"><span class="nm" role="rowheader">${esc(l.pretty)}</span><span class="money" role="gridcell" data-n="by share">${money(it.totalCents)}</span>${xcell}</div>`;
+      return `<div class="st-row${sub ? ' st-subrow' : ''}" role="row" data-i="${l.index}"><span class="nm" role="rowheader">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">with tax</small>' : ''}</span><span class="money" role="gridcell"${l.taxCents ? ' data-n="with tax"' : ''}>${money(it.totalCents)}</span>${dots(l.pretty)}</div>`;
     };
     // a bill-level tip comes back from the engine as an extra line past the receipt's own lines
     const tip = items(res).find((x) => x.itemType === 'Tip' && x.index >= model.lines.length);
     stage.innerHTML = `
-      <div class="st-people"><span class="st-sp" aria-hidden="true"><strong>${esc(model.merchant)}</strong><small>${model.lines.length} items · ${money(model.totalCents)}</small></span><div class="st-pp">${people.map((id) => `
+      <div class="st-people"><span class="st-sp" aria-hidden="true"><strong>${esc(model.merchant)}</strong><small>${model.lines.length} items · ${money(model.totalCents)}${PAYER[model.id] ? ` · ${esc(PEOPLE[PAYER[model.id]].name)} paid` : ''}</small></span><div class="st-pp">${people.map((id) => `
         <div class="st-p" data-p="${id}">${avatar(PEOPLE[id])}<span class="nm">${esc(PEOPLE[id].name)}</span><span class="amt money"></span></div>`).join('')}</div></div>
-      <div class="st-items">${folded.length ? `
-        <div class="st-row st-grp" data-lines="${folded.join(',')}">
-          <span class="nm"><button type="button" class="st-exp" aria-expanded="false" aria-controls="gs-sub"><span class="gl">${esc(grpName)}</span> <small>${folded.length} shared</small>${CHEV}</button></span><span class="money" data-n="${folded.length} shared"></span>
+      <div class="st-items" role="grid" aria-label="Who had what" aria-describedby="gs-hint">${folded.length ? `
+        <div class="st-row st-grp" role="row" data-lines="${folded.join(',')}">
+          <span class="nm" role="rowheader"><button type="button" class="st-exp" aria-expanded="false" aria-controls="gs-sub" aria-label="${esc(grpName)}, ${folded.length} items"><span class="gl">${esc(grpName)}</span> <small>${folded.length} items</small>${CHEV}</button></span><span class="money" role="gridcell" data-n="${folded.length} items"></span>
           ${dots(`${folded.length} shared ${grpName.toLowerCase()}`)}
         </div>
-        <div class="st-sub" id="gs-sub" hidden>${folded.map((i) => row(model.lines[i], true)).join('')}</div>` : ''}
+        <div class="st-sub" id="gs-sub" role="rowgroup" hidden>${folded.map((i) => row(model.lines[i], true)).join('')}</div>` : ''}
         ${model.lines.filter((l) => !folded.includes(l.index)).map((l) => row(l)).join('')}
-        ${tip ? `<div class="st-row st-x"><span class="nm">Tip</span><span class="money" data-n="by share">${money(tip.totalCents)}</span><span class="who who-x">Follows each share</span></div>` : ''}</div>
+        ${tip ? `<div class="st-row st-x" role="row"><span class="nm" role="rowheader">Tip</span><span class="money" role="gridcell" data-n="by share">${money(tip.totalCents)}</span>${xcell}</div>` : ''}</div>
+      <p class="visually-hidden" id="gs-hint">Arrow keys move between items and people. Space adds or removes someone.</p>
       <div class="st-foot"><p class="ss-owe">You spent <strong class="money ss-you"></strong> <span class="ss-them"></span></p><span class="ss-check"></span><button type="button" class="st-reset is-off" tabindex="-1" aria-label="Reset the split" title="Reset">${ICON.replay}</button></div>`;
     el = {
       sub: $('.st-sub', stage), exp: $('.st-exp', stage), grp: $('.st-grp', stage),
@@ -78,6 +82,7 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
   }
 
   function paint() {
+    clearTimeout(whyT);
     const res = compute(model);
     const vis = visRows();
     if (!vis.includes(focusRow)) focusRow = el.grp || vis[0];
@@ -130,7 +135,7 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
   }
 
   stage.addEventListener('click', (e) => {
-    if (e.target.closest('.st-reset')) { model.lines = JSON.parse(JSON.stringify(original)); paint(); return; }
+    if (e.target.closest('.st-reset')) { model.lines = JSON.parse(JSON.stringify(original)); if (el.sub && !el.sub.hidden) toggleFold(); else paint(); return; }
     if (e.target.closest('.st-exp') || (e.target.closest('.st-grp') && !e.target.closest('.who'))) { toggleFold(); return; }
     const btn = e.target.closest('.dot-b');
     if (!btn) return;
@@ -145,6 +150,10 @@ export function mountSplit(root, { initial = 'green-basket' } = {}) {
         const who = $('.who', row);
         who.classList.remove('nope'); void who.offsetWidth; who.classList.add('nope');
         live.textContent = 'Someone has to have it. Add another person first.';
+        // and where the eye is: the footer's check line, for two seconds
+        clearTimeout(whyT);
+        el.check.className = 'ss-check is-why'; el.check.textContent = 'Someone has to have it.';
+        whyT = setTimeout(paint, 2000);
         return;
       }
       ix.forEach((i) => { const m = lineMembers(model.lines[i]).filter((x) => x !== p); model.lines[i].split = { type: 'equal', people: people.filter((x) => m.includes(x)) }; });

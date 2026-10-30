@@ -108,7 +108,7 @@ const DEFS = [
     // Examples page: a shared line leads (towels, 4 ways), so the first tap takes someone
     // off and the shares visibly change; then the lines that make the shares differ.
     lead: [13, 0, 11, 12, 9, 10],
-    bank: { date: 'OCT 24', merchant: 'GREEN BASKET MKT', cat: 'Shopping' }, day: 'Oct 24',
+    bank: { date: 'OCT 24', merchant: 'GREEN BASKET MKT', cat: 'Groceries' }, day: 'Oct 24',
   },
   {
     id: 'dinner', kind: 'shared', title: 'Dinner a friend paid', short: 'Dinner',
@@ -125,7 +125,7 @@ const DEFS = [
   },
   {
     id: 'rent', kind: 'recurring', title: 'Rent and bills', short: 'Rent',
-    payer: 'you', group: 'Roommates', repeat: 'Every month on the 1st',
+    payer: 'you', group: 'Roommates', repeat: 'Every month on the 1st', cadence: 'Every month · 1st',
     bank: { date: 'OCT 01', merchant: 'OAK ST PROPERTY', cat: 'Transfer' }, day: 'Oct 1', store: 'Oak St Property',
     people: ROOMIES,
     items: [
@@ -136,12 +136,11 @@ const DEFS = [
       { name: 'Parking space 12', amount: '75.00', category: 'parking', split: { type: 'exact', amounts: { jordan: '75.00' } } },
     ],
     total: '2632.40',
-    why: 'Jordan has the big room and parking. Sam has the small room.',
     next: ['Nov 1', 'Dec 1', 'Jan 1'],
   },
   {
     id: 'streaming', kind: 'recurring', title: 'Streaming, split four ways', short: 'Streaming',
-    payer: 'you', group: 'Roommates', repeat: 'Every month on the 3rd',
+    payer: 'you', group: 'Roommates', repeat: 'Every month on the 3rd', cadence: 'Every month · 3rd',
     bank: { date: 'OCT 03', merchant: 'STREAMBOX.TV', cat: 'Entertainment' }, day: 'Oct 3', store: 'StreamBox',
     people: ROOMIES,
     items: [{ name: 'Premium plan', amount: '22.99', category: 'subscriptions', split: eq(ROOMIES) }],

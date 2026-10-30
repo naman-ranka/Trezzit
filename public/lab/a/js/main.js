@@ -21,8 +21,11 @@ safe(() => mountScan($('#scan-demo'), {
   splitLabel: 'Split it',
   // rent is not a receipt anyone snaps: the landing scan offers groceries, pharmacy and dinner (/scan/ keeps all four)
   exclude: ['monthly-rent'],
+  foldAll: true,
   onSplit(model) {
     if (model.id === 'green-basket') {
+      // the same receipt, as it was just read: the story returns to the default split and flashes its header
+      document.dispatchEvent(new CustomEvent('tz:story-arrive'));
       // land on the playground ("Tap to change who had what."): on desktop, the last scroll step under the reading line
       const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
       const last = $('#story .step[data-step="3"]');
@@ -37,10 +40,20 @@ safe(() => mountScan($('#scan-demo'), {
     location.href = `./scan/?r=${encodeURIComponent(id)}#split`;
   },
 }));
-safe(initStory);
-safe(initScenarios);
-safe(initChat);
-safe(initLedger);
+const inits = [safe(initStory), safe(initScenarios), safe(initChat), safe(initLedger)];
+
+// A shared link like /#ai: the scan, story and chat take their final height after the browser's own hash jump, so
+// the target drifts (one screen short on a phone). Once they are built, land on it again, unless the visitor has
+// already scrolled on their own.
+if (location.hash.length > 1) {
+  let moved = false;
+  const mine = () => { moved = true; };
+  ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach((t) => addEventListener(t, mine, { once: true, passive: true }));
+  Promise.all(inits).then(() => requestAnimationFrame(() => {
+    const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (el && !moved) el.scrollIntoView({ block: 'start' });
+  }));
+}
 
 function nav() {
   const navEl = $('#nav');
@@ -49,12 +62,20 @@ function nav() {
   const update = () => {
     t = false;
     navEl.classList.toggle('is-scrolled', scrollY > 8);
-    const y = navEl.offsetHeight / 2;
-    const onDark = darks.some((d) => { const r = d.getBoundingClientRect(); return r.top <= y && r.bottom >= y; });
+    // dark as soon as any dark section is under the bar, so the bar always reads as part of the navy edge it meets
+    // (a light bar over the top of a navy band looked like a seam)
+    const h = navEl.offsetHeight;
+    // a section whose top sits exactly at the bar's bottom (an anchor jump) counts as under it
+    const onDark = darks.some((d) => { const r = d.getBoundingClientRect(); return r.top <= h + 1 && r.bottom > 1; });
     navEl.classList.toggle('on-dark', onDark);
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', onDark ? '#0a1020' : '#ffffff');
   };
-  addEventListener('scroll', () => { if (!t) { t = true; requestAnimationFrame(update); } }, { passive: true });
+  const soon = () => { if (!t) { t = true; requestAnimationFrame(update); } };
+  addEventListener('scroll', soon, { passive: true });
+  // anchor jumps and programmatic scrolls (nav links, "Split it", a chip) settle the colour too, not only wheel scrolls
+  addEventListener('scrollend', soon);
+  addEventListener('hashchange', () => requestAnimationFrame(soon));
+  addEventListener('load', soon);
   update();
 }
 

@@ -11,7 +11,7 @@
 <link rel="icon" href="../../_kit/brand/favicon.ico" sizes="any">
 <link rel="preload" href="../../_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../../_kit/tokens.css">
-<link rel="stylesheet" href="../../_kit/receipts/receipt.css" data-tz-receipt>
+<link rel="stylesheet" href="../css/receipt.css" data-tz-receipt>
 <link rel="stylesheet" href="../css/a.css">
 <link rel="stylesheet" href="../css/scan.css">
 <script type="module" src="../js/scan-page.js"></script>
@@ -25,12 +25,6 @@
       <svg viewBox="0 0 120 120" width="22" height="22" aria-hidden="true" fill="currentColor"><polygon points="10.56,85.55 109.44,24.22 109.44,35.03 10.56,96.58" fill-opacity=".64"/><path d="M10 8.8h100v10.26H10zM45.42 8.8h9.07v81.23h-9.07zM64.69 30.01h9.08v81.17h-9.08zM10 100.92h100v10.26H10z"/></svg>
       <span>Trezzit</span>
     </a>
-    <nav class="pg-nav" aria-label="Steps">
-      <ol class="pg-steps" role="list">
-        <li><a href="#scan" aria-current="step">1 Scan</a></li>
-        <li><a href="#split">2 Split</a></li>
-      </ol>
-    </nav>
     <div class="nav-cta">
       <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
       <a class="btn btn-primary btn-sm" href="https://app.trezzit.com/signup">Sign up</a>
@@ -51,8 +45,8 @@
   <section class="pg-sec pg-split" id="split" aria-labelledby="split-title">
     <div class="wrap">
       <header class="pg-head">
-        <h2 id="split-title" class="h3">Split it.</h2>
-        <p class="sub">Tap to change who had what. Nothing is saved.</p>
+        <h2 id="split-title" class="h3">Who had what?</h2>
+        <p class="sub">Nothing is saved.</p>
       </header>
       <div class="play" id="play-root"></div>
     </div>
@@ -65,15 +59,29 @@
         <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
         <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
       </div>
-      <a class="pg-ai" href="/mcp">Next time, ask Claude or ChatGPT</a>
+      <a class="pg-ai" href="/mcp">Or ask Claude or ChatGPT</a>
     </div>
   </section>
 </main>
 
-<footer class="pg-foot">
-  <div class="wrap">
-    <p>Sample receipts are made up. Your own photo is scanned only on trezzit.com, after you agree to send it to Google Gemini. Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
-    <nav class="pg-links" aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/support">Support</a></nav>
+<footer class="foot dark">
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <svg viewBox="0 0 120 120" width="22" height="22" aria-hidden="true" fill="currentColor"><polygon points="10.56,85.55 109.44,24.22 109.44,35.03 10.56,96.58" fill-opacity=".64"/><path d="M10 8.8h100v10.26H10zM45.42 8.8h9.07v81.23h-9.07zM64.69 30.01h9.08v81.17h-9.08zM10 100.92h100v10.26H10z"/></svg>
+      <span>Trezzit LLC</span>
+    </div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="/split">Split a bill</a>
+      <a href="/mcp">Claude &amp; ChatGPT</a>
+      <a href="https://app.trezzit.com/login">Log in</a>
+      <a href="https://app.trezzit.com/signup">Sign up</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/your-data">Your data</a>
+      <a href="/delete-account">Delete account</a>
+      <a href="/support">Support</a>
+    </nav>
+    <p class="foot-legal">Sample receipts are made up. Your own photo is scanned only on trezzit.com, after you agree to send it to Google Gemini. Claude and ChatGPT are trademarks of their owners; Trezzit is not affiliated with or endorsed by them.</p>
   </div>
 </footer>
 </body>

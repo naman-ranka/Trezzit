@@ -26,14 +26,8 @@ function card(sc) {
   const s = sc.sum;
   const b = sc.bank;
   return `
-  <article class="scn" id="scn-${sc.id}" data-kind="${sc.kind}" aria-labelledby="t-${sc.id}">
-    <header class="scn-h">
-      <span class="kind kind-${sc.kind}" aria-hidden="true"></span>
-      <div>
-        <h2 id="t-${sc.id}" tabindex="-1">${esc(sc.title)}</h2>
-        ${sc.why ? `<p class="lede">${esc(sc.why)}</p>` : ''}
-      </div>
-    </header>
+  <article class="scn" id="scn-${sc.id}" data-kind="${sc.kind}" aria-labelledby="scn-h-${sc.id}">
+    <h2 class="visually-hidden" id="scn-h-${sc.id}">${esc(sc.title)}</h2>
     <div class="pair pair-scn">
       <div class="pane-bank">
         <p class="pane-label"><span>Your bank</span><span>Checking ··4242</span></p>
@@ -42,7 +36,7 @@ function card(sc) {
         </div>
       </div>
       <div class="pane-tz">
-        <p class="pane-label tz"><span>${esc(sc.merchant)}${sc.repeat ? ` · ${esc(sc.repeat)}` : ''}</span></p>
+        ${sc.cadence ? `<p class="pane-label tz"><span>${esc(sc.cadence)}</span></p>` : ''}
         <div class="scn-top">
           <div>
             <p class="pt-label">You spent</p>
@@ -87,10 +81,7 @@ loadScenarios({ extras: true }).then((loaded) => {
     });
     ed.load(sc);
     if (history.replaceState) history.replaceState(null, '', `#${sc.id}`);
-    if (focus) {
-      art.querySelector('h2')?.focus({ preventScroll: true });
-      if (status) status.textContent = `Showing: ${sc.title}`;
-    }
+    if (focus && status) status.textContent = `Showing: ${sc.title}`;
   }
 
   // a chip that gets focus off-screen scrolls fully into the rail

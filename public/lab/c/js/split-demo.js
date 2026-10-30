@@ -122,8 +122,7 @@ export function mountSplit(root, opts = {}) {
     const it = st.bill.items[i];
     const item = st.result.items.find((x) => x.index === i);
     const cat = CATEGORIES[line.category] || null;
-    // the receipt's own price, plus its tax: the sum is the line total the shares add up to
-    const tax = item.taxCents ? `${money(item.totalCents - item.taxCents)} + ${money(item.taxCents)} tax` : '';
+    const tax = '';
     return `<li class="sp-row" data-i="${i}">
       <div class="sp-line">
         <span class="sp-name">${esc(itemName(it.name))}</span>
@@ -192,6 +191,8 @@ export function mountSplit(root, opts = {}) {
     root.classList.toggle('is-ok', r.check.ok);
     const changed = st.lines.some((l, i) => JSON.stringify(l.split) !== JSON.stringify(st.original[i].split)) || st.tipMode !== 'proportional';
     $('.sp-reset').disabled = !changed;
+    // Reset only shows once there is something to reset (it keeps its space, so nothing moves)
+    root.classList.toggle('changed', changed);
     if (opts.balances) {
       const payer = st.payer;
       const rows = st.people.filter((p) => p !== payer && (r.people[p]?.cents || 0) > 0)

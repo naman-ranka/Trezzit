@@ -32,6 +32,10 @@ const mountSplit = once(() => import('./split-demo.js').then((m) => m.mountSplit
 // home keeps to the apartment story: the shared groceries and one receipt that is just yours (no strangers in the split)
 lazy('scan-demo', (el) => { mountSplit(); return import('./scan-demo.js').then((m) => m.mountScan(el, { samples: ['green-basket', 'corner-pharmacy'], splitTarget: '#split', soloHref: 'just-me/' })); });
 lazy('split-demo', () => mountSplit());
-lazy('ledger-demo', (el) => import('./ledger-demo.js').then((m) => m.mountLedger(el, { compact: true, fixedHref: 'recurring/', highlight: 'pizza' })));
+lazy('ledger-demo', (el) => import('./ledger-demo.js').then((m) => m.mountLedger(el, { compact: true, byPayer: true, rentHref: 'roommates/#rent', highlight: 'pizza' })));
 lazy('chat-demo', (el) => import('./chat-demo.js').then((m) => m.mountChat(el)));
+// keyboard visitors tab faster than the lazy loaders can see: on the first Tab (or focus inside a section), mount everything
+const mountAll = once(() => lazies.forEach(({ go }) => go()));
+addEventListener('keydown', (e) => { if (e.key === 'Tab') mountAll(); });
+document.querySelectorAll('#how, #ai').forEach((s) => s.addEventListener('focusin', mountAll));
 if (scrollY > 0) arm();

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Trezzit: see what you actually spent</title>
-<meta name="description" content="Your bank shows what you paid. Trezzit shows what you spent: every item, alone or shared. Split any bill in a minute.">
+<meta name="description" content="Your bank shows what you paid. Trezzit shows what you spent: every item, alone or shared. Ask Claude or ChatGPT, or use the app.">
 <meta name="theme-color" content="#ffffff">
 <link rel="icon" href="../_kit/brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="../_kit/brand/favicon.ico" sizes="any">
@@ -23,6 +23,7 @@
 <link rel="modulepreload" href="js/world.js">
 <link rel="modulepreload" href="../_kit/receipts.js">
 <link rel="modulepreload" href="../_kit/split-engine.js">
+<link rel="preload" href="../_kit/receipts/green-basket.json" as="fetch" crossorigin>
 <script type="module" src="js/main.js"></script>
 </head>
 <body>
@@ -57,9 +58,9 @@
   <div class="wrap">
     <a class="brand" href="./" aria-label="Trezzit home"><img src="../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
     <nav class="main-nav" aria-label="Main">
-      <a class="nav-link" href="app/">Tour</a>
+      <a class="nav-link show-sm nav-tour" href="app/">Tour</a>
       <a class="nav-link show-sm" href="connect/">Use with AI</a>
-      <a class="nav-link hide-xs" href="https://app.trezzit.com/login">Log in</a>
+      <a class="nav-link" href="https://app.trezzit.com/login">Log in</a>
       <a class="btn btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
     </nav>
   </div>
@@ -72,7 +73,7 @@
   <div class="wrap">
     <div>
       <h1 id="h1">See what you actually spent.</h1>
-      <p class="sub">Not what your bank says you paid.</p>
+      <p class="sub">Scan, split and track every item, alone or shared.</p>
       <div class="ctas">
         <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
         <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
@@ -80,28 +81,28 @@
       <p class="micro"><svg class="i" aria-hidden="true"><use href="#i-shield"/></svg><span>No bank login.</span></p>
     </div>
 
-    <div class="chat is-fixed intro-pending" id="hero-chat" role="region" aria-label="Example conversation with an AI assistant connected to Trezzit">
+    <div class="chat is-fixed" id="hero-chat" role="region" aria-label="Example conversation with an AI assistant connected to Trezzit">
       <div class="chat-head">
         <span class="ai-avatar" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="#i-spark"/></svg></span>
-        <span class="chat-title"><b>Your AI app</b><span>Example · <a href="connect/" aria-label="Connect Trezzit to Claude or ChatGPT">Trezzit connected</a></span></span>
+        <span class="chat-title"><b>Claude or ChatGPT</b><span>Example</span></span>
+        <a class="chat-cta" href="connect/">Connect yours <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
-      <div class="chat-log" data-chat-log>
+      <div class="chat-log" data-chat-log tabindex="0" role="log" aria-label="Example conversation">
         <!-- finished conversation: the page opens on this and stays on it until someone asks -->
-        <div class="msg user">What did I spend at Green Basket?</div><div class="tool"><span class="st ok"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><b>Trezzit</b><span class="res">14 items, split 4 ways</span></div><div class="tcard"><div class="tcard-head"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt></span><span class="t"><b>Green Basket Market</b><span>Oct 24 · Flat 3B · you paid</span></span><span class="faces" aria-hidden="true"><i style="--c:#162d59">You</i><i style="--c:#0f766e">M</i><i style="--c:#b45309">J</i><i style="--c:#7c3aed">S</i></span></div>
+        <div class="msg user">What did I spend at Green Basket?</div><div class="tool"><span class="st ok"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><b>Trezzit</b><span class="res">14 items, split 4 ways</span></div><div class="tcard"><div class="tcard-head"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt></span><span class="t"><b>Green Basket Market</b><span>Oct 24 · Flat 3B · you paid</span></span><span class="faces" aria-hidden="true"><i style="--c:#162d59">Y</i><i style="--c:#0f766e">M</i><i style="--c:#b45309">J</i><i style="--c:#7c3aed">S</i></span></div>
     <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v money">−$100.00</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">$30.00</span></div></div>
     <div class="catbar" aria-hidden="true"><i style="flex-grow:2200;background:#0f1f3d"></i><i style="flex-grow:800;background:#3f5b8c"></i></div>
   <div class="legend"><span><i style="background:#0f1f3d"></i>Groceries <b class="money">$22.00</b></span><span><i style="background:#3f5b8c"></i>Household <b class="money">$8.00</b></span></div></div><div class="msg ai">Maya, Jordan and Sam owe you $70.00.</div>
       </div>
       <div class="chat-foot">
         <div class="chips" role="group" aria-label="Try a question" data-chat-chips>
-          <button class="chip" type="button" data-script="split">Split dinner, Alex paid</button>
-          <button class="chip" type="button" data-script="rent">Add rent every month</button>
+          <button class="chip" type="button" data-script="split"><svg class="i" aria-hidden="true"><use href="#i-send"/></svg>Split dinner, Alex paid</button>
+          <button class="chip" type="button" data-script="rent"><svg class="i" aria-hidden="true"><use href="#i-send"/></svg>Add rent monthly</button>
         </div>
         <form class="composer" data-chat-form>
           <label class="visually-hidden" for="hero-ask">Ask about your spending</label>
-          <input id="hero-ask" type="text" autocomplete="off" placeholder="Ask about your spending" enterkeyhint="send">
-          <span class="ghost" aria-hidden="true" data-ghost></span>
-          <button type="submit" aria-label="Send"><svg class="i" aria-hidden="true"><use href="#i-send"/></svg></button>
+          <input id="hero-ask" type="text" autocomplete="off" placeholder="Ask anything, try “who owes me?”" enterkeyhint="send">
+                    <button type="submit" aria-label="Send"><svg class="i" aria-hidden="true"><use href="#i-send"/></svg></button>
         </form>
       </div>
     </div>
@@ -113,19 +114,20 @@
   <div class="wrap">
     <div class="night-grid">
       <div class="connect">
-        <h2 id="ai-h">Your AI keeps it complete.</h2>
-        <p class="trust-line">Never moves money. Every change shows in your activity.</p>
+        <h2 id="ai-h">Your AI adds what’s missing.</h2>
+        <p class="trust-line">No bank login. Never moves money.</p>
         <div class="connect-go">
           <a class="btn btn-light btn-lg" href="connect/">Connect Claude or ChatGPT <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
         </div>
       </div>
       <div class="thread" data-thread role="region" aria-label="Example: your AI app checks a bank statement against Trezzit and adds the one missing charge">
         <div class="msg user"><div class="attach"><svg class="i" aria-hidden="true"><use href="#i-doc"/></svg><span>october-statement.pdf</span></div>Is everything on my statement in Trezzit?</div>
+        <div class="tool"><span class="st ok"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><b>Trezzit</b><span class="res">Checked 4 payments</span></div>
         <div class="msg ai">Juniper Deli, $11.40 on Oct 27, isn’t in Trezzit. Add it?</div>
         <div class="msg user">Yes, just mine.</div>
         <div class="tcard"><div class="tcard-head"><span class="tmark" aria-hidden="true"><img src="../_kit/brand/mark-white-128.png" alt=""></span><span class="t"><b>Activity</b><span>Just now</span></span></div>
           <div class="rows"><div class="row"><span class="n"><b style="color:var(--ink)">Juniper Deli</b> · Personal</span><span class="a money">$11.40</span></div>
-          <div class="row" style="padding-top:0"><span class="n m">Added by your AI app</span></div></div></div>
+          <div class="row" style="padding-top:0"><span class="ai-pill"><svg class="i" aria-hidden="true"><use href="#i-spark"/></svg>Added by AI</span></div></div></div>
       </div>
     </div>
   </div>
@@ -146,11 +148,10 @@
 <!-- ============ LEDGER ============ -->
 <section class="turn" id="october" aria-labelledby="october-h">
   <div class="wrap">
-    <div class="ask"><h2 id="october-h">What October really cost.</h2></div>
+    <div class="ask"><h2 id="october-h">Every item. One list.</h2></div>
     <div class="stage">
       <div class="led" data-led><noscript><p class="panel card-pad">October: you paid $2,792.02 and spent $760.50. Rent $600.00, Dining out $38.43, Groceries $23.29, Everything else $98.78.</p></noscript></div>
     </div>
-    <p class="after"><a class="link-arrow" href="app/">See the real app <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a></p>
   </div>
 </section>
 
@@ -160,7 +161,6 @@
     <h2 id="close-h">Start with one receipt.</h2>
     <div class="ctas">
       <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
-      <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
     </div>
   </div>
 </section>

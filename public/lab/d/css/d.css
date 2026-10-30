@@ -101,9 +101,6 @@ svg.i { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor;
   .ctas { margin-top: 22px; gap: 10px; }
   .hero .ctas { flex-wrap: nowrap; }
   .ctas .btn-lg { min-height: 50px; padding: 0 18px; font-size: 16px; flex: 1 1 auto; white-space: nowrap; }
-  /* receipt picker: one row of four */
-  .seg.grid2 { flex-wrap: nowrap; flex: 1 1 100%; min-width: 0; }
-  .seg.grid2 button { flex: 1 1 auto; white-space: nowrap; padding: 0 8px; justify-content: center; }
   .toolbar .btn-quiet { min-height: 44px; padding: 0 14px; font-size: 15px; }
 }
 
@@ -147,7 +144,6 @@ svg.i { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor;
 .composer:has(input:focus-visible), .search:has(input:focus-visible) { box-shadow: var(--focus-ring); outline: 2px solid transparent; }
 .composer input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; font-size: 16px; min-height: 40px; }
 .composer input:focus, .composer input:focus-visible { outline: none; box-shadow: none; }
-.composer input.autotyping { color: var(--ink); }
 .composer input::placeholder { color: var(--text-tertiary); }
 .composer button { width: 44px; height: 44px; border-radius: 999px; background: var(--ink); color: #fff; display: grid; place-items: center; }
 .composer button svg { width: 18px; height: 18px; }
@@ -284,79 +280,6 @@ svg.i { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor;
   display: grid; place-items: center; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
 }
 .media-btn svg { width: 16px; height: 16px; }
-/* ---------- scan ---------- */
-.scan-grid { display: grid; gap: 16px; }
-@media (min-width: 760px) {
-  .scan-grid { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px; align-items: start; }
-  /* a long receipt fades out instead of being cut mid-line */
-  .paper { -webkit-mask-image: linear-gradient(#000 calc(100% - 56px), transparent); mask-image: linear-gradient(#000 calc(100% - 56px), transparent); }
-}
-.paper {
-  position: relative; display: grid; justify-items: center; padding: 20px 12px; border-radius: 22px; background: linear-gradient(180deg, #eceff4, #e4e8ef);
-  overflow: hidden; height: 640px; align-content: start;
-}
-@media (max-width: 759px) { .paper { height: 220px; -webkit-mask-image: linear-gradient(#000 78%, transparent); mask-image: linear-gradient(#000 78%, transparent); } }
-.paper .tz-receipt { --tz-receipt-width: 300px; font-size: 12.5px; }
-.paper .user-photo { max-width: 100%; max-height: 600px; border-radius: 6px; box-shadow: var(--shadow-md); }
-.beam {
-  position: absolute; left: 0; right: 0; top: 0; height: 90px; pointer-events: none; opacity: 0;
-  background: linear-gradient(180deg, rgba(36, 97, 189, 0) 0%, rgba(36, 97, 189, 0.16) 70%, rgba(36, 97, 189, 0.55) 98%, rgba(255, 255, 255, 0.9) 100%);
-  border-bottom: 2px solid rgba(36, 97, 189, 0.9);
-  box-shadow: 0 6px 24px rgba(36, 97, 189, 0.45);
-}
-.paper.is-scanning .beam { opacity: 1; animation: sweep 1.9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
-@keyframes sweep { from { transform: translateY(-90px); } to { transform: translateY(var(--sweep, 560px)); } }
-.paper .tz-r-line.is-read { background: rgba(5, 150, 105, 0.1); }
-
-.result { padding: 18px; display: grid; gap: 14px; align-content: start; }
-@media (min-width: 760px) { .result { padding: 22px 24px; } }
-.result-head { display: flex; align-items: center; gap: 12px; }
-.result-head .t { display: grid; margin-right: auto; line-height: 1.25; min-width: 0; }
-.result-head .t b { font-size: 19px; color: var(--ink); letter-spacing: -0.01em; }
-.result-head .t span { font-size: 14px; color: var(--text-secondary); }
-.status { font-size: 14px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--surface-muted); color: var(--text-secondary); white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
-.status.ok { background: #e7f6ef; color: var(--positive-text); }
-.status svg { width: 14px; height: 14px; stroke-width: 2.4; }
-.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.steps li { list-style: none; display: grid; gap: 6px; font-size: 13.5px; color: var(--text-tertiary); }
-.steps li::before { content: ''; height: 3px; border-radius: 9px; background: var(--line); transition: background-color 0.3s; }
-.steps li.on { color: var(--ink); }
-.steps li.on::before { background: var(--link); }
-.steps li.done::before { background: var(--positive); }
-.steps { margin: 0; padding: 0; }
-/* the stepper only shows while a scan runs */
-.result.is-done .steps { display: none; }
-.items li.sk, .sums .sk { display: flex; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--divider); animation: none; }
-.sums .sk { border: 0; padding: 4px 0; }
-.sk i { display: block; height: 10px; border-radius: 9px; background: linear-gradient(90deg, var(--surface-muted) 0%, #eef2f7 50%, var(--surface-muted) 100%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
-.sk i:first-child { width: 46%; margin-right: auto; } .sk i:last-child { width: 48px; }
-@keyframes shimmer { to { background-position: -200% 0; } }
-.items { list-style: none; margin: 0; padding: 0; display: grid; }
-.items li { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--divider); font-size: 15px; animation: item-in 0.36s var(--ease-out) both; }
-.items li .n { margin-right: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.items li .q { color: var(--text-secondary); font-size: 14px; }
-.items li.seen, .checks li.seen { animation: none; }
-.items li .a { font-weight: 600; color: var(--ink); }
-@keyframes item-in { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
-.items .more { color: var(--text-secondary); font-size: 14px; border-bottom: 0; }
-.sums { display: grid; gap: 4px; font-size: 15px; }
-.sums div { display: flex; justify-content: space-between; color: var(--text-secondary); }
-.sums .tot { color: var(--ink); font-weight: 700; font-size: 18px; padding-top: 6px; }
-.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.checks li { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--text-secondary); animation: item-in 0.3s var(--ease-out) both; }
-.checks li svg { width: 18px; height: 18px; color: var(--positive); stroke-width: 2.2; }
-.notice { font-size: 14px; color: #7a4b00; background: var(--warning-soft); border-radius: 12px; padding: 10px 12px; }
-.empty-hint { color: var(--text-secondary); font-size: 15px; display: grid; gap: 10px; place-items: center; text-align: center; padding: 48px 12px; border: 1.5px dashed var(--line-strong); border-radius: 16px; }
-.result-foot { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
-
-dialog.sheet {
-  border: 0; padding: 0; border-radius: 24px; max-width: min(440px, calc(100vw - 32px)); width: 100%; box-shadow: var(--shadow-lg); color: var(--text);
-}
-dialog.sheet::backdrop { background: rgba(10, 21, 48, 0.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
-dialog.sheet form { padding: 24px; display: grid; gap: 14px; }
-dialog.sheet h3 { font-size: 22px; }
-dialog.sheet p { font-size: 15px; color: var(--text-secondary); }
-dialog.sheet .acts { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
 
 /* ---------- split ---------- */
 .split-grid { display: grid; gap: 16px; }
@@ -368,7 +291,6 @@ dialog.sheet .acts { display: flex; gap: 10px; justify-content: flex-end; flex-w
 .sitem .pr { font-weight: 600; color: var(--ink); font-size: 15.5px; text-align: right; }
 .sitem .meta { font-size: 14px; color: var(--text-secondary); grid-column: 1; min-height: 1.4em; }
 .sitem .meta.warn { color: var(--negative); font-weight: 600; }
-.sitem .nm .tx { display: block; font-weight: 400; font-size: 13.5px; color: var(--text-tertiary); }
 .sitem .who { grid-column: 2; display: flex; gap: 2px; justify-content: flex-end; }
 @media (max-width: 520px) {
   .sitem { grid-template-columns: minmax(0, 1fr) auto; }
@@ -389,7 +311,6 @@ dialog.sheet .acts { display: flex; gap: 10px; justify-content: flex-end; flex-w
 @keyframes shake { 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
 .sitem.extra { background: var(--surface-subtle); }
 .sitem.extra .nm { font-weight: 500; }
-.show-more { width: 100%; min-height: 48px; font-weight: 600; color: var(--link); border-top: 1px solid var(--divider); font-size: 15px; }
 .totals { padding: 18px; display: grid; gap: 4px; }
 @media (min-width: 900px) { .totals { position: sticky; top: 84px; } }
 .totals h3 { font-size: 15px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0; }
@@ -471,12 +392,6 @@ dialog.sheet .acts { display: flex; gap: 10px; justify-content: flex-end; flex-w
 .sugg button:hover { color: var(--ink); border-color: var(--line-strong); }
 .sugg button[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .sum-card { padding: 22px; display: grid; gap: 14px; }
-.paidspent { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.paidspent div { border-radius: 14px; padding: 12px; background: var(--surface-subtle); line-height: 1.2; }
-.paidspent span { font-size: 14px; color: var(--text-secondary-on-tint); display: block; margin-bottom: 4px; }
-.paidspent b { font-size: 21px; letter-spacing: -0.02em; color: var(--text-secondary-on-tint); font-weight: 600; }
-.paidspent .sp { background: var(--accent-soft); }
-.paidspent .sp b { color: var(--ink); font-weight: 700; }
 .cats { display: grid; gap: 8px; }
 .cat { display: grid; gap: 4px; }
 .cat .l { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-secondary); }
@@ -561,7 +476,6 @@ dialog.sheet .acts { display: flex; gap: 10px; justify-content: flex-end; flex-w
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-  .paper.is-scanning .beam { opacity: 0; }
 }
 
 /* ================= subpages ================= */
@@ -639,10 +553,6 @@ button.prompt:hover { background: #ebeff6; }
 .chapter p { font-size: 19px; color: var(--text-secondary); margin-top: 14px; max-width: 26em; }
 .chapter .ask-mini { display: inline-block; margin-top: 18px; background: var(--bubble); color: var(--ink); padding: 10px 16px; border-radius: 18px 18px 6px 18px; font-size: 16px; font-weight: 500; }
 .chapter .ask-mini small { display: block; font-size: 14px; color: var(--text-secondary-on-tint); font-weight: 400; }
-.result-head .t b, .result-head .t span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@media (max-width: 420px) { .result-head .tmark { display: none; } .result-head .t b { font-size: 17px; } }
-/* a live scan can take a minute: sweep twice, then rest (nothing moves for more than 5 s) */
-.paper.is-scanning.is-live .beam { animation-iteration-count: 2; }
 .sub-hero.with-side .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: center; }
 @media (min-width: 1040px) { .sub-hero.with-side .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 460px); gap: 64px; } }
 /* connect/: the setup steps sit beside the URL, both in the first screen */
@@ -694,8 +604,6 @@ button.prompt:hover { background: #ebeff6; }
   #hero-chat .msg.user, #hero-chat .msg.ai { font-size: 16.5px; }
   #hero-chat .tcard-head .t b { font-size: 16px; }
 }
-/* the receipt's tax flag column needs its own room */
-.paper .tz-receipt { padding-right: 8px; }
 /* connect/: tinted panels keep fine print at AA; the URL breaks only after the domain */
 .setup .muted { color: var(--text-secondary-on-tint); }
 @media (max-width: 420px) { .urlbox.light code { white-space: normal; overflow: visible; font-size: 13px; } }
@@ -709,7 +617,6 @@ button.prompt:hover { background: #ebeff6; }
 @media (min-width: 1040px) { .night + .turn { padding-top: 96px; } }
 /* split: "10 more items" and Reset share the card's bottom row */
 .split-foot { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--divider); padding: 0 8px 0 0; }
-.split-foot .show-more { width: auto; flex: 1; border-top: 0; text-align: left; padding: 0 16px; }
 .reset-link { min-height: 44px; padding: 0 12px; border-radius: 10px; font-size: 15px; font-weight: 600; color: var(--text-secondary); }
 .reset-link:hover { color: var(--ink); background: var(--surface-subtle); }
 .plabel { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: none; padding: 10px 0 0; border-top: 1px solid var(--divider); margin-top: 6px; }
@@ -750,16 +657,7 @@ button.prompt:hover { background: #ebeff6; }
 .btn-quiet:focus-visible { box-shadow: inset 0 0 0 1px var(--line-strong), var(--focus-ring); }
 
 /* hero: the first exchange plays once on arrival; until script decides, its lines wait unseen */
-@media (prefers-reduced-motion: no-preference) { .js #hero-chat.intro-pending .chat-log > * { visibility: hidden; } }
 .composer { position: relative; }
-.composer .ghost { display: none; position: absolute; left: 16px; right: 56px; top: 50%; transform: translateY(-50%); font-size: 16px; line-height: 1.3; color: var(--ink); white-space: nowrap; overflow: hidden; pointer-events: none; }
-.composer.is-typing .ghost, .composer.invite .ghost { display: block; }
-.composer.is-typing input::placeholder { color: transparent; }
-.composer.invite .ghost { left: 14px; }
-.composer .ghost::after { content: ''; display: inline-block; width: 2px; height: 1.15em; margin-left: 1px; vertical-align: -0.2em; background: var(--link); border-radius: 1px; }
-.composer.invite .ghost::after { animation: caret 1s steps(1) 5; }
-.composer:focus-within .ghost { display: none; }
-@keyframes caret { 50% { opacity: 0; } }
 
 /* phones: two CTAs on one line; a shorter chat head pays for the category line on the card */
 @media (max-width: 520px) {
@@ -794,24 +692,9 @@ button.prompt:hover { background: #ebeff6; }
 @media (max-width: 1039px) { .thread { justify-self: stretch; max-width: none; } }
 @media (max-width: 520px) { .thread .msg.ai { font-size: 17px; } }
 
-/* scan: on phones a short strip of paper and the four rows, so "Split it" stays close */
-@media (max-width: 599px) {
-  .paper { height: 160px; }
-  .items li.more { display: none; }
-}
-.items li.sk-more { min-height: 58px; border-bottom: 0; }
-/* placeholders are exactly the size of the rows they stand for, and the status pill says the stage,
-   so nothing in the card moves while a receipt is read */
-.result .steps { display: none; }
-.items li.sk { padding: 0; height: 38.25px; box-sizing: border-box; }
-.sums .sk { padding: 0; height: 23.25px; box-sizing: border-box; }
-.sums .sk:last-child { height: 33.9px; padding-top: 6px; }
 
 /* October: the bank only knows what you paid, so the spent side steps back */
 .led-list [data-list] { display: block; }
-.sum-card .sp, .sum-card .cats { transition: opacity 0.3s; }
-.led.is-bank .sum-card .sp, .led.is-bank .sum-card .cats { opacity: 0.28; }
-.led.is-bank .paidspent .pd b { color: var(--ink); font-weight: 700; }
 .led-more { padding: 4px 16px 0; font-size: 14px; color: var(--text-secondary); }
 .flash { animation: flash 1.4s var(--ease-out); }
 @keyframes flash { 0%, 30% { background-color: #fff4c2; } 100% { background-color: transparent; } }
@@ -823,11 +706,7 @@ button.prompt:hover { background: #ebeff6; }
 
 /* ---------- round 8 ---------- */
 /* header: Tour · Use with AI · Log in · Sign up; on small phones "Use with AI" takes Log in's place (Log in is in the footer) */
-.nav-link.hide-xs { display: inline-flex; }
-@media (max-width: 480px) { .nav-link.hide-xs { display: none; } .top .nav-link { padding: 10px 8px; } }
 /* hero chat: an example, and the way to connect the real thing */
-.chat-title a { color: inherit; text-decoration: none; }
-.chat-title a:hover { text-decoration: underline; color: var(--ink); }
 .chips[hidden] { display: none; }
 /* the top fade only once something has scrolled under it: a first line is never dimmed */
 .chat.is-fixed .chat-log { -webkit-mask-image: none; mask-image: none; }
@@ -842,8 +721,6 @@ button.prompt:hover { background: #ebeff6; }
 
 /* AI section: one plain line of guardrails; the exchange is there from the start, only its result arrives */
 .night .trust-line { color: #a9b6cf; font-size: clamp(17px, 1.5vw, 19px); line-height: 1.45; margin-top: -8px; max-width: 26em; }
-.thread .tcard.is-waiting { opacity: 0; transform: translateY(8px); }
-.thread .tcard.is-in { opacity: 1; transform: none; transition: opacity 0.3s var(--ease-out), transform 0.3s var(--ease-out); }
 
 /* split: the scanned receipt heads the list (the scan section is folded in here) */
 .split-head { display: flex; align-items: center; gap: 12px; padding: 10px 16px 12px; border-bottom: 1px solid var(--divider); }
@@ -852,7 +729,6 @@ button.prompt:hover { background: #ebeff6; }
 .split-head .t { display: grid; line-height: 1.25; margin-right: auto; min-width: 0; }
 .split-head .t b { color: var(--ink); font-size: 16px; }
 .split-head .t span { font-size: 14px; color: var(--text-secondary); }
-.more-note { flex: 1; padding: 0 16px; font-size: 14.5px; color: var(--text-secondary); min-height: 48px; display: flex; align-items: center; }
 .split-foot .check-line.sm { display: none; }
 @media (max-width: 899px) {
   /* phones: no orphan totals card; the check sits in the list's own footer, the per-person rows stay for screen readers */
@@ -861,7 +737,6 @@ button.prompt:hover { background: #ebeff6; }
   .split-foot { flex-wrap: wrap; padding: 0 8px 0 0; }
   .split-foot .check-line.sm { display: flex; order: -1; flex: 1 1 100%; margin: 10px 0 2px 10px; }
 }
-@media (max-width: 400px) { .split-head { padding-inline: 12px; } .split-head .status { padding: 4px 8px; } }
 /* desktop: one line per item, name | who | price, like the app's own list */
 @media (min-width: 900px) {
   .sitem { grid-template-columns: minmax(0, 1fr) auto 92px; grid-template-areas: 'nm who pr' 'meta who pr'; gap: 0 16px; padding: 8px 12px 8px 18px; min-height: 64px; }
@@ -869,7 +744,6 @@ button.prompt:hover { background: #ebeff6; }
   .sitem .meta { grid-area: meta; }
   .sitem .who { grid-area: who; align-self: center; }
   .sitem .pr { grid-area: pr; align-self: center; }
-  .sitem .nm .tx { display: inline; margin-left: 8px; }
 }
 
 /* October: the bank's caption sits on the list's text edge, under a hairline, like the Trezzit summary */
@@ -890,3 +764,153 @@ button.prompt:hover { background: #ebeff6; }
 @media (max-width: 520px) { .chat.is-fixed { height: 508px; } }
 @media (max-width: 385px) { .chat.is-fixed { height: 528px; } }
 @media (max-width: 370px) { .chat.is-fixed { height: 552px; } }
+
+/* ---------- round 9 ---------- */
+@keyframes item-in { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+@media (max-width: 480px) { .top .nav-link { padding: 10px 8px; } }
+/* hero chat: the composer never leaves the card; chips scroll sideways instead of stretching it */
+#hero-chat .chat-foot { min-width: 0; }
+#hero-chat .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+#hero-chat .chips::-webkit-scrollbar { display: none; }
+#hero-chat .chips .chip { flex: 0 0 auto; white-space: nowrap; }
+/* an older line scrolled under the header fades out over a full line's height */
+.chat.is-fixed .chat-log.is-scrolled { -webkit-mask-image: linear-gradient(transparent 0, #000 28px); mask-image: linear-gradient(transparent 0, #000 28px); }
+/* the avatar stack: "Y" at the same size as the other initials */
+.faces i, .faces i:first-child { font-size: 10px; letter-spacing: 0; }
+@media (max-width: 520px) { #hero-chat .faces i, #hero-chat .faces i:first-child { font-size: 9.5px; } }
+/* a friend paid: the bank cell says so in words */
+.versus .bank .v:not(.money) { color: var(--text-secondary); }
+/* split toggles: an unpressed person reads as "tap to add", not as disabled (3:1 border) */
+.who button span { border: 1.5px solid #7d8aa0; color: var(--text-secondary); }
+.who button[aria-pressed='true'] span { border-color: var(--c); color: #fff; }
+/* split: the receipt photo the rows came from */
+.rcpt-btn { flex: none; min-height: 44px; padding: 0 14px; border-radius: 999px; font-size: 14.5px; font-weight: 600; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); background: #fff; }
+.rcpt-btn:hover { background: var(--surface-subtle); }
+.rcpt-btn:focus-visible { box-shadow: inset 0 0 0 1px var(--line-strong), var(--focus-ring); outline: 2px solid transparent; }
+.split-foot .reset-link { margin-left: auto; }
+@media (max-width: 899px) { .split-foot { min-height: 48px; } }
+dialog.rcpt-dlg { border: 0; padding: 16px; border-radius: 20px; background: #d8d2c9; box-shadow: var(--shadow-lg); max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); display: none; }
+dialog.rcpt-dlg[open] { display: grid; gap: 12px; justify-items: center; }
+dialog.rcpt-dlg::backdrop { background: rgba(10, 21, 48, 0.5); }
+dialog.rcpt-dlg img { display: block; width: auto; height: auto; max-width: min(380px, calc(100vw - 64px)); max-height: calc(100dvh - 140px); border-radius: 8px; }
+dialog.rcpt-dlg form { display: flex; justify-content: center; }
+dialog.rcpt-dlg .btn { min-height: 44px; padding: 0 22px; }
+/* October: the real app sits beside the example, one tap from the tour */
+/* the close follows October without a second ending */
+@media (min-width: 900px) { .close { padding-top: 72px; } }
+@media (min-width: 1040px) { .close { padding-top: 72px; } }
+/* phones: each answer fits under its question in the hero chat (the tool pill already names the balances) */
+@media (max-width: 520px) {
+  #hero-chat .tcard.bal .tcard-head { display: none; }
+  #hero-chat .tcard.bal .rows { margin-top: 0; }
+  #hero-chat .msg.user.has-thumb { grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: center; }
+  #hero-chat .msg.user .thumb { width: 30px; height: 44px; }
+}
+
+/* ---------- round 10 ---------- */
+/* hero chat: "Connect yours" in the header, a full-size target */
+.chat-cta { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 10px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--link); text-decoration: none; white-space: nowrap; flex: none; }
+.chat-cta svg { width: 15px; height: 15px; }
+.chat-cta:hover { background: var(--surface-subtle); text-decoration: underline; }
+/* the composer's focus ring sits inside it, never on the card edge */
+#hero-chat .composer:has(input:focus-visible) { box-shadow: inset 0 0 0 2px var(--link); }
+
+/* split: rows centre on one line; names sit close to the people (desktop) */
+@media (min-width: 900px) {
+  .split-grid { grid-template-columns: minmax(0, 720px) minmax(300px, 1fr); }
+  .sitem { align-content: center; align-items: center; }
+  .sitem .nm { align-self: end; }
+  .sitem .meta { align-self: start; }
+}
+.sitem .meta { font-size: 13.5px; }
+
+/* October: one figure in the side card, the tour link under it; both views hold one height */
+.led-list { display: flex; flex-direction: column; }
+.led-list [data-list] { display: flex; flex-direction: column; flex: 1; }
+.led.is-bank .led-list [data-list] .led-foot { margin-top: auto; }
+.spent-big { display: grid; gap: 2px; }
+.spent-big .kicker { font-size: 15px; }
+.spent-big b { font-size: 34px; letter-spacing: -0.03em; color: var(--ink); font-weight: 700; line-height: 1.1; border-radius: 8px; justify-self: start; }
+.bank-cap { text-align: left; }
+
+/* close: on the page grid, like every other heading */
+.close { text-align: left; }
+.close h2, .close p { margin-left: 0; margin-right: 0; }
+.close .ctas { justify-content: flex-start; }
+.close p.micro { justify-content: flex-start; }
+@media (min-width: 1040px) { .close { padding: 96px 0 120px; } }
+
+/* receipt photo: never taller than 86% of the window */
+dialog.rcpt-dlg { max-height: 86vh; }
+dialog.rcpt-dlg img { max-height: calc(86vh - 100px); }
+
+/* connect/: a utility page, so the headline is H2-sized; the command wraps and copies */
+.sub-hero.with-side h1 { font-size: clamp(40px, 4.6vw, 64px); max-width: 11em; text-wrap: balance; }
+.sub-hero.with-side .urlbox.light { margin-top: 24px; }
+@media (min-width: 1040px) { .sub-hero.with-side .wrap > :first-child { padding-top: 0; } }
+.cmd-box { position: relative; margin-top: 16px; max-width: 680px; }
+.cmd-box pre.cmd { margin: 0; white-space: pre-wrap; word-break: break-all; overflow: visible; padding-right: 92px; }
+.cmd-copy { position: absolute; top: 6px; right: 6px; min-height: 44px; padding: 0 12px; border-radius: 10px; background: #fff; color: var(--ink); font-weight: 600; font-size: 14px; display: inline-flex; gap: 6px; align-items: center; }
+.cmd-copy svg { width: 16px; height: 16px; }
+.prompt .does:empty { min-height: 1px; }
+
+/* app/: one centred column, the heading right above its recording */
+@media (min-width: 900px) {
+  .chapter { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; gap: 20px; padding: 40px 0; }
+  .chapter.flip > :first-child { order: 0; }
+  .chapter h2 { margin-inline: auto; max-width: 14em; }
+  .chapter .stage { width: min(640px, 100%); }
+}
+
+/* ---------- round 11 ---------- */
+/* header: never wraps; below 380px Tour steps out (it is in the footer): Trezzit · Use with AI · Sign up */
+.main-nav a, .top .btn { white-space: nowrap; }
+@media (max-width: 379px) { .main-nav .nav-tour { display: none; } }
+/* app/: the play/pause button keeps a visible focus ring (a white gap, then the ring) */
+.chapter .stage .media-btn:focus-visible { box-shadow: 0 0 0 2px #fff, var(--focus-ring); outline: 2px solid transparent; }
+/* hero chat: the log scrolls by keyboard and shows its focus; the first bubble sits right under the header */
+.chat-log:focus-visible { outline: 2px solid transparent; box-shadow: inset 0 0 0 2px var(--link); }
+.chat.is-fixed .chat-log > :first-child { margin-top: 0; }
+#hero-chat .chat-log { padding-top: 12px; }
+/* chips read as questions to send; an answer can offer two of them */
+.chips .chip svg, .sugg .chip svg { width: 14px; height: 14px; flex: none; color: var(--link); }
+.sugg { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.sugg .chip { min-height: 44px; font-size: 14px; padding: 0 12px; color: var(--text); }
+.sugg .chip:hover { background: var(--surface-subtle); border-color: var(--line-strong); }
+/* the composer field is a full 44px target; the 44px send button already set the form's height */
+.composer input { min-height: 44px; }
+/* the first chip pulses once when the card is in view: a ring and a tint */
+@media (prefers-reduced-motion: no-preference) {
+  .chips .chip.nudge { animation: nudge 1.4s var(--ease-out) 1; }
+}
+@keyframes nudge { 0% { box-shadow: 0 0 0 0 rgba(36, 97, 189, 0.5); background-color: #eef3fc; } 60% { box-shadow: 0 0 0 10px rgba(36, 97, 189, 0); background-color: #eef3fc; } 100% { box-shadow: none; } }
+/* AI band: Trezzit's check is a pill on the navy, and "Added by AI" is a small pill, not a highlighter */
+.thread .tool { background: rgba(255, 255, 255, 0.06); border-color: var(--night-line); color: #a9b6cf; font-size: 15px; }
+.thread .tool b { color: #fff; }
+.thread .tool .st.spin { border-color: rgba(255, 255, 255, 0.2); border-top-color: #8fb4ff; }
+.ai-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px 3px 7px; border-radius: 999px; background: linear-gradient(140deg, #eef2ff, #e6eef9); color: var(--ink); font-size: 13px; font-weight: 600; }
+.ai-pill svg { width: 14px; height: 14px; color: var(--link); }
+@media (prefers-reduced-motion: no-preference) {
+  .thread .tcard.in .ai-pill { animation: pill-in 0.6s var(--ease-out) 0.35s both; }
+}
+@keyframes pill-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: none; } }
+/* split: "Scan it." the rows come off the receipt once, the first time the card is in view */
+@media (prefers-reduced-motion: no-preference) {
+  .split-items.scan-in [data-rows] > .sitem { animation: scan-row 0.42s var(--ease-out) both; }
+  .split-items.scan-in [data-rows] > .sitem:nth-child(2) { animation-delay: 0.06s; }
+  .split-items.scan-in [data-rows] > .sitem:nth-child(3) { animation-delay: 0.12s; }
+  .split-items.scan-in [data-rows] > .sitem:nth-child(4) { animation-delay: 0.18s; }
+}
+@keyframes scan-row { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+/* close: one action, and no long blank pause before it on phones */
+@media (max-width: 819px) { .close { padding-top: 56px; } }
+/* connect/: the headline and URL sit centred against the steps; prompt cards end in their copy icon only */
+@media (min-width: 1040px) { .sub-hero.with-side .wrap { align-items: center; } }
+.prompt .does { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.prompt .pfoot { justify-content: flex-end; }
+.prompt.copied .pfoot svg { color: var(--positive); }
+/* phones: both chips fit on one line with their send arrow */
+@media (max-width: 520px) { #hero-chat .chips .chip { padding: 0 9px 0 8px; gap: 4px; } #hero-chat .chips .chip svg { width: 13px; height: 13px; } }
+@media (max-width: 400px) { #hero-chat .chips .chip { font-size: 13.5px; letter-spacing: -0.01em; } }
+@media (max-width: 380px) { #hero-chat .chips .chip { padding: 0 7px 0 6px; font-size: 13px; } }
+@media (max-width: 370px) { #hero-chat .chips { gap: 4px; } #hero-chat .chips .chip { padding: 0 6px 0 6px; } }

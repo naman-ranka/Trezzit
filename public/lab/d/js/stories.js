@@ -1,6 +1,6 @@
 // "One list. Shared or not.": the ledger, all from the computed world.
 import { $, $$, esc, money, icon, announce } from './ui.js';
-import { getWorld, derive, catOf, PEOPLE, tone, OTHER_TONE } from './world.js';
+import { getWorld, derive, catOf, summaryCats, PEOPLE, tone, OTHER_TONE } from './world.js';
 
 const nameOf = (k) => (k === 'you' ? 'You' : PEOPLE[k]?.name || k);
 const MAX_HITS = 8;
@@ -10,7 +10,7 @@ export async function initLedger() {
   const host = document.querySelector('[data-led]');
   if (!host) return;
   const w = await getWorld();
-  const nTop = matchMedia('(max-width: 520px)').matches ? 3 : 5;
+  // Rent, Dining out, Groceries and Everything else, always in that order: the chat's October card uses the same rows.
   // The list as it stands: the split above can change the Green Basket row (and so everything it adds up to).
   let cur = { bills: w.bills, ...derive(w.bills) };
 
@@ -33,11 +33,10 @@ export async function initLedger() {
   const who = (b) => (b.payer === 'you' ? 'you paid' : `${PEOPLE[b.payer].name} paid`);
 
   function renderSum() {
-    const max = cur.cats[0].cents;
-    const top = cur.cats.slice(0, nTop);
-    const rest = cur.cats.slice(nTop).reduce((a, c) => a + c.cents, 0);
-    sum.innerHTML = `<div class="kicker">October</div>
-      <div class="paidspent"><div class="pd"><span>You paid</span><b class="money">${money(w.paidCents)}</b></div><div class="sp"><span>You spent</span><b class="money" data-spent>${money(cur.spentCents)}</b></div></div>
+    const { top, rest } = summaryCats(cur.cats);
+    const max = Math.max(rest, ...top.map((c) => c.cents));
+    // One figure: what you spent. What you paid is the bank's number, and lives in the bank view.
+    sum.innerHTML = `<div class="spent-big"><span class="kicker">October · you spent</span><b class="money" data-spent>${money(cur.spentCents)}</b></div>
       <div class="cats">${top.map((c, i) => `<div class="cat"><div class="l"><span>${esc(c.label)}</span><b class="money">${money(c.cents)}</b></div><div class="hbar"><i style="width:${Math.max(2, (c.cents / max) * 100)}%;background:${tone(i)}"></i></div></div>`).join('')}
         <div class="cat"><div class="l"><span>Everything else</span><b class="money">${money(rest)}</b></div><div class="hbar"><i style="width:${Math.max(2, (rest / max) * 100)}%;background:${OTHER_TONE}"></i></div></div></div>`;
   }
@@ -69,10 +68,11 @@ export async function initLedger() {
     }
     if (view === 'bank') {
       list.innerHTML = w.bank.map((b) => `<div class="lrow bank"><span class="ic" aria-hidden="true">${icon('bank')}</span><span class="t"><b>${esc(b.text)}</b><span>${b.date}</span></span><span class="v"><b class="money">${money(b.cents)}</b></span></div>`).join('')
-        + '<p class="bank-cap">No dinner with Alex. No Netflix. No idea what was in the $100.00.</p>';
+        + '<p class="bank-cap">No items. No splits.</p>'
+        + `<div class="led-foot"><span>${w.bank.length} payments · you paid</span><b class="money">${money(w.paidCents)}</b></div>`;
       return;
     }
-    list.innerHTML = cur.bills.map((b) => `<div class="lrow" data-bill-row="${b.id}"><span class="ic"${b.recurring ? ' aria-label="Monthly" role="img"' : ' aria-hidden="true"'}>${b.recurring ? icon('repeat') : b.byAI ? icon('spark') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.date} · ${b.byAI ? 'added by your AI' : b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('');
+    list.innerHTML = cur.bills.map((b) => `<div class="lrow" data-bill-row="${b.id}"><span class="ic"${b.recurring ? ' aria-label="Monthly" role="img"' : ' aria-hidden="true"'}>${b.recurring ? icon('repeat') : b.byAI ? icon('spark') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.date} · ${b.byAI ? 'added by AI' : b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('');
   }
 
   const setView = (v) => {
@@ -80,13 +80,22 @@ export async function initLedger() {
     $$('button[data-v]', host).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
     // Search only means something in the Trezzit view; the bank has no items to find.
     $$('[data-find]', host).forEach((el) => { el.hidden = view === 'bank'; });
-    // The bank only knows what you paid: the spent side of the card steps back.
     host.classList.toggle('is-bank', view === 'bank');
     render();
   };
 
   renderSum();
   setView('trezzit');
+  /* Both views hold the Trezzit list's height, so switching never moves the page. */
+  const hold = () => {
+    if (view !== 'trezzit' || q.value.trim()) return;
+    const panel = list.parentElement;
+    panel.style.minHeight = '';
+    panel.style.minHeight = panel.offsetHeight + 'px';
+  };
+  hold();
+  addEventListener('resize', hold, { passive: true });
+  document.fonts?.ready.then(hold);
 
   host.addEventListener('click', (e) => {
     const v = e.target.closest('button[data-v]');

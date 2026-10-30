@@ -1,52 +1,80 @@
 /* chat.js: a scripted assistant exchange. Neutral chat styling (not a copy of any AI app),
- * Trezzit's own cards for tool results. Two prompts: the write (this page's receipt, split from a sentence, shown as a
- * preview and saved only after "Save it") and the read (what you spent, your share only), plus a Replay.
- * The log has one fixed height (the taller finished exchange, measured at this width), and messages start at its top,
- * so switching prompts never moves the page and nothing sits above the request. The panel opens on the write, finished;
- * a chip or Replay plays one (Replay rests while it plays). A one-line result is announced when a run ends. */
+ * Trezzit's own cards for tool results. Three prompts: the write (this page's receipt, split from a sentence, shown as a
+ * preview and saved only after a yes), who owes you (the month's balances, live from the split), and what you spent on
+ * groceries (your share only), plus a Replay. The log is as tall as the exchange on screen (measured at this width, eased),
+ * and messages start at its top. The panel opens on the write, finished; a chip or Replay plays one (Replay rests while
+ * it plays). A one-line result is announced when a run ends. */
 import { $, $$, esc, money, ICON, reduced, avatar } from './util.js';
 import { loadModel, compute, PEOPLE } from './data.js';
+import { balances, ROOMMATES } from './balances.js';
 
 const TZ = '<svg viewBox="0 0 120 120" aria-hidden="true" fill="currentColor"><polygon points="10.56,85.55 109.44,24.22 109.44,35.03 10.56,96.58" fill-opacity=".64"/><path d="M10 8.8h100v10.26H10zM45.42 8.8h9.07v81.23h-9.07zM64.69 30.01h9.08v81.17h-9.08zM10 100.92h100v10.26H10z"/></svg>';
+
+// your groceries-only share of the Green Basket receipt (live from the story), plus two earlier grocery runs
+const OTHER_GROCERIES = 1780 + 920;
+const gbGroceries = () => window.__tzSplit?.groceriesCents ?? 2200;
+const groceries = () => gbGroceries() + OTHER_GROCERIES;
+
+// Maya's balance nets two bills (you paid Green Basket, she paid the farmers market), so the card shows why
+function oweCard() {
+  const b = balances();
+  const gbMaya = window.__tzSplit?.people?.maya ?? 3000;
+  const net = ROOMMATES.reduce((a, p) => a + b[p], 0);
+  const why = { maya: `Green Basket ${money(gbMaya)} − market $9.20`, jordan: 'Green Basket', sam: 'Green Basket' };
+  const r = (p) => `<div class="r">${avatar(PEOPLE[p])}<span>${esc(PEOPLE[p].name)}<small class="why">${esc(why[p])}</small></span><span class="money${b[p] >= 0 ? ' pos' : ''}">${b[p] < 0 ? `you owe ${money(-b[p])}` : money(b[p])}</span></div>`;
+  return `<div class="tz-card" data-owe><div class="hd"><strong>Owed to you · October</strong></div>
+    <p class="big money">${money(net)}</p>
+    <div class="rows">${ROOMMATES.map(r).join('')}</div></div>`;
+}
 
 async function scripts() {
   const gb = compute(await loadModel('green-basket'));
   // a person's total, and (for the two named in the request) the items that made it, so the preview can be checked
   const row = (p, items) => `<div class="r">${avatar(PEOPLE[p])}<span>${esc(PEOPLE[p].name)}${items ? `<small class="why">${esc(items)} + ¼ shared</small>` : ''}</span><span class="money">${money(gb.people[p].cents)}</span></div>`;
-  const owes = (p, cents) => `<div class="r">${avatar(PEOPLE[p])}<span>${esc(PEOPLE[p].name)} <small>owes you</small></span><span class="money pos">${money(cents)}</span></div>`;
   return {
     // the write first: the page's own receipt, handed to the AI; a preview, then saved only after a yes
     split: {
-      chip: 'Split this receipt',
+      chip: 'Split with my roommates',
       say: 'Saved to Roommates.',
       steps: [
-        { t: 'user', att: true, text: 'Split this with my roommates. Avocados and cold brew are mine, oat milk and kale chips are Maya’s.' },
+        { t: 'user', att: true, text: 'Split with my roommates. Avocados and cold brew are mine; oat milk and kale chips, Maya’s.' },
         { t: 'tool', label: 'Reading the receipt', done: '14 items read' },
         { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Green Basket Market · Oct 24</strong><span class="money">${money(gb.totalCents)}</span></div>
           <span class="tag">Preview · not saved yet</span>
           <div class="rows rows-p">${row('you', 'Avocados, cold brew')}${row('maya', 'Oat milk, kale chips')}${row('jordan')}${row('sam')}</div></div>` },
-        { t: 'user', text: 'Save it' },
-        { t: 'tool', label: 'Saving', done: 'Saved to Roommates', ok: true },
+        // a real assistant asks before a write; the save happens only after the yes
+        { t: 'ai', text: 'Save this to Roommates?' },
+        // a sentence, not a button: the visitor's own reply
+        { t: 'user', text: 'Yes, save it.' },
+        // the write is logged where the visitor can check it: the proof says so, not a footnote
+        { t: 'tool', label: 'Saving', done: 'Saved to Roommates · in your activity log', ok: true },
+      ],
+    },
+    // a second read: the running balance across every shared bill this month, the same numbers as the month card
+    owe: {
+      chip: 'Who owes me?',
+      say: () => `Roommates owe you ${money(ROOMMATES.reduce((a, p) => a + balances()[p], 0))}.`,
+      steps: [
+        { t: 'user', text: 'Who owes me?' },
+        { t: 'tool', label: 'Checking balances', done: 'Balances, all bills' },
+        { t: 'card', html: () => oweCard() },
       ],
     },
     // the read: the shared-aware ledger, across every bill, that only an AI connected to it can answer
     ask: {
-      chip: 'What did I spend?',
-      say: 'Groceries, October: $49.00. Maya owes you $112.40, Jordan $64.10, Sam $58.75.',
+      chip: 'What did I spend on groceries?',
+      say: () => `Groceries, October: ${money(groceries())}.`,
       steps: [
-        { t: 'user', text: 'What did I actually spend on groceries?' },
+        { t: 'user', text: 'What did I spend on groceries?' },
         { t: 'tool', label: 'Adding up your shares', done: 'Groceries, October' },
-        { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Groceries · October</strong></div>
-          <p class="big money">$49.00</p>
+        // Green Basket is the receipt split above: its groceries-only slice follows whatever share you gave yourself there
+        { t: 'card', html: () => `<div class="tz-card"><div class="hd"><strong>Groceries · October</strong></div>
+          <p class="big money" data-gt>${money(groceries())}</p>
           <div class="rows">
-            <div class="r"><span class="dot" style="--c:var(--cat-groceries)"></span><span>Green Basket Market</span><span class="money">$22.00 <small>of $100.00</small></span></div>
+            <div class="r"><span class="dot" style="--c:var(--cat-groceries)"></span><span>Green Basket Market<small class="why">groceries only</small></span><span class="money" data-gb>${money(gbGroceries())}</span></div>
             <div class="r"><span class="dot" style="--c:var(--cat-groceries)"></span><span>Green Grocer</span><span class="money">$17.80 <small>yours</small></span></div>
             <div class="r"><span class="dot" style="--c:var(--cat-groceries)"></span><span>Farmers market</span><span class="money">$9.20 <small>of $32.25</small></span></div>
           </div></div>` },
-        // balances carry across every bill, so "who owes me" is one more question, not a spreadsheet
-        { t: 'user', text: 'And who owes me?' },
-        { t: 'card', html: `<div class="tz-card"><div class="hd"><strong>Roommates · all bills</strong></div>
-          <div class="rows rows-p">${owes('maya', 11240)}${owes('jordan', 6410)}${owes('sam', 5875)}</div></div>` },
       ],
     },
   };
@@ -99,7 +127,11 @@ export async function initChat() {
   // each finished exchange's height, measured by fit(): the log takes it before a run starts, so the final frame shows
   // the whole exchange (the request included) with no empty band above a short answer
   const H = {};
-  const size = () => { const h = Math.max(0, ...Object.values(H)); if (h) log.style.height = `${h}px`; };
+  // the log is as tall as the default exchange (the split), so it ends right under "Saved to Roommates"; a taller
+  // exchange scrolls inside, kept at its newest message
+  // the log is as tall as the exchange on screen (measured at this width), easing between them, so a short answer
+  // never sits over an empty band; a tap changes it, so only the visitor's own action ever moves the page below
+  const size = (k) => { const h = H[k]; if (h) log.style.height = `${h}px`; };
   async function play(key, { instant = false, keep = false } = {}) {
     token += 1;
     const tk = token;
@@ -139,7 +171,7 @@ export async function initChat() {
           }
           scrollDown();
         } else if (st.t === 'card') {
-          log.appendChild(el(st.html)); scrollDown();
+          log.appendChild(el(typeof st.html === 'function' ? st.html() : st.html)); scrollDown();
           if (!fast) await wait(1100, tk);
         }
       }
@@ -147,18 +179,23 @@ export async function initChat() {
     running = false;
     setPaused(false);
     setBtn(false);
-    if (!instant) live.textContent = S[key].say;
+    if (!instant) live.textContent = typeof S[key].say === 'function' ? S[key].say() : S[key].say;
   }
 
   // bring the panel into view first, so a tap near the fold never plays off screen
+  // nothing is ever parked under the sticky nav: the chips and panel together when they fit, else the panel's top
+  // the chips never end up under the translucent bar: they come out from under it if they are there, and the page only
+  // scrolls far enough to show the answer's end, never past the chips
   const start = (k) => {
     setPaused(false);
-    const r = chat.getBoundingClientRect();
-    const bottom = r.bottom;
-    if (r.top < 0 || bottom > innerHeight) {
-      const dy = r.top < 0 ? r.top - 16 : Math.min(r.top - 72, bottom - innerHeight + 16);
-      scrollBy({ top: dy, behavior: reduced() ? 'auto' : 'smooth' });
-    }
+    const navH = document.getElementById('nav')?.offsetHeight || 56;
+    const top = navH + 12;
+    const rr = root.getBoundingClientRect();
+    const end = chat.getBoundingClientRect().top + chat.offsetHeight - log.offsetHeight + (H[k] || log.offsetHeight);
+    let dy = 0;
+    if (rr.top < top) dy = rr.top - top;
+    else if (end > innerHeight - 12) dy = Math.min(end - (innerHeight - 12), rr.top - top);
+    if (Math.abs(dy) > 2) scrollBy({ top: dy, behavior: reduced() ? 'auto' : 'smooth' });
     play(k);
   };
   $$('.chat-chips button', root).forEach((b) => b.addEventListener('click', () => start(b.dataset.k)));
@@ -179,6 +216,14 @@ export async function initChat() {
   // Never an empty or half-played panel: it opens on the first exchange, finished, at every width (nothing plays on
   // its own, so a fast scroll never passes a spinner in a tall empty box). A chip or Replay plays one, animated.
   await fit();
+  // the split above changed your groceries share: a read card already on screen follows it
+  document.addEventListener('tz:share', () => {
+    const gt = $('[data-gt]', log); const gbv = $('[data-gb]', log);
+    if (gt) gt.textContent = money(groceries());
+    if (gbv) gbv.textContent = money(gbGroceries());
+    const owe = $('[data-owe]', log);
+    if (owe) owe.outerHTML = oweCard();
+  });
   let w = innerWidth;
   addEventListener('resize', () => { if (innerWidth !== w && !running) { w = innerWidth; fit(); } }, { passive: true });
   if ('IntersectionObserver' in window) {

@@ -33,10 +33,11 @@ export async function initStory() {
   const fold = original.map((l, i) => i).filter((i) => groups[i] === 1 && !original[i].taxCents);
   const folded = fold.length >= 3 ? fold : [];
   const sumOf = (ix) => ix.reduce((a, i) => a + res.items[i].totalCents, 0);
-  const dots = (label) => `<span class="who" role="group" aria-label="Who had ${esc(label)}">${people.map((p) => `<button type="button" class="dot-b" data-p="${p}" aria-label="${esc(label)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button>`).join('')}</span>`;
+  // a real grid for assistive tech: each line is a row (its name the row header), each person's dot a cell
+  const dots = (label) => `<span class="who" role="none">${people.map((p) => `<span class="dc" role="gridcell"><button type="button" class="dot-b" data-p="${p}" aria-label="${esc(label)}: ${esc(PEOPLE[p].name)}" aria-pressed="false" tabindex="-1" style="--c:${PEOPLE[p].color}"><i></i></button></span>`).join('')}</span>`;
   const lineRow = (l, i, sub = false) => `
-      <div class="st-row${sub ? ' st-subrow' : ''}" data-i="${i}" data-g="${GROUP(i)}" style="--r:${i}">
-        <span class="nm">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">+ tax</small>' : ''}</span><span class="money"${l.taxCents ? ' data-n="with tax"' : ''}>${money(res.items[i].totalCents)}</span>
+      <div class="st-row${sub ? ' st-subrow' : ''}" role="row" data-i="${i}" data-g="${GROUP(i)}" style="--r:${i}">
+        <span class="nm" role="rowheader">${esc(l.pretty)}${l.taxCents ? ' <small class="tx">with tax</small>' : ''}</span><span class="money" role="gridcell"${l.taxCents ? ' data-n="with tax"' : ''}>${money(res.items[i].totalCents)}</span>
         ${dots(l.pretty)}
       </div>`;
   const grpLabel = `${fold.length} shared groceries`;
@@ -45,14 +46,15 @@ export async function initStory() {
     <div class="st-people"><span class="st-sp" aria-hidden="true"><strong>${esc(model.merchant)}</strong><small>${model.lines.length} items · ${money(model.totalCents)}</small></span><div class="st-pp">${people.map((id) => `
       <div class="st-p" data-p="${id}">${avatar(PEOPLE[id])}<span class="nm">${esc(PEOPLE[id].name)}</span><span class="amt money">–</span></div>`).join('')}
     </div></div>
-    <div class="st-items">${folded.length ? `
-      <div class="st-row st-grp" data-lines="${folded.join(',')}" data-g="1" style="--r:0">
-        <span class="nm"><button type="button" class="st-exp" aria-expanded="false" aria-controls="st-sub"><span class="gl">Groceries</span> <small>${folded.length} shared</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span><span class="money" data-n="${folded.length} shared">${money(sumOf(folded))}</span>
+    <div class="st-items" role="grid" aria-label="Who had what" aria-describedby="st-hint">${folded.length ? `
+      <div class="st-row st-grp" role="row" data-lines="${folded.join(',')}" data-g="1" style="--r:0">
+        <span class="nm" role="rowheader"><button type="button" class="st-exp" aria-expanded="false" aria-controls="st-sub" aria-label="Groceries, ${folded.length} items"><span class="gl">Groceries</span> <small>${folded.length} items</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span><span class="money" role="gridcell" data-n="${folded.length} items">${money(sumOf(folded))}</span>
         ${dots(grpLabel)}
       </div>
-      <div class="st-sub" id="st-sub" hidden>${folded.map((i) => lineRow(model.lines[i], i, true)).join('')}</div>` : ''}
+      <div class="st-sub" id="st-sub" role="rowgroup" hidden>${folded.map((i) => lineRow(model.lines[i], i, true)).join('')}</div>` : ''}
       ${model.lines.map((l, i) => (folded.includes(i) ? '' : lineRow(l, i))).join('')}</div>
     <div class="st-foot"><p class="ss-owe">You spent <strong class="money ss-you"></strong> <span class="ss-them">Roommates owe you <b class="money"></b></span></p><span class="ss-check"></span><button type="button" class="st-reset" tabindex="-1" aria-label="Reset the split" title="Reset">${ICON.replay}</button></div>
+    <p class="visually-hidden" id="st-hint">Arrow keys move between items and people. Space adds or removes someone.</p>
     <p class="visually-hidden" aria-live="polite" data-live></p>`;
 
   const allRows = $$('.st-row', stage);
@@ -67,11 +69,18 @@ export async function initStory() {
   const avs = Object.fromEntries(people.map((p) => [p, $(`.st-p[data-p="${p}"]`, stage)]));
   const shown = Object.fromEntries(people.map((p) => [p, '–']));
   // the ledger below shows this receipt landing in your month: tell it your share whenever it changes
+  // (and the chat and the search: your groceries-only share, and your share of each line)
   const share = () => {
     const cents = res.people.you?.cents || 0;
-    if (window.__tzShare === cents) return;
+    const mine = model.lines.map((_, i) => res.items.find((x) => x.index === i)?.shares?.you || 0);
+    // everyone's share too: the balances below (and the AI's "Who owes me?") follow the whole split, not only yours
+    const each = Object.fromEntries(people.map((p) => [p, res.people[p]?.cents || 0]));
+    const sig = `${mine.join()}|${people.map((p) => each[p]).join()}`;
+    if (window.__tzSplit?.sig === sig) return;
     window.__tzShare = cents;
-    document.dispatchEvent(new CustomEvent('tz:share', { detail: { cents, totalCents: model.totalCents } }));
+    const groceriesCents = mine.reduce((a, c, i) => a + (model.lines[i].category === 'groceries' ? c : 0), 0);
+    window.__tzSplit = { cents, mine, groceriesCents, people: each, sig };
+    document.dispatchEvent(new CustomEvent('tz:share', { detail: { cents, totalCents: model.totalCents, mine, groceriesCents, people: each } }));
   };
   share();
   const steps = $$('.step', root);
@@ -87,6 +96,12 @@ export async function initStory() {
   const footYou = $('.st-foot .ss-you', stage);
   const footThem = $('.st-foot .ss-them b', stage);
   footReset.addEventListener('click', () => reset());
+  // the scan's "Split it" arrives here with the receipt it just read: the default split, and its header flashes once
+  document.addEventListener('tz:story-arrive', () => {
+    if (edited) reset();
+    const hd = $('.st-people', stage);
+    hd.classList.remove('is-flash'); void hd.offsetWidth; hd.classList.add('is-flash');
+  });
   // desktop: one caption under the heading, cross-faded in place as each (invisible) scroll step activates
   const sideCap = $('.story-cap span', root);
   let capT0 = 0;
@@ -101,8 +116,17 @@ export async function initStory() {
     sideCap.classList.add('is-out');
     capT0 = setTimeout(() => { sideCap.textContent = text; sideCap.classList.remove('is-out'); }, 200);
   }
+  // a refused tap says why where the eye already is: the footer's check line, for two seconds (same slot, nothing moves)
+  let whyT = 0;
+  function why() {
+    clearTimeout(whyT);
+    footCheck.className = 'ss-check is-why';
+    footCheck.textContent = 'Someone has to have it.';
+    whyT = setTimeout(() => renderFoot(), 2000);
+  }
   // the footer ends the split on the hero's word: what you spent (live), then what the others owe you
   function renderFoot(t = totalsAt(current < 0 ? LAST : current)) {
+    clearTimeout(whyT);
     footCheck.className = `ss-check${res.check.ok ? '' : ' bad'}`;
     footCheck.innerHTML = res.check.ok ? `${ICON.check}Adds up to ${money(res.check.sumCents)}` : `Shares add up to ${money(res.check.sumCents)}, not ${money(res.check.expectedCents)}`;
     // Reset keeps its slot (visibility only), so it never reflows the footer
@@ -222,9 +246,16 @@ export async function initStory() {
     paintTotals(LAST);
     live.textContent = `You spent ${money(res.people.you?.cents || 0)}. ` + people.filter((p) => p !== 'you').map((p) => `${PEOPLE[p].name} ${money(res.people[p]?.cents || 0)}`).join(', ') + (res.check.ok ? '. Adds up exactly.' : '.');
   }
+  // Reset returns the card to its first frame: the original split, and the nine folded again
   function reset() {
     model.lines = JSON.parse(JSON.stringify(original));
     edited = false;
+    if (sub && !sub.hidden) {
+      sub.hidden = true;
+      expBtn.setAttribute('aria-expanded', 'false');
+      grpRow.classList.remove('is-open'); stage.classList.remove('is-open');
+      setH();
+    }
     resplit();
   }
   function toggleFold(open = sub.hidden) {
@@ -235,8 +266,9 @@ export async function initStory() {
     expBtn.setAttribute('aria-expanded', String(open));
     grpRow.classList.toggle('is-open', open);
     stage.classList.toggle('is-open', open);
-    if (open) sub.scrollTop = 0;
     paintDots(current < 0 ? 0 : current);
+    // the nine grow in (300ms), so the card's new height reads as the same card opening, not a jump
+    if (open && !reduced()) sub.animate([{ height: '0px', opacity: 0 }, { height: `${sub.scrollHeight}px`, opacity: 1 }], { duration: 300, easing: 'cubic-bezier(.2,.7,.2,1)' });
     // the pinned stage keeps its place while the nine are open (it grows downward, not re-centred), and if the page
     // itself moved, scroll back so the row you clicked stays under the cursor
     if (!open) setH();
@@ -290,6 +322,7 @@ export async function initStory() {
         const who = $('.who', row);
         who.classList.remove('nope'); void who.offsetWidth; who.classList.add('nope');
         live.textContent = 'Someone has to have it. Add another person first.';
+        why();
         return;
       }
       ix.forEach((i) => { const m = lineMembers(model.lines[i]).filter((x) => x !== p); model.lines[i].split = { type: 'equal', people: people.filter((x) => m.includes(x)) }; });

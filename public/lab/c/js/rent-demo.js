@@ -56,7 +56,7 @@ root.innerHTML = `<div class="rec${opts.compact || opts.sideRoot ? ' rec-compact
       <label for="rent-in">Rent</label>
       <span class="money-in-field">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-help"></span>
       <span class="step-btns"><button type="button" data-step="-2500" aria-label="Lower rent by $25">−</button><button type="button" data-step="2500" aria-label="Raise rent by $25">+</button></span>
-      <span id="rent-help" class="muted small">By room size · 25 · 25 · 28 · 22%</span>
+      <span id="rent-help" class="muted small" aria-live="polite"></span>
     </div>
     <ul class="rec-lines" role="list"></ul>
     <ul class="sp-people rec-shares" role="list" aria-live="polite">${ROOM.map((p) => `<li class="sp-person" data-p="${p}"><span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span><span class="sp-pn">${PEOPLE[p].name}</span><b class="money sp-pa"></b></li>`).join('')}</ul>
@@ -76,8 +76,9 @@ let prev = null;
 
 function render() {
   const r = compute();
-  const method = { 0: 'By percent', 1: 'Equally', 2: 'Equally', 3: 'Equally', 4: 'Just Jordan' };
-  linesEl.innerHTML = r.items.map((it, i) => `<li><span>${esc(it.name)}</span><b class="money">${money(it.totalCents)}</b><span>${method[i]}${it.shares.you ? ` · you ${money(it.shares.you)}` : ""}</span></li>`).join('')
+  // one name for the rent's split, said once, on its own line: by room size, with your percent beside your share
+  const method = { 0: 'By room size', 1: 'Equally', 2: 'Equally', 3: 'Equally', 4: 'Just Jordan' };
+  linesEl.innerHTML = r.items.map((it, i) => `<li><span>${esc(it.name)}</span><b class="money">${money(it.totalCents)}</b><span>${method[i]}${it.shares.you ? ` · you ${i === 0 ? `${PCT.you}% · ` : ''}${money(it.shares.you)}` : ''}</span></li>`).join('')
     + `<li class="rec-total"><span>Each month</span><b class="money">${money(r.totalCents)}</b></li>`;
   ROOM.forEach((p) => {
     const b = root.querySelector(`.sp-person[data-p="${p}"] .sp-pa`);
@@ -88,10 +89,9 @@ function render() {
   if (opts.compact) { prev = r; return; }
   const you = r.people.you.cents;
   // one status pill (the next rent); the rows after it just say how they arrive
-  const st = mode === 'auto' ? '<span class="up-status auto">Adds automatically</span>' : '<span class="up-status review">You review it</span>';
   const quiet = (m) => `<span class="up-how">${m === 'auto' ? 'Auto' : 'Review'}</span>`;
   const rows = [
-    ['Nov', 1, 'Monthly rent', 'Rent + utilities · your share', money(you), st],
+    ['Nov', 1, 'Monthly rent', 'Rent + utilities · your share', money(you), ''],
     ['Nov', 5, 'Netflix', 'Split 4 ways', money(flix[0]), quiet('auto')],
     ['Nov', 15, 'Gym membership', 'Just you', '$39.00', quiet('auto')],
     ['Dec', 1, 'Monthly rent', 'Same split', money(you), quiet(mode)],

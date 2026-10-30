@@ -10,7 +10,7 @@ import { money, esc, avatar, ICON, listNames, reduced } from './util.js';
 const whole = (c) => (c % 100 === 0 ? money(c).replace(/\.00$/, '') : money(c));
 /**
  * Who pays what on one line, in words: "Just Maya", "$1.37 each",
- * "$3.27–$3.28 each" (a penny left over), or names for a weighted split
+ * "$3.28 each" (a penny left over, rounded), or names for a weighted split
  * ("You $600 · Maya $600 · Jordan $672 · Sam $528").
  */
 export const shareText = (shares, order) => {
@@ -20,8 +20,8 @@ export const shareText = (shares, order) => {
   const vals = ids.map((id) => shares[id]);
   const lo = Math.min(...vals);
   const hi = Math.max(...vals);
-  if (lo === hi) return `${money(lo)} each`;
-  if (hi - lo === 1) return `${money(lo)}–${money(hi)} each`;
+  // a penny left over is not news: "$4.10 each" (the pills and the live summary stay exact)
+  if (hi - lo <= 1) return `${money(Math.round(vals.reduce((a, v) => a + v, 0) / vals.length))} each`;
   return ids.map((id) => `${id === 'you' ? 'You' : PEOPLE[id].name} ${whole(shares[id])}`).join(' · ');
 };
 
@@ -105,16 +105,17 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     const shown = [...lead.map((i) => res.items.find((it) => it.index === i && !isExtra(it))).filter(Boolean),
       ...res.items.filter((it) => isExtra(it) || !lead.includes(it.index))];
     const rows = shown.map((it) => {
-      const extra = it.isExtraCharge || it.itemType === 'Tip' || it.itemType === 'Fee' || it.itemType === 'Discount';
+      const extra = isExtra(it);
       const src = extra ? null : items[it.index];
       const who = src ? splitPeople(src.split, order) : [];
       const c = cat(it.category);
       const whoCell = multi && !extra
-        ? `<div class="se-who">${facesHTML(order, who, it.name)}</div>`
-        : (extra ? '<span class="se-prop">In proportion to each share</span>' : `<span class="se-cat"><span class="dot" style="--c:${c.color}"></span>${esc(c.label)}</span>`);
-      return `<li class="se-item${extra ? ' is-extra' : ''}" data-i="${extra ? '' : it.index}" style="--cat:${extra ? '#94a3b8' : c.color}">
-        <div class="se-line"><span class="dot" style="--c:${extra ? '#94a3b8' : c.color}" title="${esc(c.label)}"></span><span class="se-name">${esc(it.name)}</span><span class="se-meta"><span class="se-price money">${money(it.totalCents)}</span><span class="se-each money">${multi ? esc(shareText(it.shares, order)) : ''}</span></span></div>
-        <div class="se-sub">${whoCell}</div>
+        ? facesHTML(order, who, it.name)
+        : (extra ? '' : `<span class="se-cat"><span class="dot" style="--c:${c.color}"></span>${esc(c.label)}</span>`);
+      return `<li class="ss-item se-item${extra ? ' is-extra' : ''}" data-i="${extra ? '' : it.index}">
+        <span class="ss-name"><span>${esc(it.name)}</span><small class="se-each">${multi ? esc(shareText(it.shares, order)) : ''}</small></span>
+        <span class="ss-who">${whoCell}</span>
+        <span class="ss-price money">${money(it.totalCents)}</span>
       </li>`;
     }).join('');
 
@@ -148,7 +149,7 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
           <div class="catbar" aria-hidden="true">${catBar(sum.byCategory)}</div>
           <ul class="cats" role="list">${catList(sum.byCategory)}</ul>
         </div>
-        <div class="se-end"><p class="se-check">${ICON.check}<span>Adds up to <b class="money">${money(res.totalCents)}</b></span></p>${multi ? '<button type="button" class="btn btn-quiet btn-sm" data-reset>Reset</button>' : ''}</div>
+        <div class="se-end"><p class="se-check">${ICON.check}<span>Adds up</span></p>${multi ? '<button type="button" class="btn btn-quiet btn-sm" data-reset>Reset</button>' : ''}</div>
         <p class="visually-hidden" aria-live="polite" data-live></p>
       </div>`;
     last = sum;
@@ -163,6 +164,8 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
       if (!li) return;
       const each = li.querySelector('.se-each');
       const txt = order.length > 1 ? shareText(it.shares, order) : '';
+      clearTimeout(Number(each.dataset.t || 0));
+      each.classList.remove('is-warn');
       if (each.textContent !== txt) {
         each.textContent = txt;
         each.classList.remove('flash'); void each.offsetWidth; each.classList.add('flash');
@@ -187,7 +190,6 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     root.querySelector('.se-ytitle').textContent = `Your ${money(sum.mine)}, by category`;
     root.querySelector('.catbar').innerHTML = catBar(sum.byCategory);
     root.querySelector('.cats').innerHTML = catList(sum.byCategory);
-    root.querySelector('.se-check b').textContent = money(res.totalCents);
     const live = root.querySelector('[data-live]');
     live.textContent = order.map((id) => `${PEOPLE[id].name} ${money(res.people[id]?.cents || 0)}`).join(', ');
     last = sum;
@@ -214,6 +216,12 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
     if (!next) {
       const live = root.querySelector('[data-live]');
       live.textContent = 'Someone has to have it. Add another person first.';
+      const each = li.querySelector('.se-each');
+      const was = each.textContent;
+      each.textContent = 'Someone has to have it.';
+      each.classList.add('is-warn');
+      clearTimeout(Number(each.dataset.t || 0));
+      each.dataset.t = String(setTimeout(() => { each.classList.remove('is-warn'); each.textContent = was; }, 2400));
       b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
       return;
     }

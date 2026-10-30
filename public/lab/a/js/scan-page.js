@@ -18,8 +18,10 @@ const start = SAMPLES.some((s) => s.id === want) ? want : 'green-basket';
 
 const play = mountSplit($('#play-root'), { initial: liveModel || start });
 const scanner = mountScan($('#scan-demo'), {
-  splitLabel: 'Split it',
+  // the split is right below on this page: the arrow says the button scrolls there
+  splitLabel: 'Split it \u2193',
   autoStart: false,
+  foldAll: true,
   onResult(model) { play.load(model.source === 'live' ? model : model.id); },
   onSplit() {
     $('#split').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -28,13 +30,4 @@ const scanner = mountScan($('#scan-demo'), {
 const scanned = liveModel ? Promise.resolve() : scanner.run(start, { instant: arriving });
 if (arriving) {
   Promise.all([play.ready, scanned]).then(() => requestAnimationFrame(() => $('#split').scrollIntoView()));
-}
-
-// the step nav marks where you are (aria-current="step")
-const steps = [...document.querySelectorAll('.pg-steps a')];
-if ('IntersectionObserver' in window && steps.length) {
-  new IntersectionObserver((es) => es.forEach((e) => {
-    const onSplit = e.isIntersecting;
-    steps.forEach((a) => { if ((a.hash === '#split') === onSplit) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current'); });
-  }), { rootMargin: '-45% 0px -45% 0px' }).observe($('#split'));
 }

@@ -1,11 +1,10 @@
-/* scenarios.js: "One place for everything you spend". Beside the real app's month (index.html), an item search
- * across every sample receipt: only what is yours (your share of shared lines). All amounts come from the kit's engine. */
-import { CATEGORIES } from '../../_kit/receipts.js';
-import { $, $$, esc, money, ICON, onceVisible } from './util.js';
+/* scenarios.js: the search inside the month card. Typing (or a chip) filters the same card down to items: only what is
+ * yours (your share of shared lines), from every sample receipt plus a short made-up history. Clearing the box brings
+ * the month back. Green Basket follows the split above (story.js sends your share of each line). */
+import { $, $$, esc, money, onceVisible } from './util.js';
 import { loadModel, compute, SAMPLES, dateLabel } from './data.js';
 
-/* Earlier receipts in the same made-up account (amounts in cents, your share first), so a search finds a habit, not
- * one line: the café and Value Mart bills are the ones on the app screenshot beside the search. */
+/* Earlier receipts in the same made-up account (amounts in cents, your share first), so a search finds a habit, not one line. */
 const HISTORY = [
   { name: 'Oat milk latte', merchant: 'Corner Café', date: '2026-10-27', cat: 'dining', mine: 525, total: 525 },
   { name: 'Whole milk ½ gal', merchant: 'Value Mart', date: '2026-10-22', cat: 'groceries', mine: 71, total: 284 },
@@ -14,64 +13,91 @@ const HISTORY = [
   { name: 'Sunscreen stick SPF30', merchant: 'Corner Pharmacy', date: '2026-07-12', cat: 'personal-care', mine: 749, total: 749 },
   { name: 'Sunscreen SPF50 2pk', merchant: 'Green Basket Market', date: '2026-06-03', cat: 'personal-care', mine: 450, total: 1800 },
 ];
+const CAT_LABEL = { groceries: 'groceries', household: 'household', 'personal-care': 'personal care', health: 'health', dining: 'dining', rent: 'rent', utilities: 'utilities', internet: 'internet', parking: 'parking' };
+const ICO = {
+  basket: '<path d="M4 9h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8zM8.5 9l3-5m4 5l-3-5"/>',
+  cup: '<path d="M5 10h12v4a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5zM17 11h1.5a2.5 2.5 0 0 1 0 5H17M8 4.5v2.5M11.5 4.5v2.5"/>',
+  home: '<path d="M4 11l8-6.5 8 6.5M6.5 9.5V20h11V9.5"/>',
+  bottle: '<path d="M10 3h4v3.2l1.6 2.3a2 2 0 0 1 .4 1.2V19a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9.7a2 2 0 0 1 .4-1.2L10 6.2zM8 13h8"/>',
+};
+const icoFor = (cat) => ({ dining: 'cup', household: 'home', rent: 'home', utilities: 'home', internet: 'home', parking: 'home', 'personal-care': 'bottle', health: 'bottle' }[cat] || 'basket');
+const CHIPS = ['sunscreen', 'milk', 'household'];
+const CAP = 4;
 
-// the index needs every sample receipt: fetch them only as the search comes near (the first screen loads one receipt)
 export function initScenarios() {
-  const el = $('#search-demo');
-  if (el) onceVisible(el, search, { threshold: 0, rootMargin: '0px 0px 900px 0px' });
-}
+  const box = $('#search-demo');
+  if (!box) return;
+  const input = $('input', box);
+  const rows = $('#m-rows');
+  const hits = $('#m-hits');
+  const live = $('#m-live');
+  const card = $('#month');
+  const head = $('.m-k', card);
+  const total = $('#m-total', card);
+  // results sit in a box as tall as the month's four rows, so a short (or empty) result never makes the page below jump
+  let rowsH = 0;
+  box.insertAdjacentHTML('beforeend', `<div class="sd-chips" role="group" aria-label="Try a search">${CHIPS.map((q) => `<button type="button" aria-pressed="false">${q}</button>`).join('')}</div>`);
+  let index = null;
+  let loading = null;
+  // your share of each Green Basket line, live from the story (null until the story speaks: the defaults stand)
+  let gb = window.__tzSplit?.mine || null;
+  document.addEventListener('tz:share', (e) => { gb = e.detail.mine || gb; if (input.value.trim()) show(input.value, { announce: false }); });
 
-/* ---------- search ---------- */
-async function search() {
-  const el = $('#search-demo');
-  if (!el) return;
-  const index = [];
-  for (const s of SAMPLES) {
-    const m = await loadModel(s.id);
-    const r = compute(m);
-    m.lines.forEach((l, i) => {
-      const it = r.items.find((x) => x.index === i);
-      const mine = it?.shares?.you || 0;
-      // your spending only: a line with no share of yours is someone else's, not a $0.00 row
-      if (!mine) return;
-      const shared = Object.values(it.shares || {}).filter((c) => c > 0).length > 1;
-      // a monthly bill is dated this month's 1st, so every answer is spending that already happened (the page is Oct 29)
-      index.push({ id: s.id, name: l.pretty, merchant: m.merchant, date: s.recurring ? '2026-10-01' : m.date, cat: l.category, mine, total: it.totalCents, shared, i, monthly: !!s.recurring });
-    });
-  }
-  HISTORY.forEach((h, k) => index.push({ ...h, shared: h.total !== h.mine, i: 100 + k }));
-  // newest first, so every answer reads like the ledger
-  index.sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.i - b.i);
+  // the index needs every sample receipt: fetch them only as the card comes near, or on the first keystroke
+  const load = () => (loading ||= (async () => {
+    const out = [];
+    for (const s of SAMPLES) {
+      const m = await loadModel(s.id);
+      const r = compute(m);
+      m.lines.forEach((l, i) => {
+        const it = r.items.find((x) => x.index === i);
+        // a monthly bill is dated this month's 1st, so every answer is spending that already happened (the page is Oct 29)
+        out.push({ id: s.id, name: l.pretty, merchant: m.merchant, date: s.recurring ? '2026-10-01' : m.date, cat: l.category, mine: it?.shares?.you || 0, total: it?.totalCents || 0, i, monthly: !!s.recurring });
+      });
+    }
+    HISTORY.forEach((h, k) => out.push({ ...h, i: 100 + k }));
+    out.sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.i - b.i);
+    index = out;
+  })());
+  onceVisible(box, load, { threshold: 0, rootMargin: '0px 0px 900px 0px' });
 
-  el.classList.add('panel');
-  el.innerHTML = `
-    <label class="sd-input">${ICON.search}<span class="visually-hidden">Search your items</span>
-      <input type="search" placeholder="Search items, stores, categories" autocomplete="off" spellcheck="false"></label>
-    <div class="sd-chips" role="group" aria-label="Try a search">${['sunscreen', 'rent', 'milk', 'household'].map((q) => `<button type="button">${q}</button>`).join('')}</div>
-    <div class="sd-results"></div>
-    <p class="visually-hidden" aria-live="polite" data-live></p>`;
-  const input = $('input', el);
-  const out = $('.sd-results', el);
-  const live = $('[data-live]', el);
   let liveT = 0;
-  // always three rows tall (results are capped at three, and every chip finds three), so typing never moves the page
-  const DEFAULT = 'sunscreen';
-  const show = (q, { announce = true } = {}) => {
-    // an empty box goes back to the opening answer (sunscreen), with its chip pressed
-    const t = q.trim().toLowerCase() || DEFAULT;
-    const hits = index.filter((x) => `${x.name} ${x.merchant} ${CATEGORIES[x.cat]?.label}`.toLowerCase().includes(t)).slice(0, 3);
-    out.innerHTML = hits.length ? hits.map((x) => `<div class="sd-r"><span class="dot" style="--c:${CATEGORIES[x.cat]?.color}"></span>
-      <span class="nm">${esc(x.name)}</span><span class="meta">${x.monthly ? 'Repeats monthly' : esc(x.merchant)} · ${dateLabel(x.date).replace(/, \d{4}$/, '')}</span>
-      <span class="amt"><strong class="money">${money(x.mine)}</strong>${x.shared ? `<small class="money">of ${money(x.total)}</small>` : '<small>yours</small>'}</span></div>`).join('')
-      : `<p class="sd-empty">None of your items match "${esc(q)}".</p>`;
-    $$('.sd-chips button', el).forEach((b) => b.setAttribute('aria-pressed', String(b.textContent === t)));
+  async function show(q, { announce = true } = {}) {
+    const t = q.trim().toLowerCase();
+    $$('.sd-chips button', box).forEach((b) => b.setAttribute('aria-pressed', String(b.textContent === t)));
+    if (!t) {
+      hits.hidden = true; rows.hidden = false; hits.innerHTML = ''; clearTimeout(liveT);
+      if (card.classList.contains('is-search')) { card.classList.remove('is-search'); card.__month?.(); }
+      return;
+    }
+    if (!rows.hidden) rowsH = rows.offsetHeight;
+    await load();
+    if (input.value.trim().toLowerCase() !== t) return; // a newer keystroke won
+    const mineOf = (x) => (x.id === 'green-basket' && gb ? gb[x.i] || 0 : x.mine);
+    const all = index.filter((x) => mineOf(x) > 0 && `${x.name} ${x.merchant} ${CAT_LABEL[x.cat] || ''}`.toLowerCase().includes(t));
+    const found = all.slice(0, CAP);
+    hits.innerHTML = found.length ? found.map((x) => {
+      const mine = mineOf(x);
+      const shared = x.total !== mine;
+      return `<li class="m-row"><span class="m-ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICO[icoFor(x.cat)]}</svg></span>
+        <span class="m-t">${esc(x.name)}<small>${x.monthly ? 'Repeats monthly' : esc(x.merchant)} · ${dateLabel(x.date).replace(/, \d{4}$/, '')}</small></span>
+        <span class="m-a"><strong class="money">${money(mine)}</strong>${shared ? `<small class="money">of ${money(x.total)}</small>` : ''}</span></li>`;
+    }).join('') : `<li class="m-empty">None of your items match "${esc(q.trim())}".</li>`;
+    rows.hidden = true; hits.hidden = false;
+    if (rowsH) hits.style.minHeight = `${rowsH}px`;
+    // a search is an all-time question: the header and the big number answer it (your share of exactly the rows shown)
+    card.classList.add('is-search');
+    const n = found.length;
+    head.textContent = all.length > CAP ? `Latest ${CAP} of ${all.length} items` : `${n || 'No'} item${n === 1 ? '' : 's'} · all time`;
+    total.textContent = money(found.reduce((a, x) => a + mineOf(x), 0));
     // one short summary for screen readers, once typing pauses (not every row on every keystroke)
     clearTimeout(liveT);
-    if (announce) liveT = setTimeout(() => { live.textContent = `${hits.length || 'No'} result${hits.length === 1 ? '' : 's'} for ${t}`; }, 400);
-  };
+    if (announce) liveT = setTimeout(() => { live.textContent = `${found.length || 'No'} item${found.length === 1 ? '' : 's'} for ${t}`; }, 400);
+  }
   input.addEventListener('input', () => show(input.value));
-  $$('.sd-chips button', el).forEach((b) => b.addEventListener('click', () => { input.value = b.textContent; show(input.value); }));
-  // it opens on the headline's own search, already answered, so its height never changes on its own
-  input.value = DEFAULT;
-  show(input.value, { announce: false });
+  // a pressed chip clears the search (the month comes back)
+  $$('.sd-chips button', box).forEach((b) => b.addEventListener('click', () => {
+    input.value = b.getAttribute('aria-pressed') === 'true' ? '' : b.textContent;
+    show(input.value);
+  }));
 }

@@ -1,11 +1,39 @@
 // One made-up October for "you": every number on the page is computed here
 // with the kit's split engine from the kit's recorded scans.
 import { SAMPLES, PEOPLE as KIT_PEOPLE, CATEGORIES, getSample, loadScan as kitLoadScan, splitSample } from '../../_kit/receipts.js';
-import { normalizeScan } from '../../_kit/scan-client.js';
 import { splitBill, toCents } from '../../_kit/split-engine.js';
 import { sentence } from './ui.js';
 
 export { SAMPLES, getSample };
+
+/* The kit's scan normaliser (scan-client.js formatScanResult port), copied here so the page
+   doesn't load the whole scan client for one function. */
+const has = (v) => v !== null && v !== undefined && v !== '';
+const fix2 = (v, fb = '0.00') => (!has(v) ? fb : (Number.isNaN(Number(v)) ? String(v) : Number(v).toFixed(2)));
+const rate = (v, fb = '0') => (!has(v) ? fb : (Number.isFinite(Number(v)) ? String(Number(v)) : String(v)));
+const qty = (v) => { const n = Number(v); return has(v) && Number.isFinite(n) && n > 0 ? String(n) : '1'; };
+function normalizeScan(res) {
+  const r = (res?.receipt && Array.isArray(res.receipt.items) ? res.receipt : Array.isArray(res?.items) ? res : null) || {};
+  const tip = Number(r.tip?.amount || 0);
+  const cur = r.storeInformation?.currency;
+  const discountAmount = Number((Array.isArray(r.discounts) ? r.discounts : []).reduce((a, d) => a + (Number(d?.amount) || 0), 0).toFixed(2));
+  return {
+    currency: typeof cur === 'string' && /^[A-Za-z]{3}$/.test(cur.trim()) ? cur.trim().toUpperCase() : null,
+    discountAmount,
+    items: (r.items || []).map((it = {}) => {
+      const extra = it.itemType === 'Fee' || it.itemType === 'Tip';
+      return {
+        name: it.name || 'Unknown Item', amount: fix2(it.totalPrice), quantity: qty(it.quantity),
+        taxPercent: extra ? '0' : rate(it.tax), isExtraCharge: extra, itemType: it.itemType || 'Item',
+        ...(has(it.taxAmount) ? { taxAmount: fix2(it.taxAmount) } : {}),
+      };
+    }),
+    subtotal: fix2(r.subtotalBeforeChargesAndTaxes),
+    tax: fix2(r.taxSummary?.totalTaxAmount),
+    total: fix2(r.grandTotal),
+    tip: tip > 0 ? fix2(tip) : null,
+  };
+}
 
 /* The kit's rent statement is dated November; this page's example is October, so
    the rent sample is re-dated here (a local patch, the kit file is untouched). */
@@ -29,6 +57,13 @@ export const CATS = {
   subscriptions: { label: 'Subscriptions', color: '#9333ea' },
 };
 export const catOf = (id) => CATS[id] || CATS.other;
+/* The October summary always shows the same rows in the same order, so a tap moves amounts, never rows. */
+const SUMMARY = ['rent', 'dining', 'groceries'];
+export function summaryCats(cats) {
+  const top = SUMMARY.map((id) => cats.find((c) => c.id === id) || { id, cents: 0, ...catOf(id) });
+  const rest = cats.filter((c) => !SUMMARY.includes(c.id)).reduce((a, c) => a + c.cents, 0);
+  return { top, rest };
+}
 /* Charts use one hue: navy for the largest share, then lighter steps; grey is "everything else". */
 const TONES = ['#0f1f3d', '#3f5b8c', '#7f95bb', '#b3c1d9', '#d3dcea'];
 export const tone = (i) => TONES[Math.min(i, TONES.length - 1)];
@@ -72,8 +107,18 @@ async function build() {
     { date: 'Oct 1', text: 'ONLINE TRANSFER RENT', cents: -263240 },
   ];
   const paidCents = -bank.reduce((a, b) => a + b.cents, 0);
-  const derived = derive(bills);
+  return { scans, bank, paidCents, ...derive(bills) };
+}
 
+/** The world after the visitor re-split one receipt: the chat, the list and the balances all read this. */
+export function withSplit(w, id, split) {
+  const bills = w.bills.map((b) => (b.id === id ? { ...b, split, youCents: split.people.you?.cents || 0 } : b));
+  return { ...w, ...derive(bills) };
+}
+
+/** Everything that follows from the bills: your total, categories, and every receipt line.
+    Re-run when a split changes, so the October list always agrees with the split above it. */
+export function derive(bills) {
   // Who owes whom across October: positive means they owe you. Settled bills (rent) are in no balance.
   const net = {};
   bills.filter((b) => !b.settled).forEach((b) => Object.entries(b.split.people).forEach(([p, v]) => {
@@ -81,13 +126,6 @@ async function build() {
     if (b.payer === 'you') net[p] = (net[p] || 0) + v.cents;
     else if (p === 'you') net[b.payer] = (net[b.payer] || 0) - v.cents;
   }));
-
-  return { scans, bills, bank, paidCents, ...derived, net };
-}
-
-/** Everything that follows from the bills: your total, categories, and every receipt line.
-    Re-run when a split changes, so the October list always agrees with the split above it. */
-export function derive(bills) {
   const spentCents = bills.reduce((a, b) => a + b.youCents, 0);
 
   const byCat = {};
@@ -109,7 +147,7 @@ export function derive(bills) {
   }));
   const items = lines.filter((l) => l.cents > 0);
 
-  return { spentCents, cats, lines, items };
+  return { bills, net, spentCents, cats, lines, items };
 }
 
 /** A split of one sample with custom per-line people (Sets), for the playground. */

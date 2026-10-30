@@ -3,7 +3,7 @@
 import { loadScenarios } from './data.js';
 import { initSnapSplit } from './snap-split.js';
 import { initChatDemo } from './chat-demo.js';
-import { initReveal, initNav, bankAmt, itemIndex, bankIndex, wireSearch } from './shared.js';
+import { initReveal, initNav, itemIndex, bankIndex, wireSearch } from './shared.js';
 import { tweenMoney, reduced, whenVisible, watchVisible } from './util.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -15,14 +15,16 @@ initReveal();
 /* ---------- hero: tap a bank line, see what you actually spent ----------
    Each bank line is a tab; its Trezzit view counts down (380 ms, no delay) from the bank amount
    to your share. First paint shows the final $30.00: nothing big is ever wrong for long.
-   All three views share one grid cell, so the card never changes size when you switch.
-   Until the visitor touches the hero, it walks once through the three lines (shared, personal,
-   recurring) every 5 s, then rests on the first. A thin bar on the selected line shows the wait;
-   it pauses on hover, focus or when the card is off screen, and never runs with reduced motion. */
+   All views share one grid cell, so the card never changes size when you switch.
+   Until the visitor touches the hero, it walks once through shared, personal and recurring
+   (Green Basket -> Pharmacy -> Oak St -> back to Green Basket), then stops for good. A thin bar on
+   the selected line shows the wait. It pauses on hover, focus, off screen and with the visible
+   Pause button (WCAG 2.2.2), stops on any tap of a line, and never runs with reduced motion. */
 const hero = $('[data-hero]');
 const proof = $('[data-proof]');
 const tabs = $$('.pb-line', hero);
 const views = $$('.pt-view', hero);
+const tourBtn = $('[data-tour-btn]', hero);
 let current = tabs[0];
 hero.classList.add('is-ready');
 function playHero(tab = current) {
@@ -49,42 +51,55 @@ function select(tab, { focus = false } = {}) {
     v.inert = !on;
   });
   if (focus) tab.focus();
-  $('[data-paid-amt]', hero).textContent = tab.lastElementChild.textContent;
   placeSeam();
   playHero(tab);
 }
 views.forEach((v) => { v.inert = !v.classList.contains('is-on'); });
 
 /* the tour: pharmacy, rent, back to groceries, then it stops for good */
-const tour = [tabs[1], tabs[2], tabs[0]];
+const byId = (id) => tabs.find((t) => t.id === id);
+const tour = [byId('pb-pharmacy'), byId('pb-rent'), byId('pb-groceries')];
+const DWELL = [4600, 3800, 3800]; // the first wait is the longest: the headline is read first
 let step = -1;
 let hovered = false;
 let focused = false;
 let onScreen = false;
+let held = false; // the Pause button
 function stopTour() {
   if (step === Infinity) return;
   step = Infinity;
   hero.classList.remove('is-auto', 'is-paused');
+  tourBtn.hidden = true;
 }
-function pauseTour() { hero.classList.toggle('is-paused', hovered || focused || !onScreen); }
+function pauseTour() { hero.classList.toggle('is-paused', held || hovered || focused || !onScreen); }
 function nextStop() {
   step += 1;
   if (step >= tour.length) { stopTour(); return; }
+  hero.style.setProperty('--dwell', `${DWELL[step]}ms`);
   hero.classList.remove('is-auto'); void hero.offsetWidth; hero.classList.add('is-auto');
+  tourBtn.hidden = false;
 }
 hero.addEventListener('animationend', (e) => {
   if (e.animationName !== 'tour' || step === Infinity) return;
   select(tour[step]);
   nextStop();
 });
+tourBtn.addEventListener('click', () => {
+  held = !held;
+  tourBtn.setAttribute('aria-label', held ? 'Play' : 'Pause');
+  tourBtn.classList.toggle('is-held', held);
+  pauseTour();
+});
+const shown = () => tabs.filter((t) => t.offsetParent !== null);
 tabs.forEach((t) => t.addEventListener('click', () => { stopTour(); select(t); }));
 $('.pb-lines', hero).addEventListener('keydown', (e) => {
-  const i = tabs.indexOf(current);
+  const list = shown();
+  const i = list.indexOf(current);
   const by = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
   let next = null;
-  if (by) next = tabs[(i + by + tabs.length) % tabs.length];
-  else if (e.key === 'Home') next = tabs[0];
-  else if (e.key === 'End') next = tabs[tabs.length - 1];
+  if (by) next = list[(i + by + list.length) % list.length];
+  else if (e.key === 'Home') next = list[0];
+  else if (e.key === 'End') next = list[list.length - 1];
   if (!next) return;
   e.preventDefault();
   stopTour();
@@ -92,19 +107,22 @@ $('.pb-lines', hero).addEventListener('keydown', (e) => {
 });
 proof.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovered = true; pauseTour(); } });
 proof.addEventListener('pointerleave', () => { hovered = false; pauseTour(); });
-proof.addEventListener('focusin', () => { focused = true; pauseTour(); });
+proof.addEventListener('focusin', (e) => { if (e.target !== tourBtn) { focused = true; pauseTour(); } });
 proof.addEventListener('focusout', () => { focused = false; pauseTour(); });
 if (!reduced()) {
-  watchVisible(proof, (v) => { onScreen = v; pauseTour(); }, { threshold: 0.6 });
-  whenVisible(proof, () => { if (step === -1) nextStop(); }, { threshold: 0.6 });
+  watchVisible(proof, (v) => { onScreen = v; pauseTour(); }, { threshold: 0.5 });
+  whenVisible(proof, () => { if (step === -1) nextStop(); }, { threshold: 0.5 });
 }
-/* the arrow sits on the selected bank line (layout decides where that is) */
+/* a phone hides the two extra statement lines: if one was selected, fall back to the first */
+addEventListener('resize', () => { if (current.offsetParent === null) select(tabs[0]); }, { passive: true });
+/* the arrow sits on the selected bank line (CSS places it on the first line before JS runs) */
 const seam = $('.seam', hero);
 function placeSeam() {
   if (innerWidth < 640) { seam.style.top = ''; return; }
   const f = current.getBoundingClientRect();
   const p = seam.offsetParent.getBoundingClientRect();
-  seam.style.top = `${Math.round(f.top + f.height / 2 - p.top - 17)}px`;
+  const top = `${Math.round(f.top + f.height / 2 - p.top - 17)}px`;
+  if (seam.style.top !== top) seam.style.top = top;
 }
 placeSeam();
 addEventListener('resize', placeSeam, { passive: true });
@@ -118,13 +136,11 @@ loadScenarios().then((list) => {
   /* split it by the item */
   initSnapSplit($('[data-snap]'), (sampleId) => Promise.resolve(scenarioForSample[sampleId]));
 
-  /* search: one query, two searches (the bank's store names vs every item), and the month in one line */
+  /* search: one query, two searches (the bank's store names vs every item); the total under
+     Trezzit's results is your share of what matched (the month when the field is empty) */
   const find = $('[data-find]');
-  wireSearch(find, itemIndex(list), bankIndex(list));
-  const paid = list.filter((sc) => sc.bank).reduce((a, sc) => a + sc.sum.total, 0);
-  const spent = list.reduce((a, sc) => a + sc.sum.mine, 0);
-  $('[data-paid]', find).textContent = bankAmt(paid);
-  tweenMoney($('[data-spent]', find), spent, { dur: 0 });
+  const month = list.reduce((a, sc) => a + sc.sum.mine, 0);
+  wireSearch(find, itemIndex(list), bankIndex(list), month);
 
   /* AI */
   initChatDemo($('#ai'), list);

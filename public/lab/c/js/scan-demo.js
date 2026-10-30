@@ -1,7 +1,9 @@
 /* scan-demo.js: tap a sample receipt (recorded scan) or use your own photo
  * (live on trezzit.com only, via the kit's scan-client) and watch it read. */
 import { scan, isLive } from '../../_kit/scan-client.js';
-import { receiptHTML, ensureReceiptStyles } from '../../_kit/receipts.js';
+import { receiptHTML as kitReceiptHTML, ensureReceiptStyles } from '../../_kit/receipts.js';
+// the printed "ITEMS 19" counts units; every label on the page counts lines (14), so the footer line goes
+const receiptHTML = (raw, o) => kitReceiptHTML(raw, o).replace(/<p>ITEMS \d+<\/p>\s*/, '');
 import { toCents } from '../../_kit/split-engine.js';
 import { SAMPLE_META, getSample, sampleBill } from './data.js';
 import { h, esc, money, reduced, onVisible, itemName, storeName, prettyDate, icon, bus } from './util.js';
@@ -20,7 +22,7 @@ const checksFor = (bill) => {
   const v = (bill?.backendValidations || []).filter((c) => c.check !== 'tax_distribution_check' || Number(bill.tax) > 0);
   if (!v.length) return [];
   const bad = v.find((c) => !c.passed);
-  return [bad ? { passed: false, message: `${CHECK_LABEL[bad.check] || 'Total'} doesn’t match the receipt` } : { passed: true, message: 'Adds up to the receipt total' }];
+  return [bad ? { passed: false, message: `${CHECK_LABEL[bad.check] || 'Total'} doesn’t match the receipt` } : { passed: true, message: 'Matches the receipt' }];
 };
 const checkLI = (c, i, pending) => `<li class="${c.passed ? 'ok' : 'warn'}${pending ? ' pending' : ''}" style="--i:${i}">${icon.check}<span>${esc(CHECK_LABEL[c.check] || c.message)}</span></li>`;
 
@@ -58,9 +60,9 @@ export function mountScan(root, opts = {}) {
         <ol class="so-items" aria-label="Items read from the receipt"></ol>
         <button type="button" class="c-link-btn so-more" hidden></button>
         <p class="so-sum"></p>
-        <ul class="so-checks" aria-label="Checked against the receipt"></ul>
         <div class="so-foot">
           <p class="so-total"><span>Total</span><b class="money"></b></p>
+          <ul class="so-checks" aria-label="Checked against the receipt"></ul>
           ${opts.splitTarget ? `<button type="button" class="c-btn c-btn-sm c-btn-primary so-split">Split this receipt ${icon.arrow}</button>` : ''}
           ${opts.soloHref ? `<a class="c-btn c-btn-sm c-btn-quiet so-split so-solo" href="${esc(opts.soloHref)}" hidden>See it sorted ${icon.arrow}</a>` : ''}
         </div>

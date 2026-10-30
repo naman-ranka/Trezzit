@@ -13,9 +13,10 @@
  */
 
 import { loadScan, getSample, receiptHTML, ensureReceiptStyles } from '../../_kit/receipts.js';
-import { PEOPLE, CATEGORIES, summarise } from './data.js';
+import { PEOPLE, summarise } from './data.js';
 import { shareText, splitPeople, isExtra, facesHTML, toggleSplit, wireFaceKeys } from './split-editor.js';
 import { money, esc, avatar, ICON, reduced, whenVisible } from './util.js';
+import { splitAmount } from '../../_kit/split-engine.js';
 
 const SWEEP_MS = 600;
 
@@ -38,27 +39,33 @@ export function initSnapSplit(root, scenarioFor) {
   let sampleId = null;
 
   const bill = () => ({ ...sc.bill, items: items.map((it) => ({ ...it })) });
-  const others = () => order.filter((id) => id !== 'you');
 
+  /* Lines show the receipt's own prices (before tax), so 8.95 on the paper is $8.95 here; the tax
+     is its own row, like the tip. The pills stay exact: each line's tax goes to whoever had it. */
   function subText(it) {
-    if (isExtra(it)) return 'In proportion to each share';
-    return shareText(it.shares, order);
+    if (isExtra(it)) return '';
+    return shareText(splitAmount(it.priceCents, items[it.index].split, order).shares, order);
   }
 
   function rowHTML(it) {
     const extra = isExtra(it);
     const who = extra ? [] : splitPeople(items[it.index].split, order);
     return `<li class="ss-item${extra ? ' is-extra' : ''}" data-i="${it.index}">
-      <span class="dot" aria-hidden="true" style="--c:${extra ? '#94a3b8' : (CATEGORIES[it.category] || CATEGORIES.other).color}"></span>
       <span class="ss-name"><span>${esc(it.name)}</span><small data-each>${esc(subText(it))}</small></span>
       <span class="ss-who">${extra ? '' : facesHTML(order, who, it.name)}</span>
-      <span class="ss-price money">${money(it.totalCents)}</span>
+      <span class="ss-price money">${money(extra ? it.totalCents : it.priceCents)}</span>
     </li>`;
   }
+  const taxHTML = (res) => {
+    const tax = res.items.filter((it) => !isExtra(it)).reduce((a, it) => a + it.taxCents, 0);
+    return tax ? `<li class="ss-item is-extra is-tax"><span class="ss-name"><span>Tax</span></span><span class="ss-who"></span><span class="ss-price money">${money(tax)}</span></li>` : '';
+  };
 
-  const peopleHTML = (res) => others().map((id) => {
+  /* You first (your number is the one a tap is about), then everyone else */
+  const peopleHTML = (res) => order.map((id) => {
     const cents = res.people[id]?.cents || 0;
-    return `<li data-id="${id}">${avatar(PEOPLE[id], { size: 'sm' })}<span class="sp-name">${esc(PEOPLE[id].name)}</span><b class="money" data-cents="${cents}">${money(cents)}</b></li>`;
+    const you = id === 'you';
+    return `<li data-id="${id}"${you ? ' class="is-you"' : ''}>${avatar(PEOPLE[id], { size: 'sm' })}<span class="sp-name">${you ? 'You' : esc(PEOPLE[id].name)}</span><b class="money" data-cents="${cents}"${you ? ' data-mine' : ''}>${money(cents)}</b></li>`;
   }).join('');
 
   /* The lines that explain the shares lead (sc.lead); the rest follow in receipt order. */
@@ -72,16 +79,16 @@ export function initSnapSplit(root, scenarioFor) {
     order = sc.people;
     const sum = summarise(sc, bill());
     const res = sum.result;
-    list.innerHTML = ordered(res).map(rowHTML).join('');
+    const rows = ordered(res);
+    const firstExtra = rows.findIndex(isExtra);
+    const html = rows.map(rowHTML);
+    html.splice(firstExtra < 0 ? html.length : firstExtra, 0, taxHTML(res));
+    list.innerHTML = html.join('');
     peopleEl.innerHTML = peopleHTML(res);
-    const payer = sc.payer === 'you' ? '' : `<span class="ss-paid">${esc(PEOPLE[sc.payer].name)} paid</span>`;
     foot.innerHTML = `
-      <div class="ss-total"><span>Total</span><b class="money">${money(res.totalCents)}</b></div>
-      <p class="ss-check">${ICON.check}<span>To the cent.</span></p>
-      <div class="ss-end">
-        <p class="ss-mine"><span>You spent</span><b class="money" data-mine data-cents="${sum.mine}">${money(sum.mine)}</b>${payer}</p>
-        <button type="button" class="btn btn-quiet btn-sm" data-reset>Reset</button>
-      </div>`;
+      <p class="ss-total"><span>Total</span><b class="money">${money(res.totalCents)}</b></p>
+      <p class="ss-check">${ICON.check}<span>Adds up</span></p>
+      <button type="button" class="btn btn-quiet btn-sm" data-reset>Reset</button>`;
   }
 
   function update() {
@@ -100,8 +107,7 @@ export function initSnapSplit(root, scenarioFor) {
         li.querySelectorAll('.faces .av').forEach((b) => b.setAttribute('aria-pressed', String(who.includes(b.dataset.id))));
       }
     });
-    others().forEach((id) => setMoney(peopleEl.querySelector(`[data-id="${id}"] b`), res.people[id]?.cents || 0));
-    setMoney(foot.querySelector('[data-mine]'), sum.mine);
+    order.forEach((id) => setMoney(peopleEl.querySelector(`[data-id="${id}"] b`), res.people[id]?.cents || 0));
     live.textContent = order.map((id) => `${PEOPLE[id].name} ${money(res.people[id]?.cents || 0)}`).join(', ');
   }
 
@@ -163,7 +169,7 @@ export function initSnapSplit(root, scenarioFor) {
     paper.querySelector('.tz-r-foot p')?.remove(); // its unit count ("ITEMS 19") reads as a mismatch next to the line count
     if (thumbImg) thumbImg.innerHTML = paper.innerHTML;
     paper.style.transform = '';
-    const tag = [sc.day, sc.payer === 'you' ? '' : `${PEOPLE[sc.payer].name} paid`].filter(Boolean).join(' · ');
+    const tag = [sc.day, sc.payer === 'you' ? '' : `${PEOPLE[sc.payer].name} paid`, 'Read from a photo'].filter(Boolean).join(' · ');
     tags.forEach((t) => { t.textContent = tag; });
     render();
   }

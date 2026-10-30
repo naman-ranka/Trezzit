@@ -15,18 +15,26 @@ export function initChrome() {
   };
   addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
+  $$('[data-copy]').forEach((b) => b.setAttribute('aria-live', 'polite'));
   $$('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
     const label = b.querySelector('.does') || b.querySelector('span') || b;
     const was = label.textContent;
-    try { await navigator.clipboard.writeText(b.dataset.copy); label.textContent = 'Copied'; b.classList.add('copied'); }
+    // Prompt cards end in their copy icon only: on copy it turns into a check (the word is for screen readers).
+    const use = b.classList.contains('prompt') ? b.querySelector('.pfoot use') : null;
+    try {
+      await navigator.clipboard.writeText(b.dataset.copy); label.textContent = 'Copied'; b.classList.add('copied');
+      if (use) use.setAttribute('href', '#i-check');
+    }
     catch {
       // No clipboard access: select the URL instead and say how to copy it, without changing the button's width.
       const code = b.parentElement.querySelector('code');
       if (code) { const r = document.createRange(); r.selectNodeContents(code); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
       b.title = 'Selected. Press Ctrl+C or ⌘C to copy.';
+      label.textContent = 'Selected';
+      setTimeout(() => { label.textContent = was; }, 1800);
       return;
     }
-    setTimeout(() => { label.textContent = was; b.classList.remove('copied'); }, 1800);
+    setTimeout(() => { label.textContent = was; b.classList.remove('copied'); use?.setAttribute('href', '#i-copy'); }, 1800);
   }));
 
   $$('[data-tabs]').forEach((list) => {

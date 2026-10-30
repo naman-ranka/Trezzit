@@ -1431,3 +1431,222 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-
 @media (max-width: 479px) { .msg.act { padding: 7px 10px; font-size: 13.5px; gap: 8px; } }
 @media (max-width: 400px) { .sp-person { column-gap: 4px; } .sp-person .av { width: 18px; height: 18px; font-size: 9.5px; } .sp-pn { font-size: 12.5px; } }
 .tc-people b.neg { color: var(--ink); }
+
+/* =====================================================================
+   Round 8
+   ===================================================================== */
+/* jumps are instant (focus never lags behind the scroll); the demos animate their own scrolls */
+html { scroll-behavior: auto; }
+[id] { scroll-margin-top: 80px; }
+
+/* hero: the bank card keeps its "Your bank" label on phones; the AI chip meets the 44px bar */
+@media (max-width: 480px) {
+  .bank { background: none; border: 0; padding: 0; }
+  .bank figcaption { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; font-size: 13px; line-height: 16px; margin: 0 0 4px; padding-left: 4px; }
+  .bank figcaption .bank-i { display: none; }
+  .hero-join { height: 20px; }
+}
+.ai-chip { min-height: 44px; }
+
+/* split: the sticky totals bar on phones is solid, square-bottomed, with a hairline edge (no row peeks around it) */
+@media (max-width: 859px) {
+  ul.sp-people { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 0; box-shadow: 0 1px 0 var(--line); }
+}
+.sp-items { overflow-anchor: none; }
+.sp-meta .sp-tax { white-space: nowrap; }
+
+/* scan: a receipt that is just yours says so where "Split this receipt" would be */
+.so-solo-t { margin-left: auto; font-size: 14px; color: var(--muted); }
+.so-solo-t + .so-solo { margin-left: 0; }
+.scan:not(.is-done) .so-solo-t { visibility: hidden; }
+
+/* understand: rent leads the categories as one row that links to its page */
+.lg-cats a.lg-fixed { margin-top: 0; border-top: 0; border-radius: 10px; color: var(--text); text-decoration: none; }
+@media (min-width: 480px) { .lg-cats a.lg-fixed { grid-template-columns: 30px 1fr 72px auto 76px; } }
+@media (max-width: 479px) { .lg-cats a.lg-fixed { grid-template-columns: 30px 1fr auto auto; } .lg-cats a.lg-fixed .lg-cd { display: block; } }
+.lg-cats a.lg-fixed .lg-ci { opacity: 1; }
+.lg-cats a.lg-fixed .lg-cn { color: inherit; }
+.lg-cats a.lg-fixed b { color: var(--ink); }
+.lg-rtag { background: none; height: auto; overflow: visible; display: none; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
+@media (min-width: 480px) { .lg-rtag { display: inline-flex; } }
+.lg-rtag svg { width: 14px; height: 14px; }
+.lg-cats a.lg-fixed .lg-fgo { color: var(--accent); font-weight: 600; }
+
+/* close: the month, by who paid, adds up to one total */
+.month { margin: clamp(28px, 4vw, 44px) auto 0; max-width: 520px; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 8px 20px 0; box-shadow: 0 1px 2px rgba(15, 31, 61, .04), 0 8px 24px -12px rgba(15, 31, 61, .12); }
+ul.mo-rows { margin: 0; padding: 0; list-style: none; }
+.mo-rows li { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--divider); }
+.mo-k { display: grid; gap: 2px; min-width: 0; }
+.mo-k b { font-size: 16px; font-weight: 600; color: var(--ink); }
+.mo-k small { font-size: 14px; color: var(--muted); }
+.mo-rows li > b { font-size: 17px; font-weight: 600; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.mo-op { color: var(--faint, #9aa3b2); margin-right: 6px; font-weight: 500; }
+.mo-sum { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 0 16px; border-top: 1px solid var(--ink); margin-top: -1px; font-size: 16px; font-weight: 600; color: var(--muted); }
+.mo-sum b { font-size: clamp(26px, 3vw, 32px); font-weight: 700; color: var(--ink); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.month + .cta-row { margin-top: clamp(28px, 4vw, 40px); }
+@media (max-width: 480px) { .month { padding: 4px 16px 0; } .mo-k small { font-size: 13px; } }
+/* no-shift reserves, re-measured for round 8 (smallest finished height per range, 320-1440) */
+.verb-demo #scan-demo { min-height: 762px; }
+.verb-demo #split-demo { min-height: 704px; }
+.verb-demo #ledger-demo { min-height: 640px; }
+#chat-demo { min-height: 674px; }
+@media (min-width: 640px) { #chat-demo { min-height: 766px; } }
+@media (min-width: 720px) { .verb-demo #scan-demo { min-height: 595px; } }
+@media (min-width: 860px) { .verb-demo #split-demo { min-height: 510px; } }
+@media (min-width: 880px) { .verb-demo #ledger-demo { min-height: 424px; } }
+/* the ledger's reserve only holds the space until it renders; after that the card fits its content (no stretched gaps after a search) */
+.verb-demo #ledger-demo.ledger { min-height: 0; align-content: start; }
+@media (max-width: 380px) { .chat-log { gap: 7px; } }
+.ai-hero-demo#chat-demo { min-height: 674px; }
+@media (min-width: 600px) { .ai-hero-demo#chat-demo { min-height: 766px; } }
+
+/* =====================================================================
+   Round 9: one loud moment (the H1), quieter steps, nothing said twice
+   ===================================================================== */
+/* nav: Roommates leads; on phones it is the one link beside Log in (gone under 380px, where it can't fit) */
+@media (max-width: 859px) {
+  .nav-links { display: flex; margin-left: auto; gap: 0; }
+  .nav-links a:not(.nav-rm) { display: none; }
+  .nav-links .nav-rm { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; }
+  .nav-cta { margin-left: 0; }
+}
+@media (max-width: 379px) { .nav-links { display: none; } .nav-cta { margin-left: auto; } }
+
+/* type: the H1 is the only display size; step and section heads are calm, the close is a step down */
+.verb-copy h3 { --h3: clamp(26px, 2.6vw, 36px); font-size: var(--h3); letter-spacing: -0.03em; line-height: 1.1; }
+.verb-copy h3 .verb-n { width: 30px; height: 30px; font-size: 15px; margin-top: calc((1.1 * var(--h3) - 30px) / 2); }
+@media (max-width: 719px) { .verb-copy h3 .verb-n { width: 26px; height: 26px; font-size: 13px; margin-top: calc((1.1 * var(--h3) - 26px) / 2); } }
+.sh h2 { font-size: clamp(26px, 2.6vw, 36px); letter-spacing: -0.03em; line-height: 1.1; }
+.close-t { font-size: clamp(34px, 4.6vw, 56px); }
+.close { padding: clamp(64px, 9vw, 128px) 0; }
+.verb { padding-top: clamp(48px, 6vw, 88px); }
+.verb:first-of-type { padding-top: 0; }
+
+/* step cards are product surfaces: a hairline, no drop shadow */
+.verb-demo .demo-frame { box-shadow: none; border-color: var(--line); }
+
+/* step 2: "Rent too" sits at the end of the heading row */
+#split .verb-copy { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 16px; max-width: none; }
+.verb-more { margin: 0; }
+.verb-more a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--accent); font-weight: 600; font-size: 16px; text-decoration: none; }
+.verb-more a:hover { text-decoration: underline; }
+
+/* step 3 (home): one total, split by who paid; each row filters the list */
+.lg-sum-pay .lg-label { font-size: 15px; font-weight: 600; color: var(--muted); }
+ul.lg-pays { margin: 16px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--divider); }
+.lg-pays li { border-bottom: 1px solid var(--divider); }
+.lg-pay { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: calc(100% + 20px); margin: 4px -10px; padding: 9px 10px; min-height: 52px; text-align: left; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; cursor: pointer; transition: background-color .2s; }
+.lg-pay:hover { background: var(--wash); }
+.lg-pay[aria-pressed='true'] { background: var(--accent-soft); box-shadow: inset 0 0 0 1px #c8dafa; }
+.lg-pk { display: grid; gap: 2px; min-width: 0; }
+.lg-pk b { font-size: 16px; font-weight: 600; color: var(--ink); }
+.lg-pk small { font-size: 14px; color: var(--muted); }
+.lg-pay > b { font-size: 17px; font-weight: 600; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ledger.compact .lg-count:empty { display: none; }
+.ledger.compact .lg-search + .lg-count:empty + .lg-list { margin-top: 10px; }
+.ledger.filtered .lg-row:not(.lg-item) { display: grid !important; }
+@media (max-width: 879px) {
+  .ledger.compact > .lg-sum-pay { order: -1; border-top: 0; padding-top: 0; }
+  .ledger.compact > .lg-find { border-top: 1px solid var(--divider); padding-top: 18px; }
+}
+
+/* close (home and subpages): no recap, no slogan band on subpages; the buttons follow the last demo */
+.close-cta { padding: clamp(8px, 2vw, 24px) 0 clamp(64px, 8vw, 104px); background: none; text-align: center; }
+.close-cta .cta-row { margin-top: 0; }
+.close-cta .close-sub { margin-top: 14px; font-size: 16px; }
+
+/* AI section: the copy sits centred beside the chat, not stranded at the top */
+.ai-copy h2 { font-size: clamp(30px, 3.2vw, 44px); }
+@media (min-width: 980px) { .ai-grid { align-items: center; } .ai-copy { position: static; } }
+/* /ai: the H1 fits three lines; the server URL is on the first screen at desktop */
+@media (min-width: 1024px) { .ai-hero h1 { font-size: clamp(40px, 3.7vw, 52px); } }
+.ai-quick { display: none; }
+@media (min-width: 1024px) {
+  .ai-quick { display: block; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .ai-quick .url-box { margin-top: 0; }
+  .ai-quick .url-box code { font-size: 14px; }
+  .ai-quick-s { margin-top: 10px; font-size: 14px; color: var(--muted); }
+}
+
+/* chat: the conversation sits at the bottom of the panel, like a chat app (spare room goes above it) */
+.chat-log { justify-content: flex-end; }
+.prompt .ps { display: none; }
+@media (max-width: 479px) {
+  .chat-prompts { display: flex; flex-wrap: nowrap; gap: 6px; }
+  .chat-prompts .prompt { flex: 1 1 auto; white-space: nowrap; padding: 4px 10px; }
+  .prompt .pl { display: none; }
+  .prompt .ps { display: inline; }
+}
+
+/* roommates: rent beside its heading and the balance, like the hero's two columns */
+.rent-grid { display: grid; gap: 4px; }
+.rent-grid .sh { margin-bottom: 16px; }
+.rent-grid .bal { margin-top: 16px; }
+@media (min-width: 1000px) {
+  .rent-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: 'head card' 'bal card'; column-gap: 56px; align-items: start; }
+  .rent-h { grid-area: head; margin-top: 24px; }
+  .rent-card { grid-area: card; }
+  .rent-bal { grid-area: bal; }
+  .rent-grid .bal { margin-top: 0; }
+}
+/* the balance rows open to the bills behind each net */
+.bal-list li { display: block; padding: 0; }
+.bal-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 6px 0; background: none; border: 0; text-align: left; font: inherit; font-size: 16px; color: inherit; cursor: pointer; }
+.bal-row > b { margin-left: auto; color: var(--ink); font-size: 18px; letter-spacing: -0.01em; }
+.bal-list li.pos .bal-row > b { color: var(--pos); }
+.bal-chev { flex: none; width: 8px; height: 8px; margin: -4px 2px 0 6px; border-right: 1.6px solid var(--muted); border-bottom: 1.6px solid var(--muted); transform: rotate(45deg); transition: transform .2s var(--ease); }
+.bal-row[aria-expanded='true'] .bal-chev { transform: rotate(-135deg); margin-top: 4px; }
+ul.bal-why { margin: 0 0 10px 32px; padding: 0; list-style: none; font-size: 14px; }
+.bal-list .bal-why li { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border: 0; }
+.bal-list .bal-why b { margin: 0; font-size: 14px; font-weight: 600; color: var(--text) !important; }
+.bal-why small { color: var(--muted); font-size: 14px; }
+.bal-why .money { color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* split: Reset appears once there is something to reset; the tax footnote is gone */
+.split:not(.changed) .sp-reset { visibility: hidden; }
+.sp-tax { display: none; }
+
+/* scan: no subtotal line; the check is a small chip beside the total */
+.so-sum { display: none; }
+.so-foot ul.so-checks { margin: 0 auto 0 0; }
+.so-foot .so-solo { margin-left: auto; }
+.lg-pay::after { content: ''; flex: none; width: 7px; height: 7px; margin: 0 4px 0 -6px; border-right: 1.6px solid var(--faint, #9aa3b2); border-bottom: 1.6px solid var(--faint, #9aa3b2); transform: rotate(-45deg); transition: transform .2s var(--ease); }
+.lg-pay[aria-pressed='true']::after { transform: rotate(45deg); border-color: var(--accent); }
+@media (max-width: 859px) {
+  .nav-in { gap: 8px; }
+  .nav-links .nav-rm, .nav-login { white-space: nowrap; padding: 0 8px; }
+}
+@media (max-width: 400px) { .nav-in { gap: 4px; } .nav-links .nav-rm, .nav-login { padding: 0 6px; font-size: 14.5px; } }
+@media (min-width: 1000px) {
+  .rent-grid { grid-template-rows: min-content 1fr; }
+  .rent-bal { align-self: start; }
+  .rent-card .rec-shares .sp-pa { font-size: 18px; }
+  .rent-card .rec-shares .av { width: 26px; height: 26px; }
+  .rent-card .rec-shares .sp-person { gap: 8px; padding-inline: 10px; min-width: 0; }
+}
+@media (min-width: 1024px) {
+  .ai-quick .url-box { grid-template-columns: minmax(0, 1fr) auto; }
+  .ai-quick .url-box .url-l { grid-column: 1; grid-row: 1; }
+  .ai-quick .url-box code { grid-column: 1 / -1; grid-row: 2; font-size: 15px; }
+  .ai-quick .url-box button { grid-column: 2; grid-row: 1; }
+}
+/* no-shift reserves, re-measured for round 9 (smallest finished height per range, 320-1440) */
+.verb-demo #scan-demo { min-height: 742px; }
+.verb-demo #split-demo { min-height: 703px; }
+.verb-demo #ledger-demo { min-height: 617px; }
+#chat-demo { min-height: 605px; }
+.ai-hero-demo#chat-demo { min-height: 605px; }
+@media (min-width: 480px) { #chat-demo { min-height: 701px; } .ai-hero-demo#chat-demo { min-height: 685px; } }
+@media (min-width: 600px) { .verb-demo #scan-demo { min-height: 691px; } }
+@media (min-width: 640px) { #chat-demo { min-height: 709px; } }
+@media (min-width: 720px) { .verb-demo #scan-demo { min-height: 641px; } }
+@media (min-width: 860px) { .verb-demo #scan-demo { min-height: 581px; } .verb-demo #split-demo { min-height: 504px; } }
+@media (min-width: 880px) { .verb-demo #ledger-demo { min-height: 362px; } }
+.verb-demo #ledger-demo.ledger { min-height: 0; }
+.lg-pay { justify-content: flex-start; }
+.lg-pay > b { margin-left: auto; }
+.lg-rentlink a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--accent); font-weight: 600; font-size: 15px; text-decoration: none; }
+.lg-rentlink a:hover { text-decoration: underline; }
+/* phones: hero buttons share the cards' 20px gutter (one left edge down the hero) */
+@media (max-width: 480px) { .hero .cta-row .c-btn { max-width: none; } }
+@media (max-width: 859px) { .split .sp-hint { margin-top: 8px; } }

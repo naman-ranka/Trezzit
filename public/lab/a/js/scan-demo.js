@@ -15,12 +15,13 @@ export const STORE_ICON = {
   receipt: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4L6 21zM9 8h6M9 12h6M9 16h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
 
-export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabel = 'Split this receipt', exclude = [] } = {}) {
+export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabel = 'Split this receipt', exclude = [], foldAll = false } = {}) {
   const samples = SAMPLES.filter((s) => !exclude.includes(s.id));
+  root.classList.toggle('fold-all', foldAll);
   root.innerHTML = `
     <div class="seg-ctl scan-picker" role="group" aria-label="Choose a receipt">
       ${samples.map((s) => `<button type="button" data-id="${s.id}" aria-pressed="false">${SHORT[s.id].label}</button>`).join('')}
-      <button type="button" class="file-pick" aria-pressed="false">${ICON.upload}Your photo</button>
+      <button type="button" class="file-pick" aria-pressed="false" aria-label="Your own photo">${ICON.upload}Photo</button>
       <input type="file" class="visually-hidden file-in" accept="image/*,application/pdf" tabindex="-1" aria-hidden="true">
     </div>
     <div class="scan-stage">
@@ -39,16 +40,14 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
         <button type="button" class="more-items is-off" tabindex="-1"></button>
         <div class="sums is-off">${SUMS_PLACEHOLDER}</div>
         <div class="result-cta is-off"><button type="button" class="btn btn-primary split-btn" tabindex="-1">${esc(splitLabel)}</button></div>
+        <div class="consent" role="group" aria-labelledby="consent-t" hidden>
+          <p class="consent-t" id="consent-t">Scan your own receipt</p>
+          <p>To read it, your photo is sent to Google Gemini. Trezzit keeps scan photos for 90 days.</p>
+          <p class="consent-l"><a href="/privacy">Privacy</a><a href="/your-data">Your data</a></p>
+          <div class="row"><button type="button" class="btn btn-quiet" data-v="no">Not now</button><button type="button" class="btn btn-primary" data-v="ok">Choose photo</button></div>
+        </div>
       </div>
-    </div>
-    <dialog class="consent" aria-labelledby="consent-t">
-      <form method="dialog">
-        <p class="consent-t" id="consent-t">Scan your own receipt</p>
-        <p>To read it, your photo is sent to Google Gemini. Trezzit keeps scan photos for 90 days. Up to 10 scans an hour.</p>
-        <p><a href="/privacy">Privacy</a> · <a href="/your-data">Your data</a></p>
-        <div class="row"><button class="btn btn-quiet" value="cancel">Not now</button><button class="btn btn-primary" value="ok">Choose a photo</button></div>
-      </form>
-    </dialog>`;
+    </div>`;
 
   const viewer = $('.viewer', root);
   const paper = $('.viewer-paper', root);
@@ -66,14 +65,18 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   const splitBtn = $('.split-btn', root);
   const more = $('.more-items', root);
   // phones: the parsed list stays a fixed 5 rows (no layout shift); the rest folds behind "+N more"
-  const FOLD = 4;
+  // the landing folds at every width (5 rows on desktop), so the card has one fixed height and never re-grows
   const compact = () => innerWidth < 900;
+  const folds = () => compact() || foldAll;
+  // phones: 3 rows on the folding pages (the landing and /scan/), so "Split it" and the next heading come sooner
+  const foldN = () => (compact() ? (foldAll ? 3 : 4) : 5);
   const showCta = (on) => { cta.classList.toggle('is-off', !on); splitBtn.tabIndex = on ? 0 : -1; };
   function fold(open) {
     const rows = $$('li', list);
     // exactly one row past the fold takes the button's slot instead of a "+1 more" button (same height)
-    const six = compact() && !open && rows.length === FOLD + 1;
-    const folding = compact() && !open && rows.length > FOLD + 1;
+    const FOLD = foldN();
+    const six = folds() && !open && rows.length === FOLD + 1;
+    const folding = folds() && !open && rows.length > FOLD + 1;
     rows.forEach((li, i) => { li.hidden = folding && i >= FOLD; });
     list.classList.toggle('is-open', !!open);
     list.classList.toggle('is-six', six);
@@ -86,7 +89,8 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   }
   more.addEventListener('click', () => fold(true));
   const fileIn = $('.file-in', root);
-  const dialog = $('.consent', root);
+  const consent = $('.consent', root);
+  let agreed = false;
   let ctrl = null;
   let current = null;
   let photoUrl = null;
@@ -100,16 +104,23 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   };
   const press = (id) => $$('.scan-picker button', root).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id || (id === 'file' && b.classList.contains('file-pick')))));
 
+  // phones show the paper at 0.8 (CSS --ps), so about ten lines are in the window while the beam walks down them
   function place(index) {
     const line = paper.querySelector(`.tz-r-line[data-index="${index}"]`);
     if (!line) return;
     line.classList.add('is-read');
+    const k = parseFloat(getComputedStyle(paper).getPropertyValue('--ps')) || 1;
     const vh = viewer.clientHeight;
-    const ph = paper.scrollHeight;
-    const top = line.offsetTop + paper.querySelector('.tz-receipt').offsetTop;
+    const ph = paper.scrollHeight * k;
+    const pr = paper.getBoundingClientRect();
+    const lr = line.getBoundingClientRect();
+    // the line's place on the paper, in the paper's own (unscaled, untranslated) units, then on screen
+    const y = (lr.top - pr.top) / k;
+    const top = y * k;
+    const bottom = (y + lr.height / k) * k;
     follow = Math.max(0, Math.min(top - vh * 0.45, ph - vh + 24));
-    paper.style.transform = `translateY(${-follow}px)`;
-    beam.style.transform = `translateY(${top + line.offsetHeight - 58 - follow + 28}px)`;
+    paper.style.setProperty('--fy', `${-follow}px`);
+    beam.style.transform = `translateY(${bottom - follow - 60}px)`;
   }
 
   function header(model, sampleId) {
@@ -132,8 +143,9 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   async function run(input, { notice, instant = false } = {}) {
     if (typeof input !== 'string' && !isLive()) {
       // Off trezzit.com the API refuses this origin: say so up front (before the read starts) and play the closest sample.
-      return run(closestSample(input), { notice: 'Live scanning runs on trezzit.com, so here is a sample receipt instead.' });
+      return run(closestSample(input), { notice: "Real scans run on trezzit.com. Here's a sample." });
     }
+    consent.hidden = true; root.classList.remove('is-asking');
     ctrl?.abort();
     ctrl = new AbortController();
     const signal = ctrl.signal;
@@ -149,7 +161,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     sums.classList.add('is-off'); sums.innerHTML = SUMS_PLACEHOLDER; showCta(false);
     bar.style.width = '4%';
     viewer.classList.remove('is-scanning');
-    paper.style.transform = ''; follow = 0;
+    paper.style.setProperty('--fy', '0px'); follow = 0;
     if (photoUrl) { URL.revokeObjectURL(photoUrl); photoUrl = null; }
 
     let sample = null;
@@ -159,7 +171,7 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
       paper.innerHTML = input.type.startsWith('image/') ? `<img class="viewer-photo" src="${photoUrl}" alt="">` : '';
       header(null, null);
       title.textContent = input.name || 'Your photo';
-      meta.textContent = isLive() ? 'Scanning for real' : 'Live scanning runs on trezzit.com';
+      meta.textContent = isLive() ? 'Scanning for real' : 'Real scans run on trezzit.com';
     } else {
       sample = getSample(input);
       const raw = await loadScan(input);
@@ -215,18 +227,22 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     if (!list.children.length) result.bill.items.forEach((it, i) => list.appendChild(itemRow(it, i, result.sampleId ? getSample(result.sampleId) : null)));
     // the read-line tint fades out once the scan is done (it marks progress, not a result)
     $$('.tz-r-line', paper).forEach((l) => l.classList.remove('is-read'));
-    paper.style.transform = ''; list.scrollTop = 0;
+    paper.style.setProperty('--fy', '0px'); list.scrollTop = 0;
     list.tabIndex = 0;
     fold(false);
     header(model, result.sampleId);
     const b = result.bill;
     const lineSum = b.items.reduce((a, it) => a + toCents(it.amount), 0) + toCents(b.tax) + (b.items.some((i) => i.itemType === 'Tip') ? 0 : toCents(b.tip)) - Math.round((b.discountAmount || 0) * 100);
     const ok = lineSum === toCents(b.total);
-    sums.innerHTML = `
-      <div><span>Subtotal</span><span class="money">${money(toCents(b.subtotal))}</span></div>
-      ${toCents(b.tax) ? `<div><span>Tax</span><span class="money">${money(toCents(b.tax))}</span></div>` : ''}
-      ${toCents(b.tip) ? `<div><span>Tip</span><span class="money">${money(toCents(b.tip))}</span></div>` : ''}
-      <div class="tot"><span>Total</span><span class="money">${money(toCents(b.total))}</span></div>`;
+    // the lines plus tax (and tip) make the total, so anyone checking the math can: one row above Total, outside the
+    // fold, reserved even when a bill has neither (rent), so the card's height never changes
+    const taxC = toCents(b.tax);
+    const tipC = b.items.some((i) => i.itemType === 'Tip') ? 0 : toCents(b.tip);
+    const discC = Math.round((b.discountAmount || 0) * 100);
+    const extraLabel = [taxC && 'Tax', tipC && 'tip'].filter(Boolean).join(' and ').replace(/^tip/, 'Tip');
+    sums.innerHTML = `<div class="sum-x${taxC || tipC ? '' : ' is-nil'}"><span>${extraLabel || 'Tax'}</span><span class="money">${money(taxC + tipC)}</span></div>`
+      + (discC ? `<div class="sum-x"><span>Discount</span><span class="money">${money(-discC)}</span></div>` : '')
+      + `<div class="tot"><span>Total</span><span class="money">${money(toCents(b.total))}</span></div>`;
     sums.classList.remove('is-off');
     showCta(!!onSplit);
     bar.style.width = '100%';
@@ -236,24 +252,34 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
   }
 
   $$('.scan-picker button[data-id]', root).forEach((b) => b.addEventListener('click', () => run(b.dataset.id)));
-  $('.file-pick', root).addEventListener('click', () => {
-    if (isLive() && typeof dialog.showModal === 'function') {
-      dialog.showModal();
-    } else fileIn.click();
-  });
+  // the privacy line comes before the picker: the first tap shows it inside the card, with "Choose photo";
+  // once agreed, later taps open the picker directly
   let pendingDrop = null;
-  dialog.addEventListener('close', () => {
+  const ask = (f = null) => {
+    pendingDrop = f;
+    consent.hidden = false;
+    root.classList.add('is-asking');
+    press('file');
+    $('[data-v="ok"]', consent).focus({ preventScroll: true });
+  };
+  consent.addEventListener('click', (e) => {
+    const v = e.target.closest('[data-v]')?.dataset.v;
+    if (!v) return;
+    consent.hidden = true;
+    root.classList.remove('is-asking');
     const f = pendingDrop; pendingDrop = null;
-    if (dialog.returnValue !== 'ok') return;
+    if (v !== 'ok') { if (current) press(current.id); return; }
+    agreed = true;
     if (f) run(f); else fileIn.click();
   });
+  $('.file-pick', root).addEventListener('click', () => { if (agreed) fileIn.click(); else ask(); });
   fileIn.addEventListener('change', () => { const f = fileIn.files?.[0]; if (f) run(f); fileIn.value = ''; });
   viewer.addEventListener('dragover', (e) => { e.preventDefault(); });
   viewer.addEventListener('drop', (e) => {
     e.preventDefault();
     const f = e.dataTransfer?.files?.[0];
     if (!f) return;
-    if (isLive() && typeof dialog.showModal === 'function') { pendingDrop = f; dialog.showModal(); } else run(f);
+    if (agreed) run(f); else ask(f);
   });
   $('.split-btn', root).addEventListener('click', () => current && onSplit?.(current));
 
@@ -286,8 +312,8 @@ async function quick(id, { onStage, instant, signal }) {
   return { source: 'sample', sampleId: id, raw, bill };
 }
 
-// keeps the totals block at its final height while it is hidden (phones show only the Total row)
-const SUMS_PLACEHOLDER = '<div class="tot"><span>Total</span><span class="money">$0.00</span></div>';
+// keeps the totals block (tax row + Total) at its final height while it is hidden
+const SUMS_PLACEHOLDER = '<div class="sum-x"><span>Tax</span><span class="money">$0.00</span></div><div class="tot"><span>Total</span><span class="money">$0.00</span></div>';
 
 function titleCaseStore(t) {
   return String(t || '').toLowerCase().replace(/(^|\s)([a-z])/g, (m, a, b) => a + b.toUpperCase());

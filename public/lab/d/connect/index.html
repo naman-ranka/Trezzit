@@ -45,9 +45,9 @@
   <div class="wrap">
     <a class="brand" href="../" aria-label="Trezzit home"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
     <nav class="main-nav" aria-label="Main">
-      <a class="nav-link" href="../app/">Tour</a>
+      <a class="nav-link show-sm nav-tour" href="../app/">Tour</a>
       <a class="nav-link show-sm" href="../connect/" aria-current="page">Use with AI</a>
-      <a class="nav-link hide-xs" href="https://app.trezzit.com/login">Log in</a>
+      <a class="nav-link" href="https://app.trezzit.com/login">Log in</a>
       <a class="btn btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
     </nav>
   </div>
@@ -71,26 +71,25 @@
       <div class="tabpanel" role="tabpanel" id="p-claude" aria-labelledby="b-claude">
         <ol class="steps-light">
           <li><span>In Claude, open <strong>Settings → Connectors</strong>.</span></li>
-          <li><span>Choose <strong>Add custom connector</strong>, name it Trezzit and paste the server URL.</span></li>
-          <li><span>Sign in to Trezzit, check what Claude is asking for, and select <strong>Allow access</strong>.</span></li>
-          <li><span>In a chat, turn Trezzit on from the tools menu and ask away.</span></li>
+          <li><span><strong>Add custom connector</strong> named Trezzit; paste the server URL.</span></li>
+          <li><span>Sign in and select <strong>Allow access</strong>.</span></li>
+          <li><span>Turn on Trezzit from a chat’s tools menu.</span></li>
         </ol>
       </div>
       <div class="tabpanel" role="tabpanel" id="p-chatgpt" aria-labelledby="b-chatgpt" hidden>
         <ol class="steps-light">
-          <li><span>In ChatGPT, open <strong>Settings → Apps</strong> and turn on <strong>Developer mode</strong>.</span></li>
-          <li><span>Choose <strong>Create app</strong>, name it Trezzit and paste the server URL.</span></li>
+          <li><span>In ChatGPT, add Trezzit as a custom app (<strong>Developer mode</strong>) and paste the server URL.</span></li>
           <li><span>Select Connect, sign in to Trezzit, and select <strong>Allow access</strong>.</span></li>
           <li><span>Mention Trezzit in a chat, or pick it from the tools menu, and ask.</span></li>
         </ol>
-        <p class="muted small tab-note">ChatGPT lists custom apps under Developer mode for now. Photo scanning needs code execution turned on.</p>
+        <p class="muted small tab-note">Photo scanning needs code execution turned on.</p>
       </div>
       <div class="tabpanel" role="tabpanel" id="p-other" aria-labelledby="b-other" hidden>
         <ol class="steps-light">
           <li><span>Any app that supports remote MCP servers with OAuth sign-in can connect with the server URL.</span></li>
           <li><span>In Claude Code, for example:</span></li>
         </ol>
-        <pre class="cmd"><code>claude mcp add --transport http trezzit https://api.trezzit.com/api/mcp</code></pre>
+        <div class="cmd-box"><pre class="cmd"><code id="cc-cmd">claude mcp add --transport http trezzit https://api.trezzit.com/api/mcp</code></pre><button type="button" class="cmd-copy" data-copy="claude mcp add --transport http trezzit https://api.trezzit.com/api/mcp" aria-describedby="cc-cmd"><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg><span>Copy</span></button></div>
         <p class="muted small tab-note">Photo scanning needs an app that can run code.</p>
       </div>
       <p class="acct">Need a Trezzit account? <a href="https://app.trezzit.com/signup">Sign up</a></p>
@@ -103,9 +102,9 @@
   <div class="wrap">
     <h2 id="a-h">Then just ask.</h2>
     <div class="block-body prompts">
-      <button class="prompt" type="button" data-copy="Here's the receipt. Split the towels four ways, the rest is mine."><q>Here's the receipt. Split the towels four ways, the rest is mine.</q><span class="pfoot"><span class="does">Scans, then saves it item by item</span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button>
-      <button class="prompt" type="button" data-copy="What did I spend on groceries last month, personal and shared?"><q>What did I spend on groceries last month, personal and shared?</q><span class="pfoot"><span class="does">Totals your share only</span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button>
-      <button class="prompt" type="button" data-copy="Add our rent every month: by room, bills four ways, parking is Jordan's."><q>Add our rent every month: by room, bills four ways, parking is Jordan's.</q><span class="pfoot"><span class="does">Sets up a recurring bill</span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button>
+      <button class="prompt" type="button" data-copy="Here's the receipt. Split the towels four ways, the rest is mine."><q>Here's the receipt. Split the towels four ways, the rest is mine.</q><span class="pfoot"><span class="does"></span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button>
+      <button class="prompt" type="button" data-copy="What did I spend on groceries last month, personal and shared?"><q>What did I spend on groceries last month, personal and shared?</q><span class="pfoot"><span class="does"></span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button>
+      <button class="prompt" type="button" data-copy="Add our rent every month: by room, bills four ways, parking is Jordan's."><q>Add our rent every month: by room, bills four ways, parking is Jordan's.</q><span class="pfoot"><span class="does"></span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button>
     </div>
   </div>
 </section>
@@ -117,7 +116,7 @@
       <ul class="perm one">
         <li><svg class="i" aria-hidden="true"><use href="#i-shield"/></svg><span>Never moves money.</span></li>
         <li><svg class="i" aria-hidden="true"><use href="#i-eye"/></svg><span>Reads your expenses, groups and balances.</span></li>
-        <li><svg class="i" aria-hidden="true"><use href="#i-list"/></svg><span>Adds expenses, settle-ups and recurring bills.</span></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-list"/></svg><span>Adds expenses, settle-ups and recurring bills, each one in your activity.</span></li>
         <li><svg class="i" aria-hidden="true"><use href="#i-unplug"/></svg><span>Disconnect any time. <em>Profile → Connected AI apps.</em></span></li>
       </ul>
       <p class="muted small perm-note">Can’t edit bills yet. Trezzit never sees your chats.</p>

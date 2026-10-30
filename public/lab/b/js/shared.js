@@ -46,32 +46,51 @@ export function bankIndex(list) {
  * One query, two searches: the bank's (store names) mirrors what you type into Trezzit's
  * (every line of every receipt, its store, category and the people on it).
  */
-export function wireSearch(scope, index, bank = []) {
+export function wireSearch(scope, index, bank = [], month = null) {
   const input = scope.querySelector('[data-search]');
   const out = scope.querySelector('[data-results]');
   const bankQ = scope.querySelector('[data-bank-q]');
   const bankOut = scope.querySelector('[data-bank-res]');
+  const spent = scope.querySelector('[data-spent]');
+  const spentLabel = scope.querySelector('[data-spent-label]');
+  const setSpent = (label, cents, n = '') => {
+    if (!spent) return;
+    spentLabel.textContent = label;
+    if (n) spentLabel.insertAdjacentHTML('beforeend', `<span class="ft-n"><span class="ft-sep"> · </span>${esc(n)}</span>`);
+    const changed = spent.dataset.cents !== String(cents);
+    spent.dataset.cents = String(cents);
+    spent.textContent = money(cents);
+    if (changed && !reduced()) { spent.classList.remove('flash'); void spent.offsetWidth; spent.classList.add('flash'); }
+  };
   if (!input || !out) return;
   const names = Object.keys(PEOPLE).filter((id) => id !== 'you').map((id) => PEOPLE[id].name.toLowerCase());
   const draw = () => {
     const raw = input.value.trim();
     const words = raw.toLowerCase().split(/\s+/).filter(Boolean);
     if (bankQ) { bankQ.textContent = raw || 'Search'; bankQ.classList.toggle('is-empty', !raw); }
-    if (!words.length) { out.innerHTML = ''; if (bankOut) bankOut.innerHTML = ''; return; }
-    // your record is your share: only lines you had a share in
-    let hits = index.filter((r) => r.mine > 0 && words.every((w) => r.hay.includes(w)));
+    if (!words.length) { out.innerHTML = ''; if (bankOut) bankOut.innerHTML = ''; if (month !== null) setSpent('You spent in October', month); spent?.parentElement.classList.remove('is-none'); return; }
+    // your record is your share: only lines you had a share in, biggest share first
+    let hits = index.filter((r) => r.mine > 0 && words.every((w) => r.hay.includes(w))).sort((x, y) => y.mine - x.mine);
     // a person's name: the things you shared with fewer people come first
     if (words.some((w) => names.includes(w))) hits = [...hits].sort((x, y) => x.owner.length - y.owner.length);
-    out.innerHTML = hits.slice(0, 3).map((r) => `<li><span class="dot" style="--c:${r.color}" aria-hidden="true"></span><span>${esc(r.name)}<small>${esc(r.store)} · ${esc(r.day)}</small></span><b class="money">${money(r.mine)}</b></li>`).join('')
+    out.innerHTML = hits.slice(0, 3).map((r) => `<li><span class="dot" style="--c:${r.color}" aria-hidden="true"></span><span><span>${esc(r.name)}</span><small>${esc(r.store)} · ${esc(r.day)}</small></span><b class="money">${money(r.mine)}</b></li>`).join('')
       + (hits.length ? '' : '<li class="sd-none">Nothing in October.</li>');
+    // "You spent on towels", or "You spent with Maya" for a person
+    const person = Object.values(PEOPLE).find((p) => p.id !== 'you' && words.includes(p.name.toLowerCase()));
+    const what = person && words.length === 1 ? `with ${person.name}` : `on ${raw}`;
+    if (month !== null) setSpent(`You spent ${what}`, hits.reduce((a, r) => a + r.mine, 0), `${hits.length} item${hits.length === 1 ? '' : 's'}`);
+    // nothing matched: "Nothing in October." is the whole answer (no "You spent on zzz $0.00")
+    if (spent) spent.parentElement.classList.toggle('is-none', !hits.length);
     if (bankOut) {
       const b = bank.filter((l) => words.every((w) => l.hay.includes(w)));
       bankOut.innerHTML = b.length
         ? `<ul role="list">${b.map((l) => `<li><span>${esc(l.date)}</span><span>${esc(l.merchant)}</span><span>${bankAmt(l.cents)}</span></li>`).join('')}</ul>`
-        : '<p class="fb-none">No results</p><p class="fb-why">Store names only.</p>';
+        : '<p class="fb-none">No results</p><p class="fb-why">Stores and categories only</p>';
     }
   };
   input.addEventListener('input', draw);
+  // an emptied field never sits there blank: leaving it brings the example back
+  input.addEventListener('blur', () => { if (!input.value.trim()) { input.value = input.defaultValue; draw(); } });
   scope.addEventListener('click', (e) => {
     const t = e.target.closest('[data-try]');
     if (!t) return;

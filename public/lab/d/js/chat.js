@@ -1,6 +1,6 @@
 // Scripted AI conversations: a user message, Trezzit tool calls, a Trezzit card, the answer.
-import { $, $$, esc, money, icon, tmark, reducedMotion, Clock, announce, tweenMoney, onVisible } from './ui.js';
-import { getWorld, catOf, PEOPLE, tone, OTHER_TONE } from './world.js';
+import { $, esc, money, icon, tmark, reducedMotion, Clock, announce, onVisible } from './ui.js';
+import { getWorld, withSplit, catOf, summaryCats, PEOPLE, tone, OTHER_TONE } from './world.js';
 
 const okIcon = `<span class="st ok">${icon('check')}</span>`;
 // Nothing found is not a success: a neutral dot, not a green check.
@@ -15,7 +15,7 @@ function legend(list) {
 
 /* ---------- the cards ---------- */
 /** Who shared the receipt, as the split's own avatars. */
-const faces = (ids) => `<span class="faces" aria-hidden="true">${ids.map((k) => `<i style="--c:${PEOPLE[k].color}">${k === 'you' ? 'You' : PEOPLE[k].initials}</i>`).join('')}</span>`;
+const faces = (ids) => `<span class="faces" aria-hidden="true">${ids.map((k) => `<i style="--c:${PEOPLE[k].color}">${k === 'you' ? 'Y' : PEOPLE[k].initials}</i>`).join('')}</span>`;
 
 function splitCard(w) {
   const b = gbOf(w);
@@ -27,11 +27,11 @@ function splitCard(w) {
 }
 
 function octoberCard(w) {
-  const top = w.cats.slice(0, 3);
-  const rest = w.cats.slice(3).reduce((a, c) => a + c.cents, 0);
+  // The same four rows as the October summary on the page, in the same order.
+  const { top, rest } = summaryCats(w.cats);
   return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>October</b><span>${w.bills.length} expenses · your share only</span></span></div>
     <div class="versus"><div class="bank plain"><span class="lbl">You paid</span><span class="v money">${money(w.paidCents)}</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">${money(w.spentCents)}</span></div></div>
-    ${legend([...top, { cents: rest, label: 'Other', other: true }])}</div>`;
+    ${legend([...top, { cents: rest, label: 'Everything else', other: true }])}</div>`;
 }
 
 function rentCard(w) {
@@ -41,7 +41,7 @@ function rentCard(w) {
 }
 
 function towelsCard(w) {
-  const t = w.items.find((i) => /towel/i.test(i.name));
+  const t = w.lines.find((i) => /towel/i.test(i.name));
   return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>${esc(t.name)}</b><span>${esc(t.bill)} · ${t.date} · receipt attached</span></span></div>
     <div class="versus"><div class="bank plain"><span class="lbl">Item total</span><span class="v money">${money(t.totalCents)}</span></div><div class="mine"><span class="lbl">Your share</span><span class="v money">${money(t.cents)}</span></div></div>
     <div class="legend"><span><i style="background:${tone(0)}"></i>${catOf(t.category).label}</span><span>Split ${t.n} ways</span></div></div>`;
@@ -55,14 +55,14 @@ function dinnerCard(w) {
   const you = b.split.people.you;
   const cats = Object.entries(you.byCategory).map(([id, cents]) => ({ cents, ...catOf(id) })).sort((a, b) => b.cents - a.cents);
   return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Taqueria Sol</b><span>${b.date} · ${esc(b.group)} · ${esc(PEOPLE[b.payer].name)} paid ${money(b.totalCents)}</span></span></div>
-    <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v money">${money(0)}</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">${money(you.cents)}</span></div></div>
+    <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v">Nothing</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">${money(you.cents)}</span></div></div>
     ${legend(cats)}</div>`;
 }
 
 function activityCard(label, cents) {
   return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Activity</b><span>Just now</span></span></div>
     <div class="rows"><div class="row"><span class="n"><b style="color:var(--ink)">${esc(label)}</b> · Personal</span><span class="a money">${money(cents)}</span></div>
-    <div class="row" style="padding-top:0"><span class="n m">Added by your AI app</span></div></div></div>`;
+    <div class="row" style="padding-top:0"><span class="ai-pill">${icon('spark')}Added by AI</span></div></div></div>`;
 }
 
 /** Where a balance comes from, when it nets more than one bill: "Green Basket $30.00 − Netflix $4.50". */
@@ -77,7 +77,7 @@ function partsOf(w, k) {
 
 function balanceCard(w, names) {
   const ids = Object.keys(w.net).filter((k) => w.net[k]);
-  return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Balances</b><span>October · rent settled</span></span></div>
+  return `<div class="tcard bal"><div class="tcard-head">${tmark()}<span class="t"><b>Balances</b><span>October · rent settled</span></span></div>
     <div class="rows">${ids.map((k) => {
       const c = w.net[k]; const hi = names.includes(k); const why = partsOf(w, k);
       return `<div class="row"><span class="n">${hi ? `<b style="color:var(--ink)">${esc(PEOPLE[k].name)}</b>` : esc(PEOPLE[k].name)} <span class="m">· ${c > 0 ? 'owes you' : 'you owe'}</span>${why ? `<small class="why">${why}</small>` : ''}</span><span class="a money">${money(Math.abs(c))}</span></div>`;
@@ -124,23 +124,23 @@ export function scripts(w) {
     ],
     // The chip: a different receipt from the opening card (a dinner a friend paid), so no total is contradicted.
     split: [
-      { t: 'user', thumb: 'assets/thumb-taqueria.webp', text: 'Split my dinner with Alex and Priya. Alex paid.' },
-      { t: 'tool', run: 'Reading the receipt', done: `Read ${dinnerCount(w)}, ${money(dinnerOf(w).totalCents)} · saved`, ms: 700 },
+      { t: 'user', thumb: 'assets/thumb-taqueria.webp', text: 'Split my dinner. Alex paid.' },
+      { t: 'tool', run: 'Reading the receipt', done: dinnerCount(w), ms: 700 },
       { t: 'card', html: dinnerCard },
-      { t: 'ai', text: `Saved. You owe Alex ${money(dinnerOf(w).youCents)}.` },
+      { t: 'ai', text: `You owe Alex ${money(dinnerOf(w).youCents)}.` },
     ],
-    // A typed "split my receipt": the receipt's own split (the opening card).
+    // A typed "split my receipt" with nothing attached: the latest scanned receipt, said as such.
     splitTyped: [
-      { t: 'user', thumb: 'assets/thumb-green-basket.webp', text: '' },
-      { t: 'tool', run: 'Reading the receipt', done: 'Read 14 items, $100.00 · saved', ms: 700 },
+      { t: 'user', text: '' },
+      { t: 'tool', run: 'Finding your latest receipt', done: 'Green Basket · 14 items', ms: 700 },
       { t: 'card', html: splitCard },
-      { t: 'ai', text: `Saved. Maya, Jordan and Sam owe you ${owed}.` },
+      { t: 'ai', text: `Split by item. Maya, Jordan and Sam owe you ${owed}.` },
     ],
     dinner: [
-      { t: 'user', thumb: 'assets/thumb-taqueria.webp', text: 'Split my dinner receipt. Alex paid.' },
-      { t: 'tool', run: 'Reading the receipt', done: `Read ${dinnerCount(w)}, ${money(dinnerOf(w).totalCents)} · saved`, ms: 700 },
+      { t: 'user', text: 'Split my dinner receipt. Alex paid.' },
+      { t: 'tool', run: 'Finding the dinner receipt', done: `Taqueria Sol · ${dinnerCount(w)}`, ms: 700 },
       { t: 'card', html: dinnerCard },
-      { t: 'ai', text: `Saved. You owe Alex ${money(w.bills.find((x) => x.id === 'taqueria-sol').youCents)}.` },
+      { t: 'ai', text: `You owe Alex ${money(dinnerOf(w).youCents)}.` },
     ],
     october: [
       { t: 'user', text: 'What did I spend in October?' },
@@ -150,9 +150,9 @@ export function scripts(w) {
     ],
     rent: [
       { t: 'user', text: 'Add our rent every month, split by room.' },
-      { t: 'tool', run: 'Setting up the schedule', done: 'Monthly on the 1st', ms: 700 },
+      { t: 'tool', run: 'Setting up the schedule', done: 'Saved', ms: 700 },
       { t: 'card', html: rentCard },
-      { t: 'ai', text: 'Done. It asks you each month first.' },
+      { t: 'ai', text: 'Done. Each month it waits for you to confirm.' },
     ],
     towels: [
       { t: 'user', text: 'What did the hand towels cost me?' },
@@ -177,19 +177,59 @@ const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 const DINING = /\b(eating|food|going)\s+out\b|\brestaurants?\b|\btake-?out\b|\bdinners?\b|\blunch(es)?\b/g;
 // "add $12 coffee", "log 8.50 for lunch": an amount and something to call it.
 const ADD = /\b(add|record|log)\b/;
-// The amount is taken whole: "$12.345" is never quietly cut to $12.34.
-const DOLLARS = /\$\s*(\d{1,5}(?:\.\d+)?)(?![\d.])/;
-const NUMBER = /(?<![\d.])(\d{1,5}(?:\.\d+)?)(?![\d.])/;
+// The amount is taken whole: "$12.345" is never quietly cut to $12.34, and "$1,200" is 1200
+// (thousands commas are dropped before matching).
+const DOLLARS = /\$\s*(\d{1,6}(?:\.\d+)?)(?![\d.])/;
+const NUMBER = /(?<![\d.])(\d{1,6}(?:\.\d+)?)(?![\d.])/;
+// What Trezzit is, and what it costs: a first visitor's first questions, never an item search.
+const ABOUT = /\bwhat(?:'|’)?s (?:trezzit|this)\b|\bwhat is (?:trezzit|this|it)\b|\bhow (?:does|do) (?:it|this|trezzit) work\b|\bhow does trezzit\b|\bwhat (?:can|does) (?:trezzit|it|this|you) do\b|\b(?:about|explain) trezzit\b|^\s*trezzit\s*\??\s*$/;
+const PRICE = /\b(?:is|are) (?:it|this|trezzit|you) free\b|\bfree\b.*\b(?:trezzit|app)\b|\bpricing\b|\bpric(?:e|es)\b.*\btrezzit\b|\bcost of trezzit\b|\bhow much (?:is|does) (?:trezzit|it cost|this cost|trezzit cost)\b|^\s*free\s*\??\s*$/;
+const TRY = ['Who owes me?', 'What did avocados cost me?'];
 // Everyday words for lines on the example receipts.
 const SYN = { coffee: 'brew', latte: 'brew', snack: 'chips', medicine: 'health', med: 'health' };
 const SYNONYMS = /\b(coffees?|lattes?|snacks?|medicine|meds)\b/g;
 const FILLER = /\b(add|record|log|a|an|the|for|at|on|to|my|of|expense|cash|card|just|mine|personal|please|dollars?|bucks|usd|spent|bought|paid)\b/g;
 
+/** An even split of a typed amount, exact to the cent (the first shares take the odd cents, as the app does). */
+function evenSplit(q, s, amt, n, named) {
+  const cents = Math.round(parseFloat(amt[1]) * 100);
+  const user = { t: 'user', text: q };
+  if (/\.\d{3,}/.test(amt[1]) || !(cents > 0)) return [user, { t: 'ai', text: 'Amounts go to the cent. Try “split wifi $60 4 ways”.' }];
+  // Never quietly change the number of people.
+  if (n > 12) return [user, { t: 'ai', text: 'Up to 12 people in this example. Try “split wifi $60 4 ways”.' }];
+  const flat = ['maya', 'jordan', 'sam'];
+  let others = named.length ? named : flat;
+  if (n >= 2 && !named.length) others = n - 1 <= 3 ? flat.slice(0, n - 1) : null;
+  const count = others ? others.length + 1 : n;
+  if (count < 2) return [user, { t: 'ai', text: 'Split it with who? Try “split wifi $60 4 ways”.' }];
+  // A share of $0.00 is not a debt: never save one.
+  if (cents < count) return [user, { t: 'ai', text: `Too small to split ${count} ways.` }];
+  const base = Math.floor(cents / count); const odd = cents - base * count;
+  const shares = Array.from({ length: count }, (_, i) => base + (i < odd ? 1 : 0));
+  const owedC = cents - shares[0];
+  const label = cap(s.replace(amt[0], ' ').replace(/\b\d+\s*(ways|people|of us)\b/g, ' ')
+    .replace(/\b(split|evenly|equally|between|among|with|roommates?|flat(mates)?|me|us|and|it|this|ways?|maya|jordan|sam|alex|priya)\b/g, ' ')
+    .replace(FILLER, ' ').replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim()).slice(0, 28) || 'Shared expense';
+  const inFlat = others && others.every((k) => flat.includes(k));
+  const ids = others ? ['you', ...others] : null;
+  const card = () => `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>${esc(label)}</b><span>${inFlat ? 'Flat 3B · ' : ''}you paid · split ${count} ways</span></span>${ids ? faces(ids) : ''}</div>
+    <div class="versus" style="margin-bottom:0"><div class="bank"><span class="lbl">Your bank</span><span class="v money">${money(-cents)}</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">${money(shares[0])}</span></div></div></div>`;
+  const whoOwes = others ? `${who(others)} ${others.length === 1 ? 'owes' : 'owe'} you` : `The other ${count - 1} owe you`;
+  return [user, { t: 'tool', run: 'Saving', done: `${money(cents)} · ${count} ways`, ms: 500 }, { t: 'card', html: card }, { t: 'ai', text: `Saved. ${whoOwes} ${money(owedC)}.` }];
+}
+
 export function answer(q, w) {
-  const s = q.toLowerCase();
+  // "$1,200" is 1200: thousands commas go before any amount is read.
+  const s = q.toLowerCase().replace(/(\d),(?=\d{3}\b)/g, '$1');
   const say = (text, tool, card) => [{ t: 'user', text: q }, ...(tool ? [tool] : []), ...(card ? [{ t: 'card', html: card }] : []), { t: 'ai', text }];
   const named = NAMES.filter((n) => new RegExp(`\\b${n}\\b`).test(s));
   if (/^\s*(hi|hello|hey|yo|hiya|thanks|thank you|ok|okay|cool|test)\b[\s!.?]*$/.test(s)) return say('Ask me about anything you spent, like avocados or dining out.');
+  if (PRICE.test(s)) {
+    return [{ t: 'user', text: q }, { t: 'ai', text: 'Trezzit keeps every item you buy, alone or shared, so you see what you actually spent. See for yourself:', link: ['https://app.trezzit.com/signup', 'Sign up'] }];
+  }
+  if (ABOUT.test(s)) {
+    return [{ t: 'user', text: q }, { t: 'ai', text: 'Trezzit keeps every item you buy, alone or shared, so you see what you actually spent. Use the app, or ask me.', link: ['connect/', 'Connect yours'] }];
+  }
   // Trust and setup come first: they are what a new visitor asks, and none of them is an item search.
   if (/\b(connect|set ?up|install|add|use)\b.*\b(claude|chatgpt|ai)\b|\bhow do i (use|get|start|connect|set)\b/.test(s) && !DOLLARS.test(s)) {
     return [{ t: 'user', text: q }, { t: 'ai', text: 'Copy one URL into Claude or ChatGPT. Takes a minute.', link: ['connect/', 'Connect'] }];
@@ -235,9 +275,20 @@ export function answer(q, w) {
   }
 
   // Only clear intents play a scripted answer; questions about things are searched instead.
-  const reuse = (id) => scripts(w)[id].map((st, i) => (i === 0 ? { ...st, text: q, thumb: id === 'splitTyped' || id === 'dinner' ? st.thumb : undefined } : st));
+  // A typed message never grows an attachment the visitor didn't add.
+  const reuse = (id) => scripts(w)[id].map((st, i) => (i === 0 ? { ...st, text: q, thumb: undefined } : st));
   if (/\b(categor|breakdown|break\s+down|summar|overview)/.test(s)) return reuse('october');
+  // The page's own opening question gets the opening card, never a different one.
+  if (/\bgreen\s*basket\b/.test(s) && /\b(spen[dt]|cost|total|much)\b/.test(s) && !/\b(split|receipt)\b/.test(s)) return reuse('spent');
   if (/\brent\b/.test(s) && /\b(add|every|monthly|recurr|repeat|schedule)/.test(s)) return reuse('rent');
+  // "split wifi 4 ways $60": an amount to share is an even split, saved as typed (no receipt involved).
+  const splitWords = /\bsplit\b|\b\d+\s*ways\b|\broommates?\b|\bflat(mates)?\b|\bevenly\b/;
+  if (splitWords.test(s) && !/\breceipt\b/.test(s)) {
+    const ways = s.match(/\b(\d+)\s*(ways|people|of us)\b/);
+    const amt = s.match(DOLLARS) || s.replace(/\b\d+\s*(ways|people|of us)\b/g, ' ').match(NUMBER);
+    if (amt) return evenSplit(q, s, amt, ways ? Number(ways[1]) : 0, named);
+    if (!/\b(dinner|tacos?|taqueria|restaurant|alex|priya|green\s*basket|groceries)\b/.test(s)) return say('How much, and how many ways? Try “split wifi $60 4 ways”.');
+  }
   if (/\bsplit\b|\breceipt\b|\broommates?\b/.test(s)) {
     return reuse(/\b(dinner|tacos?|taqueria|restaurant|alex|priya)\b/.test(s) ? 'dinner' : 'splitTyped');
   }
@@ -285,8 +336,9 @@ export function answer(q, w) {
   }
   if (!words.length && /\b(october|this month|last month|spen[dt]|total|everything|overall|altogether|pa(y|id))\b/.test(s)) return reuse('october');
   // Nothing to look for: say what works instead of running an empty search.
-  if (!words.length) return say('Ask me what you spent, who owes you, or to add something.');
-  return say('Not in this example. Try avocados or dining out.', tool([]));
+  // Nothing found is never a dead end: two questions that work, one tap away.
+  if (!words.length) return [{ t: 'user', text: q }, { t: 'ai', text: 'Ask me what you spent, who owes you, or to add something. Try one of these:', suggest: TRY }];
+  return [{ t: 'user', text: q }, { t: 'ai', text: 'I can’t see that in this example. Try one of these:', suggest: TRY }];
 }
 
 /* ---------- player ----------
@@ -301,7 +353,8 @@ const userHtml = (st) => {
     ? `<div class="msg user has-thumb"><img class="thumb" src="${st.thumb}" alt="Receipt photo" width="40" height="58"><span>${esc(st.text)}</span></div>`
     : `<div class="msg user">${att}${esc(st.text)}</div>`;
 };
-const aiHtml = (st) => `<div class="msg ai">${esc(st.text)}${st.link ? ` <a class="link-arrow" href="${st.link[0]}">${esc(st.link[1])} ${icon('arrow')}</a>` : ''}</div>`;
+const chipHtml = (text) => `<button class="chip" type="button" data-ask="${esc(text)}">${icon('send')}${esc(text)}</button>`;
+const aiHtml = (st) => `<div class="msg ai">${esc(st.text)}${st.link ? ` <a class="link-arrow" href="${st.link[0]}">${esc(st.link[1])} ${icon('arrow')}</a>` : ''}${st.suggest ? `<span class="sugg">${st.suggest.map(chipHtml).join('')}</span>` : ''}</div>`;
 const toolHtml = (text, done, none = false) => `<div class="tool">${done ? (none ? noneIcon : okIcon) : '<span class="st spin" aria-hidden="true"></span>'}<b>Trezzit</b><span class="res">${esc(text)}</span></div>`;
 
 class Player {
@@ -311,22 +364,32 @@ class Player {
     this.ctl = $('[data-chat-ctl]', root);
     this.chipBox = $('[data-chat-chips]', root);
     // A chip that has played makes way for the next question, so nothing on offer has already been answered.
-    this.pool = ['Who owes me?', 'What did towels cost me?'];
+    this.pool = ['Who owes me?', 'My share of towels?'];
     this.clock = new Clock();
     // A fixed-height chat (the hero) scrolls inside itself, so nothing outside it ever moves.
     this.fixed = root.classList.contains('is-fixed');
     this.state = 'static'; this.current = script;
     this.pending = null; this.first = null;
     this.anchor = this.fixed ? [...this.log.querySelectorAll('.msg.user')].pop() : null;
+    // The split section below re-splits Green Basket: every later answer uses the new numbers
+    // (messages already in the chat stay as they were said).
+    document.addEventListener('d:split', (e) => { this.w = withSplit(this.w, e.detail.id, e.detail.split); this.s = scripts(this.w); });
     this.ctl?.addEventListener('click', () => this.onCtl());
-    this.chipBox?.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (c) this.useChip(c); });
+    this.chipBox?.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (c) { this.touched = true; this.useChip(c); } });
+    // Suggestions inside an answer ask their question when tapped.
+    this.log.addEventListener('click', (e) => { const c = e.target.closest('.sugg .chip'); if (c) { this.touched = true; this.run(null, answer(c.dataset.ask, this.w)); } });
     const form = $('[data-chat-form]', root);
     if (form) form.addEventListener('submit', (e) => {
       e.preventDefault();
       const input = $('input', form); const q = input.value.trim().slice(0, 140);
+      this.touched = true;
       if (!q) return;
       input.value = '';
-      this.run(null, answer(q, w));
+      const steps = answer(q, this.w);
+      // The first typed answer ends with the way to get this for real.
+      const last = steps[steps.length - 1];
+      if (!this.linked && last?.t === 'ai' && !last.suggest) { this.linked = true; if (!last.link) steps[steps.length - 1] = { ...last, link: ['connect/', 'Connect yours'] }; }
+      this.run(null, steps);
     });
     this.setCtl('replay');
     // The top fade only appears once something has scrolled under it, so a first line is never dimmed.
@@ -348,7 +411,7 @@ class Player {
     const next = this.pool.shift();
     if (next) {
       const b = document.createElement('button');
-      b.type = 'button'; b.className = 'chip'; b.dataset.ask = next; b.textContent = next;
+      b.type = 'button'; b.className = 'chip'; b.dataset.ask = next; b.innerHTML = icon('send') + esc(next);
       c.replaceWith(b);
       if (had) b.focus({ preventScroll: true });
     } else {
@@ -446,8 +509,22 @@ class Player {
       this.state = 'done'; this.setCtl('replay');
       this.pending = null; this.first = null; this.log.style.minHeight = '';
       this.follow();
-      announce(this.log.lastElementChild?.textContent || '');
+      announce(this.summary());
     } catch (e) { if (e.message !== 'cancelled') throw e; }
+  }
+
+  /** What a screen reader hears when an answer lands: the card's gist, then the closing line
+      ("Taqueria Sol, 7 items + tip. You owe Alex $27.03."). */
+  summary() {
+    const q = [...this.log.querySelectorAll('.msg.user')].pop();
+    const after = [];
+    for (let el = q?.nextElementSibling; el; el = el.nextElementSibling) after.push(el);
+    const card = after.find((el) => el.classList.contains('tcard'));
+    const tool = after.find((el) => el.classList.contains('tool'));
+    const ai = after.filter((el) => el.classList.contains('msg') && el.classList.contains('ai')).pop();
+    const gist = [card?.querySelector('.tcard-head .t b')?.textContent, tool?.querySelector('.res')?.textContent].filter(Boolean).join(', ');
+    const end = ai ? [...ai.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim() : '';
+    return [gist && `${gist}.`, end].filter(Boolean).join(' ');
   }
 
   add(html) {
@@ -461,16 +538,21 @@ class Player {
     return el;
   }
 
-  /** Fixed chats follow the newest line. The question stays in view while there is room,
-      but the newest line always wins: an answer is never left below the fold of the chat. */
+  /** Fixed chats keep the latest question at the top of the log, with its answer under it,
+      so no bubble is ever sliced by the header. Only an exchange taller than the log
+      scrolls on to its newest line. */
   follow(now = false) {
     if (!this.fixed) return;
     requestAnimationFrame(() => {
       const log = this.log;
-      let top = log.scrollHeight - log.clientHeight;
-      if (this.anchor?.parentNode === log) top = Math.min(top, this.anchor.offsetTop - 18);
+      const max = log.scrollHeight - log.clientHeight;
       const last = log.lastElementChild;
-      if (last) top = Math.max(top, last.offsetTop + last.offsetHeight + 12 - log.clientHeight);
+      let top = max;
+      if (this.anchor?.parentNode === log && last) {
+        const qTop = this.anchor.offsetTop - 10;
+        const end = last.offsetTop + last.offsetHeight + 12;
+        top = end - qTop <= log.clientHeight ? Math.min(max, qTop) : end - log.clientHeight;
+      }
       log.scrollTo({ top: Math.max(0, top), behavior: now || reducedMotion() ? 'auto' : 'smooth' });
     });
   }
@@ -509,67 +591,46 @@ class Player {
   }
 }
 
-/* ---------- the hero's first second ----------
-   The page opens on the finished exchange (static HTML, so nothing is ever empty without
-   script). On a first visit with motion allowed, it plays once, in about 2.5 s: the question
-   types itself into the composer, the Trezzit lookup runs, your bank's −$100.00 shows, then
-   what you spent counts up to $30.00. A blinking caret then says: your turn.
-   Any tap, focus or scroll away finishes it at once. */
-Player.prototype.intro = async function intro() {
-  const form = $('[data-chat-form]', this.root);
-  const input = $('input', form);
-  const ghost = $('[data-ghost]', form);
-  const steps = this.s.spent;
-  const q = steps[0].text;
-  this.clock.cancel();
-  const token = this.clock.token;
-  const wait = (ms) => this.clock.wait(ms, token);
-  this.state = 'playing'; this.pending = steps; this.first = null;
-  this.log.innerHTML = '';
-  this.root.classList.remove('intro-pending');
-  const stopGhost = () => { form.classList.remove('is-typing'); ghost.textContent = ''; };
-  const invite = () => form.classList.add('invite');
-  input.addEventListener('focus', () => { form.classList.remove('invite'); if (this.state === 'playing') this.complete(); stopGhost(); }, { once: true });
-  this.chipBox?.addEventListener('click', () => { stopGhost(); form.classList.remove('invite'); }, { once: true });
-  try {
-    form.classList.add('is-typing');
-    for (let i = 1; i <= q.length; i += 1) { ghost.textContent = q.slice(0, i); await wait(30); }
-    await wait(140);
-    stopGhost();
-    this.add(userHtml(steps[0]));
-    await wait(220);
-    const tool = this.add(toolHtml(steps[1].run + '…', false));
-    await wait(360);
-    tool.querySelector('.st').outerHTML = okIcon;
-    tool.querySelector('.res').textContent = steps[1].done;
-    await wait(120);
-    const card = this.add(steps[2].html(this.w));
-    const mine = $('.mine .v', card);
-    const to = gbOf(this.w).youCents;
-    mine.textContent = money(0);
-    await wait(200);
-    tweenMoney(mine, to, { from: 0, dur: 600 });
-    await wait(650);
-    this.add(`<div class="msg ai">${esc(steps[3].text)}</div>`);
-    this.state = 'done'; this.pending = null; this.first = null;
-    this.follow();
-    invite();
-  } catch (e) {
-    if (e.message !== 'cancelled') throw e;
-    stopGhost();
-  }
-};
-
-/* ---------- the AI section: one exchange, no second chat window ----------
-   The exchange is on the page from the start, so the navy never shows an empty column
-   (on a phone it scrolls past at reading speed). Only its result, the Activity card,
-   arrives: once, when 40% of it is in view. */
+/* ---------- the AI section: one exchange, played once ----------
+   The statement question is on the page from the start, so the navy never shows an empty
+   column. When the thread is a third in view, the rest plays once: Trezzit checks the
+   payments, the AI names the missing one, you say yes, the Activity card lands. It stays
+   finished; leaving the screen mid-play finishes it at once. Reduced motion: all static. */
 function initThread() {
   const t = document.querySelector('[data-thread]');
-  const card = t?.querySelector('.tcard');
-  if (!card || reducedMotion()) return;
-  card.classList.add('is-waiting');
-  onVisible(card, () => card.classList.replace('is-waiting', 'is-in'), 0.4);
+  if (!t || reducedMotion()) return;
+  const [first, tool, aiLine, yes, card] = [...t.children];
+  if (!card) return;
+  const st = tool.querySelector('.st'); const res = tool.querySelector('.res');
+  const doneSt = st.outerHTML; const doneRes = res.textContent;
+  t.classList.add('is-armed');
+  first.classList.add('in'); first.style.animation = 'none';
+  const timers = []; let typing; let over = false;
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const show = (el) => el.classList.add('in');
+  const dots = (before) => {
+    typing = document.createElement('div');
+    typing.className = 'typing'; typing.setAttribute('aria-hidden', 'true'); typing.innerHTML = '<i></i><i></i><i></i>';
+    typing.style.top = before.offsetTop + 'px';
+    t.appendChild(typing);
+  };
+  const finish = () => {
+    if (over) return; over = true;
+    timers.forEach(clearTimeout); typing?.remove();
+    tool.querySelector('.st').outerHTML = doneSt; res.textContent = doneRes;
+    [tool, aiLine, yes, card].forEach(show);
+  };
+  onVisible(t, () => {
+    if (over) return;
+    at(250, () => { tool.querySelector('.st').outerHTML = '<span class="st spin" aria-hidden="true"></span>'; res.textContent = 'Checking your statement…'; show(tool); });
+    at(1150, () => { tool.querySelector('.st').outerHTML = doneSt; res.textContent = doneRes; });
+    at(1350, () => dots(aiLine));
+    at(1850, () => { typing?.remove(); show(aiLine); });
+    at(2550, () => show(yes));
+    at(3050, () => { show(card); over = true; });
+    // Nothing plays unseen.
+    new IntersectionObserver(([e], io) => { if (over) io.disconnect(); else if (!e.isIntersecting) { finish(); io.disconnect(); } }).observe(t);
+  }, 0.35);
 }
 
 export async function initChats() {
@@ -578,9 +639,13 @@ export async function initChats() {
   initThread();
   if (!hero) return [];
   const p = new Player(hero, w, { script: 'spent' });
-  const r = hero.getBoundingClientRect();
-  const fresh = scrollY < 120 && r.top < innerHeight && r.bottom > 0 && document.visibilityState === 'visible';
-  if (!reducedMotion() && fresh && !(document.activeElement && hero.contains(document.activeElement))) p.intro();
-  else hero.classList.remove('intro-pending');
+  // The page opens on the finished exchange: nothing plays until someone asks. Once the card is
+  // mostly in view, the first chip pulses once, to say the questions are live.
+  if (!reducedMotion()) {
+    onVisible(hero, () => setTimeout(() => {
+      const c = p.chipBox?.querySelector('.chip');
+      if (c && !p.touched && !hero.contains(document.activeElement)) c.classList.add('nudge');
+    }, 1200), 0.6);
+  }
   return [p];
 }
