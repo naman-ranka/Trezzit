@@ -184,3 +184,9 @@ ul.lg-pays { margin: 16px 0 0; padding: 0; list-style: none; border-top: 1px sol
 .ledger.demoing .lg-search { border-color: var(--accent); background: #fff; }
 .ledger.compact .lg-search { min-height: 46px; }
 .ledger.compact .lg-search input { height: 44px; min-height: 44px; }
+@media (min-width: 880px) and (max-width: 999px) {
+  .lg-rt small { white-space: normal; }
+}
+@media (max-width: 359px) {
+  .lg-rt b { white-space: normal; }
+}

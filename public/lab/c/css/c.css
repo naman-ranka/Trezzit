@@ -862,3 +862,15 @@ button.tzc-owe:focus-visible { box-shadow: var(--focus-ring); }
 #chat-demo.chat:not(.ai-hero-demo) { min-height: 0; }
 .tzc-label, .tzc-amt b { transition: opacity .18s var(--ease); }
 .hero-viz.swap .tzc-label, .hero-viz.swap .tzc-amt b { opacity: 0; }
+#cat-demo { container: cats / inline-size; }
+.cats-in > * { min-width: 0; }
+@container cats (max-width: 640px) {
+  ul.cat-list { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 899px) {
+  .hero-viz { grid-template-columns: minmax(0, 1fr); }
+}
+.tzc-amt span { min-width: 0; overflow: hidden; white-space: nowrap; }
+@media (min-width: 721px) {
+  .foot nav { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+}

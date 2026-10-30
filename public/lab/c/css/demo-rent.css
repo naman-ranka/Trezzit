@@ -90,3 +90,8 @@ ul.rec-shares { grid-template-columns: repeat(2, 1fr) !important; }
 @media (max-width: 359px) {
   .up-r { grid-auto-flow: row !important; justify-items: end; }
 }
+@media (min-width: 1000px) and (max-width: 1119px) {
+  .rent-card .rec-shares .sp-person { grid-template-columns: auto minmax(0, 1fr); column-gap: 6px; row-gap: 2px; padding-inline: 10px; }
+  .rent-card .rec-shares .av { grid-row: auto; width: 22px; height: 22px; font-size: 10px; }
+  .rent-card .rec-shares .sp-pa { grid-column: 1 / -1; }
+}

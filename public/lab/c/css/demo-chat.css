@@ -130,3 +130,6 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-
 }
 .chat-log:focus-visible { outline: 2px solid transparent !important; }
 .msg.tool:not(.done) .tl-s { width: 14px; height: 14px; border: 2px solid var(--line, #e3e7ee); border-top-color: var(--accent); }
+@media (max-width: 359px) {
+  .chat-prompts { flex-wrap: wrap; }
+}
