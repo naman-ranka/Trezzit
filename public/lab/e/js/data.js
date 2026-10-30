@@ -10,7 +10,8 @@ import { itemName, storeName, bus } from './util.js';
 // Maya's teal darkened (#0d9488 -> #0f766e) so white initials pass WCAG AA (5.5:1); the others already pass.
 // E r2: no person shares a colour with the accent or a category (Priya was the link blue), and people are
 // round while categories are square. These match the --p-* and --cat-* tokens in c.css.
-export const PEOPLE = { ...KIT_PEOPLE, maya: { ...KIT_PEOPLE.maya, color: '#0f766e' }, priya: { ...KIT_PEOPLE.priya, color: '#0e7490' } };
+// Dark theme: every person colour is a token (--av-you, --p-*: c.css), so it follows the theme.
+export const PEOPLE = Object.fromEntries(Object.entries(KIT_PEOPLE).map(([k, v]) => [k, { ...v, color: k === 'you' ? 'var(--av-you)' : `var(--p-${k})` }]));
 // E r3: saturated hues belong to people only. Categories are one ink ramp (--cat-1..4 in c.css: ink at
 // 100/70/45/25%), assigned so no two categories on one receipt share a step; their marks stay square.
 const RAMP = { groceries: 1, rent: 1, health: 2, dining: 2, utilities: 2, 'personal-care': 3, household: 3, internet: 3, subscriptions: 3, gifts: 4, parking: 4, other: 4 };

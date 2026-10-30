@@ -17,17 +17,17 @@
 .rec-lines b { color: var(--ink); }
 .rec-edit { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px; border-radius: var(--r-md); background: var(--wash); font-size: var(--t-sm); }
 .rec-edit label { font-weight: 600; color: var(--ink); }
-.money-in-field { background: #fff; border: 1px solid var(--line-strong); border-radius: var(--r-sm); padding: 0 10px; }
+.money-in-field { background: var(--card); border: 1px solid var(--line-strong); border-radius: var(--r-sm); padding: 0 10px; }
 .money-in-field input { border: 0; outline: none; width: 7.5ch; font-size: var(--t-md); font-variant-numeric: tabular-nums; background: none; }
 .step-btns { display: inline-flex; gap: 6px; }
-.step-btns button { width: 44px; height: 44px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: #fff; font-size: var(--t-lg); color: var(--ink); }
+.step-btns button { width: 44px; height: 44px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: var(--card); font-size: var(--t-lg); color: var(--ink); }
 .rec-shares { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 @media (min-width: 560px) {
   .rec-shares { grid-template-columns: repeat(4, 1fr); }
 }
 .rec-mode { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: var(--t-sm); font-weight: 600; color: var(--muted); }
 .upcoming { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-.up-row { display: grid; gap: 12px; align-items: center; padding: 10px 12px; border-radius: var(--r-md); border: 1px solid var(--line); background: #fff; }
+.up-row { display: grid; gap: 12px; align-items: center; padding: 10px 12px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--card); }
 .up-row .mr-d { width: 48px; height: 50px; font-size: var(--t-lg); }
 .up-row b { color: var(--ink); }
 .up-row small { display: block; color: var(--muted); font-size: var(--t-sm); }
@@ -35,7 +35,7 @@
 .hist-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; font-size: var(--t-sm); color: var(--muted); }
 .hist-top b { font-size: var(--t-lg); color: var(--ink); letter-spacing: -0.02em; }
 .hist-bars { display: flex; align-items: flex-end; gap: 6px; height: 72px; margin-top: 10px; }
-.hist-bars i { flex: 1; background: color-mix(in srgb, var(--recurring) 30%, #fff); border-radius: var(--r-sm) var(--r-sm) 3px 3px; height: var(--h); transition: height .5s var(--ease); position: relative; }
+.hist-bars i { flex: 1; background: color-mix(in srgb, var(--recurring) 30%, var(--card)); border-radius: var(--r-sm) var(--r-sm) 3px 3px; height: var(--h); transition: height .5s var(--ease); position: relative; }
 .hist-bars i.now { background: var(--recurring); }
 .hist-lbl { display: flex; gap: 6px; margin-top: 4px; }
 .hist-lbl span { flex: 1; text-align: center; font-size: var(--t-xs); color: var(--muted); }
@@ -64,7 +64,7 @@ ul.rec-shares { grid-template-columns: repeat(2, 1fr) !important; }
 @media (min-width: 560px) {
   .rec-compact ul.rec-shares { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
 }
-.hist-lbl .nx { color: #0f766e; }
+.hist-lbl .nx { color: var(--teal-ink); }
 @media (max-width: 359px) {
   .up-r { flex-wrap: wrap; }
 }
@@ -97,9 +97,10 @@ ul.rec-shares { grid-template-columns: repeat(2, 1fr) !important; }
 }
 /* E r3: one meaning per colour. Grey fill is the bank's view only, so the rent editor and the history are
    white with a hairline; the history bars are the ink ramp (this month in ink); dates are plain text. */
-:root { --recurring: var(--ink); --recurring-soft: var(--fill); }
-.rec-edit, .hist { background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
-.hist-bars i { background: color-mix(in srgb, var(--ink) 18%, #fff); }
+/* also over the dark theme's tokens (c.css), which sit at the same weight as these selectors */
+:root, :root[data-theme], :root:not([data-theme='light']) { --recurring: var(--ink); --recurring-soft: var(--fill); --recurring-fill: var(--ink-fill); }
+.rec-edit, .hist { background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+.hist-bars i { background: color-mix(in srgb, var(--ink) 18%, var(--card)); }
 .hist-bars i.now { background: var(--ink); }
 .hist-lbl .nx { color: var(--ink); }
 .mr-d { background: none; color: var(--ink); width: auto; min-width: 40px; }

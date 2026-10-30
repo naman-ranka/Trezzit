@@ -41,7 +41,7 @@ export async function mountLedger(root, opts = {}) {
   const delta = spent - last;
   // colour means one thing at a time: rent, the top 3 categories in their hue, and one grey "Other"
   const rest = cats.slice(3).reduce((a, [, c]) => a + c, 0);
-  const barParts = (fixed ? [[fixed.youCents, cat('rent').color]] : []).concat(cats.slice(0, 3).map(([k, c]) => [c, cat(k).color]), rest ? [[rest, '#cbd2dc']] : []);
+  const barParts = (fixed ? [[fixed.youCents, cat('rent').color]] : []).concat(cats.slice(0, 3).map(([k, c]) => [c, cat(k).color]), rest ? [[rest, 'var(--cat-rest)']] : []);
   const nRows = cats.length + (fixed ? 1 : 0);
   css('ledger'); // its styles (linked by the page, or loaded by home.js before mounting)
   root.classList.add('ledger');

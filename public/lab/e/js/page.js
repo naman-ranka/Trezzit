@@ -1,7 +1,29 @@
 /* page.js: chrome shared by every lab C page: nav state, scroll reveals, copy buttons. */
 import { reduced, icon } from './util.js';
 
+/* Dark theme: the OS decides until the visitor presses the nav toggle; the choice is stored and the inline
+ * script in <head> applies it before first paint on the next page. */
+const THEME_KEY = 'trezzit-lab-e-theme';
+const GROUND = { light: '#ffffff', dark: '#151517' };
+function initTheme() {
+  const root = document.documentElement;
+  const os = matchMedia('(prefers-color-scheme: dark)');
+  const tg = document.querySelector('[data-theme-toggle]');
+  const now = () => root.dataset.theme || (os.matches ? 'dark' : 'light');
+  const sync = () => tg?.setAttribute('aria-pressed', String(now() === 'dark'));
+  tg?.addEventListener('click', () => {
+    const next = now() === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', GROUND[next]));
+    try { localStorage.setItem(THEME_KEY, next); } catch { /* private mode: the choice lasts this page only */ }
+    sync();
+  });
+  os.addEventListener?.('change', sync);
+  sync();
+}
+
 export function initPage() {
+  initTheme();
   const nav = document.querySelector('.nav');
   if (nav) {
     const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);

@@ -1,26 +1,26 @@
 /* demo-chat.css: styles for js/chat-demo.js only. */
 .chat-prompts { margin-bottom: 14px; }
-.prompt { padding: 0 14px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-weight: 500; color: var(--text); transition: border-color .2s var(--ease), background-color .2s var(--ease), color .2s var(--ease); }
+.prompt { padding: 0 14px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-weight: 500; color: var(--text); transition: border-color .2s var(--ease), background-color .2s var(--ease), color .2s var(--ease); }
 .prompt:hover { border-color: var(--line-strong); }
-.prompt[aria-pressed='true'] { background: #fff; color: var(--ink); border-color: var(--ink); box-shadow: inset 0 0 0 .5px var(--ink); }
+.prompt[aria-pressed='true'] { background: var(--card); color: var(--ink); border-color: var(--ink); box-shadow: inset 0 0 0 .5px var(--ink); }
 /* the chat sits in the same frame as every demo: white, 1px line, 22px corners, no shadow */
-.chat-win { background: #fff; border-radius: var(--r-lg); border: 1px solid var(--line); box-shadow: none; overflow: hidden; }
+.chat-win { background: var(--card); border-radius: var(--r-lg); border: 1px solid var(--line); box-shadow: none; overflow: hidden; }
 .chat-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 12px 12px 18px; border-bottom: 1px solid var(--divider); }
 .chat-id { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .chat-id > span:last-child { display: grid; line-height: 1.25; min-width: 0; }
 .chat-id b { font-size: var(--t-sm); color: var(--ink); }
 .chat-id small { font-size: var(--t-sm); color: var(--muted); }
-.chat-glyph { width: 32px; height: 32px; border-radius: var(--r-sm); display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, #3b6fd0, #6d4ed8); flex: none; }
+.chat-glyph { width: 32px; height: 32px; border-radius: var(--r-sm); display: grid; place-items: center; color: var(--on-fill); background: var(--ink-fill); flex: none; }
 .chat-ctl { width: 44px; height: 44px; border-radius: var(--r-sm); display: grid; place-items: center; color: var(--muted); border: 1px solid var(--line); flex: none; }
 .chat-ctl:hover { color: var(--ink); border-color: var(--line-strong); }
 .chat-log { margin: 0; padding: 18px; list-style: none; display: flex; flex-direction: column; gap: 10px; }
 @media (min-width: 640px) {
   .chat-log { padding: 22px 24px; }
 }
-.msg.u .bub { background: var(--ink); color: #fff; border-radius: var(--r-md) var(--r-md) var(--r-sm) var(--r-md); padding: 10px 14px; font-size: var(--t-md); line-height: 1.45; }
-.att { display: inline-flex; align-items: center; background: rgba(255, 255, 255, .12); border-radius: var(--r-sm); font-size: var(--t-sm); }
+.msg.u .bub { background: var(--ink-fill); color: var(--on-fill); border-radius: var(--r-md) var(--r-md) var(--r-sm) var(--r-md); padding: 10px 14px; font-size: var(--t-md); line-height: 1.45; }
+.att { display: inline-flex; align-items: center; background: var(--att-wash); border-radius: var(--r-sm); font-size: var(--t-sm); }
 .att img { object-fit: cover; object-position: top; }
-.att .doc-i { border-radius: 3px; background: #fff; color: var(--neg); font-weight: 800; display: grid; place-items: center; }
+.att .doc-i { border-radius: 3px; background: var(--card); color: var(--neg); font-weight: 800; display: grid; place-items: center; }
 .tl-i { width: 24px; height: 24px; border-radius: var(--r-sm); background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
 .tl-s { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; color: var(--pos); opacity: 0; transition: opacity .2s var(--ease); }
 .msg.tool:not(.done) .tl-s { opacity: 1; color: var(--accent); animation: spin .7s linear infinite; }
@@ -48,7 +48,7 @@
 .tc-rows.mono .r { display: flex; align-items: center; gap: 8px; font-family: 'Receipt Mono', var(--font-mono); font-size: var(--t-sm); }
 .tc-rows em { font-style: normal; font-family: var(--font-sans); }
 .tc-rows em.ok { color: var(--pos); display: grid; }
-.tc-rows em.no { color: var(--amber); font-size: var(--t-xs); font-weight: 600; background: #fffbeb; border-radius: var(--r-sm); padding: 1px 6px; }
+.tc-rows em.no { color: var(--amber); font-size: var(--t-xs); font-weight: 600; background: var(--amber-soft); border-radius: var(--r-sm); padding: 1px 6px; }
 @media (max-width: 480px) {
   .tc-rows.mono .r { margin-left: auto; }
 }
@@ -112,7 +112,7 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-
 }
 .msg.act { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--wash); font-size: var(--t-sm); color: var(--muted); line-height: 1.35; }
 .msg.act b { color: var(--text); font-weight: 600; }
-.act-i { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #ecfdf5; color: #047857; }
+.act-i { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--pos-soft); color: var(--pos); }
 .act-i svg { width: 14px; height: 14px; }
 @media (max-width: 479px) {
   .msg.act { padding: 7px 10px; font-size: var(--t-xs); gap: 8px; }
@@ -130,7 +130,7 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-
   .prompt .ps { display: inline; }
 }
 .chat-log:focus-visible { outline: 2px solid transparent !important; }
-.msg.tool:not(.done) .tl-s { width: 14px; height: 14px; border: 2px solid var(--line, #e3e7ee); border-top-color: var(--accent); }
+.msg.tool:not(.done) .tl-s { width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--accent); }
 @media (max-width: 359px) {
   .chat-prompts { flex-wrap: wrap; }
 }
@@ -147,8 +147,8 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-
 .chat-try[hidden] { display: none; }
 /* E r2: no borrowed surfaces. The glyph is flat ink; cards inside the chat are flat (1px line, white, no
    lift), titled in ink; the missing charge says so where the check would be, on the amount's line. */
-.chat-glyph { background: var(--ink); }
-.tc { background: #fff; border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: none; }
+.chat-glyph { background: var(--ink-fill); }
+.tc { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: none; }
 .tc-k { color: var(--ink); font-weight: 600; }
 .tc-rows.mono li { align-items: baseline; }
 .tc-rows.mono .r { align-items: baseline; }
@@ -167,7 +167,7 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !importa
    (no pills, no sparkle); the activity row is a white, hairline row (grey is the statement's colour only);
    the result is the one "You spent" idiom: label, then the new figure with the old one struck through. */
 .tc-rows em.no, .tc-rows.mono em.no { background: none; padding: 0; color: var(--accent); font-weight: 600; }
-.msg.act { background: #fff; }
+.msg.act { background: var(--card); }
 .act-i { background: none; color: var(--pos); width: 18px; height: 18px; }
 .act-ai { background: none; padding: 0; gap: 0; color: var(--accent); font-weight: 600; font-size: var(--t-sm); line-height: inherit; }
 .msg.proof { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding: 2px 2px 0; }
@@ -179,7 +179,7 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !importa
    line lights up once before your AI asks about it */
 .msg.leaving { opacity: 0; transition: opacity .2s var(--ease); }
 .tc-rows li.miss.hl { animation: tchl 1.4s var(--ease); }
-@keyframes tchl { 0%, 40% { background: var(--accent-soft); box-shadow: 0 0 0 6px var(--accent-soft); } 100% { background: transparent; box-shadow: 0 0 0 6px rgba(238, 244, 253, 0); } }
+@keyframes tchl { 0%, 40% { background: var(--accent-soft); box-shadow: 0 0 0 6px var(--accent-soft); } 100% { background: transparent; box-shadow: 0 0 0 6px transparent; } }
 .tc-stmt .tc-rows { margin-top: 0; }
 .msg.act .act-ai:only-child { font-size: var(--t-sm); }
 .msg.ghost { opacity: .14; transition: opacity .25s var(--ease); }
@@ -191,7 +191,7 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !importa
 @media (hover: none) { .prompt:hover { border-color: var(--line); } .chat-ctl:hover { color: var(--muted); border-color: var(--line); } }
 /* ---------- E final (judge notes): the header control is a labelled button ("Replay", "Pause", "Resume"), and a
    replay never ghosts the finished chat: each later message takes a short beat at full strength ---------- */
-.chat-ctl { width: auto; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 10px; font: inherit; font-size: var(--t-sm); font-weight: 600; color: var(--text); background: #fff; }
+.chat-ctl { width: auto; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 10px; font: inherit; font-size: var(--t-sm); font-weight: 600; color: var(--text); background: var(--card); }
 .chat-ctl svg { flex: none; color: var(--muted); }
 .msg.ghost { opacity: 1; }
 .anim .msg.beat { animation: msg-beat .5s var(--ease); }

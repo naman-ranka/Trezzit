@@ -25,7 +25,7 @@
 .who-a { font-size: var(--t-sm); font-weight: 600; color: var(--ink); line-height: 1.1; }
 @media (min-width: 860px) {
   .who-n { display: block; }
-  .who:not([aria-pressed='true']) .who-n { color: #6b7280; }
+  .who:not([aria-pressed='true']) .who-n { color: var(--text-4); }
 }
 .sp-more { margin-top: 2px; }
 .sp-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 10px; padding-top: 14px; border-top: 1px solid var(--line); }
