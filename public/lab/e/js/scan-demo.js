@@ -10,7 +10,7 @@ import { receiptHTML as kitReceiptHTML, ensureReceiptStyles, splitSample } from 
 const receiptHTML = (raw, o) => kitReceiptHTML(raw, o).replace(/<p>ITEMS \d+<\/p>\s*/, '');
 import { toCents } from '../../_kit/split-engine.js';
 import { SAMPLE_META, CATEGORIES, getSample, sampleBill } from './data.js';
-import { h, esc, money, reduced, onVisible, itemName, storeName, prettyDate, icon, bus, css, countMoney } from './util.js';
+import { h, esc, money, reduced, onVisible, itemName, storeName, prettyDate, icon, bus, css } from './util.js';
 
 const STAGE_LABEL = { idle: 'Ready', uploading: 'Uploading', reading: 'Reading items', checking: 'Checking the math', done: 'Checking the math' }; // never "Done" beside a total still counting
 // one line of compact chips: the list's label says what they mean
@@ -43,7 +43,8 @@ export function mountScan(root, opts = {}) {
   const ids = opts.samples || ['green-basket', 'taqueria-sol', 'corner-pharmacy', 'monthly-rent'];
   const base = new URL('../assets/', import.meta.url).href;
   // "Your photo" only where it is real (trezzit.com): elsewhere it could only replay a sample
-  const own = isLive() && opts.own !== false;
+  // (opts.own 'always': offered everywhere; off trezzit.com it opens the honest notice and plays a sample)
+  const own = opts.own === 'always' || (isLive() && opts.own !== false);
   root.classList.add('scan', 'booting'); // hidden until the first receipt is laid out at its final size
   root.classList.toggle('no-own', !own);
   root.classList.toggle('no-total', opts.total === false);
@@ -51,9 +52,9 @@ export function mountScan(root, opts = {}) {
     <div class="scan-pick" role="group" aria-label="Pick a receipt to scan"${ids.length < 2 && !own ? ' hidden' : ''}>
       ${ids.map((id) => `<button type="button" class="pick" data-id="${id}" aria-pressed="false">
         <img src="${base}thumb-${id}.webp" alt="" width="36" height="52" loading="lazy" decoding="async">
-        <span><b>${esc(SAMPLE_META[id].short)}</b><small>${esc(SAMPLE_META[id].kind)}</small></span></button>`).join('')}
+        <span><b>${esc(opts.names?.[id] || SAMPLE_META[id].short)}</b>${opts.kinds === false ? '' : `<small>${esc(SAMPLE_META[id].kind)}</small>`}</span></button>`).join('')}
       ${own ? `<button type="button" class="pick pick-own" data-own aria-expanded="false">
-        <span class="pick-ico">${icon.upload}</span><span><b>Your photo</b><small>Photo or PDF</small></span></button>` : ''}
+        <span class="pick-ico">${icon.upload}</span><span><b>Your photo</b>${opts.kinds === false ? '' : '<small>Photo or PDF</small>'}</span></button>` : ''}
     </div>
     <div class="scan-body">
       <div class="scan-stage" aria-hidden="true">
@@ -69,7 +70,7 @@ export function mountScan(root, opts = {}) {
         </div>
         <div class="so-mid">
           <ol class="so-items" aria-label="Items read from the receipt"></ol>
-          <p class="so-rest"><span></span><span class="money"></span></p>
+          <p class="so-rest"><span></span><span class="money"></span><span class="so-live" aria-hidden="true"></span></p>
           <button type="button" class="c-link-btn so-more" hidden></button>
           <p class="so-sum"></p>
           <div class="so-cats" hidden></div>
@@ -113,9 +114,9 @@ export function mountScan(root, opts = {}) {
   const soloLink = root.querySelector('.so-solo') || root.querySelector('.so-mine');
   // a receipt that is just yours has nothing to split: say where it went instead (home: in place, by category)
   const setSolo = (id) => {
-    if (!soloLink || !splitBtn) return;
+    if (!splitBtn) return;
     const solo = !!id && getSample(id)?.people?.length === 1;
-    soloLink.hidden = !solo || !!opts.soloSummary;
+    if (soloLink) soloLink.hidden = !solo || !!opts.soloSummary;
     splitBtn.hidden = solo;
   };
   // the read ends on one small picture instead of the item list (step 2 shows the items): the receipt,
@@ -138,7 +139,6 @@ export function mountScan(root, opts = {}) {
   const notice = root.querySelector('.so-notice');
   const prog = root.querySelector('.so-prog i');
   const txt = statusEl.querySelector('.txt');
-  const readSum = () => [...list.querySelectorAll('.so-item:not(.pending) .money')].reduce((a, el) => a + Math.round(parseFloat(el.textContent.replace(/[^0-9.]/g, '')) * 100), 0);
   const setProg = (f) => { prog.style.transform = `scaleX(${Math.max(0, Math.min(1, f))})`; };
   let nItems = 0;
   const moreBtn = root.querySelector('.so-more');
@@ -159,10 +159,15 @@ export function mountScan(root, opts = {}) {
   let objectUrl = null;
 
   const actions = root.querySelectorAll('.so-split');
+  // while it reads, the progress words sit in the "+ N more items" row (the row the read ends on), so there is
+  // no empty band above the total, and the total itself stays blank until it lands on the printed total
+  const live = root.querySelector('.so-live');
+  const setLive = (t) => { live.textContent = t || ''; };
   const setStage = (s) => {
     root.dataset.stage = s;
     actions.forEach((a) => { if (s === 'done') a.removeAttribute('aria-disabled'); else a.setAttribute('aria-disabled', 'true'); });
     txt.textContent = STAGE_LABEL[s] || s;
+    setLive(s === 'done' || s === 'idle' ? '' : STAGE_LABEL[s] || s);
     if (s === 'idle') setProg(0);
   };
   const press = (id) => root.querySelectorAll('.pick[data-id]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
@@ -199,7 +204,7 @@ export function mountScan(root, opts = {}) {
   function reset(store) {
     list.innerHTML = '';
     checks.innerHTML = '';
-    totalEl.textContent = '';
+    totalEl.textContent = '—';
     sumEl.innerHTML = '';
     storeEl.innerHTML = store || '';
     notice.hidden = true;
@@ -227,7 +232,7 @@ export function mountScan(root, opts = {}) {
     restEl.hidden = rest <= 0;
     const extra = toCents(bill.tax) > 0 ? 'tax' : toCents(bill.tip) > 0 ? 'tip' : '';
     restEl.firstChild.textContent = n ? `+ ${n} more item${n === 1 ? '' : 's'}${extra ? ` and ${extra}` : ''}` : extra.replace(/^./, (c) => c.toUpperCase()) || 'Other';
-    restEl.lastChild.textContent = money(rest, bill.currency || 'USD');
+    restEl.querySelector('.money').textContent = money(rest, bill.currency || 'USD');
   }
   // while the beam reads, the list shows the last lines read (a window that follows the beam), so the list
   // and the paper never disagree; once the total lands it folds back to the first lines plus "+ N more"
@@ -251,8 +256,8 @@ export function mountScan(root, opts = {}) {
   function layout(bill) {
     list.innerHTML = bill.items.map((it, i) => itemLI(it, i, true)).join('');
     checks.innerHTML = checksFor(bill).map((c, i) => checkLI(c, i, true)).join('');
-    // the total counts up as lines are read, then lands on the printed total once the math checks
-    totalEl.textContent = money(0, bill.currency || 'USD');
+    // the total stays blank while the lines are read (a running sum beside "Total" would contradict the receipt)
+    totalEl.textContent = '—';
     setSum(bill);
     syncMore();
     setRest(bill);
@@ -260,7 +265,7 @@ export function mountScan(root, opts = {}) {
 
   async function run(input, { instant = false, note = '' } = {}) {
     // off trezzit.com a photo never leaves the device: the closest recorded sample plays, and says so up front
-    if (typeof input !== 'string' && !isLive()) return run(closestSample(input), { instant, note: 'Real scans run on trezzit.com, so this is a sample receipt.' });
+    if (typeof input !== 'string' && !isLive()) return run(ids.includes(closestSample(input)) ? closestSample(input) : ids[0], { instant, note: 'Real scans run on trezzit.com, so this is a sample receipt.' });
     ctrl?.abort();
     ctrl = new AbortController();
     const signal = ctrl.signal;
@@ -297,12 +302,10 @@ export function mountScan(root, opts = {}) {
             for (; shown < detail.items.length; shown += 1) addItem(detail.items[shown], shown);
             if (shown) { follow(shown - 1); roll(shown); }
             const n = nItems || detail.items.length;
-            if (shown) txt.textContent = `Reading items ${shown} of ${n}`;
-            if (shown) totalEl.textContent = money(detail.items.slice(0, shown).reduce((a, it) => a + toCents(it.amount), 0));
+            if (shown) { txt.textContent = `Reading items ${shown} of ${n}`; setLive(txt.textContent); }
             setProg(0.1 + 0.8 * (n ? shown / n : 0));
           }
           if (stage === 'checking') setProg(0.95);
-          if (stage === 'checking' && detail.total != null) countMoney(totalEl, readSum(), toCents(detail.total), 420);
           if (stage === 'checking') {
             settlePaper();
             if (checks.querySelector('.pending')) checks.querySelectorAll('.pending').forEach((li) => li.classList.remove('pending'));
@@ -325,8 +328,7 @@ export function mountScan(root, opts = {}) {
       }
       if (result.source === 'live') storeEl.innerHTML = storeLine(result.raw.receipt);
       // the status says "Adds up" only once the total has finished counting, so the two never disagree
-      await countMoney(totalEl, readSum(), toCents(result.bill.total), reduced() || instant ? 0 : 420, result.bill.currency || 'USD');
-      if (signal.aborted) return;
+      totalEl.textContent = money(toCents(result.bill.total), result.bill.currency || 'USD');
       setSum(result.bill);
       const catId = result.source === 'sample' ? (result.sampleId || input) : null;
       if (catId && opts.cats !== false) { setCats(catId, result.bill); root.classList.add('has-cats'); }
@@ -429,7 +431,7 @@ export function mountScan(root, opts = {}) {
       ghost.querySelector('.so-status .txt').innerHTML = `${icon.check}Adds up to ${money(toCents(bill.total))}`;
       ghost.querySelector('.so-total b').textContent = money(toCents(bill.total));
       const gr = ghost.querySelector('.so-rest');
-      if (gr) { gr.hidden = false; gr.firstChild.textContent = '+ 10 more items and tax'; gr.lastChild.textContent = '$00.00'; }
+      if (gr) { gr.hidden = false; gr.firstChild.textContent = '+ 10 more items and tax'; gr.querySelector('.money').textContent = '$00.00'; }
       ghost.querySelectorAll('button.so-split:not(.so-solo)').forEach((x) => { x.hidden = getSample(id)?.people?.length === 1; });
       max = Math.max(max, ghost.offsetHeight);
     }

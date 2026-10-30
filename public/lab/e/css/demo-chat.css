@@ -189,3 +189,12 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !importa
 .msg.proof .spent > b > span.money { font-size: var(--t-lg); letter-spacing: -0.02em; }
 .msg.proof a { min-height: 44px; padding: 0 8px; margin-right: -8px; }
 @media (hover: none) { .prompt:hover { border-color: var(--line); } .chat-ctl:hover { color: var(--muted); border-color: var(--line); } }
+/* ---------- E final (judge notes): the header control is a labelled button ("Replay", "Pause", "Resume"), and a
+   replay never ghosts the finished chat: each later message takes a short beat at full strength ---------- */
+.chat-ctl { width: auto; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 10px; font: inherit; font-size: var(--t-sm); font-weight: 600; color: var(--text); background: #fff; }
+.chat-ctl svg { flex: none; color: var(--muted); }
+.msg.ghost { opacity: 1; }
+.anim .msg.beat { animation: msg-beat .5s var(--ease); }
+@keyframes msg-beat { 0% { transform: translateY(4px); } 45% { transform: translateY(-1px); } 100% { transform: none; } }
+.msg.proof.beat { animation: none; }
+@media (prefers-reduced-motion: reduce) { .msg.beat { animation: none; } }

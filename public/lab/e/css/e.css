@@ -305,3 +305,98 @@ a.tzc-go:focus-visible { outline: none; box-shadow: var(--focus-ring); border-ra
 @media (min-width: 457px) { .verb-demo #split-demo { min-height: 624px; } }
 @media (min-width: 591px) { .verb-demo #split-demo { min-height: 640px; } }
 @media (min-width: 640px) { .verb-demo #split-demo { min-height: 609px; } }
+
+/* ======================================================================================
+   E final (judge notes): the hero arrow ends above the card on phones; the dinner row is an absence in
+   the bank's own type; the pharmacy shows its four data.js categories in the same height; the quiet
+   "Split a bill, no account" path sits beside the no-bank check; home shares one content edge.
+   ====================================================================================== */
+.hero-join .join-v { display: none; }
+@media (max-width: 899px) {
+  /* a vertical arrow drawn for the gap it lives in: it starts under the bank card and stops 2px above the card */
+  .hero-join { width: 14px; height: 24px; margin: 2px 0; }
+  .hero-join .join-h { display: none; }
+  .hero-join .join-v { display: block; width: 14px; height: 22px; transform: none; overflow: visible; }
+}
+@media (max-width: 599px) {
+  .hero-join { height: 18px; margin: 2px 0; }
+  .hero-join .join-v { height: 18px; }
+}
+/* the dinner is not on your statement: the same mono line as the others, muted, with no amount */
+.brow-none { font-family: var(--font-mono); }
+.brow-none .bn { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brow-none .ba { color: var(--faint); }
+/* pharmacy: four category rows fill the same height as two rows plus "Owed to you" */
+ul.tzc-cats.tzc-four { gap: 0; margin-top: 10px; }
+.tzc-four li { padding-block: 3px; }
+@media (max-width: 599px) { .tzc-four li { padding-block: 2px; } }
+/* "Split a bill, no account" beside the check, one line wherever it fits */
+.hero .micro { column-gap: 18px; }
+.hero .micro .split-link { min-height: 34px; }
+@media (max-width: 599px) {
+  .hero .micro { flex-direction: row; flex-wrap: wrap; justify-content: center; column-gap: 14px; }
+  .hero .micro .nobank, .hero .micro .split-link { min-height: 28px; }
+}
+@media (min-width: 600px) { .hero .micro { margin-top: 8px; } }
+/* one content edge on home: nav, sections and footer all sit on the 960px column */
+.home .nav .wrap, .home .foot .wrap { max-width: calc(960px + 2 * var(--gutter)); }
+.brow-none .ba { display: none; }
+.brow-none { grid-template-columns: 56px minmax(0, 1fr); }
+@media (max-width: 599px) { .brow-none { grid-template-columns: 48px minmax(0, 1fr); } }
+@media (max-width: 359px) { .brow-none .bn { white-space: normal; line-height: 1.25; } }
+/* the AI section: stacked (phones, tablets) it is centred like the hero and the close; side by side, the copy
+   sits centred against the chat instead of leaving a tall empty column under it */
+@media (max-width: 979px) {
+  .ai-copy { text-align: center; }
+  .ai-copy h2 { margin-inline: auto; max-width: 22ch; }
+  .ai-copy .ai-links { display: flex; justify-content: center; }
+}
+@media (min-width: 980px) {
+  .ai .ai-grid { align-items: center; }
+  .ai .ai-copy { position: static; align-self: center; padding-top: 0; }
+}
+
+/* ---------- E final: reserved heights re-measured 320-1920 (10px steps) after the picker, the payer rows, the grid
+   summary and the AI layout changed; a boundary between two samples reserves the larger neighbour ---------- */
+.verb-demo #scan-demo { min-height: 755px; }
+@media (min-width: 380px) { .verb-demo #scan-demo { min-height: 742px; } }
+@media (min-width: 410px) { .verb-demo #scan-demo { min-height: 686px; } }
+@media (min-width: 481px) { .verb-demo #scan-demo { min-height: 697px; } }
+@media (min-width: 591px) { .verb-demo #scan-demo { min-height: 713px; } }
+@media (min-width: 720px) { .verb-demo #scan-demo { min-height: 535px; } }
+@media (min-width: 820px) { .verb-demo #scan-demo { min-height: 479px; } }
+@media (min-width: 900px) { .verb-demo #scan-demo { min-height: 466px; } }
+@media (min-width: 971px) { .verb-demo #scan-demo { min-height: 472px; } }
+@media (min-width: 1100px) { .verb-demo #scan-demo { min-height: 436px; } }
+@media (min-width: 1191px) { .verb-demo #scan-demo { min-height: 446px; } }
+.verb-demo #split-demo { min-height: 795px; }
+@media (min-width: 330px) { .verb-demo #split-demo { min-height: 783px; } }
+@media (min-width: 331px) { .verb-demo #split-demo { min-height: 801px; } }
+@media (min-width: 350px) { .verb-demo #split-demo { min-height: 792px; } }
+@media (min-width: 360px) { .verb-demo #split-demo { min-height: 758px; } }
+@media (min-width: 371px) { .verb-demo #split-demo { min-height: 761px; } }
+@media (min-width: 420px) { .verb-demo #split-demo { min-height: 736px; } }
+@media (min-width: 450px) { .verb-demo #split-demo { min-height: 717px; } }
+@media (min-width: 480px) { .verb-demo #split-demo { min-height: 620px; } }
+@media (min-width: 591px) { .verb-demo #split-demo { min-height: 636px; } }
+@media (min-width: 640px) { .verb-demo #split-demo { min-height: 606px; } }
+@media (min-width: 881px) { .verb-demo #split-demo { min-height: 609px; } }
+@media (min-width: 900px) { .verb-demo #split-demo { min-height: 606px; } }
+@media (min-width: 981px) { .verb-demo #split-demo { min-height: 609px; } }
+@media (min-width: 1100px) { .verb-demo #split-demo { min-height: 606px; } }
+@media (min-width: 1191px) { .verb-demo #split-demo { min-height: 609px; } }
+.verb-demo #ledger-demo { min-height: 659px; }
+@media (min-width: 370px) { .verb-demo #ledger-demo { min-height: 643px; } }
+@media (min-width: 371px) { .verb-demo #ledger-demo { min-height: 651px; } }
+@media (min-width: 591px) { .verb-demo #ledger-demo { min-height: 667px; } }
+@media (min-width: 770px) { .verb-demo #ledger-demo { min-height: 649px; } }
+@media (min-width: 880px) { .verb-demo #ledger-demo { min-height: 347px; } }
+#chat-demo:not(.ai-hero-demo) { min-height: 605px; }
+@media (min-width: 330px) { #chat-demo:not(.ai-hero-demo) { min-height: 566px; } }
+@media (min-width: 340px) { #chat-demo:not(.ai-hero-demo) { min-height: 549px; } }
+@media (min-width: 360px) { #chat-demo:not(.ai-hero-demo) { min-height: 515px; } }
+@media (min-width: 381px) { #chat-demo:not(.ai-hero-demo) { min-height: 520px; } }
+@media (min-width: 401px) { #chat-demo:not(.ai-hero-demo) { min-height: 531px; } }
+@media (min-width: 471px) { #chat-demo:not(.ai-hero-demo) { min-height: 561px; } }
+@media (min-width: 631px) { #chat-demo:not(.ai-hero-demo) { min-height: 569px; } }
+@media (min-width: 1191px) { #chat-demo:not(.ai-hero-demo) { min-height: 572px; } }

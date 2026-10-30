@@ -189,3 +189,25 @@
 @media (min-width: 420px) and (max-width: 639px) {
   .tg { --col: 58px; }
 }
+/* ---------- E final (judge notes): one live summary line under the grid (what you spent, what your roommates
+   owe you); the folded row reads "Shared groceries ×9" at every width; no tax hint (the price says it on hover) ---------- */
+.tg-sum { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; margin: 12px auto 0; max-width: 760px; padding-top: 10px; border-top: 1px solid var(--divider); font-size: var(--t-sm); color: var(--muted); }
+.tg-sum b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tg-sum a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; min-height: 44px; margin-block: -10px; }
+.tg-sum a > span { color: var(--accent); }
+@media (hover: hover) { .tg-sum a:hover { color: var(--ink); text-decoration: underline; } }
+.tg-sum a:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 2px; }
+#split-demo .tg-sum { max-width: none; }
+@media (max-width: 479px) {
+  /* phones: the two figures as two hairline rows, label left and amount right (like step 3's rows) */
+  .tg-sum { display: grid; gap: 0; padding-top: 4px; }
+  .tg-sum-dot { display: none; }
+  .tg-sum > span, .tg-sum > a { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 36px; margin: 0; }
+  .tg-sum > a { border-top: 1px solid var(--divider); }
+  .tg-sum > a b { margin-left: auto; }
+}
+@media (max-width: 479px) {
+  /* phones show (and screen readers read) the short name only; the long one is not rendered at all */
+  .tg-long { display: none; }
+  .tg-grp .tg-exp small { display: none !important; }
+}

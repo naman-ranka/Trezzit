@@ -104,7 +104,7 @@ export async function mountChat(root, opts = {}) {
     <div class="chat-win">
       <div class="chat-bar">
         <span class="chat-id"><span class="chat-glyph" aria-hidden="true">${icon.sparkle}</span><span class="chat-name"><b>Your AI</b></span></span>
-        <button type="button" class="chat-ctl" aria-label="Replay">${icon.replay}</button>
+        <button type="button" class="chat-ctl">${icon.replay}<span>Replay</span></button>
       </div>
       <div class="chat-log" role="log" aria-live="off" aria-label="Conversation"></div>
       <div class="chat-try"${keys.length < 2 ? ' hidden' : ''}>
@@ -124,9 +124,11 @@ export async function mountChat(root, opts = {}) {
   let touched = false;
 
   const setCtl = () => {
-    const mode = state === 'done' ? 'replay' : paused || state === 'idle' ? 'play' : 'pause';
-    ctl.innerHTML = icon[mode];
-    ctl.setAttribute('aria-label', mode === 'replay' ? 'Replay' : mode === 'play' ? 'Play' : 'Pause');
+    // a labelled control, never a bare video-style ▶: the finished chat offers "Replay", a running one "Pause"
+    const mode = state === 'done' || state === 'idle' ? 'replay' : paused ? 'play' : 'pause';
+    const label = mode === 'replay' ? 'Replay' : mode === 'play' ? 'Resume' : 'Pause';
+    ctl.innerHTML = `${icon[mode]}<span>${label}</span>`;
+    ctl.removeAttribute('aria-label');
     ctl.dataset.mode = mode;
   };
 
@@ -235,15 +237,13 @@ export async function mountChat(root, opts = {}) {
       // (from > 0: the question is already on screen, the answer carries on under it)
       // home: the question and the statement stay on screen (the frame is never empty); only the last beat
       // replays: the missing line lights up, then the question, your yes, the added row and October's new total
-      // The later messages stay in place, faded to a ghost, and come back one by one: the frame never empties.
+      // The later messages stay drawn at full strength (never ghosted, so nothing looks disabled) and each one
+      // takes its beat in turn; October's figure counts from the old total to the new one at its own beat.
       const k = keepN(steps);
       let ghosts = null;
       if (!from && k && log.children.length === steps.length && log.firstElementChild?.classList.contains('u')) {
         ghosts = [...log.children].slice(k);
-        ghosts.forEach((c) => { c.classList.remove('enter'); c.classList.add('ghost'); });
-        const to = log.querySelector('.msg.proof [data-to]');
-        const pf = steps.find((st) => st.t === 'proof');
-        if (to && pf) to.textContent = money(pf.from);
+        ghosts.forEach((c) => { c.classList.remove('enter', 'beat'); });
         from = k;
         const miss = log.querySelector('.tc-rows li.miss');
         if (miss) { miss.classList.remove('hl'); void miss.offsetWidth; miss.classList.add('hl'); await wait(500, my); }
@@ -265,9 +265,9 @@ export async function mountChat(root, opts = {}) {
         if (s.t === 'proof') await wait(350, my);
         if (ghosts) {
           const el = ghosts.shift();
-          el.classList.remove('ghost');
+          el.classList.remove('beat');
           void el.offsetWidth;
-          el.classList.add('enter');
+          el.classList.add('beat');
           if (s.t === 'act' && s.added) L.addAI();
           if (s.t === 'proof') countMoney(el.querySelector('[data-to]'), s.from, s.to, 700);
           continue;
@@ -292,8 +292,8 @@ export async function mountChat(root, opts = {}) {
   }));
   ctl.addEventListener('click', () => {
     touched = true;
-    if (ctl.dataset.mode === 'replay') { play(current, { instant: false }); return; }
     if (state === 'idle') { play(current, { instant: false, from: log.children.length === 1 ? 1 : 0 }); return; }
+    if (ctl.dataset.mode === 'replay') { play(current, { instant: false }); return; }
     paused = !paused;
     state = paused ? 'paused' : 'playing';
     if (!paused) gate?.();

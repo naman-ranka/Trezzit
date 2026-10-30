@@ -69,6 +69,8 @@ export function countMoney(el, from, to, dur = 700, cur = 'USD') {
       if (p < 1) requestAnimationFrame(step); else resolve();
     };
     requestAnimationFrame(step);
+    // frames can stall (a hidden tab, a busy page): the figure still comes to rest on its exact value
+    setTimeout(() => { if (tweens.get(el) === my) { tweens.set(el, my + 0.5); el.textContent = money(to, cur); resolve(); } }, dur + 120);
   });
 }
 

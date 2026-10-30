@@ -287,3 +287,20 @@ ul.so-checks { display: none; }
 }
 .so-again svg { width: 16px; height: 16px; }
 @media (min-width: 720px) and (max-width: 899px) { .verb-demo .so-store { min-height: 57px; } }
+/* ---------- E final (judge notes): two samples and "Your photo" in one row; while reading, the progress words
+   sit in the "+ N more items" row, so there is no empty band above the total and the total stays blank ("—")
+   until it lands on the printed total; the progress bar stops short of "Scan again"; "Split this receipt"
+   appears with the check (never as a disabled-looking link). ---------- */
+.so-head .so-prog { margin-right: 56px; }
+.so-rest { position: relative; }
+.so-live { position: absolute; left: 0; top: 6px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.scan:not(.is-done) .so-rest { visibility: visible; }
+.scan:not(.is-done) .so-rest > :not(.so-live) { visibility: hidden; }
+.scan.is-done .so-live { display: none; }
+.scan:not(.is-done) .so-status { visibility: hidden; }
+.scan:not(.is-done) .so-total b { color: var(--faint); }
+.scan:not(.is-done) .so-split { visibility: hidden; opacity: 1; }
+.scan .pick small:empty { display: none; }
+/* the receipt keeps what a photo of it shows: the store, the date, the lines and the totals (no address,
+   register, card or footer lines) */
+.scan-paper .tz-r-head p:not(.tz-r-store):not(.tz-r-meta), .scan-paper .tz-r-foot p, .scan-paper .tz-r-sums > div:last-child { display: none; }

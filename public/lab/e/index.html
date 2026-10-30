@@ -31,7 +31,7 @@
 <link rel="modulepreload" href="js/page.js">
 <script type="module" src="js/home.js"></script>
 </head>
-<body>
+<body class="home">
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="nav">
@@ -58,7 +58,7 @@
     <div class="cta-row">
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
     </div>
-    <p class="micro"><span class="nobank">No bank login needed.</span></p>
+    <p class="micro"><span class="nobank">No bank login needed.</span><a class="split-link" href="https://app.trezzit.com/split">Split a bill, no account <span aria-hidden="true">→</span></a></p>
 
     <div class="hero-viz" data-hero>
       <figure class="bank" aria-labelledby="bank-cap">
@@ -68,12 +68,12 @@
         <div class="bank-rows" role="tablist" aria-label="October charges" aria-orientation="vertical">
           <button type="button" class="brow" role="tab" id="bt-gb" aria-controls="tv-gb" aria-selected="true"><span class="bd">Oct 24</span><span class="bn">GREEN BASKET MARKET</span><span class="ba">−$100.00</span><i class="btime" aria-hidden="true"></i></button>
           <button type="button" class="brow" role="tab" id="bt-ph" aria-controls="tv-ph" aria-selected="false" tabindex="-1"><span class="bd">Oct 20</span><span class="bn">CORNER PHARMACY</span><span class="ba">−$48.22</span><i class="btime" aria-hidden="true"></i></button>
-          <button type="button" class="brow brow-none" role="tab" id="bt-tq" aria-controls="tv-tq" aria-selected="false" tabindex="-1"><span class="bd">Oct 18</span><span class="bn">Taqueria Sol <em>Alex paid</em></span><span class="ba">$0.00</span><i class="btime" aria-hidden="true"></i></button>
+          <button type="button" class="brow brow-none" role="tab" id="bt-tq" aria-controls="tv-tq" aria-selected="false" tabindex="-1" aria-label="Oct 18, Taqueria Sol: not on your card, Alex paid"><span class="bd">Oct 18</span><span class="bn">Not on your card · Alex paid</span><span class="ba" aria-hidden="true">—</span><i class="btime" aria-hidden="true"></i></button>
         </div>
       </figure>
 
       <div class="hero-join" aria-hidden="true">
-        <svg viewBox="0 0 120 40" preserveAspectRatio="none"><path pathLength="1" d="M2 20 H 112" /><path pathLength="1" d="M104 12 L 114 20 L 104 28" /></svg>
+        <svg class="join-h" viewBox="0 0 120 40" preserveAspectRatio="none"><path pathLength="1" d="M2 20 H 112" /><path pathLength="1" d="M104 12 L 114 20 L 104 28" /></svg><svg class="join-v" viewBox="0 0 14 24"><path pathLength="1" d="M7 1 V 21" /><path pathLength="1" d="M2.5 16.5 L 7 21.5 L 11.5 16.5" /></svg>
       </div>
 
       <div class="tzc" role="group" aria-label="The same purchase in Trezzit">
@@ -83,7 +83,7 @@
             <span><b>Green Basket Market</b><small>Oct 24 · Apartment 3B</small></span>
           </div>
           <p class="tzc-label" data-label>You spent</p>
-          <p class="tzc-amt"><span class="visually-hidden">$30.00 of $100.00</span><b class="money" data-amt aria-hidden="true">$30.00</b> <span class="money" aria-hidden="true">of $100.00</span></p>
+          <p class="tzc-amt"><b class="money" data-amt>$30.00</b> <span class="money">of $100.00</span></p>
           <div class="tzc-bar" aria-hidden="true"><i style="--w:30;--seg:var(--p-you)"></i><i style="--w:30;--seg:var(--p-maya)"></i><i style="--w:20;--seg:var(--p-jordan)"></i><i style="--w:20;--seg:var(--p-sam)"></i></div>
           <ul class="tzc-legend" aria-hidden="true"><li style="--c:var(--p-you)" class="me">You</li><li style="--c:var(--p-maya)">Maya</li><li style="--c:var(--p-jordan)">Jordan</li><li style="--c:var(--p-sam)">Sam</li></ul>
           <ul class="tzc-cats" role="list">
@@ -98,13 +98,14 @@
             <span><b>Corner Pharmacy</b><small>Oct 20 · Just you</small></span>
           </div>
           <p class="tzc-label" data-label>You spent</p>
-          <p class="tzc-amt"><span class="visually-hidden">$48.22 of $48.22</span><b class="money" data-amt aria-hidden="true">$48.22</b> <span class="money" aria-hidden="true">of $48.22</span></p>
+          <p class="tzc-amt"><b class="money" data-amt>$48.22</b> <span class="money">of $48.22</span></p>
           <div class="tzc-bar" aria-hidden="true"><i style="--w:100;--seg:var(--p-you)"></i></div>
           <ul class="tzc-legend" aria-hidden="true"><li style="--c:var(--p-you)" class="me">You</li></ul>
-          <ul class="tzc-cats" role="list">
+          <ul class="tzc-cats tzc-four" role="list">
             <li><i style="--c:var(--cat-health)"></i><span><b>Health</b></span><b class="money">$23.20</b></li>
             <li><i style="--c:var(--cat-personal-care)"></i><span><b>Personal care</b></span><b class="money">$18.34</b></li>
-            <li><i style="--c:var(--cat-gifts)"></i><span><b>Gifts and groceries</b></span><b class="money">$6.68</b></li>
+            <li><i style="--c:var(--cat-gifts)"></i><span><b>Gifts</b></span><b class="money">$5.39</b></li>
+            <li><i style="--c:var(--cat-groceries)"></i><span><b>Groceries</b></span><b class="money">$1.29</b></li>
           </ul>
         </div>
         <div class="tzv" id="tv-tq" role="tabpanel" aria-labelledby="bt-tq" data-paid="0" data-spent="2703">
@@ -113,7 +114,7 @@
             <span><b>Taqueria Sol</b><small>Oct 18 · Weekend at the lake</small></span>
           </div>
           <p class="tzc-label" data-label>You spent</p>
-          <p class="tzc-amt"><span class="visually-hidden">$27.03 of $84.87</span><b class="money" data-amt aria-hidden="true">$27.03</b> <span class="money" aria-hidden="true">of $84.87</span></p>
+          <p class="tzc-amt"><b class="money" data-amt>$27.03</b> <span class="money">of $84.87</span></p>
           <div class="tzc-bar" aria-hidden="true"><i style="--w:27.03;--seg:var(--p-you)"></i><i style="--w:29.88;--seg:var(--p-alex)"></i><i style="--w:27.96;--seg:var(--p-priya)"></i></div>
           <ul class="tzc-legend" aria-hidden="true"><li style="--c:var(--p-you)" class="me">You</li><li style="--c:var(--p-alex)">Alex</li><li style="--c:var(--p-priya)">Priya</li></ul>
           <ul class="tzc-cats tzc-items" role="list">
@@ -187,7 +188,6 @@
 <section class="close close-end" aria-label="Get started">
   <div class="wrap">
     <h2 class="close-h rv">See what you actually spent.</h2>
-    <p class="close-sub rv">Every purchase, every split, every bill.<br class="br-wide"> In one place your AI can&nbsp;read.</p>
     <div class="cta-row rv">
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
     </div>

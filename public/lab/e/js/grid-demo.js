@@ -25,7 +25,7 @@ const members = (l) => {
 };
 // phones: the name without its pack size ("Cold brew", not "Cold brew 32 oz"), so every row is one line
 const shortName = (n) => n.replace(/\s+\d[\d.,/]*\s*(oz|fl oz|pk|ct|lb|lbs|g|kg|l|ml|in|ft|pack|count)\b.*$/i, '').replace(/^Hand towels$/i, 'Towels');
-const nameHTML = (n) => { const s = shortName(n); return s === n ? `<span>${esc(n)}</span>` : `<span><span class="tg-long">${esc(n)}</span><span class="tg-short" aria-hidden="true">${esc(s)}</span></span>`; };
+const nameHTML = (n) => { const s = shortName(n); return s === n ? `<span>${esc(n)}</span>` : `<span><span class="tg-long">${esc(n)}</span><span class="tg-short">${esc(s)}</span></span>`; };
 const avatar = (p) => `<span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : esc(PEOPLE[p].name[0])}</span>`;
 
 /** A model from a scan result ({ sampleId, raw, bill }): A's modelFrom, kept to what the grid needs. */
@@ -96,13 +96,13 @@ export async function mountGrid(root, opts = {}) {
       <div class="tg-body">
         <div class="tg-grid" role="grid" aria-label="Who had what on ${esc(m.merchant)}" aria-describedby="tg-hint-${uid}" style="--n:${people.length}">
           <div class="tg-people" role="row">
-            <span class="tg-hint" role="columnheader"><span>${fine ? 'Click' : 'Tap'} any dot.</span><small class="tg-tax">Prices include tax.</small><span hidden id="tg-hint-${uid}">${fine ? 'Click' : 'Tap'} a dot to change who had what.</span></span>
+            <span class="tg-hint" role="columnheader"><span>${fine ? 'Click' : 'Tap'} any dot.</span>${opts.taxHint === false ? '' : '<small class="tg-tax">Prices include tax.</small>'}<span hidden id="tg-hint-${uid}">${fine ? 'Click' : 'Tap'} a dot to change who had what.</span></span>
             <span class="tg-pr-h" role="columnheader"><span class="visually-hidden">Price</span></span>
             ${people.map((p) => `<span class="tg-p" role="columnheader" data-p="${p}">${avatar(p)}<span class="tg-pn">${esc(PEOPLE[p].name)}</span><b class="tg-pa money"></b></span>`).join('')}
           </div>
           <div class="tg-rows" role="rowgroup">
             ${folded.length ? `<div class="tg-row tg-grp" role="row" data-lines="${folded.join(',')}">
-              <span class="tg-nm" role="rowheader">${catDot(m.lines[folded[0]])}<button type="button" class="tg-exp" aria-expanded="false" aria-controls="tg-sub-${uid}"><span><span class="tg-long">${esc(foldCat)}</span><span class="tg-short" aria-hidden="true">${/^Shared /.test(foldCat) ? 'Shared' : esc(shortName(foldCat))}</span></span><small>×${folded.length}</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span>
+              <span class="tg-nm" role="rowheader">${catDot(m.lines[folded[0]])}<button type="button" class="tg-exp" aria-expanded="false" aria-controls="tg-sub-${uid}"><span><span class="tg-long">${esc(foldCat)}</span><span class="tg-short">${esc(foldCat)} ×${folded.length}</span></span><small>×${folded.length}</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span>
               <span class="tg-pr money" role="gridcell" data-sum="${folded.join(',')}"></span>${dots(`${foldCat}, ${folded.length} items`)}</div>
             <div class="tg-sub" id="tg-sub-${uid}" role="none" hidden>${folded.map((i) => row(m.lines[i], true)).join('')}</div>` : ''}
             ${m.lines.filter((l) => !folded.includes(l.index)).map((l) => row(l, false)).join('')}
@@ -116,6 +116,7 @@ export async function mountGrid(root, opts = {}) {
         <p class="tg-why" aria-hidden="true"></p>
         <button type="button" class="tg-reset" aria-label="Reset the split">Reset</button>
       </div>
+      ${opts.summary ? `<p class="tg-sum"><span>You spent <b class="money" data-sum-you></b></span><span class="tg-sum-dot" aria-hidden="true">·</span>${opts.summaryHref ? `<a href="${esc(opts.summaryHref)}">` : '<span>'}Roommates owe you <b class="money" data-sum-owed></b>${opts.summaryHref ? ' <span aria-hidden="true">→</span></a>' : '</span>'}</p>` : ''}
       ${opts.note ? `<p class="tg-note">${opts.noteHref ? `<a href="${esc(opts.noteHref)}">${esc(opts.note)} <span aria-hidden="true">→</span></a>` : esc(opts.note)}</p>` : ''}
       <p class="visually-hidden" aria-live="polite" data-say></p>
       <dialog class="tg-dlg" aria-label="${esc(m.merchant)} receipt"><div class="tg-dlg-in"><button type="button" class="tg-x" aria-label="Close">×</button><div class="tg-paper">${receiptHTML(m.raw, { sample: m.sample, shadow: false }).replace(/<p>ITEMS \d+<\/p>\s*/, '')}</div></div></dialog>`;
@@ -131,7 +132,7 @@ export async function mountGrid(root, opts = {}) {
 
   function paint() {
     const people = m.people;
-    $$('.tg-pr[data-i]').forEach((el) => { el.textContent = money(res.items[+el.dataset.i].totalCents); });
+    $$('.tg-pr[data-i]').forEach((el) => { el.textContent = money(res.items[+el.dataset.i].totalCents); if (m.lines[+el.dataset.i]?.taxCents) el.title = `${money(res.items[+el.dataset.i].totalCents - m.lines[+el.dataset.i].taxCents)} + ${money(m.lines[+el.dataset.i].taxCents)} tax`; });
     $$('.tg-pr[data-sum]').forEach((el) => { el.textContent = money(el.dataset.sum.split(',').reduce((a, i) => a + res.items[+i].totalCents, 0)); });
     people.forEach((p) => { const el = root.querySelector(`.tg-p[data-p="${p}"] .tg-pa`); el.textContent = money(res.people[p]?.cents || 0); });
     const rows = vis();
@@ -151,6 +152,9 @@ export async function mountGrid(root, opts = {}) {
     const how = root.querySelector('[data-tip-how]');
     if (how) how.innerHTML = tipMode === 'equal' ? 'Equally' : '<span class="visually-hidden">By what each ordered</span>';
     foot();
+    // one line under the grid: what you spent and what your roommates owe you (you paid the receipt)
+    const sy = root.querySelector('[data-sum-you]');
+    if (sy) { const you = res.people.you?.cents || 0; sy.textContent = money(you); root.querySelector('[data-sum-owed]').textContent = money(m.totalCents - you); }
     $('.tg-reset').classList.toggle('is-off', !edited);
     $('.tg-reset').tabIndex = edited ? 0 : -1;
   }

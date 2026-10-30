@@ -111,3 +111,23 @@
   .mo .lg-ri { width: 28px; height: 28px; }
   .mo .lg-ri svg { width: 14px; height: 14px; }
 }
+/* ---------- E final (judge notes): home shows C's who-paid split as three compact rows under "You spent";
+   they add up to the figure above them and move with it when your AI adds a charge ---------- */
+.mo.mo-pays-compact ul.lg-pays { margin: 8px 0 0; border-top: 0; }
+.mo.mo-pays-compact .lg-pays li { border-bottom: 0; }
+.mo.mo-pays-compact .lg-pays li + li { border-top: 1px solid var(--divider); }
+.mo.mo-pays-compact .lg-pay { width: 100%; margin: 0; padding: 7px 2px; min-height: 0; gap: 12px; border-radius: 0; }
+.mo.mo-pays-compact .lg-pk b, .mo.mo-pays-compact .lg-pay > b { font-size: var(--t-sm); }
+.mo.mo-pays-compact .lg-pk b { font-weight: 500; color: var(--text); }
+.mo.mo-pays-compact .lg-pay > b { font-weight: 600; font-variant-numeric: tabular-nums; }
+@media (min-width: 880px) {
+  /* the tiles sit side by side again (as on phones) and the three rows take the height under them, so the
+     October column and the search column still end on one line */
+  .ledger.mo.mo-find-first.mo-pays-compact .mo-vs { flex: none; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto; }
+  .ledger.mo.mo-find-first.mo-pays-compact .mo-vs p { align-content: start; }
+  .mo.mo-pays-compact ul.lg-pays { margin-top: auto; padding-top: 12px; }
+}
+@media (min-width: 880px) and (max-width: 979px) {
+  .mo.mo-pays-compact .mo-vs p { padding-inline: 12px; }
+  .mo.mo-pays-compact .mo-mine b { font-size: var(--t-lg); }
+}

@@ -38,6 +38,7 @@ export async function mountMonth(root, opts = {}) {
   // them), and on phones the search comes first, so its answer sits above the keyboard, not under the tiles
   const payers = opts.payers !== false;
   root.classList.toggle('mo-find-first', !!opts.findFirst);
+  root.classList.toggle('mo-pays-compact', payers && !!opts.compactPayers);
   // the gap between the two tiles, named in each: the rent transfer, and your share of it
   const rentBank = BANK.find((b) => b.id === 'monthly-rent');
   const rentMine = L.entries.find((e) => e.id === 'monthly-rent');
@@ -46,14 +47,14 @@ export async function mountMonth(root, opts = {}) {
       <p class="lg-label">October</p>
       <div class="mo-vs">
         <p class="mo-bank"><span class="mo-k">Your bank</span><b class="money">−${money(BANK_PAID)}</b>${rentBank ? `<small class="mo-why mono">${esc(rentBank.text.split(' ')[0])} <span class="money">−${money(rentBank.cents)}</span></small>` : ''}</p>
-        <p class="mo-mine"><span class="mo-k">You spent</span><span class="visually-hidden" data-spent-sr></span><b class="money" data-spent aria-hidden="true"></b>${rentMine ? `<small class="mo-why">Rent, your share <span class="money">${money(rentMine.youCents)}</span></small>` : ''}</p>
+        <p class="mo-mine"><span class="mo-k">You spent</span><b class="money" data-spent></b>${rentMine && !payers ? `<small class="mo-why">Rent, your share <span class="money">${money(rentMine.youCents)}</span></small>` : ''}</p>
       </div>
       ${payers ? `<ul class="lg-pays" role="list" aria-label="By who paid">${PAY.map(([k, label]) => `<li><span class="lg-pay is-static">
         <span class="lg-pk"><b>${label}</b></span><b class="money" data-paysum="${k}"></b></span></li>`).join('')}</ul>` : ''}
     </div>
     <div class="lg-find">
       <label class="lg-search">${icon.search}<span class="visually-hidden">Search every item</span>
-        <input type="search" placeholder="${esc(opts.placeholder || `Search every item, try “${opts.demoSearch || 'water'}”`)}" autocomplete="off" spellcheck="false"></label>
+        <input type="search" placeholder="${esc(opts.placeholder || `Try “${opts.demoSearch || 'water'}”`)}" autocomplete="off" spellcheck="false"></label>
       <div class="mo-foil" hidden>
         <p class="mo-fk"><span class="bank-i" aria-hidden="true"></span>Your bank <span class="mo-fq"></span></p>
         <div class="mo-fr"></div>
@@ -67,14 +68,12 @@ export async function mountMonth(root, opts = {}) {
   const countEl = root.querySelector('.lg-count');
   const foil = root.querySelector('.mo-foil');
   const spentEl = root.querySelector('[data-spent]');
-  const spentSr = root.querySelector('[data-spent-sr]');
   let filterPay = null;
   let showAI = false; // the row your AI just added, shown alone until the visitor searches or filters
   let flashAI = false;
 
   function sums() {
     if (payers) PAY.forEach(([k, , f]) => { root.querySelector(`[data-paysum="${k}"]`).textContent = money(L.entries.filter(f).reduce((a, e) => a + e.youCents, 0)); });
-    spentSr.textContent = money(L.spent);
   }
   const who = (e) => (e.payer === 'you' ? 'you paid' : `${e.payer} paid`);
   function entryRow(e) {
@@ -150,7 +149,12 @@ export async function mountMonth(root, opts = {}) {
       : '<span class="mo-tz">Trezzit</span>';
   }
 
-  input.addEventListener('input', () => { if (input.value.trim()) { filterPay = null; showAI = false; } render(); });
+  let free = false;
+  input.addEventListener('input', (e) => {
+    if (e.isTrusted && !free) { free = true; findEl.style.minHeight = ''; }
+    if (input.value.trim()) { filterPay = null; showAI = false; }
+    render();
+  });
   // a click into a field that still holds text replaces it, never appends to it
   input.addEventListener('focus', () => input.select());
   // phones: focusing the field brings it up under the nav, so the bank's answer and the first hits stay
@@ -171,13 +175,14 @@ export async function mountMonth(root, opts = {}) {
   let lockedW = 0;
   const lockHeight = (force) => {
     // only a new width can change it (a taller window, or a full-page capture, must not re-render the list)
-    if (force !== true && root.clientWidth === lockedW) return;
+    if (free || (force !== true && root.clientWidth === lockedW)) return;
     lockedW = root.clientWidth;
     const keep = input.value;
     findEl.style.minHeight = '';
     // the tallest of the answers people try first (two rows each), so none of them moves the page
     let max = 0;
-    [sample, 'rent', 'dinner', 'milk'].forEach((q) => { input.value = q; render(); max = Math.max(max, findEl.offsetHeight); });
+    // (the demo's answer, and every shorter prefix it types on the way: the shells show from the first letter)
+    for (let i = 1; i <= sample.length; i += 1) { input.value = sample.slice(0, i); render(); max = Math.max(max, findEl.offsetHeight); }
     // and the row your AI adds, with its note (home)
     const ai = showAI; const fl = flashAI; const fp = filterPay;
     showAI = true; flashAI = false; filterPay = null; input.value = ''; render(); max = Math.max(max, findEl.offsetHeight);
@@ -252,7 +257,7 @@ export async function mountMonth(root, opts = {}) {
       countEl.setAttribute('aria-live', 'off');
       for (let i = 1; i <= q.length && !stop; i += 1) {
         input.value = q.slice(0, i);
-        if (i >= Math.min(4, q.length)) { filterPay = null; render(); }
+        filterPay = null; render();
         await new Promise((r) => setTimeout(r, 90));
       }
       if (stop) return;
