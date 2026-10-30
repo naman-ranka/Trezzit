@@ -1,21 +1,19 @@
-/* split-page.js: /split. Step 1 is E's scan frame (a recorded sample, or your photo: scanned for real on
- * trezzit.com after the Gemini disclosure); whatever it reads lands in the split tool below. */
+/* split-page.js: /split. The page explains splitting by item and shows it on sample receipts (E's scan frame
+ * handing off to the tap grid); the splitting itself happens in the app's /split, where every "Split a bill"
+ * button goes. On a Vercel preview of this site those buttons go to the staging app. */
 import { initPage } from './page.js';
 import { css } from './util.js';
-import { sampleBill } from './data.js';
-import { mountSplitTool } from './split-tool.js';
+import { APP } from '../../_kit/scan-client.js';
 
 initPage();
-const tool = mountSplitTool(document.getElementById('split-tool'));
-// the tool starts on the dinner the scan reads first, so the totals are there before the scan plays
-sampleBill('taqueria-sol').then(({ raw, bill }) => tool.load({ sampleId: 'taqueria-sol', raw, bill }));
-// a receipt the visitor picks replaces the tool's bill; the scan that plays by itself never overwrites their edits
+document.querySelectorAll('a[data-app-split]').forEach((a) => { a.href = `${APP}/split`; });
+
+const gridEl = document.getElementById('split-demo');
+Promise.all([import('./grid-demo.js'), css('grid')]).then(([m]) => m.mountGrid(gridEl, {
+  sampleId: 'taqueria-sol', listen: true, summary: true, tipToggle: true,
+}));
 const scanEl = document.getElementById('scan-demo');
-let picked = false;
-scanEl.addEventListener('click', (e) => { if (e.target.closest('.pick, .so-again, .scan-stage')) picked = true; });
-scanEl.addEventListener('change', () => { picked = true; });
 Promise.all([import('./scan-demo.js'), css('scan')]).then(([m]) => m.mountScan(scanEl, {
-  samples: ['taqueria-sol', 'green-basket'], names: { 'taqueria-sol': 'Dinner', 'green-basket': 'Groceries' }, kinds: false, own: 'always',
-  cats: false, fromTop: true, threshold: 0.4, splitTarget: '#split-tool',
-  onDone: (result) => { tool.load(result, { user: picked }); picked = false; },
+  samples: ['taqueria-sol', 'green-basket'], names: { 'taqueria-sol': 'Dinner', 'green-basket': 'Groceries' }, kinds: false, own: false,
+  cats: false, fromTop: true, threshold: 0.4, splitTarget: '#split-demo',
 }));

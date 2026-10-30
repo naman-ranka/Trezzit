@@ -39,7 +39,6 @@
 <link rel="stylesheet" href="/assets/e/css/site.css">
 <link rel="modulepreload" href="/assets/e/js/util.js">
 <link rel="modulepreload" href="/assets/e/js/page.js">
-<link rel="modulepreload" href="/assets/e/js/split-tool.js">
 <link rel="modulepreload" href="/assets/_kit/split-engine.js">
 <script type="module" src="/assets/e/js/split-page.js"></script>
 <script type="application/ld+json">
@@ -104,7 +103,7 @@
           "name": "What happens to my receipt photo?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "On trezzit.com, a photo you scan is sent to Google Gemini to read it. The sample receipts on this page are recorded scans and send nothing. See the privacy policy."
+            "text": "When you scan a receipt in the splitter, the photo is sent to Google Gemini to read it. The samples on this page are recorded scans and send nothing. See the privacy policy."
           }
         }
       ],
@@ -158,24 +157,21 @@
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Trezzit</a></li><li><span aria-current="page">Split a bill</span></li></ol></nav>
     <h1 id="pg-t">Split the bill by item. Share one&nbsp;link.</h1>
     <p class="lede">Scan a receipt or type the items, tap who had what, and send everyone their share. Nothing to install, no account to&nbsp;make.</p>
+    <div class="pg-cta"><a class="c-btn c-btn-primary" href="https://app.trezzit.com/split" data-app-split>Split a bill</a><a class="c-btn c-btn-quiet" href="#tool">See how it works</a></div>
     <p class="micro">Free. The people you send it to don’t need an account either.</p>
   </div>
 </section>
 
 <section class="pg-sec pg-tool" id="tool" aria-labelledby="tool-t">
   <div class="wrap">
-    <h2 id="tool-t" class="visually-hidden">Split a receipt</h2>
-    <div class="tool-grid">
-      <div class="tool-scan">
-        <h3 class="st-h" id="scan-h">Add the receipt</h3>
-        <div class="demo-frame" id="scan-demo" aria-labelledby="scan-h">
-          <noscript><p class="nojs">The splitter on this page needs JavaScript. <a href="https://app.trezzit.com/split">Open the splitter in the app</a>.</p></noscript>
-        </div>
-      </div>
-      <div class="demo-frame st" id="split-tool">
-        <noscript><p class="nojs">Taqueria Sol, $84.87 with $6.17 tax and a $12.00 tip: You $27.03, Alex $29.88, Priya $27.96. Adds up to $84.87.</p></noscript>
-      </div>
+    <header class="sh"><h2 id="tool-t">Try it on a sample receipt</h2><p>Pick a receipt, then tap who had what. When it’s your own bill, the splitter takes it from there.</p></header>
+    <div class="demo-frame" id="scan-demo" aria-label="Sample receipt being read">
+      <noscript><p class="nojs">Taqueria Sol, Oct 18: seven items, $6.17 tax and a $12.00 tip, $84.87 in all.</p></noscript>
     </div>
+    <div class="demo-frame" id="split-demo" aria-label="Who had what">
+      <noscript><p class="nojs">Split by item: You $27.03, Alex $29.88, Priya $27.96. Adds up to $84.87.</p></noscript>
+    </div>
+    <div class="pg-cta"><a class="c-btn c-btn-primary" href="https://app.trezzit.com/split" data-app-split>Split your own bill</a></div>
   </div>
 </section>
 
@@ -237,7 +233,7 @@
       <details><summary>Can I split a bill without an app or an account?</summary><p>Yes. Splitting a bill runs in the browser and needs no account, and the people you send the link to don’t need one either. You can sign in later to keep the bill.</p></details>
       <details><summary>How are tax and tip split?</summary><p>In proportion. Tax follows each item, so it lands on whoever had it, and the tip is shared by what each person ordered. In the app you can also split the tip equally.</p></details>
       <details><summary>What if everyone ordered something different?</summary><p>That is what splitting by item is for: two people can share a starter while a third pays only for their own main. In the app, any item can also be split by share, by percentage or by exact amount.</p></details>
-      <details><summary>What happens to my receipt photo?</summary><p>On trezzit.com, a photo you scan is sent to Google Gemini to read it. The sample receipts on this page are recorded scans and send nothing. See the <a href="/privacy">privacy policy</a>.</p></details>
+      <details><summary>What happens to my receipt photo?</summary><p>When you scan a receipt in the splitter, the photo is sent to Google Gemini to read it. The samples on this page are recorded scans and send nothing. See the <a href="/privacy">privacy policy</a>.</p></details>
     </div>
     <p class="pg-more">Coming from Splitwise? <a href="/splitwise-alternative">See how Trezzit compares</a> · Keep every bill, and your own share of it: <a href="https://app.trezzit.com/signup">create an account</a></p>
   </div>

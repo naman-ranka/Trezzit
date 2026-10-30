@@ -101,93 +101,12 @@
   .hero .cta-row { margin-top: 18px; }
 }
 
-/* ---------- /split: the scan frame, then the tool ---------- */
+/* ---------- /split: sample receipt, then who had what, then the way into the app ---------- */
 .pg-tool { padding-top: 8px; }
-.tool-grid { display: grid; gap: clamp(20px, 3vw, 32px); max-width: 960px; }
-.st-h { font-size: var(--t-lg); letter-spacing: -0.02em; line-height: 1.2; color: var(--ink); font-weight: 700; }
-.tool-scan > .st-h { margin-bottom: 12px; }
-.st { display: grid; gap: 0; padding: 0 !important; overflow: hidden; }
-.st-block { padding: clamp(16px, 2.4vw, 24px); }
-.st-block + .st-block { border-top: 1px solid var(--line); }
-.st-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 16px; }
-.st-head .c-link-btn { min-height: 36px; }
-.st-hint { margin-top: 4px; color: var(--muted); font-size: var(--t-sm); line-height: 1.45; }
-
-.st input, .st select { font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--line-strong); border-radius: var(--r-sm); min-height: 40px; padding: 6px 10px; min-width: 0; }
-.st input:focus-visible, .st select:focus-visible { outline: none; border-color: var(--accent); box-shadow: var(--focus-ring, 0 0 0 3px rgb(var(--accent-rgb) / .25)); }
-.st input::placeholder { color: var(--placeholder); }
-
-/* people: avatar, editable name, remove */
-.st-people { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; align-items: center; }
-.st-person { display: inline-flex; align-items: center; gap: 4px; padding: 3px 3px 3px 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); }
-.st-person input { border-color: transparent; background: transparent; width: 9ch; min-height: 34px; padding: 4px 6px; font-weight: 600; font-size: var(--t-sm); border-radius: 999px; }
-.st-person input:hover { border-color: var(--line); }
-.st-av { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: #fff; font-size: var(--t-xs); font-weight: 700; }
-.st-x { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; }
-.st-x:hover:not(:disabled) { background: var(--wash); color: var(--ink); }
-.st-x:disabled { opacity: .3; cursor: default; }
-.st-people .c-btn { min-height: 40px; }
-
-/* items: name and price on one line, who had it below */
-.st-items { list-style: none; margin: 16px 0 12px; padding: 0; border-top: 1px solid var(--divider); }
-.st-item { padding: 12px 0; border-bottom: 1px solid var(--divider); }
-.st-line { display: grid; grid-template-columns: minmax(0, 1fr) 7.5rem 34px; gap: 8px; align-items: center; }
-.st-money { position: relative; display: block; }
-.st-money > span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: var(--t-sm); }
-.st-money input { width: 100%; padding-left: 22px; text-align: right; font-variant-numeric: tabular-nums; }
-.st-who { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.st-chip { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 4px 12px 4px 8px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--card); color: var(--muted); font-size: var(--t-sm); font-weight: 500; cursor: pointer; max-width: 100%; }
-.st-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.st-chip i { flex: none; width: 14px; height: 14px; border-radius: 50%; border: 1.6px solid var(--line-4); }
-.st-chip[aria-pressed='true'] { border-color: var(--ink); color: var(--ink); box-shadow: inset 0 0 0 .5px var(--ink); }
-.st-chip[aria-pressed='true'] i { background: var(--c); border-color: var(--c); }
-.st-chip.nope { animation: st-nope .35s var(--ease); }
-@keyframes st-nope { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
-.st-each { margin-top: 6px; font-size: var(--t-xs); color: var(--muted); min-height: 1em; }
-.st-each:empty { display: none; }
-.st-extras { display: grid; grid-template-columns: repeat(2, minmax(0, 9rem)); gap: 10px 14px; margin-top: 18px; align-items: end; }
-.st-amt { display: grid; gap: 4px; font-size: var(--t-sm); font-weight: 600; color: var(--muted); }
-.st-prop { grid-column: 1 / -1; color: var(--muted); font-size: var(--t-sm); }
-
-/* totals */
-.st-totals { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 0; }
-.st-totals li { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--divider); }
-.st-totals li:first-child { border-top: 0; }
-.st-tn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: var(--text); }
-.st-totals b { font-size: var(--t-md); color: var(--ink); }
-.st-check { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--pos); font-size: var(--t-sm); font-weight: 600; }
-.st-check b { color: var(--ink); }
-.st-check.bad { color: var(--neg); }
-.st-note { margin-top: 6px; color: var(--amber); font-size: var(--t-sm); }
-.st-payer { display: inline-flex; align-items: center; gap: 10px; margin-top: 14px; font-size: var(--t-sm); font-weight: 600; color: var(--muted); }
-.st-payer select { max-width: 14rem; }
-
-/* share */
-.st-share .c-btn { margin-top: 14px; }
-.st-out:empty { display: none; }
-.st-out { margin-top: 14px; }
-.st-msg { color: var(--text); font-size: var(--t-sm); line-height: 1.5; padding: 12px 14px; border-radius: var(--r-sm); background: var(--fill); border: 1px solid var(--line); }
-.st-msg a, .st-after a { color: var(--accent); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
-.st-ok { display: flex; align-items: center; gap: 6px; color: var(--pos); font-weight: 600; font-size: var(--t-sm); }
-.st-url { margin-top: 10px; }
-.st-after { margin-top: 10px; font-size: var(--t-sm); }
-.st-fine { margin-top: 8px; color: var(--muted); font-size: var(--t-xs); line-height: 1.45; }
-@media (max-width: 420px) {
-  .st-line { grid-template-columns: minmax(0, 1fr) 6.2rem 34px; gap: 6px; }
-  .st-extras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
+.pg-tool .demo-frame + .demo-frame { margin-top: clamp(16px, 2.4vw, 24px); }
+.pg-cta { display: flex; flex-wrap: wrap; gap: 10px 12px; margin-top: 20px; }
+.pg-tool .pg-cta { justify-content: center; margin-top: clamp(20px, 3vw, 28px); }
 .pg-more { margin-top: 22px; color: var(--muted); font-size: var(--t-md); }
-.tool-grid > .demo-frame, .tool-scan > .demo-frame { margin-inline: 0; max-width: none; width: 100%; }
-@media (min-width: 860px) {
-  /* wide: the items on the left; the shares and the link beside them, in view while you tap */
-  .st { grid-template-columns: minmax(0, 1fr) minmax(260px, 300px); overflow: visible; }
-  .st > .st-block:first-child { border-right: 1px solid var(--line); }
-  .st-side { align-self: start; position: sticky; top: 64px; }
-}
-@media (max-width: 859px) {
-  .st-side { border-top: 1px solid var(--line); }
-  .st-person input { width: 7ch; }
-}
 /* /splitwise-alternative: the grid beside its words on wide screens */
 .sw-demo { display: grid; gap: 24px; align-items: start; }
 .sw-demo > .demo-frame { margin-inline: 0; width: 100%; max-width: 620px; }
