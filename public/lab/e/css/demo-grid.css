@@ -211,3 +211,4 @@
   .tg-long { display: none; }
   .tg-grp .tg-exp small { display: none !important; }
 }
+@media (max-width: 479px) { .tg-sum > .tg-sum-dot { display: none; } }

@@ -131,3 +131,5 @@
   .mo.mo-pays-compact .mo-vs p { padding-inline: 12px; }
   .mo.mo-pays-compact .mo-mine b { font-size: var(--t-lg); }
 }
+/* axe: the bank's "No results" passes AA on the grey foil */
+.mo-none { color: var(--muted); }

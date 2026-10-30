@@ -47,7 +47,7 @@ export async function mountMonth(root, opts = {}) {
       <p class="lg-label">October</p>
       <div class="mo-vs">
         <p class="mo-bank"><span class="mo-k">Your bank</span><b class="money">−${money(BANK_PAID)}</b>${rentBank ? `<small class="mo-why mono">${esc(rentBank.text.split(' ')[0])} <span class="money">−${money(rentBank.cents)}</span></small>` : ''}</p>
-        <p class="mo-mine"><span class="mo-k">You spent</span><b class="money" data-spent></b>${rentMine && !payers ? `<small class="mo-why">Rent, your share <span class="money">${money(rentMine.youCents)}</span></small>` : ''}</p>
+        <p class="mo-mine"><span class="mo-k">You spent</span><b class="money" data-spent></b>${rentMine && !opts.compactPayers ? `<small class="mo-why">Rent, your share <span class="money">${money(rentMine.youCents)}</span></small>` : ''}</p>
       </div>
       ${payers ? `<ul class="lg-pays" role="list" aria-label="By who paid">${PAY.map(([k, label]) => `<li><span class="lg-pay is-static">
         <span class="lg-pk"><b>${label}</b></span><b class="money" data-paysum="${k}"></b></span></li>`).join('')}</ul>` : ''}

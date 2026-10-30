@@ -198,3 +198,5 @@ ul.tc-people.tc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !importa
 @keyframes msg-beat { 0% { transform: translateY(4px); } 45% { transform: translateY(-1px); } 100% { transform: none; } }
 .msg.proof.beat { animation: none; }
 @media (prefers-reduced-motion: reduce) { .msg.beat { animation: none; } }
+/* axe: the struck old total passes AA */
+.msg.proof .spent s { color: var(--muted); }

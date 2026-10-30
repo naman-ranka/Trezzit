@@ -400,3 +400,13 @@ ul.tzc-cats.tzc-four { gap: 0; margin-top: 10px; }
 @media (min-width: 471px) { #chat-demo:not(.ai-hero-demo) { min-height: 561px; } }
 @media (min-width: 631px) { #chat-demo:not(.ai-hero-demo) { min-height: 569px; } }
 @media (min-width: 1191px) { #chat-demo:not(.ai-hero-demo) { min-height: 572px; } }
+/* the summary's separator dot was rendering as its own row on phones; grid reservations below 480 re-measured */
+.verb-demo #split-demo { min-height: 759px; }
+@media (min-width: 330px) { .verb-demo #split-demo { min-height: 747px; } }
+@media (min-width: 331px) { .verb-demo #split-demo { min-height: 765px; } }
+@media (min-width: 350px) { .verb-demo #split-demo { min-height: 756px; } }
+@media (min-width: 360px) { .verb-demo #split-demo { min-height: 722px; } }
+@media (min-width: 371px) { .verb-demo #split-demo { min-height: 725px; } }
+@media (min-width: 420px) { .verb-demo #split-demo { min-height: 700px; } }
+@media (min-width: 450px) { .verb-demo #split-demo { min-height: 681px; } }
+@media (min-width: 480px) { .verb-demo #split-demo { min-height: 620px; } }
