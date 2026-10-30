@@ -92,12 +92,12 @@ async function build() {
   // Your October, newest first. payer: who paid the bill.
   const bills = [
     { id: 'juniper-deli', title: 'Juniper Deli', date: 'Oct 27', group: null, payer: 'you', byAI: true, split: deli },
-    { id: 'green-basket', title: 'Green Basket Market', date: 'Oct 24', group: 'Flat 3B', payer: 'you', split: scans['green-basket'].split },
+    { id: 'green-basket', title: 'Green Basket Market', date: 'Oct 24', group: 'Flatmates', payer: 'you', split: scans['green-basket'].split },
     { id: 'corner-pharmacy', title: 'Corner Pharmacy', date: 'Oct 20', group: null, payer: 'you', split: scans['corner-pharmacy'].split },
     { id: 'taqueria-sol', title: 'Taqueria Sol', date: 'Oct 18', group: 'Dinner crew', payer: 'alex', split: scans['taqueria-sol'].split },
-    { id: 'netflix', title: 'Netflix', date: 'Oct 12', group: 'Flat 3B', payer: 'maya', recurring: true, split: netflix },
+    { id: 'netflix', title: 'Netflix', date: 'Oct 12', group: 'Flatmates', payer: 'maya', recurring: true, split: netflix },
     // Rent is settled: Maya, Jordan and Sam paid you back their rooms on Oct 1, so it's in no balance.
-    { id: 'monthly-rent', title: 'Rent & bills', date: 'Oct 1', group: 'Flat 3B', payer: 'you', recurring: true, settled: true, split: scans['monthly-rent'].split },
+    { id: 'monthly-rent', title: 'Rent & bills', date: 'Oct 1', group: 'Flatmates', payer: 'you', recurring: true, settled: true, split: scans['monthly-rent'].split },
   ].map((b) => ({ ...b, totalCents: b.split.totalCents, youCents: b.split.people.you?.cents || 0 }));
 
   const bank = [

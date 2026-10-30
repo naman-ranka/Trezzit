@@ -34,6 +34,14 @@ export function initHero(root) {
     } catch { /* a newer run took over */ }
   }
 
+  // "Owed to you" opens to who owes what (and how it gets settled)
+  const owe = root.querySelector('.tzc-owe');
+  const who = root.querySelector('.tzc-who');
+  owe?.addEventListener('click', () => {
+    const open = owe.getAttribute('aria-expanded') !== 'true';
+    owe.setAttribute('aria-expanded', String(open));
+    who.hidden = !open;
+  });
   replay?.addEventListener('click', play);
   play();
 }

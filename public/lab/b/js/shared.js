@@ -69,11 +69,11 @@ export function wireSearch(scope, index, bank = [], month = null) {
     const words = raw.toLowerCase().split(/\s+/).filter(Boolean);
     if (bankQ) { bankQ.textContent = raw || 'Search'; bankQ.classList.toggle('is-empty', !raw); }
     if (!words.length) { out.innerHTML = ''; if (bankOut) bankOut.innerHTML = ''; if (month !== null) setSpent('You spent in October', month); spent?.parentElement.classList.remove('is-none'); return; }
-    // your record is your share: only lines you had a share in, biggest share first
+    // your record is your share (the two biggest show; the count and total under them cover the rest): only lines you had a share in, biggest share first
     let hits = index.filter((r) => r.mine > 0 && words.every((w) => r.hay.includes(w))).sort((x, y) => y.mine - x.mine);
     // a person's name: the things you shared with fewer people come first
     if (words.some((w) => names.includes(w))) hits = [...hits].sort((x, y) => x.owner.length - y.owner.length);
-    out.innerHTML = hits.slice(0, 3).map((r) => `<li><span class="dot" style="--c:${r.color}" aria-hidden="true"></span><span><span>${esc(r.name)}</span><small>${esc(r.store)} · ${esc(r.day)}</small></span><b class="money">${money(r.mine)}</b></li>`).join('')
+    out.innerHTML = hits.slice(0, 2).map((r) => `<li><span class="dot" style="--c:${r.color}" aria-hidden="true"></span><span><span>${esc(r.name)}</span><small>${esc(r.store)} · ${esc(r.day)}</small></span><b class="money">${money(r.mine)}</b></li>`).join('')
       + (hits.length ? '' : '<li class="sd-none">Nothing in October.</li>');
     // "You spent on towels", or "You spent with Maya" for a person
     const person = Object.values(PEOPLE).find((p) => p.id !== 'you' && words.includes(p.name.toLowerCase()));
@@ -85,7 +85,7 @@ export function wireSearch(scope, index, bank = [], month = null) {
       const b = bank.filter((l) => words.every((w) => l.hay.includes(w)));
       bankOut.innerHTML = b.length
         ? `<ul role="list">${b.map((l) => `<li><span>${esc(l.date)}</span><span>${esc(l.merchant)}</span><span>${bankAmt(l.cents)}</span></li>`).join('')}</ul>`
-        : '<p class="fb-none">No results</p><p class="fb-why">Stores and categories only</p>';
+        : '<p class="fb-none">No results</p>';
     }
   };
   input.addEventListener('input', draw);

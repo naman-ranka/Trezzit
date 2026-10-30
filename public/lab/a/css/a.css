@@ -89,7 +89,8 @@ body { background: var(--canvas); overflow-x: clip; }
   color: var(--ink);
 }
 .nav.is-scrolled { border-bottom-color: var(--line); }
-.nav.on-dark { background: rgba(10, 16, 32, 0.78); color: #fff; border-bottom-color: rgba(255, 255, 255, 0.08); }
+.nav.on-dark.on-edge { background: var(--dark-bg); }
+.nav.on-dark { background: rgba(10, 16, 32, 0.72); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); color: #fff; border-bottom-color: rgba(255, 255, 255, 0.08); }
 .nav-in { height: 100%; display: flex; align-items: center; gap: 24px; max-width: calc(var(--wrap) + var(--gutter) * 2); margin: 0 auto; padding-inline: var(--gutter); }
 .brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: inherit; font-weight: 700; font-size: 19px; letter-spacing: -0.02em; min-height: 44px; }
 .nav-links { display: none; gap: 4px; margin-left: auto; }
@@ -118,7 +119,7 @@ body { background: var(--canvas); overflow-x: clip; }
 }
 @media (min-width: 1000px) {
   /* a little short of the fold, so the grey scan band peeks in */
-  .hero { min-height: min(calc(100svh - var(--nav-h) - 56px), 780px); display: flex; flex-direction: column; padding-bottom: 0; }
+  .hero { min-height: min(calc(100svh - var(--nav-h) - 64px), 740px); display: flex; flex-direction: column; padding-bottom: 24px; }
   .hero-grid { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: 24px; flex: 1; }
 }
 
@@ -166,6 +167,10 @@ body { background: var(--canvas); overflow-x: clip; }
   .hv-bank { width: 360px; margin: 0 0 0 24px; }
   .hv-spent { width: 360px; margin: -14px 0 0 0; }
 }
+/* the pair is the hero's proof, so on a desktop it is drawn at the headline's scale (about 470px wide, the $30.00 at
+   about 78px), not as a small card floating in white */
+@media (min-width: 1000px) { .hv-cards { zoom: 1.15; } }
+@media (min-width: 1200px) { .hv-cards { zoom: 1.3; } }
 
 /* intro (pending state hides, .intro plays) */
 .intro-pending .hv-bank, .intro-pending .hv-spent { opacity: 0; }
@@ -261,14 +266,22 @@ body { background: var(--canvas); overflow-x: clip; }
    down it while reading); the card shows the first 5 rows, then "+N more items", Total and Split it, every slot
    reserved from the first frame, so switching receipts never changes the height */
 @media (min-width: 900px) {
-  .result { height: 520px; padding: 24px 26px 20px; position: relative; }
+  .result { height: 520px; padding: 22px 26px 20px; position: relative; }
+  /* every slot fits the 520px frame with its 20px foot (the "+N more" row is a full 44px target) */
+  .result .status { margin-top: 14px; min-height: 40px; }
+  .result .progress { margin-top: 6px; }
+  .result .sums { margin-top: 4px; padding-top: 8px; }
+  .result .store-ico { width: 42px; height: 42px; }
+  .result .items { margin-top: 10px; }
+  .result .result-cta { margin-top: 12px; }
+  .fold-all .items li { --row: 38px; }
   .fold-all .viewer { -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 98%); mask-image: linear-gradient(to bottom, #000 70%, transparent 98%); }
-  .fold-all .items { --row: 40px; flex: none; height: calc(var(--row) * 5); overflow: hidden; }
+  .fold-all .items { --row: 38px; flex: none; height: calc(var(--row) * 5); overflow: hidden; }
   .fold-all .items.is-six { height: calc(var(--row) * 6); }
   .fold-all .items.is-six + .more-items { display: none; }
   .fold-all .items.is-open { flex: none; height: auto; overflow: visible; }
   .fold-all .result:has(.items.is-open) { height: auto; }
-  .fold-all .more-items { display: block; height: 40px; }
+  .fold-all .more-items { display: flex; align-items: center; height: 44px; }
 }
 .result-head { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
 .store-ico { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
@@ -305,10 +318,10 @@ body { background: var(--canvas); overflow-x: clip; }
   .progress { display: none; }
   .status { margin-top: 14px; }
 }
-.more-items { display: none; height: 44px; width: 100%; text-align: left; padding: 0 2px; font-size: 15px; font-weight: 600; color: var(--accent); border-bottom: 1px solid var(--divider); }
+.more-items { display: none; height: 44px; min-height: 44px; align-items: center; width: 100%; text-align: left; padding: 0 2px; font-size: 15px; font-weight: 600; color: var(--accent); border-bottom: 1px solid var(--divider); }
 .more-items:hover { text-decoration: underline; }
 .sums.is-off, .result-cta.is-off, .more-items.is-off { visibility: hidden; }
-@media (max-width: 899px) { .more-items { display: block; } }
+@media (max-width: 899px) { .more-items { display: flex; } }
 .result { position: relative; }
 .items li .money { font-weight: 600; }
 .items li .q { color: var(--muted); font-size: 14px; margin-left: 6px; }
@@ -324,13 +337,16 @@ body { background: var(--canvas); overflow-x: clip; }
 .result-empty { flex: 1; display: grid; place-items: center; color: var(--muted); font-size: 15px; text-align: center; }
 
 /* consent: the privacy line comes before the picker, inside the card (same height, nothing moves) */
-.consent { position: absolute; inset: 0; z-index: 2; background: #fff; border-radius: inherit; padding: 24px; display: grid; align-content: center; gap: 12px; animation: itemIn 240ms var(--ease-out) both; }
+.consent { position: absolute; inset: 0; z-index: 2; background: #fff; border-radius: inherit; padding: 24px 26px; display: grid; align-content: start; gap: 12px; animation: itemIn 240ms var(--ease-out) both; }
 .consent[hidden] { display: none; }
-@media (max-width: 899px) { .consent { align-content: start; padding: 22px 20px; } }
+@media (min-width: 900px) { .consent { align-content: center; padding: 32px 40px; } .consent .consent-t { font-size: 26px; } .consent p { font-size: 17px; } }
+@media (max-width: 899px) { .consent { padding: 22px 20px; } }
+.consent p a { color: var(--ink); text-underline-offset: 3px; }
+/* while the question is open, the sample paper steps back: it is not what will be read */
+.viewer-paper { transition: transform 500ms var(--ease-out), opacity 240ms var(--ease-out); }
+.is-asking .viewer-paper { opacity: 0.35; }
 .consent .consent-t { font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
 .consent p { font-size: 16px; color: var(--muted); max-width: 26em; }
-.consent .consent-l { display: flex; gap: 16px; }
-.consent .consent-l a { color: var(--muted); display: inline-flex; align-items: center; min-height: 44px; }
 .consent .row { display: flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
 
 /* ============ STORY ============ */
@@ -385,9 +401,7 @@ body { background: var(--canvas); overflow-x: clip; }
 /* the footer speaks only once the split is whole (step 3), so it never disagrees with the header; its slot stays */
 .story-stage:not([data-step='3']) .st-foot { visibility: hidden; }
 .st-foot .ss-owe strong.ss-you { color: var(--ink); }
-.st-foot .ss-them { color: var(--muted); font-size: 15px; white-space: nowrap; }
-.st-foot .ss-them::before { content: '\00b7  '; }
-@media (max-width: 599px) { .st-foot .ss-them { display: block; } .st-foot .ss-them::before { content: none; } }
+.st-foot .ss-them { display: block; color: var(--muted); font-size: 15px; white-space: nowrap; }
 .st-foot .ss-them b { font-weight: 600; color: var(--positive-text); }
 @media (max-width: 899px) {
   /* phones: one caption line in the stage replaces the step list; the people row sticks; check + Reset in the footer */
@@ -406,7 +420,7 @@ body { background: var(--canvas); overflow-x: clip; }
 @media (min-width: 900px) {
   /* left: the heading and ONE caption, pinned beside the stage; the caption cross-fades in place as each step
      activates. The steps are invisible scroll triggers in the same column (their h3s stay for screen readers). */
-  .story { --pin-top: calc(var(--nav-h) + max(16px, (100svh - var(--nav-h) - var(--stage-h, 640px)) / 2));
+  .story { --pin-top: calc(var(--nav-h) + max(16px, min((100svh - var(--nav-h) - var(--stage-h, 640px)) / 2, 100svh - var(--nav-h) - var(--stage-ho, 0px) - 16px)));
     grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); column-gap: 64px; row-gap: 0; }
   /* the title with a changing subline right under it, one unit, centred against the stage */
   .story-left { grid-area: 1 / 1; align-self: start; position: sticky; top: var(--pin-top); z-index: 1; height: var(--stage-h, 640px); display: flex; flex-direction: column; justify-content: center; }
@@ -423,7 +437,7 @@ body { background: var(--canvas); overflow-x: clip; }
   .story .story-steps { grid-area: 1 / 1; display: block; pointer-events: none; padding-top: 16svh; } /* beats the kit's ol[role=list] reset, so a nav jump lands on step 1 */
   /* about half the pinned scroll of round 9: three short beats, then room to play */
   .step { height: 24svh; }
-  .step:last-child { height: 50svh; }
+  .step:last-child { height: calc(50svh + var(--open-extra, 0px)); }
   .step-card { opacity: 0; padding: 0; }
 }
 
@@ -571,45 +585,22 @@ body { background: var(--canvas); overflow-x: clip; }
 .m-ico { position: relative; width: 44px; height: 44px; border-radius: 50%; background: var(--surface-muted); color: var(--ink); display: grid; place-items: center; }
 .m-ico > svg { width: 22px; height: 22px; }
 .m-t { min-width: 0; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.3; }
-.m-t small { display: block; font-size: 14px; font-weight: 400; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.m-cats i { font-style: normal; }
-@media (max-width: 599px) { .m-cats i { display: none; } .m-cats span { display: block; } }
+.m-t small { display: block; font-size: 14px; font-weight: 400; color: var(--muted); }
+.m-t small i { font-style: normal; }
+.m-t small .m-who { font-weight: 600; color: var(--ink); }
+.m-cats > span { white-space: nowrap; }
+/* phones: "Shared", then one line per category (the column is narrow), never a line that ends on a dot */
+@media (max-width: 599px) { .m-t small > i:has(+ .m-cats), .m-cats > i { display: none; } .m-cats, .m-cats > span { display: block; } }
+.m-hits .m-t small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .m-a { text-align: right; line-height: 1.3; }
 .m-a strong { display: block; font-size: 16px; color: var(--ink); }
 .m-a small { font-size: 14px; color: var(--muted); }
 .m-empty { padding: 28px 0; text-align: center; font-size: 15px; color: var(--muted); }
 .m-hits:has(.m-empty) { display: grid; place-items: center; }
-/* the receipt from the story lands: the row settles in, and the month total counts up by your share */
-.month .m-new { border-radius: 12px; transition: background-color 1200ms var(--ease-out); }
-.month.is-landing .m-new { animation: mLand 520ms var(--ease-out) both; background: var(--accent-soft); transition: none; }
-.month.is-pending .m-new { opacity: 0; transform: translateY(-10px); }
-@keyframes mLand { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
-.month .m-new { margin-inline: -8px; padding-inline: 8px; }
+/* the receipt from the story is in your month: its row is highlighted once as the card arrives (the total never counts) */
+.month .m-new { border-radius: 12px; transition: background-color 1200ms var(--ease-out); margin-inline: -8px; padding-inline: 8px; }
+.month.is-landing .m-new { background: var(--accent-soft); transition: none; }
 @media (max-width: 379px) { .month { padding-inline: 14px; } .m-row { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; } .m-ico { width: 40px; height: 40px; } .m-t { font-size: 15px; } .m-t small { font-size: 13px; } }
-
-/* the balances strip: net across this month's shared bills, live from the split; Settle up records it */
-.m-bal { border-top: 1px solid var(--divider); margin-top: 4px; padding: 12px 0 10px; }
-.mb-hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.mb-k { font-size: 15px; color: var(--muted); }
-.mb-k strong { color: var(--positive-text); font-weight: 700; font-size: 16px; margin-left: 4px; }
-.mb-btn { min-height: 44px; padding: 0 14px; margin-right: -8px; border-radius: 999px; font-size: 15px; font-weight: 600; color: var(--accent); }
-.mb-btn:hover { background: var(--fill-soft); }
-.mb-btn:disabled { color: var(--muted); cursor: default; background: none; }
-.mb-btn:focus-visible { outline: 2px solid #2461bd; outline-offset: 2px; box-shadow: none; }
-.mb-people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
-.mb-p { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 8px; align-items: center; }
-.mb-p .av { --size: 30px; font-size: 13px; grid-row: 1 / span 2; }
-.mb-p .nm { font-size: 13px; color: var(--muted); line-height: 1.2; }
-.mb-p .v { font-size: 16px; font-weight: 700; color: var(--ink); line-height: 1.25; display: inline-flex; align-items: center; gap: 4px; }
-.mb-p .v small { font-size: 12px; font-weight: 500; color: var(--muted); }
-.mb-p .v svg { width: 18px; height: 18px; color: var(--positive-text); }
-.mb-p.is-neg .v { color: var(--muted); }
-.m-bal.is-settled .mb-k { color: var(--ink); font-weight: 600; }
-.mb-note { font-size: 14px; color: var(--muted); min-height: 0; }
-.mb-note:empty { display: none; }
-.mb-note { margin-top: 8px; }
-@media (max-width: 379px) { .mb-p { column-gap: 6px; } .mb-p .av { --size: 26px; font-size: 12px; } .mb-p .v { font-size: 15px; } }
-@media (prefers-reduced-motion: no-preference) { .mb-p .v { transition: opacity 200ms; } }
 
 /* the search row */
 .search-demo { margin-top: 16px; display: grid; gap: 10px; min-width: 0; }
@@ -648,6 +639,8 @@ body { background: var(--canvas); overflow-x: clip; }
 .chat-top .ttl { font-size: 15px; font-weight: 600; color: #fff; white-space: nowrap; }
 .chat-top .conn { white-space: nowrap; }
 @media (max-width: 479px) { .chat-top .conn { font-size: 13px; } .chat-chips button { font-size: 15px; padding: 0 14px; } }
+/* two prompts, one row, down to 360 */
+@media (max-width: 389px) { .chat-chips { gap: 6px; } .chat-chips button { font-size: 14px; } }
 .chat-top .conn { font-size: 14px; color: #7ee2b8; display: inline-flex; align-items: center; gap: 6px; }
 .chat-top .conn::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #34d399; }
 .chat-top .ctl { margin-left: auto; display: flex; gap: 4px; }
@@ -667,12 +660,12 @@ body { background: var(--canvas); overflow-x: clip; }
 .msg-u.has-att img { width: 40px; height: 52px; object-fit: cover; object-position: top; border-radius: 8px; background: #fff; }
 .msg-a { align-self: flex-start; color: #e8edf6; }
 .msg-a p + p { margin-top: 8px; }
-.typing::after { content: '\2009\2588'; animation: blink 900ms steps(1) infinite; color: #8db8ff; }
+.typing::after { content: '\2009\2588'; animation: blink 900ms steps(1) 8; color: #8db8ff; }
 @keyframes blink { 50% { opacity: 0; } }
 .tool { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--dark-muted); padding: 6px 12px 6px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); animation: itemIn 300ms var(--ease-out) both; }
 .tool .tz { width: 22px; height: 22px; border-radius: 6px; background: #fff; color: var(--ink); display: grid; place-items: center; }
 .tool .tz svg { width: 14px; height: 14px; }
-.tool .s { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: #8db8ff; animation: spin 800ms linear infinite; }
+.tool .s { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: #8db8ff; animation: spin 800ms linear 12; }
 .tool.done .s { animation: none; border: 0; background: none; color: #34d399; width: auto; height: auto; }
 .tool.done .s::before { content: '\2713'; font-weight: 700; }
 /* the save confirmation: its own message after "Save it", never a rewrite of the preview */
@@ -759,3 +752,7 @@ body { background: var(--canvas); overflow-x: clip; }
 
 /* narrow phones: the merchant stays whole on one line */
 @media (max-width: 379px) { .hv-bank-name { font-size: 13px; letter-spacing: 0; } .hv-bank-row { gap: 10px; } }
+
+/* Track: the vision in the H2's second line, a step quieter (as the AI H2 does on navy) */
+.sec-scen .h2-2 { color: var(--muted); }
+@media (max-width: 389px) { .sec-scen .h2 { font-size: 31px; } }

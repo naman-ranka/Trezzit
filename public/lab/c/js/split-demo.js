@@ -48,8 +48,6 @@ export function mountSplit(root, opts = {}) {
   const itemsEl = $('.sp-items');
   const more = $('.sp-more');
   const say = $('.sp-say');
-  const hint = $('.sp-hint');
-  const HINT = hint.textContent;
   let hintT = 0;
 
   function markTip() {
@@ -268,14 +266,25 @@ export function mountSplit(root, opts = {}) {
       const row = b.closest('.sp-row');
       row.classList.remove('nope'); void row.offsetWidth; row.classList.add('nope');
       say.textContent = `Someone has to pay for ${name}.`;
-      // say it where the eye is, too, then put the hint back
-      hint.textContent = 'Someone has to pay for it';
-      root.classList.add('hinting');
-      clearTimeout(hintT);
-      hintT = setTimeout(() => { hint.textContent = HINT; root.classList.remove('hinting'); }, 1500);
+      // one message, on the line itself (its "Just you" note), then the note comes back; nothing else moves
+      const m = row.querySelector('.sp-method');
+      if (m) {
+        if (!m.dataset.was) m.dataset.was = m.textContent;
+        m.textContent = 'Someone has to pay for it';
+        m.classList.add('sp-refuse');
+        clearTimeout(hintT);
+        hintT = setTimeout(() => { if (m.isConnected) { m.textContent = m.dataset.was; m.classList.remove('sp-refuse'); delete m.dataset.was; } }, 2200);
+      }
       return;
     }
-    root.classList.add('touched');
+    if (!root.classList.contains('touched')) {
+      // the hint goes once used; its space closes without moving the tapped line under the finger
+      const row = b.closest('.sp-row');
+      const before = row.getBoundingClientRect().top;
+      root.classList.add('touched');
+      const d = row.getBoundingClientRect().top - before;
+      if (d) window.scrollBy(0, d);
+    }
     const ordered = st.people.filter((x) => next.includes(x));
     // toggling back to the original people restores the original split (a percent line stays a percent line)
     const orig = st.original[i]?.split;
@@ -293,10 +302,22 @@ export function mountSplit(root, opts = {}) {
     if (!b) return;
     const all = [...b.parentElement.querySelectorAll('.who')];
     const k = all.indexOf(b);
-    const to = { ArrowRight: k + 1, ArrowDown: k + 1, ArrowLeft: k - 1, ArrowUp: k - 1, Home: 0, End: all.length - 1 }[e.key];
+    let next;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      // up and down move to the same person on the previous or next visible line
+      const rows = [...itemsEl.querySelectorAll('.sp-row')].filter((r) => r.offsetParent !== null);
+      const r = rows[rows.indexOf(b.closest('.sp-row')) + (e.key === 'ArrowDown' ? 1 : -1)];
+      e.preventDefault();
+      if (!r) return;
+      next = r.querySelector(`.who[data-p="${b.dataset.p}"]`) || r.querySelector('.who');
+      r.querySelectorAll('.who').forEach((x) => { x.tabIndex = x === next ? 0 : -1; });
+      next.focus();
+      return;
+    }
+    const to = { ArrowRight: k + 1, ArrowLeft: k - 1, Home: 0, End: all.length - 1 }[e.key];
     if (to === undefined) return;
     e.preventDefault();
-    const next = all[(to + all.length) % all.length];
+    next = all[(to + all.length) % all.length];
     all.forEach((x) => { x.tabIndex = x === next ? 0 : -1; });
     next.focus();
   });

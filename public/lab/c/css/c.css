@@ -1558,15 +1558,8 @@ ul.lg-pays { margin: 16px 0 0; padding: 0; list-style: none; border-top: 1px sol
 /* AI section: the copy sits centred beside the chat, not stranded at the top */
 .ai-copy h2 { font-size: clamp(30px, 3.2vw, 44px); }
 @media (min-width: 980px) { .ai-grid { align-items: center; } .ai-copy { position: static; } }
-/* /ai: the H1 fits three lines; the server URL is on the first screen at desktop */
+/* /ai: the H1 fits three lines */
 @media (min-width: 1024px) { .ai-hero h1 { font-size: clamp(40px, 3.7vw, 52px); } }
-.ai-quick { display: none; }
-@media (min-width: 1024px) {
-  .ai-quick { display: block; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
-  .ai-quick .url-box { margin-top: 0; }
-  .ai-quick .url-box code { font-size: 14px; }
-  .ai-quick-s { margin-top: 10px; font-size: 14px; color: var(--muted); }
-}
 
 /* chat: the conversation sits at the bottom of the panel, like a chat app (spare room goes above it) */
 .chat-log { justify-content: flex-end; }
@@ -1624,12 +1617,6 @@ ul.bal-why { margin: 0 0 10px 32px; padding: 0; list-style: none; font-size: 14p
   .rent-card .rec-shares .av { width: 26px; height: 26px; }
   .rent-card .rec-shares .sp-person { gap: 8px; padding-inline: 10px; min-width: 0; }
 }
-@media (min-width: 1024px) {
-  .ai-quick .url-box { grid-template-columns: minmax(0, 1fr) auto; }
-  .ai-quick .url-box .url-l { grid-column: 1; grid-row: 1; }
-  .ai-quick .url-box code { grid-column: 1 / -1; grid-row: 2; font-size: 15px; }
-  .ai-quick .url-box button { grid-column: 2; grid-row: 1; }
-}
 /* no-shift reserves, re-measured for round 9 (smallest finished height per range, 320-1440) */
 .verb-demo #scan-demo { min-height: 742px; }
 .verb-demo #split-demo { min-height: 703px; }
@@ -1650,3 +1637,199 @@ ul.bal-why { margin: 0 0 10px 32px; padding: 0; list-style: none; font-size: 14p
 /* phones: hero buttons share the cards' 20px gutter (one left edge down the hero) */
 @media (max-width: 480px) { .hero .cta-row .c-btn { max-width: none; } }
 @media (max-width: 859px) { .split .sp-hint { margin-top: 8px; } }
+
+/* ===================== Round 10 ===================== */
+/* Forced colors (Windows High Contrast) drops box-shadow rings: a transparent outline becomes a system-colour one there */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible { outline: 2px solid transparent !important; outline-offset: 2px; }
+.chat-log:focus-visible, .lg-fixed:focus-visible { outline: 2px solid transparent !important; }
+.money-in-field:focus-within, .lg-search:focus-within { outline: 2px solid transparent; outline-offset: 2px; }
+
+/* Hero share bar: a thin stacked bar with names under it, so it can't read as tabs */
+.tzc-bar { height: auto; gap: 3px; margin-top: 16px; align-items: stretch; }
+.tzc-bar i { display: block; background: none !important; border-radius: 0; padding: 0; color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.2; }
+.tzc-bar i::before { content: ''; display: block; height: 8px; background: var(--seg); transition: background-color .6s var(--ease); }
+.tzc-bar i:first-child::before { border-radius: 4px 0 0 4px; }
+.tzc-bar i:last-child::before { border-radius: 0 4px 4px 0; }
+.tzc-bar span { display: block; margin-top: 6px; }
+.tzc-bar .you { --seg: var(--ink); color: var(--ink); font-weight: 600; }
+.tzc-bar .maya { --seg: #2a9d8f; }
+.tzc-bar .jordan { --seg: #e0a35b; }
+.tzc-bar .sam { --seg: #9b7be0; }
+.anim .hero-viz:not(.s2) .tzc-bar .you::before { border-radius: 4px; }
+@media (max-width: 719px) { .tzc-bar { margin-top: 12px; height: auto; } }
+@media (forced-colors: active) {
+  .tzc-bar i::before { forced-color-adjust: none; background: Canvas; border: 1px solid CanvasText; }
+  .tzc-bar i.you::before { background: Highlight; }
+}
+
+/* Hero: the AI line is a quiet text link (one loud moment: the two buttons); phones drop it (nav and the AI section carry it) */
+.ai-chip { background: none; padding: 0; min-height: 44px; color: var(--muted); font-weight: 500; gap: 6px; }
+.ai-chip:hover { background: none; color: var(--accent); text-decoration: underline; }
+.hero .micro { margin-top: 8px; }
+@media (max-width: 599px) { .hero .micro { display: none; } }
+.hero { padding-bottom: clamp(24px, 3vw, 32px); }
+
+/* The vision line heads the three steps: they are how that one place fills up */
+.how-t { text-align: center; font-size: clamp(34px, 4.4vw, 56px); letter-spacing: -0.04em; line-height: 1.04; font-weight: 700; text-wrap: balance; margin: 0 auto clamp(4px, 1vw, 12px); max-width: 18ch; }
+.how-t span { color: var(--accent); }
+.close-end { padding: clamp(40px, 6vw, 88px) 0 clamp(56px, 7vw, 104px); }
+.close-end .close-sub { margin-top: 14px; font-size: 16px; }
+
+/* Scan: the total and the buttons are there from the start, muted, so the card is never half empty */
+.scan:not(.is-done) .so-total span { visibility: visible; }
+.scan:not(.is-done) .so-total b { visibility: visible; color: transparent; position: relative; }
+.scan:not(.is-done) .so-total b::after { content: '—'; position: absolute; left: 0; color: var(--faint, #9aa3b2); }
+.scan:not(.is-done) .so-split { visibility: visible; opacity: .4; pointer-events: none; }
+.so-split { transition: opacity .3s var(--ease); }
+
+/* Home ledger: the four rows that make the month, then one folded line that closes the sum */
+.ledger.by-payer .lg-list > .lg-row:not(.lg-item) { display: grid !important; }
+.lg-restline { border-bottom: 1px solid var(--divider); }
+.lg-rest { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 48px; padding: 6px 0 6px 52px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
+.lg-rest span { min-width: 0; }
+.lg-rest small { display: block; font-size: 13px; color: var(--muted); }
+.lg-rest b { color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+.lg-rest:hover span { color: var(--accent); }
+.lg-who { color: inherit; font-weight: inherit; }
+@media (max-width: 879px) {
+  /* rows open the list below them: a down chevron, not a "go to page" one */
+  .lg-pay::after { transform: rotate(45deg); margin-top: -4px; }
+  .lg-pay[aria-pressed='true']::after { transform: rotate(225deg); margin-top: 4px; }
+  /* one divider between the who-paid rows and the search */
+  .ledger.compact > .lg-sum-pay .lg-pays li:last-child { border-bottom: 0; }
+}
+
+/* Split: the hint goes once used (the tapped line is held in place by split-demo.js); a refusal speaks on its own line */
+.split.touched .sp-hint { display: none; }
+.sp-method.sp-refuse { color: var(--amber); font-weight: 600; }
+.sp-row.nope { animation: nope .18s; }
+@keyframes nope { 33% { transform: translateX(-3px); } 66% { transform: translateX(3px); } }
+@media (prefers-reduced-motion: reduce) { .sp-row.nope { animation: none; } }
+
+/* Rent field: the whole 44px box is the input */
+.money-in-field { display: flex; align-items: center; min-height: 44px; cursor: text; font-weight: 500; }
+.money-in-field input { align-self: stretch; min-height: 42px; padding-block: 0; }
+
+/* Wide screens: the copy rides beside the tall card instead of leaving an empty column */
+@media (min-width: 1024px) {
+  .sc-hero-demo .wrap > .sc-copy { position: sticky; top: 112px; align-self: start; }
+  .rent-bal { position: sticky; top: 112px; align-self: start; }
+}
+
+/* Trips, phones: "Tax and tip" and its switch on one row, no box */
+@media (max-width: 419px) {
+  .sp-tip { flex-wrap: nowrap; border: 0; padding: 0; font-size: 13px; }
+  .sp-tip .seg button { font-size: 13px; padding-inline: 10px; }
+}
+/* Recurring, phones: the amount stays in the right column, like desktop */
+@media (max-width: 480px) {
+  .up-row { grid-template-columns: 44px minmax(0, 1fr) auto; }
+  .up-r { grid-column: 3; justify-items: end; grid-auto-flow: row; gap: 4px; }
+}
+@media (max-width: 359px) { .up-r { grid-auto-flow: row !important; justify-items: end; } }
+
+/* 44px targets everywhere */
+.nav-links a, .nav-login { min-height: 44px; display: inline-flex; align-items: center; }
+.foot nav a { display: inline-flex; align-items: center; min-height: 44px; line-height: 1.2; }
+.foot-h { margin-bottom: 0; }
+.tzc-bar i:not(.you) { color: var(--muted); }
+.how-t + .verb { padding-top: clamp(28px, 4vw, 56px); }
+
+/* ===================== Round 11 ===================== */
+/* Hero: "Owed to you" opens to who owes what */
+button.tzc-owe { width: 100%; border: 0; font: inherit; font-size: 15px; font-weight: 500; text-align: left; cursor: pointer; }
+button.tzc-owe b { margin-left: auto; }
+.tzc-chev { flex: none; width: 7px; height: 7px; margin: -3px 2px 0 2px; border-right: 1.6px solid currentColor; border-bottom: 1.6px solid currentColor; transform: rotate(45deg); transition: transform .2s var(--ease); }
+.tzc-owe[aria-expanded='true'] .tzc-chev { transform: rotate(-135deg); margin-top: 3px; }
+button.tzc-owe:hover { background: #d1fae5; }
+button.tzc-owe:focus-visible { box-shadow: var(--focus-ring); }
+.tzc-who { padding: 6px 14px 2px; }
+.tzc-who ul { margin: 0; padding: 0; list-style: none; }
+.tzc-who li { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 15px; color: var(--text); }
+.tzc-who li b { margin-left: auto; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tzc-who .av-sm { width: 24px; height: 24px; font-size: 11px; }
+.tzc-who p { margin-top: 4px; font-size: 14px; color: var(--muted); }
+
+/* Hero: the AI link shows on phones too (it is the only AI pointer above the fold) */
+@media (max-width: 599px) { .hero .micro { display: block; margin-top: 4px; } }
+/* Phone nav: brand, Log in, Sign up (Roommates is under "Rent too" and in the footer) */
+@media (max-width: 599px) { .nav-links .nav-rm { display: none; } }
+
+/* The vision line over the steps: solid ink, no second accent */
+.how-t { color: var(--ink); max-width: none; }
+
+/* Close: the thesis once more, then the buttons; half the old air */
+.close-end { padding: clamp(32px, 4vw, 56px) 0 clamp(40px, 5vw, 64px); }
+.close-h { font-size: clamp(26px, 2.6vw, 36px); letter-spacing: -0.03em; line-height: 1.1; font-weight: 700; color: var(--ink); margin: 0 auto 22px; text-wrap: balance; }
+@media (max-width: 480px) { .close .cta-row .c-btn { max-width: none; } }
+
+/* Scan: the subtotal and tax are back, so the listed items visibly add up to the total;
+   the check chip waits for the total */
+.so-sum { display: block; }
+.scan:not(.is-done) .so-checks { visibility: hidden; }
+@media (min-width: 720px) { .verb-demo .scan-stage { height: 400px; } }
+/* picker: just the store names, two equal tabs */
+.pick small { display: none; }
+@media (max-width: 719px) {
+  .scan.no-own .scan-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .scan.no-own .pick { padding: 6px 16px 6px 10px; justify-content: flex-start; gap: 10px; }
+}
+@media (max-width: 419px) { .scan.no-own .pick { justify-content: center; padding-inline: 16px; } }
+
+/* Split and ledger sit on the canvas (the scan keeps its frame around the receipt) */
+#split .demo-frame, #understand .demo-frame { border: 0; box-shadow: none; border-radius: 0; padding: 0; background: none; }
+.verb-copy { margin-bottom: clamp(16px, 2vw, 24px); }
+
+/* Ledger: who-paid rows are a label and an amount; the row "See your share" points at lights up once */
+.lg-pk small { display: none; }
+.lg-row.flash { animation: lgflash 2s var(--ease); border-radius: 10px; }
+@keyframes lgflash { 0%, 40% { background: var(--accent-soft); box-shadow: 0 0 0 6px var(--accent-soft); } 100% { background: transparent; box-shadow: 0 0 0 6px transparent; } }
+@media (prefers-reduced-motion: reduce) { .lg-row.flash { animation: none; background: var(--accent-soft); } }
+
+/* Chat: a loading ring with a visible track (it read as a stray ")") */
+.msg.tool:not(.done) .tl-s { width: 14px; height: 14px; border: 2px solid var(--line, #e3e7ee); border-top-color: var(--accent); }
+
+/* Footer: tighter rows on desktop; three columns on phones */
+@media (min-width: 721px) { .foot nav a { min-height: 32px; } }
+@media (max-width: 720px) {
+  .foot nav { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; }
+  .foot nav a { font-size: 14px; min-height: 40px; }
+}
+
+/* Roommates: rent and the apartment balance are the hero (home already plays the grocery split) */
+.rm-hero .bal { margin-top: 20px; }
+@media (min-width: 1000px) {
+  .rm-hero .wrap { grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); grid-template-rows: min-content 1fr; grid-template-areas: 'copy card' 'bal card'; column-gap: 56px; }
+  .rm-hero.sc-hero-demo .wrap > .sc-copy { grid-area: copy; position: static; }
+  .rm-hero.sc-hero-demo .wrap > .sc-side { grid-area: card; }
+  .rm-hero.sc-hero-demo .wrap > .rent-bal { grid-area: bal; position: sticky; top: 96px; align-self: start; }
+  .rm-hero .bal { margin-top: 28px; }
+}
+@media (max-width: 999px) { .rm-hero .sc-side { margin-top: 24px; } }
+/* phones: the check chip sits beside the total (the subtotal line took that row's space) */
+@media (max-width: 480px) {
+  .so-foot { column-gap: 8px; }
+  .so-total { gap: 8px; }
+  .so-total b { font-size: 24px; }
+  .so-foot .so-checks li { font-size: 13px; padding: 2px 8px 2px 5px; }
+  .so-sum { margin-top: 6px; }
+}
+.close-sub { text-wrap: balance; }
+@media (min-width: 1000px) { .rm-hero h1 { font-size: clamp(40px, 3.4vw, 50px); } }
+/* no-shift reserves, re-measured for round 11 (first sample's finished height, smallest per range, 320-1440):
+   the scan gained its subtotal line, the split and ledger lost their frame, the phone chat keeps its consent turns */
+.verb-demo #scan-demo { min-height: 765px; }
+.verb-demo #split-demo { min-height: 697px; }
+.verb-demo #ledger-demo { min-height: 660px; }
+#chat-demo { min-height: 669px; }
+@media (min-width: 480px) { .verb-demo #split-demo { min-height: 673px; } #chat-demo { min-height: 701px; } }
+@media (min-width: 600px) { .verb-demo #scan-demo { min-height: 722px; } }
+@media (min-width: 640px) { #chat-demo { min-height: 709px; } }
+@media (min-width: 720px) { .verb-demo #scan-demo { min-height: 612px; } }
+@media (min-width: 860px) { .verb-demo #split-demo { min-height: 460px; } }
+@media (min-width: 880px) { .verb-demo #ledger-demo { min-height: 358px; } }
+@media (min-width: 1000px) { .verb-demo #scan-demo { min-height: 535px; } }
+.verb-demo #ledger-demo.ledger { min-height: 0; }
+.ai-hero-demo#chat-demo { min-height: 669px; }
+@media (min-width: 480px) { .ai-hero-demo#chat-demo { min-height: 701px; } }
+.how-t { font-size: clamp(30px, 3.6vw, 48px); }

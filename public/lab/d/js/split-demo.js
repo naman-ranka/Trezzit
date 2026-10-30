@@ -4,7 +4,7 @@ import { getWorld, getSample, PEOPLE, itemName, splitWith } from './world.js';
 
 // Four curated rows are the demo; the rest of the receipt is one quiet line, never a wall of avatars.
 const BILLS = {
-  'green-basket': { payer: 'you', group: 'Flat 3B', thumb: 'assets/thumb-green-basket.webp', photo: 'assets/receipt-green-basket.webp', order: [13, 9, 10, 11, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8], visible: 4 },
+  'green-basket': { payer: 'you', group: 'Flatmates', thumb: 'assets/thumb-green-basket.webp', photo: 'assets/receipt-green-basket.webp', order: [13, 9, 10, 11, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8], visible: 4 },
   'taqueria-sol': { payer: 'alex', group: 'Dinner crew', thumb: 'assets/thumb-taqueria.webp', order: [0, 1, 2, 3, 4, 5, 6], visible: 7 },
 };
 // The same rows up front at every width (so "10 more items" never changes with the screen).
@@ -35,14 +35,19 @@ export async function initSplit() {
       One owner needs no line: the filled avatar and the price already say it. */
   function metaFor(it) {
     const ids = Object.keys(it.shares).filter((k) => it.shares[k]);
-    if (ids.length < 2) return '';
+    // A taxed line's price includes its tax, so it never disagrees with the shelf price on the photo.
+    const tax = it.taxCents ? ' · incl. tax' : '';
+    // One owner: a short "Yours" / "Maya’s", so every row keeps the same two lines on phones.
+    if (ids.length < 2) return `${ids[0] === 'you' ? 'Yours' : `${PEOPLE[ids[0]].name}’s`}${tax}`;
     const all = state.s.people.length;
     const nm = (k) => (k === 'you' ? 'You' : PEOPLE[k].name);
     const vals = ids.map((k) => it.shares[k]);
     const same = vals.every((v) => v === vals[0]);
-    if (ids.length === all && same) return `${all} ways · ${money(vals[0])} each`;
-    return same ? `${ids.map(nm).join(', ')} · ${money(vals[0])} each` : `${ids.map(nm).join(', ')} · ${vals.map((v) => money(v)).join(' · ')}`;
+    if (ids.length === all && same) return `${all} ways · ${money(vals[0])} each${tax}`;
+    return (same ? `${ids.map(nm).join(', ')} · ${money(vals[0])} each` : `${ids.map(nm).join(', ')} · ${vals.map((v) => money(v)).join(' · ')}`) + tax;
   }
+
+  const solo = (it) => Object.keys(it.shares).filter((k) => it.shares[k]).length < 2;
 
   function render() {
     const r = compute();
@@ -56,13 +61,13 @@ export async function initSplit() {
         const P = PEOPLE[p]; const on = state.sets[i].has(p);
         return `<button type="button" tabindex="${k ? -1 : 0}" aria-pressed="${on}" data-i="${i}" data-p="${p}" aria-label="${esc(P.name)}"><span style="--c:${P.color}">${p === 'you' ? 'You' : P.initials}</span></button>`;
       }).join('');
-      return `<div class="sitem" data-row="${i}"><span class="nm">${esc(itemName(it.name))}</span><span class="pr money">${money(it.totalCents)}</span><span class="meta" data-meta="${i}">${esc(metaFor(it))}</span><span class="who" role="toolbar" aria-label="Who shares ${esc(itemName(it.name))}">${chips}</span></div>`;
+      return `<div class="sitem" data-row="${i}"><span class="nm">${esc(itemName(it.name))}</span><span class="pr money">${money(it.totalCents)}</span><span class="meta${solo(it) ? ' solo' : ''}" data-meta="${i}">${esc(metaFor(it))}</span><span class="who" role="toolbar" aria-label="Who shares ${esc(itemName(it.name))}">${chips}</span></div>`;
     }).join('');
     const tip = r.items.find((x) => x.itemType === 'Tip');
     const tipRow = tip ? `<div class="sitem extra"><span class="nm">Tip</span><span class="pr money">${money(tip.totalCents)}</span><span class="meta" data-meta="tip">${esc(tipMeta(tip))}</span></div>` : '';
     // The scan is where the rows came from: the receipt heads the list, and its photo opens.
     const nItems = r.items.filter((x) => x.itemType !== 'Tip').length;
-    const head = `<div class="split-head"><img src="${cfg.thumb}" alt="" width="40" height="58"><span class="t"><b>${esc(s.title)}</b><span>Scanned · ${nItems} items</span></span>${cfg.photo ? `<button class="rcpt-btn" type="button" data-photo aria-haspopup="dialog">Receipt</button>` : ''}</div>`;
+    const head = `<div class="split-head"><img src="${cfg.thumb}" alt="" width="40" height="58"><span class="t"><b>${esc(s.title)}</b><span>Scanned · ${nItems} items</span></span><button class="reset-link" type="button" data-split-reset>Reset</button>${cfg.photo ? `<button class="rcpt-btn" type="button" data-photo aria-haspopup="dialog">Receipt</button>` : ''}</div>`;
 
     const payer = cfg.payer;
     // "Owes you" is said once, as a label over the people who owe the payer.
@@ -102,7 +107,7 @@ export async function initSplit() {
     const r = compute();
     r.items.forEach((it) => {
       const m = $(`[data-meta="${it.itemType === 'Tip' ? 'tip' : it.index}"]`, host);
-      if (m) m.textContent = it.itemType === 'Tip' ? tipMeta(it) : metaFor(it);
+      if (m) { m.textContent = it.itemType === 'Tip' ? tipMeta(it) : metaFor(it); if (it.itemType !== 'Tip') m.classList.toggle('solo', solo(it)); }
     });
     state.s.people.forEach((p) => {
       tweenMoney($(`[data-amt="${p}"]`, host), r.people[p].cents);
@@ -136,7 +141,7 @@ export async function initSplit() {
   host.addEventListener('click', (e) => {
     const ph = e.target.closest('[data-photo]');
     if (ph) { showPhoto(ph); return; }
-    if (e.target.closest('[data-split-reset]')) { load(state.id); publish(compute()); $('[data-split-reset]', host)?.focus(); return; }
+    if (e.target.closest('[data-split-reset]')) { load(state.id); publish(compute()); $$('[data-split-reset]', host).find((x) => x.offsetParent)?.focus(); return; }
     const b = e.target.closest('button[data-p]');
     if (!b) return;
     $$('button', b.parentElement).forEach((x) => { x.tabIndex = x === b ? 0 : -1; });

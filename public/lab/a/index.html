@@ -25,17 +25,8 @@
   })();
 </script>
 <link rel="modulepreload" href="./js/util.js">
-<link rel="modulepreload" href="./js/data.js">
-<link rel="modulepreload" href="./js/scan-demo.js">
-<link rel="modulepreload" href="./js/story.js">
 <link rel="modulepreload" href="./js/hero.js">
-<link rel="modulepreload" href="./js/scenarios.js">
-<link rel="modulepreload" href="./js/chat.js">
-<link rel="modulepreload" href="./js/ledger.js">
-<link rel="modulepreload" href="./js/balances.js">
-<link rel="modulepreload" href="../_kit/split-engine.js">
-<link rel="modulepreload" href="../_kit/receipts.js">
-<link rel="modulepreload" href="../_kit/scan-client.js">
+<link rel="modulepreload" href="./js/scan-demo.js">
 <script type="module" src="./js/main.js"></script>
 </head>
 <body>
@@ -72,7 +63,7 @@
         <a class="btn btn-primary btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
         <a class="btn btn-quiet btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>
       </div>
-      <p class="micro">Free. No bank login.</p>
+      <p class="micro"><span>Free. No bank login.</span><span>Works with Claude and ChatGPT.</span></p>
     </div>
 
     <figure class="hero-visual" id="hero-visual">
@@ -146,33 +137,31 @@
 <section class="sec sec-scen" id="scenarios" aria-labelledby="scen-title">
   <div class="wrap">
     <header class="sec-head sec-head-c" data-reveal>
-      <h2 id="scen-title" class="h2">Every item. Every balance.</h2>
+      <h2 id="scen-title" class="h2">Everything you spent.<br> <span class="h2-2">Alone or shared.</span></h2>
     </header>
 
-    <!-- the vision, live: your month in one card (shared, monthly, personal; only your share counts), and the total is
-         exactly its rows. Each row says what it was by item or category. The receipt you just split lands in it with
-         whatever share you gave yourself above; the search filters this same card down to items, all time, with their sum. -->
+    <!-- the vision, live: your month in one card. Every receipt on this page lands here (only your share counts), each row
+         says whether it was just you or shared, and the total is exactly its rows. The receipt you split above follows
+         your taps; the search filters this same card down to items, all time, with their sum. -->
     <figure class="ledger-fig" data-reveal>
       <div class="month" id="month">
         <p class="m-k">You spent in October</p>
-        <p class="m-v money" id="m-total">$648.90</p>
+        <p class="m-v money" id="m-total">$744.60</p>
         <div class="search-demo" id="search-demo">
           <label class="sd-input"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13.2 13.2L17 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="visually-hidden">Search every item</span>
             <input type="search" placeholder="Search every item" autocomplete="off" spellcheck="false"></label>
         </div>
         <ul class="m-rows" id="m-rows" role="list">
-          <li class="m-row"><span class="m-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6.5 8 6.5M6.5 9.5V20h11V9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span class="m-t">Rent<small>Repeats monthly</small></span><span class="m-a"><strong class="money">$600.00</strong><small class="money">of $2,400.00</small></span></li>
-          <li class="m-row"><span class="m-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8zM8.5 9l3-5m4 5l-3-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span class="m-t">Farmers market<small>Groceries · Maya paid</small></span><span class="m-a"><strong class="money">$9.20</strong><small class="money">of $32.25</small></span></li>
-          <li class="m-row"><span class="m-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10h12v4a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5zM17 11h1.5a2.5 2.5 0 0 1 0 5H17M8 4.5v2.5M11.5 4.5v2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span class="m-t">Corner Café<small>Oat milk latte, croissant</small></span><span class="m-a"><strong class="money">$9.70</strong></span></li>
           <li class="m-row m-new" id="m-gb"><span class="m-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8zM8.5 9l3-5m4 5l-3-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span class="m-t">Green Basket Market<small class="m-cats" id="m-gb-cats"><span>Groceries $22.00</span><i> · </i><span>Household $8.00</span></small></span><span class="m-a"><strong class="money" id="m-gb-v">$30.00</strong><small class="money">of $100.00</small></span></li>
+            <span class="m-t">Green Basket Market<small><b class="m-who">Shared</b><i> · </i><span class="m-cats" id="m-gb-cats"><span>Groceries $22.00</span><i> · </i><span>Household $8.00</span></span></small></span><span class="m-a"><strong class="money" id="m-gb-v">$30.00</strong><small class="money">of $100.00</small></span></li>
+          <li class="m-row"><span class="m-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3h4v3.2l1.6 2.3a2 2 0 0 1 .4 1.2V19a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9.7a2 2 0 0 1 .4-1.2L10 6.2zM8 13h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="m-t">Corner Pharmacy<small><b class="m-who">Just you</b><i> · </i>Sunscreen +5 items</small></span><span class="m-a"><strong class="money">$48.22</strong></span></li>
+          <li class="m-row"><span class="m-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v7a2 2 0 0 0 2 2v9M11 3v7a2 2 0 0 1-2 2M17 21V3c-2 1-3 3.5-3 7h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="m-t">Taqueria Sol<small><b class="m-who">Shared</b><i> · </i>Dinner, 3 ways</small></span><span class="m-a"><strong class="money">$27.03</strong><small class="money">of $84.87</small></span></li>
+          <li class="m-row"><span class="m-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6.5 8 6.5M6.5 9.5V20h11V9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="m-t">Rent &amp; bills<small><b class="m-who">Shared</b><i> · </i>Every month</small></span><span class="m-a"><strong class="money">$639.35</strong><small class="money">of $2,632.40</small></span></li>
         </ul>
         <ul class="m-rows m-hits" id="m-hits" role="list" hidden></ul>
-        <!-- the running balance across this month's shared bills (live from the split above), and settling it up -->
-        <div class="m-bal" id="m-bal"></div>
         <p class="visually-hidden" aria-live="polite" id="m-live"></p>
       </div>
     </figure>
@@ -187,7 +176,7 @@
     </header>
     <div class="chat-wrap" id="chat-root" data-reveal></div>
     <div class="ai-foot" data-reveal>
-      <p class="ai-trust"><span>No bank login</span><span>Asks before saving</span><span>Never moves money</span></p>
+      <p class="ai-trust"><span>No bank login</span><span>Every change in your activity log</span><span>Never moves money</span></p>
       <div class="ai-connect">
         <a class="btn btn-light btn-lg" href="/mcp#connect-claude">Connect to Claude</a>
         <a class="btn btn-light btn-lg" href="/mcp#connect-chatgpt">Connect to ChatGPT</a>

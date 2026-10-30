@@ -9,14 +9,13 @@ import { money, esc, avatar, ICON, listNames, reduced } from './util.js';
 
 const whole = (c) => (c % 100 === 0 ? money(c).replace(/\.00$/, '') : money(c));
 /**
- * Who pays what on one line, in words: "Just Maya", "$1.37 each",
- * "$3.28 each" (a penny left over, rounded), or names for a weighted split
- * ("You $600 · Maya $600 · Jordan $672 · Sam $528").
+ * Who pays what on a shared line, in words: "$1.37 each", "$3.28 each" (a penny left over,
+ * rounded), or names for a weighted split ("You $576 · Maya $624 · Jordan $672 · Sam $528").
+ * A line one person had says nothing: the one filled face already says it.
  */
 export const shareText = (shares, order) => {
   const ids = order.filter((id) => shares[id] !== undefined && shares[id] !== 0);
-  if (ids.length === 0) return '';
-  if (ids.length === 1) return ids[0] === 'you' ? 'Just you' : `Just ${PEOPLE[ids[0]].name}`;
+  if (ids.length <= 1) return '';
   const vals = ids.map((id) => shares[id]);
   const lo = Math.min(...vals);
   const hi = Math.max(...vals);
@@ -113,7 +112,7 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
         ? facesHTML(order, who, it.name)
         : (extra ? '' : `<span class="se-cat"><span class="dot" style="--c:${c.color}"></span>${esc(c.label)}</span>`);
       return `<li class="ss-item se-item${extra ? ' is-extra' : ''}" data-i="${extra ? '' : it.index}">
-        <span class="ss-name"><span>${esc(it.name)}</span><small class="se-each">${multi ? esc(shareText(it.shares, order)) : ''}</small></span>
+        <span class="ss-name"><span>${esc(it.name)}</span><small class="se-each${src?.note ? ' is-note' : ''}">${multi ? esc(noteOr(src, it, order)) : ''}</small></span>
         <span class="ss-who">${whoCell}</span>
         <span class="ss-price money">${money(it.totalCents)}</span>
       </li>`;
@@ -163,13 +162,10 @@ export function createSplitEditor(root, { compact = false, onChange, label = 'Sp
       const li = extra ? root.querySelectorAll('.se-item.is-extra')[0] : root.querySelector(`.se-item[data-i="${it.index}"]`);
       if (!li) return;
       const each = li.querySelector('.se-each');
-      const txt = order.length > 1 ? shareText(it.shares, order) : '';
+      const txt = order.length > 1 ? (extra ? shareText(it.shares, order) : noteOr(items[it.index], it, order)) : '';
       clearTimeout(Number(each.dataset.t || 0));
       each.classList.remove('is-warn');
-      if (each.textContent !== txt) {
-        each.textContent = txt;
-        each.classList.remove('flash'); void each.offsetWidth; each.classList.add('flash');
-      }
+      if (each.textContent !== txt) each.textContent = txt;
       if (!extra) {
         const who = splitPeople(items[it.index].split, order);
         li.querySelectorAll('.faces .av').forEach((b) => b.setAttribute('aria-pressed', String(who.includes(b.dataset.id))));
@@ -251,7 +247,11 @@ export function setMoney(node, cents) {
   const changed = node.dataset.cents !== String(cents);
   node.dataset.cents = String(cents);
   node.textContent = money(cents);
-  if (changed && !reduced()) { node.classList.remove('flash'); void node.offsetWidth; node.classList.add('flash'); }
+  if (changed && !reduced()) {
+    // the pill that changed takes the cue, not the lines
+    const pill = node.closest('.snap-people li') || node;
+    pill.classList.remove('flash'); void pill.offsetWidth; pill.classList.add('flash');
+  }
 }
 
 export function catBar(byCat) {
@@ -269,4 +269,6 @@ export function catList(byCat, { limit = 8 } = {}) {
 }
 
 export { listNames };
+/* A line with an agreed rule ("By room size") says the rule while everyone is still on it. */
+const noteOr = (src, it, order) => (src?.note && splitPeople(src.split, order).length === order.length ? src.note : shareText(it.shares, order));
 export const isExtra = (it) => it.isExtraCharge || it.itemType === 'Tip' || it.itemType === 'Fee' || it.itemType === 'Discount';

@@ -34,6 +34,7 @@
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.4-3 8-7 9.5-4-1.5-7-5.1-7-9.5V6z"/><path d="M9 12l2 2 4-4"/></symbol>
     <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10.6 5.6A9.6 9.6 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a16.5 16.5 0 0 1-2.6 3.4M6.6 6.7C3.9 8.4 2.5 12 2.5 12S6 18.5 12 18.5c1.9 0 3.5-.6 4.9-1.4M9.9 9.9a2.8 2.8 0 0 0 4.2 4.2M3.5 3.5l17 17"/></symbol>
     <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
     <symbol id="i-unplug" viewBox="0 0 24 24"><path d="M7 17l-3 3M17 7l3-3M9.5 9.5L8 8 5.5 10.5a3.5 3.5 0 0 0 0 5l3 3a3.5 3.5 0 0 0 5 0L16 16l-1.5-1.5M14.5 9.5L16 8M10.5 13.5L12 12"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
@@ -45,9 +46,9 @@
   <div class="wrap">
     <a class="brand" href="../" aria-label="Trezzit home"><img src="../../_kit/brand/trezzit-mark.svg" alt="" width="24" height="24">Trezzit</a>
     <nav class="main-nav" aria-label="Main">
-      <a class="nav-link show-sm nav-tour" href="../app/">Tour</a>
-      <a class="nav-link show-sm" href="../connect/" aria-current="page">Use with AI</a>
-      <a class="nav-link" href="https://app.trezzit.com/login">Log in</a>
+      <a class="nav-link nav-tour" href="../app/">See the app</a>
+      <a class="nav-link show-sm" href="../connect/" aria-current="page" aria-label="Use with AI"><span class="nav-long">Use with&nbsp;</span>AI</a>
+      <a class="nav-link show-sm" href="https://app.trezzit.com/login">Log in</a>
       <a class="btn btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
     </nav>
   </div>
@@ -59,10 +60,11 @@
     <div>
       <h1>Trezzit in Claude and ChatGPT.</h1>
       <p class="sub">Ask what you spent. Add what’s missing.</p>
+      <p class="url-label">Server URL</p>
       <div class="urlbox light"><code id="mcp-url">https://api.trezzit.com<wbr>/api/mcp</code><button type="button" data-copy="https://api.trezzit.com/api/mcp" aria-describedby="mcp-url"><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg><span>Copy</span></button></div>
     </div>
     <div class="setup">
-      <h2 id="c-h">Connect in a minute.</h2>
+      <h2 id="c-h">Connect it.</h2>
       <div class="seg" role="tablist" aria-label="AI app" data-tabs>
         <button type="button" role="tab" aria-selected="true" aria-controls="p-claude" id="b-claude">Claude</button>
         <button type="button" role="tab" aria-selected="false" aria-controls="p-chatgpt" id="b-chatgpt" tabindex="-1">ChatGPT</button>
@@ -71,7 +73,8 @@
       <div class="tabpanel" role="tabpanel" id="p-claude" aria-labelledby="b-claude">
         <ol class="steps-light">
           <li><span>In Claude, open <strong>Settings → Connectors</strong>.</span></li>
-          <li><span><strong>Add custom connector</strong> named Trezzit; paste the server URL.</span></li>
+          <li><span>Add a custom connector named <strong>Trezzit</strong>.</span></li>
+          <li><span>Paste the server URL.</span></li>
           <li><span>Sign in and select <strong>Allow access</strong>.</span></li>
           <li><span>Turn on Trezzit from a chat’s tools menu.</span></li>
         </ol>
@@ -101,11 +104,11 @@
 <section class="block" aria-labelledby="a-h">
   <div class="wrap">
     <h2 id="a-h">Then just ask.</h2>
-    <div class="block-body prompts">
-      <button class="prompt" type="button" data-copy="Here's the receipt. Split the towels four ways, the rest is mine."><q>Here's the receipt. Split the towels four ways, the rest is mine.</q><span class="pfoot"><span class="does"></span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button>
-      <button class="prompt" type="button" data-copy="What did I spend on groceries last month, personal and shared?"><q>What did I spend on groceries last month, personal and shared?</q><span class="pfoot"><span class="does"></span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button>
-      <button class="prompt" type="button" data-copy="Add our rent every month: by room, bills four ways, parking is Jordan's."><q>Add our rent every month: by room, bills four ways, parking is Jordan's.</q><span class="pfoot"><span class="does"></span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button>
-    </div>
+    <ul class="block-body prompts">
+      <li><button class="prompt" type="button" data-copy="Here's the receipt. Split the towels four ways, the rest is mine." aria-label="Copy prompt: Here's the receipt. Split the towels four ways, the rest is mine."><q>Here's the receipt. Split the towels four ways, the rest is mine.</q><span class="pfoot"><span class="does"></span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button><p class="pres">→ Towels $8.00 each, the rest yours</p></li>
+      <li><button class="prompt" type="button" data-copy="What did I spend on groceries last month, personal and shared?" aria-label="Copy prompt: What did I spend on groceries last month, personal and shared?"><q>What did I spend on groceries last month, personal and shared?</q><span class="pfoot"><span class="does"></span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button><p class="pres">→ $23.29, only your share</p></li>
+      <li><button class="prompt" type="button" data-copy="Add our rent every month: by room, bills four ways, parking is Jordan's." aria-label="Copy prompt: Add our rent every month: by room, bills four ways, parking is Jordan's."><q>Add our rent every month: by room, bills four ways, parking is Jordan's.</q><span class="pfoot"><span class="does"></span><svg class="i" aria-hidden="true"><use href="#i-copy"/></svg></span></button><p class="pres">→ Repeats on the 1st, your share $639.35</p></li>
+    </ul>
   </div>
 </section>
 
@@ -115,11 +118,12 @@
     <div class="block-body">
       <ul class="perm one">
         <li><svg class="i" aria-hidden="true"><use href="#i-shield"/></svg><span>Never moves money.</span></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-eye-off"/></svg><span>Never sees your chats.</span></li>
         <li><svg class="i" aria-hidden="true"><use href="#i-eye"/></svg><span>Reads your expenses, groups and balances.</span></li>
-        <li><svg class="i" aria-hidden="true"><use href="#i-list"/></svg><span>Adds expenses, settle-ups and recurring bills, each one in your activity.</span></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-list"/></svg><span>Adds expenses, settle-ups and recurring bills. Each shows in Activity.</span></li>
         <li><svg class="i" aria-hidden="true"><use href="#i-unplug"/></svg><span>Disconnect any time. <em>Profile → Connected AI apps.</em></span></li>
       </ul>
-      <p class="muted small perm-note">Can’t edit bills yet. Trezzit never sees your chats.</p>
+      <p class="muted small perm-note">To change a bill, edit it in the app.</p>
     </div>
   </div>
 </section>
@@ -132,7 +136,7 @@
       <span>Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a></span>
     </div>
     <nav aria-label="Footer">
-      <a href="../app/">Tour</a>
+      <a href="../app/">See the app</a>
       <a href="../connect/">Use with AI</a>
       <a href="https://app.trezzit.com/login">Log in</a>
       <a href="/privacy">Privacy</a>

@@ -1,11 +1,11 @@
-/* roommates page: the grocery split, then the rent, then one running balance for the apartment.
- * The balance is computed live from both demos (plus this month's Netflix and pizza night),
- * the way a roommate reads it: per person, netted, from your side. */
+/* roommates page: the rent demo leads (home already plays the grocery split), beside one running
+ * balance for the apartment. The balance is computed live from the rent card, plus this month's
+ * groceries (home's default split, from the kit engine), Netflix and pizza night: per person, from your side. */
 import { initPage } from './page.js';
-import { mountSplit } from './split-demo.js';
 import { mountRent } from './rent-demo.js';
 import { distributeEqually } from '../../_kit/split-engine.js';
-import { PEOPLE } from './data.js';
+import { PEOPLE, getSample, sampleBill } from './data.js';
+import { splitSample } from '../../_kit/receipts.js';
 import { money, countMoney } from './util.js';
 
 initPage();
@@ -52,12 +52,11 @@ function renderBalance() {
   });
 }
 
-mountSplit(document.getElementById('split-demo'), {
-  sampleId: 'green-basket', yours: false,
-  onChange: (r, st) => {
-    groc = { name: 'Groceries', payer: st.payer, shares: Object.fromEntries(ROOM.map((p) => [p, r.people[p]?.cents || 0])) };
-    renderBalance();
-  },
+// the Green Basket run as home splits it by default (you paid; the same $30 / $30 / $20 / $20)
+sampleBill('green-basket').then(({ bill }) => {
+  const r = splitSample(getSample('green-basket'), bill);
+  groc = { name: 'Groceries', payer: 'you', shares: Object.fromEntries(ROOM.map((p) => [p, r.people[p]?.cents || 0])) };
+  renderBalance();
 });
 mountRent(document.getElementById('rent-demo'), {
   compact: true,

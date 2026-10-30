@@ -21,7 +21,7 @@ function splitCard(w) {
   const b = gbOf(w);
   const you = b.split.people.you;
   const cats = Object.entries(you.byCategory).map(([id, cents]) => ({ cents, ...catOf(id) })).sort((a, b) => b.cents - a.cents);
-  return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Green Basket Market</b><span>Oct 24 · Flat 3B · you paid</span></span>${faces(Object.keys(b.split.people))}</div>
+  return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Green Basket Market</b><span>Oct 24 · you paid</span></span>${faces(Object.keys(b.split.people))}</div>
     <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v money">${money(-b.totalCents)}</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">${money(you.cents)}</span></div></div>
     ${legend(cats)}</div>`;
 }
@@ -36,8 +36,9 @@ function octoberCard(w) {
 
 function rentCard(w) {
   const r = w.scans['monthly-rent'].split;
-  return `<div class="tcard"><div class="tcard-head"><span class="rec-icon" style="width:28px;height:28px;border-radius:8px">${icon('repeat')}</span><span class="t"><b>Rent &amp; bills</b><span>Monthly on the 1st</span></span></div>
-    <div class="versus" style="margin-bottom:0"><div class="bank plain"><span class="lbl">Each month</span><span class="v money">${money(r.totalCents)}</span></div><div class="mine"><span class="lbl">Your share</span><span class="v money">${money(r.people.you.cents)}</span></div></div></div>`;
+  return `<div class="tcard"><div class="tcard-head"><span class="rec-icon" style="width:28px;height:28px;border-radius:8px">${icon('repeat')}</span><span class="t"><b>Rent &amp; bills</b><span>Flatmates · starts Nov 1</span></span></div>
+    <div class="versus"><div class="bank plain"><span class="lbl">Total</span><span class="v money">${money(r.totalCents)}</span></div><div class="mine"><span class="lbl">Your share</span><span class="v money">${money(r.people.you.cents)}</span></div></div>
+    <div class="legend"><span>Rent by room</span><span>Bills 4 ways</span><span>Parking: Jordan</span></div></div>`;
 }
 
 function towelsCard(w) {
@@ -54,8 +55,8 @@ function dinnerCard(w) {
   const b = dinnerOf(w);
   const you = b.split.people.you;
   const cats = Object.entries(you.byCategory).map(([id, cents]) => ({ cents, ...catOf(id) })).sort((a, b) => b.cents - a.cents);
-  return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Taqueria Sol</b><span>${b.date} · ${esc(b.group)} · ${esc(PEOPLE[b.payer].name)} paid ${money(b.totalCents)}</span></span></div>
-    <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v">Nothing</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">${money(you.cents)}</span></div></div>
+  return `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>Taqueria Sol</b><span>${b.date} · ${esc(b.group)}</span></span></div>
+    <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v money">$0.00</span><small class="vsub">${esc(PEOPLE[b.payer].name)} paid ${money(b.totalCents)}</small></div><div class="mine"><span class="lbl">You spent</span><span class="v money">${money(you.cents)}</span></div></div>
     ${legend(cats)}</div>`;
 }
 
@@ -118,7 +119,7 @@ export function scripts(w) {
     // The page opens on this one (static HTML in index.html): a read question that always works.
     spent: [
       { t: 'user', text: 'What did I spend at Green Basket?' },
-      { t: 'tool', run: 'Looking it up', done: '14 items, split 4 ways', ms: 900 },
+      { t: 'tool', run: 'Looking it up', done: 'Read 14 items', ms: 900 },
       { t: 'card', html: splitCard },
       { t: 'ai', text: `Maya, Jordan and Sam owe you ${owed}.` },
     ],
@@ -150,9 +151,9 @@ export function scripts(w) {
     ],
     rent: [
       { t: 'user', text: 'Add our rent every month, split by room.' },
-      { t: 'tool', run: 'Setting up the schedule', done: 'Saved', ms: 700 },
+      { t: 'tool', run: 'Setting up the schedule', done: 'Monthly on the 1st', ms: 700 },
       { t: 'card', html: rentCard },
-      { t: 'ai', text: 'Done. Each month it waits for you to confirm.' },
+      { t: 'ai', text: 'Done. You confirm each month.' },
     ],
     towels: [
       { t: 'user', text: 'What did the hand towels cost me?' },
@@ -212,7 +213,7 @@ function evenSplit(q, s, amt, n, named) {
     .replace(FILLER, ' ').replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim()).slice(0, 28) || 'Shared expense';
   const inFlat = others && others.every((k) => flat.includes(k));
   const ids = others ? ['you', ...others] : null;
-  const card = () => `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>${esc(label)}</b><span>${inFlat ? 'Flat 3B · ' : ''}you paid · split ${count} ways</span></span>${ids ? faces(ids) : ''}</div>
+  const card = () => `<div class="tcard"><div class="tcard-head">${tmark()}<span class="t"><b>${esc(label)}</b><span>${inFlat ? 'Flatmates · ' : ''}you paid · split ${count} ways</span></span>${ids ? faces(ids) : ''}</div>
     <div class="versus" style="margin-bottom:0"><div class="bank"><span class="lbl">Your bank</span><span class="v money">${money(-cents)}</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money">${money(shares[0])}</span></div></div></div>`;
   const whoOwes = others ? `${who(others)} ${others.length === 1 ? 'owes' : 'owe'} you` : `The other ${count - 1} owe you`;
   return [user, { t: 'tool', run: 'Saving', done: `${money(cents)} · ${count} ways`, ms: 500 }, { t: 'card', html: card }, { t: 'ai', text: `Saved. ${whoOwes} ${money(owedC)}.` }];
@@ -231,8 +232,19 @@ export function answer(q, w) {
     return [{ t: 'user', text: q }, { t: 'ai', text: 'Trezzit keeps every item you buy, alone or shared, so you see what you actually spent. Use the app, or ask me.', link: ['connect/', 'Connect yours'] }];
   }
   // Trust and setup come first: they are what a new visitor asks, and none of them is an item search.
+  // Linking a bank is the first trust test a wary visitor types: say the promise, then what works instead.
+  if (!DOLLARS.test(s) && (/\b(plaid|chase|wells fargo|citi(bank)?|amex|capital one|bank of america|checking|savings)\b/.test(s)
+    || /\b(link|connect|sync|hook up|add)\b.*\b(bank|card|credit card|debit card)\b/.test(s) || /\bbank\b.*\b(link|connect|sync|login|log in)\b/.test(s)
+    || /\blink\b.*\baccount\b/.test(s))) {
+    return [{ t: 'user', text: q }, { t: 'ai', text: 'Trezzit never connects to your bank. Drop in a statement and I’ll find what’s missing.', suggest: ['Is my statement all in?'] }];
+  }
+  if (/\bstatement\b/.test(s)) {
+    const deli = w.bills.find((b) => b.byAI);
+    return say(`All ${w.bank.length} payments are in Trezzit. ${deli.title}, ${money(deli.totalCents)} on ${deli.date}, was the one I added.`,
+      { t: 'tool', run: 'Checking your statement', done: `Checked ${w.bank.length} payments`, ms: 700 });
+  }
   if (/\b(connect|set ?up|install|add|use)\b.*\b(claude|chatgpt|ai)\b|\bhow do i (use|get|start|connect|set)\b/.test(s) && !DOLLARS.test(s)) {
-    return [{ t: 'user', text: q }, { t: 'ai', text: 'Copy one URL into Claude or ChatGPT. Takes a minute.', link: ['connect/', 'Connect'] }];
+    return [{ t: 'user', text: q }, { t: 'ai', text: 'Copy one URL into Claude or ChatGPT.', link: ['connect/', 'Connect'] }];
   }
   if (/\bmov(e|es|ing)\b.*\bmoney\b|\bmakes? payments?\b/.test(s)) return say('Never. Trezzit records expenses and settle-ups; it can’t move money.');
   if (/\bwhat can (you|it|trezzit) (see|access|read)\b|\b(see|access|read)\b.*\b(my|data)\b|\bprivate\b|\bprivacy\b|\bsafe\b|\bsecure\b/.test(s) && !/\b(receipt|spen[dt]|owe|bank)\b/.test(s)) {
@@ -241,14 +253,14 @@ export function answer(q, w) {
   if (/\b(send|transfer|venmo|zelle|paypal|wire)\b|\bpay\s+(back|him|her|them|maya|jordan|sam|alex|priya|my|a\s+friend)\b/.test(s)) {
     return say('Trezzit never moves money. When you pay someone back elsewhere, I can record it, so your balances stay right.');
   }
-  if (/budget/.test(s)) return say('Trezzit doesn’t set budgets. It shows what you actually spent, item by item, alone or shared.');
+  if (/budget/.test(s)) return say('Trezzit doesn’t do budgets. It shows what you actually spent, item by item.');
   if (/\bbank\b.*\b(link|connect|sync|login)|\b(link|connect|sync)\b.*\bbank\b/.test(s)) return say('Trezzit never logs in to your bank. You add receipts and bills, or ask me to.');
   if (/\bbank\b/.test(s) && /\b(balance|account|statement|money)\b/.test(s)) return say('Trezzit doesn’t see your bank. It knows what you’ve recorded. Ask who owes you, or what you spent in October.');
   if (/\b(delete|remove|undo|erase)\b/.test(s)) return say('I can only delete a bill I added in the last 30 minutes. Everything else, delete in the app.');
 
   // Who owes whom, or what a friend paid: answered from the balances, never from item names.
   if (/\b(owe|owes|owed|owing|balance|balances|settle|even)\b/.test(s) || (named.length && /\b(pay|paid|pays)\b/.test(s))) {
-    const tool = { t: 'tool', run: 'Checking balances', done: 'Balances across your groups', ms: 500 };
+    const tool = { t: 'tool', run: 'Checking balances', done: 'Balances · rent settled', ms: 500 };
     // Say the direction the way it was asked: "do I owe Maya?" gets "You don't owe Maya." first.
     const asksIOwe = /\b(i|do i|did i|should i|we)\s+owe\b|\bowe\s+(maya|jordan|sam|alex|priya)\b/.test(s);
     const asksOweMe = /\bowes?\s+(me|us)\b/.test(s);
@@ -377,7 +389,7 @@ class Player {
     this.ctl?.addEventListener('click', () => this.onCtl());
     this.chipBox?.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (c) { this.touched = true; this.useChip(c); } });
     // Suggestions inside an answer ask their question when tapped.
-    this.log.addEventListener('click', (e) => { const c = e.target.closest('.sugg .chip'); if (c) { this.touched = true; this.run(null, answer(c.dataset.ask, this.w)); } });
+    this.log.addEventListener('click', (e) => { const c = e.target.closest('.sugg .chip'); if (c) { this.touched = true; this.retire(c.dataset.ask); this.run(null, answer(c.dataset.ask, this.w)); } });
     const form = $('[data-chat-form]', root);
     if (form) form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -385,11 +397,8 @@ class Player {
       this.touched = true;
       if (!q) return;
       input.value = '';
-      const steps = answer(q, this.w);
-      // The first typed answer ends with the way to get this for real.
-      const last = steps[steps.length - 1];
-      if (!this.linked && last?.t === 'ai' && !last.suggest) { this.linked = true; if (!last.link) steps[steps.length - 1] = { ...last, link: ['connect/', 'Connect yours'] }; }
-      this.run(null, steps);
+      this.retire(q);
+      this.run(null, answer(q, this.w));
     });
     this.setCtl('replay');
     // The top fade only appears once something has scrolled under it, so a first line is never dimmed.
@@ -404,9 +413,16 @@ class Player {
     }
   }
 
-  useChip(c) {
-    const steps = c.dataset.script ? this.s[c.dataset.script] : answer(c.dataset.ask, this.w);
-    const id = c.dataset.script || null;
+  /** A question you typed is never offered back to you as a chip. */
+  retire(q) {
+    const key = (t) => t.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+    const k = key(q);
+    this.pool = this.pool.filter((t) => key(t) !== k);
+    this.chipBox?.querySelectorAll('.chip').forEach((c) => { if (key(c.textContent) === k) this.swap(c); });
+  }
+
+  /** A chip that has been asked makes way for the next one in the pool. */
+  swap(c) {
     const had = document.activeElement === c;
     const next = this.pool.shift();
     if (next) {
@@ -418,6 +434,12 @@ class Player {
       c.remove();
       if (!this.chipBox.querySelector('.chip')) this.chipBox.hidden = true;
     }
+  }
+
+  useChip(c) {
+    const steps = c.dataset.script ? this.s[c.dataset.script] : answer(c.dataset.ask, this.w);
+    const id = c.dataset.script || null;
+    this.swap(c);
     this.run(id, steps);
   }
 
@@ -522,7 +544,8 @@ class Player {
     const card = after.find((el) => el.classList.contains('tcard'));
     const tool = after.find((el) => el.classList.contains('tool'));
     const ai = after.filter((el) => el.classList.contains('msg') && el.classList.contains('ai')).pop();
-    const gist = [card?.querySelector('.tcard-head .t b')?.textContent, tool?.querySelector('.res')?.textContent].filter(Boolean).join(', ');
+    const title = card?.querySelector('.tcard-head .t b')?.textContent; const res = tool?.querySelector('.res')?.textContent;
+    const gist = (title && res && res.toLowerCase().includes(title.toLowerCase()) ? [res] : [title, res]).filter(Boolean).join(', ');
     const end = ai ? [...ai.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim() : '';
     return [gist && `${gist}.`, end].filter(Boolean).join(' ');
   }
@@ -549,7 +572,7 @@ class Player {
       const last = log.lastElementChild;
       let top = max;
       if (this.anchor?.parentNode === log && last) {
-        const qTop = this.anchor.offsetTop - 10;
+        const qTop = this.anchor.offsetTop - (this.anchor.offsetTop > 30 ? 32 : 10);
         const end = last.offsetTop + last.offsetHeight + 12;
         top = end - qTop <= log.clientHeight ? Math.min(max, qTop) : end - log.clientHeight;
       }
@@ -591,46 +614,28 @@ class Player {
   }
 }
 
-/* ---------- the AI section: one exchange, played once ----------
-   The statement question is on the page from the start, so the navy never shows an empty
-   column. When the thread is a third in view, the rest plays once: Trezzit checks the
-   payments, the AI names the missing one, you say yes, the Activity card lands. It stays
-   finished; leaving the screen mid-play finishes it at once. Reduced motion: all static. */
+/* ---------- the AI section: the exchange is on the page from the start ----------
+   The statement, Trezzit's check and the AI's question are there on arrival, so the navy
+   never shows an empty frame. Only the payoff plays, once, as the thread comes into view:
+   you say yes, then the Activity card (waiting faded in its place) lands. Leaving the screen first finishes it at once.
+   Reduced motion: all static. */
 function initThread() {
   const t = document.querySelector('[data-thread]');
   if (!t || reducedMotion()) return;
-  const [first, tool, aiLine, yes, card] = [...t.children];
+  const kids = [...t.children];
+  const [yes, card] = kids.slice(-2);
   if (!card) return;
-  const st = tool.querySelector('.st'); const res = tool.querySelector('.res');
-  const doneSt = st.outerHTML; const doneRes = res.textContent;
   t.classList.add('is-armed');
-  first.classList.add('in'); first.style.animation = 'none';
-  const timers = []; let typing; let over = false;
-  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
-  const show = (el) => el.classList.add('in');
-  const dots = (before) => {
-    typing = document.createElement('div');
-    typing.className = 'typing'; typing.setAttribute('aria-hidden', 'true'); typing.innerHTML = '<i></i><i></i><i></i>';
-    typing.style.top = before.offsetTop + 'px';
-    t.appendChild(typing);
-  };
-  const finish = () => {
-    if (over) return; over = true;
-    timers.forEach(clearTimeout); typing?.remove();
-    tool.querySelector('.st').outerHTML = doneSt; res.textContent = doneRes;
-    [tool, aiLine, yes, card].forEach(show);
-  };
+  kids.slice(0, -2).forEach((el) => el.classList.add('in', 'still'));
+  const timers = []; let over = false;
+  const finish = () => { if (over) return; over = true; timers.forEach(clearTimeout); [yes, card].forEach((el) => el.classList.add('in')); };
   onVisible(t, () => {
     if (over) return;
-    at(250, () => { tool.querySelector('.st').outerHTML = '<span class="st spin" aria-hidden="true"></span>'; res.textContent = 'Checking your statement…'; show(tool); });
-    at(1150, () => { tool.querySelector('.st').outerHTML = doneSt; res.textContent = doneRes; });
-    at(1350, () => dots(aiLine));
-    at(1850, () => { typing?.remove(); show(aiLine); });
-    at(2550, () => show(yes));
-    at(3050, () => { show(card); over = true; });
+    timers.push(setTimeout(() => yes.classList.add('in'), 450));
+    timers.push(setTimeout(() => { card.classList.add('in'); over = true; }, 1000));
     // Nothing plays unseen.
     new IntersectionObserver(([e], io) => { if (over) io.disconnect(); else if (!e.isIntersecting) { finish(); io.disconnect(); } }).observe(t);
-  }, 0.35);
+  }, 0.5);
 }
 
 export async function initChats() {

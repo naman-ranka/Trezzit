@@ -914,3 +914,110 @@ dialog.rcpt-dlg img { max-height: calc(86vh - 100px); }
 @media (max-width: 400px) { #hero-chat .chips .chip { font-size: 13.5px; letter-spacing: -0.01em; } }
 @media (max-width: 380px) { #hero-chat .chips .chip { padding: 0 7px 0 6px; font-size: 13px; } }
 @media (max-width: 370px) { #hero-chat .chips { gap: 4px; } #hero-chat .chips .chip { padding: 0 6px 0 6px; } }
+/* desktop split: an item one person owns has no sub-line, so its name centres on the avatars */
+@media (min-width: 900px) { .sitem:has(.meta:empty) .nm { grid-row: 1 / span 2; align-self: center; } }
+
+/* ---------- round 12 ---------- */
+/* header: phones keep Log in; "Use with AI" shortens to "AI" under 420px, and "See the app" lives in the footer */
+@media (max-width: 419px) { .nav-long { display: none; } }
+@media (max-width: 819px) { .main-nav .nav-tour { display: none; } }
+/* hero chat (desktop): the card fits its opening exchange, no dead band above the chips */
+@media (min-width: 1040px) { .chat.is-fixed { height: 562px; } }
+/* a friend paid: the bank shows $0.00, and says why underneath */
+.versus .vsub { display: block; font-size: 13px; color: var(--text-secondary-on-tint); margin-top: 1px; }
+/* phones: a balance's "Green Basket − Netflix" line steps out so the question stays in view */
+@media (max-width: 419px) { #hero-chat .row .n small.why { display: none; } }
+
+/* AI band: the same chat frame as the hero, in its dark variant; it never shows an empty column */
+.thread { padding: 20px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.03); }
+@media (max-width: 520px) { .thread { padding: 16px 14px; gap: 12px; } }
+.thread.is-armed > .in.still { animation: none; }
+
+/* split: Reset sits in the card's header beside Receipt; rows never change height when a note appears */
+.split-head .reset-link { margin-left: auto; }
+.split-head .t { margin-right: 0; flex: 1 1 auto; }
+@media (min-width: 900px) { .split-foot { display: none; } }
+@media (max-width: 899px) {
+  .split-foot { min-height: 0; border-top: 0; }
+  .split-foot .check-line.sm { margin: 4px 10px 10px; }
+  .sitem .meta:empty { display: block; }
+}
+
+/* October: the month's pair, in the hero's language; list and summary end on one line */
+@media (min-width: 900px) { .led { align-items: stretch; } }
+.sum-card { align-content: start; }
+.sum-card .spent-big { gap: 6px; }
+.sum-card .versus { margin: 2px 0 4px; }
+.sum-card .versus .mine .v { font-size: 26px; }
+.sum-card .versus .bank .v { font-size: 17px; }
+.led-list { min-height: 0 !important; }
+
+/* connect/: the URL is named, Copy keeps its word at every width */
+.url-label { margin-top: 24px; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.sub-hero.with-side .url-label + .urlbox.light { margin-top: 6px; }
+@media (max-width: 420px) {
+  .urlbox.light button { width: auto; padding: 0 12px; }
+  .urlbox.light button span { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
+  .urlbox.light code { font-size: 12px; }
+}
+@media (max-width: 370px) { .urlbox.light code { font-size: 11.5px; } .urlbox.light { padding-left: 10px; } }
+.urlbox button.copied { background: var(--positive); color: #fff; }
+/* connect/: each prompt is a bubble with its copy icon, then what comes back */
+ul.prompts { list-style: none; margin: 28px 0 0; padding: 0; }
+ul.prompts li { display: grid; gap: 8px; align-content: start; justify-items: end; }
+button.prompt { display: flex; align-items: flex-end; gap: 8px; padding: 0; background: none; border-radius: 18px 18px 6px 18px; width: auto; max-width: 100%; }
+button.prompt:hover { background: none; }
+button.prompt:hover q { background: #e4e9f2; }
+.prompt q { background: var(--bubble); box-shadow: none; transition: background-color 0.2s; }
+.prompt .pfoot { flex: none; width: 32px; height: 32px; display: grid; place-items: center; margin-bottom: 6px; }
+.pres { font-size: 15px; color: var(--text-secondary); text-align: right; padding-right: 40px; }
+
+/* app/: two recordings per row on desktop, each phone large enough to read */
+@media (min-width: 1024px) {
+  .chapters { display: grid; grid-template-columns: 1fr 1fr; column-gap: 32px; }
+  .chapters .chapter { padding: 32px 0; }
+  .chapters .chapter .stage { width: 100%; padding: 48px 48px 80px; }
+  .chapters .chapter .phone { width: min(380px, 100%); }
+  .chapters .chapter .phone.short { width: min(420px, 100%); }
+  .chapters .chapter h2 { font-size: clamp(28px, 2.6vw, 40px); }
+}
+/* phones: Receipt alone in the header; Reset sits beside the check in the card's foot */
+@media (max-width: 899px) {
+  .split-head .reset-link { display: none; }
+  .split-foot { flex-wrap: nowrap; align-items: center; padding: 0 6px 0 0; }
+  .split-foot .check-line.sm { flex: 1 1 auto; order: 0; margin: 6px 4px 8px 10px; }
+}
+/* October: the month's pair stacked, the large figure is what you spent; categories end on the list's line */
+.sum-card { display: flex; flex-direction: column; gap: 18px; }
+.sum-card .versus { grid-template-columns: 1fr; gap: 8px; }
+.sum-card .versus .bank { display: flex; justify-content: space-between; align-items: baseline; }
+.sum-card .versus .mine { padding: 12px 14px; }
+.sum-card .versus .mine .v { font-size: 36px; letter-spacing: -0.03em; display: block; line-height: 1.1; }
+.sum-card .cats { gap: 14px; }
+@media (min-width: 900px) { .sum-card .cats { margin-top: auto; } }
+/* hero chat: the balances card needs no header (the Trezzit pill names it), so the question stays above the fold of the log */
+#hero-chat .tcard.bal .tcard-head { display: none; }
+#hero-chat .tcard.bal .rows { margin-top: 0; }
+/* October: the summary matches the list's height; a short search result never stretches the list */
+@media (min-width: 900px) { .led { align-items: start; } .led .sum-card { align-self: stretch; } }
+/* AI band: the Activity card waits faded in its place, then lands; no empty column while it plays */
+@media (prefers-reduced-motion: no-preference) {
+  .thread.is-armed > .tcard { visibility: visible; animation: none; opacity: 0.22; transform: translateY(6px) scale(0.99); transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out); }
+  .thread.is-armed > .tcard .ai-pill { opacity: 0; }
+  .thread.is-armed > .tcard.in { opacity: 1; transform: none; }
+  .thread.is-armed > .tcard.in .ai-pill { opacity: 1; }
+}
+@media (min-width: 900px) { .led.is-bank .led-list { align-self: stretch; } }
+/* the top fade is shorter than a bubble's padding, so a question pinned under it stays readable */
+.chat.is-fixed .chat-log.is-scrolled { -webkit-mask-image: linear-gradient(transparent 0, #000 16px); mask-image: linear-gradient(transparent 0, #000 16px); }
+/* split rows: one owner reads "Yours" / "Maya’s" on phones; on desktop the name centres on the avatars instead */
+@media (min-width: 900px) {
+  .sitem .meta.solo:not(.warn) { display: none; }
+  .sitem:has(.meta.solo:not(.warn)) .nm { grid-row: 1 / span 2; align-self: center; }
+}
+@media (max-width: 370px) { .chat.is-fixed { height: 560px; } }
+@media (min-width: 1024px) {
+  .chapters { align-items: start; }
+  .chapters .chapter { align-content: start; align-items: start; }
+  .chapters .chapter h2 { max-width: none; font-size: clamp(26px, 2.3vw, 34px); white-space: nowrap; }
+}

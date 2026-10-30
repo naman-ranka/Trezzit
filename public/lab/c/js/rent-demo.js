@@ -34,8 +34,8 @@ const flix = distributeEqually(2499, 4);
 // the mode toggle sits under the one row it changes (the next rent), not above the list
 const MODE = `<li class="rec-mode"><span id="mode-l">Rent on the 1st</span>
       <div class="seg" role="radiogroup" aria-labelledby="mode-l">
-        <button type="button" role="radio" aria-checked="true" data-mode="auto">Add automatically</button>
-        <button type="button" role="radio" aria-checked="false" data-mode="review">Ask me first</button>
+        <button type="button" role="radio" aria-checked="true" tabindex="0" data-mode="auto">Add automatically</button>
+        <button type="button" role="radio" aria-checked="false" tabindex="-1" data-mode="review">Ask me first</button>
       </div></li>`;
 const SIDE = `<div class="rec-side">
     <p class="rec-sub">Coming up</p>
@@ -54,7 +54,7 @@ root.innerHTML = `<div class="rec${opts.compact || opts.sideRoot ? ' rec-compact
     </div>
     <div class="rec-edit">
       <label for="rent-in">Rent</label>
-      <span class="money-in-field">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-help"></span>
+      <label class="money-in-field" for="rent-in">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-help"></label>
       <span class="step-btns"><button type="button" data-step="-2500" aria-label="Lower rent by $25">−</button><button type="button" data-step="2500" aria-label="Raise rent by $25">+</button></span>
       <span id="rent-help" class="muted small" aria-live="polite"></span>
     </div>
@@ -121,7 +121,7 @@ function flashHelp(msg) {
   help.textContent = msg;
   help.classList.add('warn');
   clearTimeout(helpT);
-  helpT = setTimeout(() => { help.textContent = HELP; help.classList.remove('warn'); }, 1800);
+  helpT = setTimeout(() => { help.textContent = HELP; help.classList.remove('warn'); }, 2200);
 }
 function setRent(cents, fromInput = false) {
   rent = Math.max(MIN, Math.min(1000000, Math.round(cents)));
@@ -130,41 +130,53 @@ function setRent(cents, fromInput = false) {
 }
 // the field and the math never disagree: only a well-formed amount changes the rent;
 // anything else keeps the last good rent until the field is left (then it snaps back)
+const RANGE = 'Between $100 and $10,000';
 const VALID = /^\d[\d,]*(\.\d{0,2})?$/;
 input.addEventListener('beforeinput', (e) => {
-  if (e.data && /[^0-9.,]/.test(e.data)) e.preventDefault();
+  if (e.data && /[^0-9.,]/.test(e.data)) { e.preventDefault(); flashHelp(RANGE); }
 });
 let lastText = input.value;
 input.addEventListener('input', () => {
   const raw = input.value.trim();
   if (raw === '') return; // clearing to retype: the math keeps the last rent until a new one is typed
-  if (!VALID.test(raw)) { input.value = lastText; return; } // refuse a malformed edit ("1.2.3")
+  if (!VALID.test(raw)) { input.value = lastText; flashHelp(RANGE); return; } // refuse a malformed edit ("1.2.3")
   lastText = raw;
   const v = Math.round(Number(raw.replace(/,/g, '')) * 100);
   if (!Number.isFinite(v)) return;
-  if (v > 1000000) { setRent(1000000); flashHelp('Up to $10,000.00'); return; }
+  if (v > 1000000) { setRent(1000000); flashHelp(RANGE); return; }
   if (v < MIN) return; // "2" on the way to "2600": the math waits; leaving the field snaps it to the minimum
   setRent(v, true);
 });
 // leaving the field (or Enter) formats it; a rent under $100.00 snaps to $100.00 and says why
 function commit() {
   const v = Math.round(Number(input.value.trim().replace(/,/g, '')) * 100);
-  if (input.value.trim() && Number.isFinite(v) && v < MIN) { setRent(MIN); flashHelp('At least $100.00'); return; }
+  if (input.value.trim() && Number.isFinite(v) && v < MIN) { setRent(MIN); flashHelp(RANGE); return; }
   setRent(rent);
 }
 input.addEventListener('blur', commit);
 input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
 root.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => {
   const next = rent + Number(b.dataset.step);
-  if (next < MIN) flashHelp('At least $100.00');
+  if (next < MIN || next > 1000000) flashHelp(RANGE);
   setRent(next);
 }));
 function bindMode() {
-  side.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
+  const radios = [...side.querySelectorAll('[data-mode]')];
+  const pick = (b, focus) => {
     mode = b.dataset.mode;
-    side.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+    radios.forEach((x) => { x.setAttribute('aria-checked', String(x === b)); x.tabIndex = x === b ? 0 : -1; });
+    if (focus) b.focus();
     render();
-  }));
+  };
+  radios.forEach((b) => b.addEventListener('click', () => pick(b)));
+  // a radio group: one tab stop, arrow keys move and select
+  radios[0].parentElement.addEventListener('keydown', (e) => {
+    const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    const k = radios.indexOf(document.activeElement);
+    pick(radios[(Math.max(0, k) + d + radios.length) % radios.length], true);
+  });
 }
 render();
 return { compute };

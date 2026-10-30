@@ -1,5 +1,5 @@
 /* main.js: wires prototype A together. */
-import { $, $$, reveals } from './util.js';
+import { $, $$, reveals, focusAfterScroll } from './util.js';
 import { initHero } from './hero.js';
 import { mountScan } from './scan-demo.js';
 import { initStory } from './story.js';
@@ -18,7 +18,7 @@ nav();
 // "Split it": the story right below already splits this receipt, so the button goes there; any other
 // sample, or your own photo, opens the full playground with that receipt.
 safe(() => mountScan($('#scan-demo'), {
-  splitLabel: 'Split it',
+  splitLabel: (m) => (!m || m.id === 'green-basket' ? 'Split it' : 'Split it \u2192'),
   // rent is not a receipt anyone snaps: the landing scan offers groceries, pharmacy and dinner (/scan/ keeps all four)
   exclude: ['monthly-rent'],
   foldAll: true,
@@ -31,6 +31,8 @@ safe(() => mountScan($('#scan-demo'), {
       const last = $('#story .step[data-step="3"]');
       if (innerWidth >= 900 && last) scrollTo({ top: last.getBoundingClientRect().top + scrollY - innerHeight * 0.4, behavior });
       else $('#story').scrollIntoView({ behavior });
+      // focus goes with the page: onto the grid's one tabbable dot, so the next Tab or Space acts on what is on screen
+      focusAfterScroll(() => $('#story-stage .dot-b[tabindex="0"]'));
       return;
     }
     let id = model.id;
@@ -66,8 +68,12 @@ function nav() {
     // (a light bar over the top of a navy band looked like a seam)
     const h = navEl.offsetHeight;
     // a section whose top sits exactly at the bar's bottom (an anchor jump) counts as under it
-    const onDark = darks.some((d) => { const r = d.getBoundingClientRect(); return r.top <= h + 1 && r.bottom > 1; });
+    const under = darks.filter((d) => { const r = d.getBoundingClientRect(); return r.top <= h + 1 && r.bottom > 1; });
+    const onDark = under.length > 0;
     navEl.classList.toggle('on-dark', onDark);
+    // a navy band that only meets the bar (an anchor jump) has light page behind the bar: the bar is solid navy there,
+    // one piece with the band; once the band is behind it, the bar is frosted navy over navy
+    navEl.classList.toggle('on-edge', onDark && !under.some((d) => d.getBoundingClientRect().top <= 0));
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', onDark ? '#0a1020' : '#ffffff');
   };
   const soon = () => { if (!t) { t = true; requestAnimationFrame(update); } };

@@ -42,6 +42,10 @@ function recastSplit(sp) {
   return out;
 }
 
+/* The pharmacy run is all yours, but a split needs someone to share with: Maya is there with no items, so on /scan/
+ * a tap can hand her the sunscreen (the default split, and so the month card's "Just you · $48.22", is unchanged). */
+const HOUSE = { 'corner-pharmacy': ['you', 'maya'] };
+
 /** Build a model from a scan result ({sampleId, raw, bill}) or a sample id. */
 export async function loadModel(id) {
   const raw = await loadScan(id);
@@ -51,7 +55,7 @@ export async function loadModel(id) {
 export function modelFrom(result) {
   const sample = result.sampleId ? getSample(result.sampleId) : null;
   const bill = result.bill;
-  const people = sample ? sample.people.map(recast) : ['you', 'maya', 'jordan', 'sam'];
+  const people = sample ? (HOUSE[sample.id] || sample.people.map(recast)) : ['you', 'maya', 'jordan', 'sam'];
   const lines = bill.items.map((it, i) => {
     const def = sample?.lines?.[i] || {};
     const extra = it.isExtraCharge;

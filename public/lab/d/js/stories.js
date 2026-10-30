@@ -31,12 +31,16 @@ export async function initLedger() {
   const q = $('[data-q]', host);
   let view = 'trezzit';
   const who = (b) => (b.payer === 'you' ? 'you paid' : `${PEOPLE[b.payer].name} paid`);
+  // Every scanned receipt says how many items it holds: the list is items, not just charges.
+  const itemsOf = (b) => { const n = b.split.items.filter((it) => it.itemType !== 'Tip').length; return n > 1 && !b.recurring ? `${n} items · ` : ''; };
 
   function renderSum() {
     const { top, rest } = summaryCats(cur.cats);
     const max = Math.max(rest, ...top.map((c) => c.cents));
     // One figure: what you spent. What you paid is the bank's number, and lives in the bank view.
-    sum.innerHTML = `<div class="spent-big"><span class="kicker">October · you spent</span><b class="money" data-spent>${money(cur.spentCents)}</b></div>
+    // The hero's pair at the scale of a month: what left your bank, and what you actually spent.
+    sum.innerHTML = `<div class="spent-big"><span class="kicker">October</span>
+        <div class="versus"><div class="bank"><span class="lbl">Your bank</span><span class="v money">${money(-w.paidCents)}</span></div><div class="mine"><span class="lbl">You spent</span><span class="v money" data-spent>${money(cur.spentCents)}</span></div></div></div>
       <div class="cats">${top.map((c, i) => `<div class="cat"><div class="l"><span>${esc(c.label)}</span><b class="money">${money(c.cents)}</b></div><div class="hbar"><i style="width:${Math.max(2, (c.cents / max) * 100)}%;background:${tone(i)}"></i></div></div>`).join('')}
         <div class="cat"><div class="l"><span>Everything else</span><b class="money">${money(rest)}</b></div><div class="hbar"><i style="width:${Math.max(2, (rest / max) * 100)}%;background:${OTHER_TONE}"></i></div></div></div>`;
   }
@@ -72,7 +76,7 @@ export async function initLedger() {
         + `<div class="led-foot"><span>${w.bank.length} payments · you paid</span><b class="money">${money(w.paidCents)}</b></div>`;
       return;
     }
-    list.innerHTML = cur.bills.map((b) => `<div class="lrow" data-bill-row="${b.id}"><span class="ic"${b.recurring ? ' aria-label="Monthly" role="img"' : ' aria-hidden="true"'}>${b.recurring ? icon('repeat') : b.byAI ? icon('spark') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.date} · ${b.byAI ? 'added by AI' : b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('');
+    list.innerHTML = cur.bills.map((b) => `<div class="lrow" data-bill-row="${b.id}"><span class="ic"${b.recurring ? ' aria-label="Monthly" role="img"' : ' aria-hidden="true"'}>${b.recurring ? icon('repeat') : b.byAI ? icon('spark') : esc(b.title[0])}</span><span class="t"><b>${esc(b.title)}</b><span>${b.date} · ${itemsOf(b)}${b.byAI ? 'added by AI' : b.settled ? 'settled' : b.group ? who(b) : 'personal'}</span></span><span class="v"><b class="money">${money(b.youCents)}</b>${b.youCents !== b.totalCents ? `<span class="money">of ${money(b.totalCents)}</span>` : ''}</span></div>`).join('');
   }
 
   const setView = (v) => {
@@ -86,16 +90,7 @@ export async function initLedger() {
 
   renderSum();
   setView('trezzit');
-  /* Both views hold the Trezzit list's height, so switching never moves the page. */
-  const hold = () => {
-    if (view !== 'trezzit' || q.value.trim()) return;
-    const panel = list.parentElement;
-    panel.style.minHeight = '';
-    panel.style.minHeight = panel.offsetHeight + 'px';
-  };
-  hold();
-  addEventListener('resize', hold, { passive: true });
-  document.fonts?.ready.then(hold);
+  /* The list is as tall as what it shows; the summary card beside it matches its height (CSS). */
 
   host.addEventListener('click', (e) => {
     const v = e.target.closest('button[data-v]');

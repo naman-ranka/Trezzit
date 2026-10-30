@@ -1,7 +1,7 @@
 /* scenarios.js: one playable Bank | Trezzit pair; the rail switches which charge it shows. */
 
 import { loadScenarios, PEOPLE } from './data.js';
-import { createSplitEditor, catBar, catList, setMoney } from './split-editor.js';
+import { createSplitEditor, setMoney } from './split-editor.js';
 import { initNav, initReveal } from './shared.js';
 import { money, bankAmt, esc, listNames } from './util.js';
 
@@ -43,13 +43,10 @@ function card(sc) {
             <p class="scn-amt money" data-mine data-cents="${s.mine}">${money(s.mine)}</p>
             <p class="pt-of">${s.mine === s.total ? 'All yours' : `of <span class="money">${money(s.total)}</span>`} · ${sc.payer === 'you' ? 'you paid' : `${esc(PEOPLE[sc.payer].name)} paid`}</p>
           </div>
-          <div class="scn-cats">
-            <div class="catbar" aria-hidden="true" data-catbar>${catBar(s.byCategory)}</div>
-            <ul class="cats" role="list" data-cats>${catList(s.byCategory, { limit: 5 })}</ul>
-          </div>
         </div>
         <div data-editor></div>
         <p class="sd-owe" data-owe>${oweHTML(sc, s)}</p>
+        ${sc.addedBy ? `<p class="pt-ai">${esc(sc.addedBy)}${sc.addedFile ? ` <span class="pt-file">${esc(sc.addedFile)}</span>` : ''}</p>` : ''}
         ${sc.next ? `<div class="sd-next" aria-label="Coming up">${sc.next.map((d) => `<span>${esc(d)}<b class="money">${money(s.mine)}</b></span>`).join('')}</div>` : ''}
       </div>
     </div>
@@ -65,6 +62,11 @@ loadScenarios({ extras: true }).then((loaded) => {
   function show(id, { focus = false } = {}) {
     const sc = byId[id] || all[0];
     rail.querySelectorAll('[data-pick]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pick === sc.id)));
+    // phones: the picked chip is never left half under the rail's fade
+    const on = rail.querySelector('[aria-pressed="true"]');
+    const r = rail.getBoundingClientRect();
+    const c = on.getBoundingClientRect();
+    if (c.left < r.left || c.right > r.right - 48) rail.scrollLeft += c.left - r.left - 16;
     list.innerHTML = card(sc);
     const art = list.firstElementChild;
     const ed = createSplitEditor(art.querySelector('[data-editor]'), {
@@ -73,8 +75,6 @@ loadScenarios({ extras: true }).then((loaded) => {
         if (!sum) return;
         // every figure changes in the same frame, so they always add up (no count-up)
         setMoney(art.querySelector('[data-mine]'), sum.mine);
-        art.querySelector('[data-catbar]').innerHTML = catBar(sum.byCategory);
-        art.querySelector('[data-cats]').innerHTML = catList(sum.byCategory, { limit: 5 });
         art.querySelector('[data-owe]').innerHTML = oweHTML(sc, sum);
         art.querySelectorAll('.sd-next b').forEach((b) => { b.textContent = money(sum.mine); });
       },

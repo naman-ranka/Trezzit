@@ -39,11 +39,10 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
         <ul class="items" role="list" tabindex="-1" aria-label="Receipt items"></ul>
         <button type="button" class="more-items is-off" tabindex="-1"></button>
         <div class="sums is-off">${SUMS_PLACEHOLDER}</div>
-        <div class="result-cta is-off"><button type="button" class="btn btn-primary split-btn" tabindex="-1">${esc(splitLabel)}</button></div>
+        <div class="result-cta is-off"><button type="button" class="btn btn-primary split-btn" tabindex="-1">${esc(typeof splitLabel === 'function' ? splitLabel(null) : splitLabel)}</button></div>
         <div class="consent" role="group" aria-labelledby="consent-t" hidden>
           <p class="consent-t" id="consent-t">Scan your own receipt</p>
-          <p>To read it, your photo is sent to Google Gemini. Trezzit keeps scan photos for 90 days.</p>
-          <p class="consent-l"><a href="/privacy">Privacy</a><a href="/your-data">Your data</a></p>
+          <p>To read it, your photo is sent to Google Gemini. Trezzit keeps scan photos for 90 days. <a href="/privacy">Privacy</a></p>
           <div class="row"><button type="button" class="btn btn-quiet" data-v="no">Not now</button><button type="button" class="btn btn-primary" data-v="ok">Choose photo</button></div>
         </div>
       </div>
@@ -244,6 +243,8 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
       + (discC ? `<div class="sum-x"><span>Discount</span><span class="money">${money(-discC)}</span></div>` : '')
       + `<div class="tot"><span>Total</span><span class="money">${money(toCents(b.total))}</span></div>`;
     sums.classList.remove('is-off');
+    // the button says where it goes (the landing: down to the story for its own receipt, another page for the rest)
+    if (typeof splitLabel === 'function') splitBtn.textContent = splitLabel(model);
     showCta(!!onSplit);
     bar.style.width = '100%';
     onResult?.(model);
@@ -261,6 +262,8 @@ export function mountScan(root, { onSplit, onResult, autoStart = true, splitLabe
     root.classList.add('is-asking');
     press('file');
     $('[data-v="ok"]', consent).focus({ preventScroll: true });
+    // phones: the card sits under the receipt window, so bring the question to the thumb
+    if (compact()) consent.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' });
   };
   consent.addEventListener('click', (e) => {
     const v = e.target.closest('[data-v]')?.dataset.v;

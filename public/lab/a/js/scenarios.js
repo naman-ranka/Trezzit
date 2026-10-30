@@ -1,18 +1,27 @@
 /* scenarios.js: the search inside the month card. Typing (or a chip) filters the same card down to items: only what is
  * yours (your share of shared lines), from every sample receipt plus a short made-up history. Clearing the box brings
  * the month back. Green Basket follows the split above (story.js sends your share of each line). */
-import { $, $$, esc, money, onceVisible } from './util.js';
+import { $, $$, esc, money } from './util.js';
 import { loadModel, compute, SAMPLES, dateLabel } from './data.js';
 
-/* Earlier receipts in the same made-up account (amounts in cents, your share first), so a search finds a habit, not one line. */
+/* Earlier receipts in the same made-up account (amounts in cents, your share first), so a search finds a habit, not one
+ * line. All before October: the month card above is exactly October, so a search never finds an October item it lacks. */
 const HISTORY = [
-  { name: 'Oat milk latte', merchant: 'Corner Café', date: '2026-10-27', cat: 'dining', mine: 525, total: 525 },
-  { name: 'Whole milk ½ gal', merchant: 'Value Mart', date: '2026-10-22', cat: 'groceries', mine: 71, total: 284 },
-  { name: 'Paper towels 6pk', merchant: 'Home supplies', date: '2026-10-25', cat: 'household', mine: 325, total: 1299 },
-  { name: 'Dish soap', merchant: 'Home supplies', date: '2026-10-25', cat: 'household', mine: 112, total: 449 },
+  { name: 'Oat milk latte', merchant: 'Corner Café', date: '2026-09-27', cat: 'dining', mine: 525, total: 525 },
+  { name: 'Paper towels 6pk', merchant: 'Home supplies', date: '2026-09-25', cat: 'household', mine: 325, total: 1299 },
+  { name: 'Dish soap', merchant: 'Home supplies', date: '2026-09-25', cat: 'household', mine: 112, total: 449 },
+  { name: 'Whole milk ½ gal', merchant: 'Value Mart', date: '2026-09-22', cat: 'groceries', mine: 71, total: 284 },
   { name: 'Sunscreen stick SPF30', merchant: 'Corner Pharmacy', date: '2026-07-12', cat: 'personal-care', mine: 749, total: 749 },
   { name: 'Sunscreen SPF50 2pk', merchant: 'Green Basket Market', date: '2026-06-03', cat: 'personal-care', mine: 450, total: 1800 },
 ];
+/* October's rent & bills statement, your share of each line (the kit's engine over the rent sample: $639.35 of
+ * $2,632.40, the month card's row). Written out here so the landing never fetches the rent receipt. */
+const RENT = [
+  { name: 'Rent', mine: 60000, total: 240000, cat: 'rent' },
+  { name: 'Water & sewer', mine: 1710, total: 6840, cat: 'utilities' },
+  { name: 'Trash & recycling', mine: 600, total: 2400, cat: 'utilities' },
+  { name: 'Internet 1 gig', mine: 1625, total: 6500, cat: 'internet' },
+].map((r) => ({ ...r, merchant: 'Rent & bills', date: '2026-10-01', monthly: true }));
 const CAT_LABEL = { groceries: 'groceries', household: 'household', 'personal-care': 'personal care', health: 'health', dining: 'dining', rent: 'rent', utilities: 'utilities', internet: 'internet', parking: 'parking' };
 const ICO = {
   basket: '<path d="M4 9h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8zM8.5 9l3-5m4 5l-3-5"/>',
@@ -43,23 +52,24 @@ export function initScenarios() {
   let gb = window.__tzSplit?.mine || null;
   document.addEventListener('tz:share', (e) => { gb = e.detail.mine || gb; if (input.value.trim()) show(input.value, { announce: false }); });
 
-  // the index needs every sample receipt: fetch them only as the card comes near, or on the first keystroke
+  // the index needs the month's receipts: fetched only when the visitor searches (focus, a chip, the first keystroke),
+  // never at page load; rent comes from RENT above
   const load = () => (loading ||= (async () => {
     const out = [];
-    for (const s of SAMPLES) {
+    for (const s of SAMPLES.filter((x) => !x.recurring)) {
       const m = await loadModel(s.id);
       const r = compute(m);
       m.lines.forEach((l, i) => {
         const it = r.items.find((x) => x.index === i);
-        // a monthly bill is dated this month's 1st, so every answer is spending that already happened (the page is Oct 29)
-        out.push({ id: s.id, name: l.pretty, merchant: m.merchant, date: s.recurring ? '2026-10-01' : m.date, cat: l.category, mine: it?.shares?.you || 0, total: it?.totalCents || 0, i, monthly: !!s.recurring });
+        out.push({ id: s.id, name: l.pretty, merchant: m.merchant, date: m.date, cat: l.category, mine: it?.shares?.you || 0, total: it?.totalCents || 0, i });
       });
     }
-    HISTORY.forEach((h, k) => out.push({ ...h, i: 100 + k }));
+    [...RENT, ...HISTORY].forEach((h, k) => out.push({ ...h, i: 100 + k }));
     out.sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.i - b.i);
     index = out;
   })());
-  onceVisible(box, load, { threshold: 0, rootMargin: '0px 0px 900px 0px' });
+  input.addEventListener('focus', () => { load().catch(() => { loading = null; }); }, { once: true });
+  box.addEventListener('pointerover', () => { load().catch(() => { loading = null; }); }, { once: true });
 
   let liveT = 0;
   async function show(q, { announce = true } = {}) {

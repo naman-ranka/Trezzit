@@ -44,6 +44,7 @@ export async function mountLedger(root, opts = {}) {
   const barParts = (fixed ? [[fixed.youCents, cat('rent').color]] : []).concat(cats.slice(0, 3).map(([k, c]) => [c, cat(k).color]), rest ? [[rest, '#cbd2dc']] : []);
   const nRows = cats.length + (fixed ? 1 : 0);
   root.classList.add('ledger');
+  if (opts.byPayer) root.classList.add('by-payer');
   // compact (home): fewer categories and rows on phones, so the demo stays one screen tall
   if (opts.compact) root.classList.add('compact');
   const chips = ['towels', 'cold brew', 'Taqueria'];
@@ -58,15 +59,15 @@ export async function mountLedger(root, opts = {}) {
   // home (byPayer): the month is one total split by who paid, the heading's promise ("your share, whoever paid");
   // each row filters the list beside it. No categories, bar or deltas here: /just-me has those.
   const PAY = [
-    ['alone', 'You paid alone', 'Corner Pharmacy', (e) => e.payer === 'you' && e.kind === 'personal'],
-    ['split', 'You split it', 'Groceries, a trip dinner, Netflix', (e) => e.payer === 'you' && e.kind !== 'personal'],
-    ['other', 'Someone else paid', 'Rent (Maya), pizza night (Jordan)', (e) => e.payer !== 'you'],
+    ['alone', 'You paid alone', (e) => e.payer === 'you' && e.kind === 'personal'],
+    ['split', 'You split it', (e) => e.payer === 'you' && e.kind !== 'personal'],
+    ['other', 'Someone else paid', (e) => e.payer !== 'you'],
   ];
   const payHTML = `<div class="lg-sum lg-sum-pay">
       <p class="lg-label">October, your share</p>
       <p class="lg-total money"><span class="visually-hidden">${money(spent)}</span><span class="lg-n" aria-hidden="true">${money(spent)}</span></p>
-      <ul class="lg-pays" role="list" aria-label="By who paid">${PAY.map(([k, label, sub, f]) => `<li><button type="button" class="lg-pay" data-pay="${k}" aria-pressed="false">
-        <span class="lg-pk"><b>${label}</b><small>${sub}</small></span><b class="money">${money(entries.filter(f).reduce((a, e) => a + e.youCents, 0))}</b></button></li>`).join('')}</ul>
+      <ul class="lg-pays" role="list" aria-label="By who paid">${PAY.map(([k, label, f]) => `<li><button type="button" class="lg-pay" data-pay="${k}" aria-pressed="false">
+        <span class="lg-pk"><b>${label}</b></span><b class="money">${money(entries.filter(f).reduce((a, e) => a + e.youCents, 0))}</b></button></li>`).join('')}</ul>
     </div>`;
   root.innerHTML = opts.byPayer ? `${findHTML}${payHTML}` : `${findHTML}
     <div class="lg-sum">
@@ -103,6 +104,10 @@ export async function mountLedger(root, opts = {}) {
   const countEl = root.querySelector('.lg-count');
   let filterCat = null;
   let filterPay = null;
+  // home: the default list leads with what makes the total add up (rent, which Maya paid), then one row
+  // per kind of payer; the rest folds into one line whose amount closes the sum to the headline
+  const LEAD = ['monthly-rent', 'pizza', 'green-basket', 'corner-pharmacy'];
+  let showAll = false;
 
   const allLines = entries.flatMap((e) => e.lines.map((l) => ({ ...l, entry: e })));
 
@@ -110,9 +115,11 @@ export async function mountLedger(root, opts = {}) {
     const k = MAIN_CAT(e);
     const who = e.payer === 'you' ? 'you paid' : `${e.payer} paid`;
     // say what a row is in the words a visitor already has: just you, who paid, what the rent covers
+    // home (byPayer): no group name on every row (it is all the same apartment); rent is just "Maya paid · monthly"
     const sub = e.kind === 'personal' ? `Just you · ${esc(e.date)}`
-      : e.id === 'monthly-rent' ? (opts.byPayer ? `${esc(e.group)} · <span class="lg-who">${esc(who)}</span> · adds on the 1st` : `${esc(e.date)} · ${esc(who)} · rent, utilities, internet`)
-        : `${esc(e.group)} · ${esc(e.date)} · <span class="lg-who">${esc(who)}</span>`;
+      : e.id === 'monthly-rent' ? (opts.byPayer ? `<span class="lg-who">${esc(who[0].toUpperCase() + who.slice(1))}</span> · monthly` : `${esc(e.date)} · ${esc(who)} · rent, utilities, internet`)
+        : opts.byPayer ? `${esc(e.date)} · <span class="lg-who">${esc(who)}</span>`
+          : `${esc(e.group)} · ${esc(e.date)} · <span class="lg-who">${esc(who)}</span>`;
     return `<li class="lg-row" data-id="${esc(e.id)}">
       <span class="lg-ri" style="--c:${cat(k).color}">${e.kind === 'recurring' ? `<span class="lg-rec" title="Recurring">${icon.repeat}</span>` : ''}${catIcon(k)}</span>
       <span class="lg-rt"><b>${esc(e.title)}</b><small>${sub}</small></span>
@@ -145,8 +152,20 @@ export async function mountLedger(root, opts = {}) {
     root.querySelectorAll('.lg-pay').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pay === filterPay)));
     root.classList.toggle('filtered', !!filterPay);
     if (!q && !filterCat) {
-      const pf = filterPay && PAY.find(([k]) => k === filterPay)[3];
-      listEl.innerHTML = entries.filter((e) => !pf || pf(e)).map(entryRow).join('')
+      const pf = filterPay && PAY.find(([k]) => k === filterPay)[2];
+      const rank = (e) => (LEAD.includes(e.id) ? LEAD.indexOf(e.id) : LEAD.length);
+      let rows = entries.filter((e) => !pf || pf(e));
+      if (opts.byPayer) rows = rows.slice().sort((x, y) => rank(x) - rank(y));
+      let restHTML = '';
+      if (opts.byPayer && !filterPay) {
+        const lead = LEAD.map((id) => entries.find((e) => e.id === id)).filter(Boolean);
+        const rest = entries.filter((e) => !lead.includes(e));
+        rows = showAll ? lead.concat(rest) : lead;
+        if (rest.length && !showAll) {
+          restHTML = `<li class="lg-restline"><button type="button" class="lg-rest" aria-expanded="false"><span>${rest.length} more <small>${esc(andList(rest.map((e) => e.title)))}</small></span><b class="money">${money(rest.reduce((a, e) => a + e.youCents, 0))}</b></button></li>`;
+        }
+      }
+      listEl.innerHTML = rows.map(entryRow).join('') + restHTML
         + (filterPay === 'other' && opts.rentHref ? `<li class="lg-rentlink"><a href="${esc(opts.rentHref)}">Split rent by room size <span aria-hidden="true">→</span></a></li>` : '');
       countEl.textContent = opts.compact ? '' : `${entries.length} expenses this month`;
       return;
@@ -169,12 +188,41 @@ export async function mountLedger(root, opts = {}) {
     ul.classList.toggle('short');
     moreCats.textContent = ul.classList.contains('short') ? `Show all ${nRows} categories` : 'Show fewer';
   });
+  listEl.addEventListener('click', (e) => {
+    if (!e.target.closest('.lg-rest')) return;
+    showAll = true;
+    render();
+    listEl.querySelector(`.lg-row[data-id="${entries.find((x) => !LEAD.includes(x.id))?.id}"]`)?.setAttribute('tabindex', '-1');
+    listEl.querySelector('.lg-row[tabindex="-1"]')?.focus({ preventScroll: true });
+  });
+  // phones: the list sits under the who-paid rows; after a tap, bring the filtered bills into view
+  const phone = matchMedia('(max-width: 879px)');
+  const reveal = () => {
+    if (!phone.matches) return;
+    const r = listEl.getBoundingClientRect();
+    if (r.top > innerHeight * 0.72) window.scrollBy({ top: r.top - innerHeight * 0.45, behavior: reduced() ? 'auto' : 'smooth' });
+  };
   input.addEventListener('input', () => { if (input.value.trim()) { filterCat = null; filterPay = null; } render(); });
   root.querySelectorAll('.lg-pay').forEach((b) => b.addEventListener('click', () => {
-    filterPay = filterPay === b.dataset.pay ? null : b.dataset.pay;
-    input.value = '';
-    render();
+    setPay(filterPay === b.dataset.pay ? null : b.dataset.pay);
+    if (filterPay) reveal();
   }));
+  function setPay(k, flashId) {
+    filterPay = k;
+    input.value = '';
+    filterCat = null;
+    render();
+    // "See your share" from the scan: the row it talks about lights up once
+    const row = flashId && listEl.querySelector(`.lg-row[data-id="${flashId}"]`);
+    if (row) { row.classList.remove('flash'); void row.offsetWidth; row.classList.add('flash'); }
+  }
+  // the search column keeps its unfiltered height, so a search or an empty result never shrinks the card
+  const findEl = root.querySelector('.lg-find');
+  const lockHeight = () => {
+    if (input.value.trim() || filterPay || filterCat || showAll) return;
+    findEl.style.minHeight = '';
+    findEl.style.minHeight = `${findEl.offsetHeight}px`;
+  };
   // a tapped chip shows its results; only keyboard or mouse users get the caret (no soft keyboard over the results)
   const finePointer = matchMedia('(pointer: fine)');
   root.querySelectorAll('.chip-q').forEach((b) => b.addEventListener('click', (e) => {
@@ -187,11 +235,13 @@ export async function mountLedger(root, opts = {}) {
     render();
   }));
   render();
-
-  // home: the row that proves the step's heading ("Your share, whoever paid.") is pointed out once seen
-  if (opts.highlight) {
-    onVisible(root, () => root.classList.add('point'), { threshold: 0.3 });
+  if (opts.byPayer) {
+    lockHeight();
+    let rz = 0;
+    addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(lockHeight); });
+    document.fonts?.ready.then(lockHeight);
   }
+
 
   // count up the headline figure the first time it is seen
   // never shows $0.00: starts at 60% of the total, as soon as the figure itself is on screen
@@ -209,5 +259,5 @@ export async function mountLedger(root, opts = {}) {
       root.classList.remove('counting');
     }, { threshold: 0 });
   }
-  return { data };
+  return { data, setPay, root };
 }

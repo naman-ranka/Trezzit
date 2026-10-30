@@ -88,6 +88,7 @@ export function initSnapSplit(root, scenarioFor) {
     foot.innerHTML = `
       <p class="ss-total"><span>Total</span><b class="money">${money(res.totalCents)}</b></p>
       <p class="ss-check">${ICON.check}<span>Adds up</span></p>
+      <a class="snap-own" href="https://app.trezzit.com/split">Scan your own receipt</a>
       <button type="button" class="btn btn-quiet btn-sm" data-reset>Reset</button>`;
   }
 
@@ -101,7 +102,7 @@ export function initSnapSplit(root, scenarioFor) {
       const txt = subText(it);
       clearTimeout(Number(each.dataset.t || 0));
       each.classList.remove('is-warn');
-      if (each.textContent !== txt) { each.textContent = txt; flash(each); }
+      if (each.textContent !== txt) each.textContent = txt;
       if (!isExtra(it)) {
         const who = splitPeople(items[it.index].split, order);
         li.querySelectorAll('.faces .av').forEach((b) => b.setAttribute('aria-pressed', String(who.includes(b.dataset.id))));
@@ -121,7 +122,7 @@ export function initSnapSplit(root, scenarioFor) {
     const changed = node.dataset.cents !== String(cents);
     node.dataset.cents = String(cents);
     node.textContent = money(cents);
-    if (changed) flash(node);
+    if (changed) flash(node.closest('li')); // only the pill whose total changed takes the cue
   }
 
   /* ---------- receipt <-> split ---------- */
@@ -138,17 +139,27 @@ export function initSnapSplit(root, scenarioFor) {
   }
 
   /* Arrival: a highlight sweeps down the receipt; the split is already final under it. */
+  let timers = [];
   function sweep() {
     if (reduced()) return;
     const rows = [...list.children];
     const n = rows.length;
-    rows.forEach((li, k) => setTimeout(() => {
+    timers = rows.map((li, k) => setTimeout(() => {
       li.classList.remove('is-lit'); void li.offsetWidth; li.classList.add('is-lit');
       light(li);
       follow(lineFor(li));
     }, (k * SWEEP_MS) / n));
-    setTimeout(() => { light(null); follow(null); hint(); }, SWEEP_MS + 120);
+    timers.push(setTimeout(() => { light(null); follow(null); hint(); }, SWEEP_MS + 120));
   }
+  /* the first touch ends the arrival at once: no band is left running over the lines */
+  function endSweep() {
+    if (!timers.length) return;
+    timers.forEach(clearTimeout); timers = [];
+    list.querySelectorAll('.is-lit').forEach((li) => li.classList.remove('is-lit'));
+    light(null); follow(null);
+  }
+  card.addEventListener('pointerdown', endSweep);
+  card.addEventListener('keydown', endSweep);
 
   /* one-time nudge on the first line's faces */
   function hint() {
@@ -169,7 +180,7 @@ export function initSnapSplit(root, scenarioFor) {
     paper.querySelector('.tz-r-foot p')?.remove(); // its unit count ("ITEMS 19") reads as a mismatch next to the line count
     if (thumbImg) thumbImg.innerHTML = paper.innerHTML;
     paper.style.transform = '';
-    const tag = [sc.day, sc.payer === 'you' ? '' : `${PEOPLE[sc.payer].name} paid`, 'Read from a photo'].filter(Boolean).join(' · ');
+    const tag = [sc.day, sc.payer === 'you' ? '' : `${PEOPLE[sc.payer].name} paid`].filter(Boolean).join(' · ');
     tags.forEach((t) => { t.textContent = tag; });
     render();
   }

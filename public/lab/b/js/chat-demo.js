@@ -33,21 +33,19 @@ export function scripts(sc) {
     match: {
       steps: [
         { user: "Add what's missing from my statement. The café was with Maya.", attach: { icon: 'doc', name: 'nov-statement.pdf' } },
-        { tools: ['Added 2 expenses'] },
-        { html: card('From nov-statement.pdf', '',
-          row(`${line('NOV 03', 'CITY PARKING', parking.total)}<small>Just you</small>`, money(parking.mine))
-          + row(`${line('NOV 06', 'CORNER CAFE', cafe.total)}<small>You and Maya</small>`, money(cafe.mine)),
-          '<p class="tzcard-by">Added by Claude</p>') },
+        { tools: [['Reading nov-statement.pdf…', 'Added 2 expenses']] },
+        { html: card('November', 'Your share',
+          row(`${line('NOV 03', 'CITY PARKING', parking.total)}`, money(parking.mine))
+          + row(`${line('NOV 06', 'CORNER CAFE', cafe.total)}<small>You and Maya</small>`, money(cafe.mine))) },
         { ai: `Maya owes you ${money(cafe.total - cafe.mine)}.` },
       ],
     },
     groceries: {
       steps: [
         { user: 'What did I spend on groceries in October?' },
-        { tools: ['Searched October'] },
+        { tools: [['Searching October…', `Found ${groc.length} expenses`]] },
         { html: card('Groceries · October', 'Your share',
-          groc.map((g) => row(`${esc(store(g.s))}<small>${esc(g.s.day)} · ${g.one ? esc(g.one) : `${g.n} items`}</small>`, money(g.cents))).join(''),
-          `<p class="tzcard-f">Total <b class="money">${money(grocTotal)}</b></p>`) },
+          groc.map((g) => row(`${esc(store(g.s))}<small>${esc(g.s.day)} · ${g.one ? esc(g.one) : `${g.n} items`}</small>`, money(g.cents))).join('')) },
         { ai: `${money(grocTotal)}, mostly at ${store(groc[0].s).replace(/ Market$/, '')}.` },
       ],
     },
@@ -90,7 +88,7 @@ export function initChatDemo(section, scenarios) {
       const att = step.attach ? `<span class="att">${ICON[step.attach.icon]}${esc(step.attach.name)}</span>` : '';
       return `<div class="msg msg-user">${att}<p></p></div>`;
     }
-    if (step.tools) return `<div class="msg msg-tool">${step.tools.map((t) => `<span class="tool"><span class="spin" aria-hidden="true"></span>${ICON.check}<span>${esc(t)}</span></span>`).join('')}</div>`;
+    if (step.tools) return `<div class="msg msg-tool">${step.tools.map(([run, done]) => `<span class="tool"><span class="spin" aria-hidden="true"></span>${ICON.check}<span class="t-run">${esc(run)}</span><span class="t-done">${esc(done)}</span></span>`).join('')}</div>`;
     if (step.ai !== undefined) return '<div class="msg msg-ai"><p></p></div>';
     return `<div class="msg msg-card">${step.html}</div>`;
   };
@@ -144,7 +142,7 @@ export function initChatDemo(section, scenarios) {
         if (m.classList.contains('msg-tool')) {
           const tools = [...m.querySelectorAll('.tool')];
           tools.forEach((t) => t.classList.remove('is-done'));
-          for (const t of tools) { await wait(260, id); t.classList.add('is-done'); }
+          for (const t of tools) { await wait(700, id); t.classList.add('is-done'); }
           await wait(120, id);
         } else {
           await wait(m.classList.contains('msg-user') ? 200 : 320, id);
@@ -153,7 +151,10 @@ export function initChatDemo(section, scenarios) {
       playing = false;
       log.classList.remove('is-playing');
       const last = S[key].steps[S[key].steps.length - 1];
-      if (live) live.textContent = last.ai || '';
+      if (live) {
+        live.textContent = last.ai || '';
+        setTimeout(() => { if (live.textContent === last.ai) live.textContent = ''; }, 3000);
+      }
     } catch (e) { if (e.message !== 'stale') throw e; }
   }
 

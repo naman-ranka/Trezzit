@@ -75,8 +75,8 @@ export function avatar(p, { size = '', pressed = null, label = '', speak = false
   const attrs = pressed === null ? (speak ? '' : 'aria-hidden="true"') : `aria-pressed="${pressed}" aria-label="${esc(label || p.name)}"`;
   const tag = pressed === null ? 'span' : 'button type="button"';
   const close = pressed === null ? 'span' : 'button';
-  // "You" fits a 44px face; a small face shows "Y" next to its name.
-  const mark = p.id === 'you' ? (size === 'sm' ? 'Y' : 'You') : esc(p.initials);
+  // every circle carries one letter, "Y" for you; the word "You" is a label beside it
+  const mark = p.id === 'you' ? 'Y' : esc(p.initials);
   return `<${tag} class="av ${size}" data-id="${p.id}" style="--c:${p.color}" ${attrs}>${mark}</${close}>`;
 }
 

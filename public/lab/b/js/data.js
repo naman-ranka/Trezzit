@@ -122,6 +122,7 @@ const DEFS = [
     id: 'pharmacy', kind: 'personal', title: 'A pharmacy run, just yours', short: 'Pharmacy',
     sample: 'corner-pharmacy', payer: 'you', group: null,
     bank: { date: 'OCT 20', merchant: 'CORNER PHARMACY', cat: 'Health' }, day: 'Oct 20',
+    addedBy: 'Added by ChatGPT',
   },
   {
     id: 'rent', kind: 'recurring', title: 'Rent and bills', short: 'Rent',
@@ -129,7 +130,7 @@ const DEFS = [
     bank: { date: 'OCT 01', merchant: 'OAK ST PROPERTY', cat: 'Transfer' }, day: 'Oct 1', store: 'Oak St Property',
     people: ROOMIES,
     items: [
-      { name: 'Rent', amount: '2400.00', category: 'rent', split: { type: 'percentage', percents: { you: 25, maya: 25, jordan: 28, sam: 22 } } },
+      { name: 'Rent', amount: '2400.00', category: 'rent', split: { type: 'percentage', percents: { you: 24, maya: 26, jordan: 28, sam: 22 } }, note: 'By room size' },
       { name: 'Water and sewer', amount: '68.40', category: 'utilities', split: eq(ROOMIES) },
       { name: 'Trash and recycling', amount: '24.00', category: 'utilities', split: eq(ROOMIES) },
       { name: 'Internet 1 Gig', amount: '65.00', category: 'internet', split: eq(ROOMIES) },
@@ -166,6 +167,7 @@ const EXTRA = [
     id: 'order', kind: 'personal', title: 'One online order', short: 'Online order',
     payer: 'you', group: null,
     bank: { date: 'OCT 15', merchant: 'MKTPLACE ORDER *3B7Q1', cat: 'Shopping' }, day: 'Oct 15', store: 'Online order',
+    addedBy: 'Added by Claude from', addedFile: 'order-confirmation.pdf',
     people: ['you'],
     items: [
       { name: 'USB-C charger, 2-pack', amount: '18.99', category: 'electronics' },

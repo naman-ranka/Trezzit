@@ -48,6 +48,14 @@ export function countTo(el, from, to, { dur = 700, cur = 'USD' } = {}) {
   });
 }
 
+/** Move focus to el() once a programmatic (smooth) scroll has settled, without scrolling again. */
+export function focusAfterScroll(el) {
+  let done = false;
+  const go = () => { if (done) return; done = true; el()?.focus({ preventScroll: true }); };
+  addEventListener('scrollend', go, { once: true });
+  setTimeout(go, 1000);
+}
+
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** Run cb once when el first comes into view. */

@@ -27,3 +27,9 @@
 /* the scan's own sample chips drive the split, so the split's chip row would repeat them */
 .pg .play-bar .seg-ctl { display: none; }
 .pg .play-bar { justify-content: flex-end; }
+
+/* under the split: one way to keep it (the app), one line on what this page does not do, and the AI route */
+.pg-save { max-width: 760px; margin: 24px auto 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.pg-save p { font-size: 15px; color: var(--muted); }
+.pg-save p a { color: var(--ink); text-underline-offset: 3px; display: inline-block; padding-block: 12px; margin-block: -12px; }
+@media (max-width: 599px) { .pg-save .btn { width: 100%; } .pg-split { padding-bottom: 48px; } }

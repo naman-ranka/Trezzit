@@ -18,7 +18,8 @@ const compact = () => innerWidth < 900;
 export async function initStory() {
   const root = $('#story-root');
   const stage = $('#story-stage');
-  if (!root || !stage) return;
+  const pin = $('#story-pin');
+  if (!root || !stage || !pin) return;
   const model = await loadModel('green-basket');
   const original = JSON.parse(JSON.stringify(model.lines));
   let res = compute(model);
@@ -27,7 +28,11 @@ export async function initStory() {
   const groups = original.map((l) => (lineMembers(l).length === people.length ? 1 : 2));
   const GROUP = (i) => groups[i];
 
-  const CAPTION = { 0: `${model.lines.length} items · ${money(model.totalCents)}`, [LAST]: 'Tap to change who had what.' };
+  // a mouse page says "Click"; a phone says "Tap" (the step heading and the caption both)
+  const verb = matchMedia('(hover: hover) and (pointer: fine)').matches ? 'Click' : 'Tap';
+  const lastH = $(`.step[data-step="${LAST}"] h3`, root);
+  if (lastH) lastH.textContent = `${verb} to change who had what.`;
+  const CAPTION = { 0: `${model.lines.length} items · ${money(model.totalCents)}`, [LAST]: `${verb} to change who had what.` };
   // The nine plain groceries everyone shares fold into one row ("Shared groceries · 9 items"), so the grid shows only
   // what differs: your two, Maya's two, the taxed towels. The fold opens on tap; a dot on it changes all nine at once.
   const fold = original.map((l, i) => i).filter((i) => groups[i] === 1 && !original[i].taxCents);
@@ -73,7 +78,7 @@ export async function initStory() {
   const share = () => {
     const cents = res.people.you?.cents || 0;
     const mine = model.lines.map((_, i) => res.items.find((x) => x.index === i)?.shares?.you || 0);
-    // everyone's share too: the balances below (and the AI's "Who owes me?") follow the whole split, not only yours
+    // everyone's share too (the footer's "Roommates owe you" follows the whole split, not only yours)
     const each = Object.fromEntries(people.map((p) => [p, res.people[p]?.cents || 0]));
     const sig = `${mine.join()}|${people.map((p) => each[p]).join()}`;
     if (window.__tzSplit?.sig === sig) return;
@@ -98,6 +103,7 @@ export async function initStory() {
   footReset.addEventListener('click', () => reset());
   // the scan's "Split it" arrives here with the receipt it just read: the default split, and its header flashes once
   document.addEventListener('tz:story-arrive', () => {
+    pinned = true; // it arrives on the playground, and stays there while in view
     if (edited) reset();
     const hd = $('.st-people', stage);
     hd.classList.remove('is-flash'); void hd.offsetWidth; hd.classList.add('is-flash');
@@ -157,8 +163,8 @@ export async function initStory() {
         const all = n === ix.length;
         b.classList.toggle('on', assigned && all);
         b.classList.toggle('part', assigned && n > 0 && !all);
-        // before its beat, a row shows who will have it, faintly (so step 1's personal rows are not empty)
-        b.classList.toggle('pre', !assigned && step > 0 && all);
+        // before its beat, a row shows who will have it, faintly (so no frame of the card is a grid of empty rows)
+        b.classList.toggle('pre', !assigned && all);
         b.setAttribute('aria-pressed', all ? 'true' : n ? 'mixed' : 'false');
         b.tabIndex = row === focusRow && c === fc ? 0 : -1; // exactly one dot is always reachable by Tab
       });
@@ -254,12 +260,21 @@ export async function initStory() {
       sub.hidden = true;
       expBtn.setAttribute('aria-expanded', 'false');
       grpRow.classList.remove('is-open'); stage.classList.remove('is-open');
+      root.style.setProperty('--open-extra', '0px');
       setH();
     }
     resplit();
   }
+  let anchorT = 0;
   function toggleFold(open = sub.hidden) {
     const y0 = expBtn.getBoundingClientRect().top;
+    const h0 = pin.offsetHeight;
+    // the browser's scroll anchoring would follow content further down as the nine grow in, scrolling the page by
+    // their height (the toggle ran off the top): off for the length of the move, so the row you clicked stays put
+    const html = document.documentElement;
+    html.style.overflowAnchor = 'none';
+    clearTimeout(anchorT);
+    anchorT = setTimeout(() => { html.style.overflowAnchor = ''; }, 600);
     pinned = true;
     if (current !== LAST) apply(LAST);
     sub.hidden = !open;
@@ -267,13 +282,16 @@ export async function initStory() {
     grpRow.classList.toggle('is-open', open);
     stage.classList.toggle('is-open', open);
     paintDots(current < 0 ? 0 : current);
-    // the nine grow in (300ms), so the card's new height reads as the same card opening, not a jump
-    if (open && !reduced()) sub.animate([{ height: '0px', opacity: 0 }, { height: `${sub.scrollHeight}px`, opacity: 1 }], { duration: 300, easing: 'cubic-bezier(.2,.7,.2,1)' });
-    // the pinned stage keeps its place while the nine are open (it grows downward, not re-centred), and if the page
-    // itself moved, scroll back so the row you clicked stays under the cursor
+    // Desktop: the stage is sticky inside the story. Opening makes it taller, and near the end of the story the
+    // section's bottom edge would push it up. The story grows by exactly what the card grew, so the card keeps its
+    // top, and closing gives it back. (The card is pinned high enough for its open height to fit: see setH().)
+    root.style.setProperty('--open-extra', open ? `${Math.max(0, pin.offsetHeight - h0)}px` : '0px');
     if (!open) setH();
+    // measured on the final layout (before the grow-in starts): if the row moved anyway, scroll it back
     const dy = expBtn.getBoundingClientRect().top - y0;
     if (Math.abs(dy) > 1) scrollBy({ top: dy, behavior: 'instant' });
+    // the nine grow in (300ms), so the card's new height reads as the same card opening, not a jump
+    if (open && !reduced()) sub.animate([{ height: '0px', opacity: 0 }, { height: `${sub.scrollHeight}px`, opacity: 1 }], { duration: 300, easing: 'cubic-bezier(.2,.7,.2,1)' });
   }
   stage.addEventListener('keydown', (e) => {
     const btn = e.target.closest?.('.dot-b');
@@ -361,8 +379,17 @@ export async function initStory() {
     if ((edited || pinned) && step < LAST && rr.bottom > 0 && rr.top < innerHeight) step = LAST;
     apply(step);
   }
-  const pin = $('#story-pin');
-  function setH() { if (!stage.classList.contains('is-open')) root.style.setProperty('--stage-h', `${pin.offsetHeight}px`); }
+  // the pinned card's closed and open heights: closed centres it beside the title; open keeps it high enough that the
+  // nine can open in place without the card leaving the screen (measured in one go, before any paint)
+  function setH() {
+    if (stage.classList.contains('is-open')) return;
+    root.style.setProperty('--stage-h', `${pin.offsetHeight}px`);
+    if (!sub || compact()) return;
+    sub.hidden = false; stage.classList.add('is-open');
+    const ho = pin.offsetHeight;
+    sub.hidden = true; stage.classList.remove('is-open');
+    root.style.setProperty('--stage-ho', `${ho}px`);
+  }
   setH();
   if ('ResizeObserver' in window) new ResizeObserver(setH).observe(pin);
   const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(measure); } };

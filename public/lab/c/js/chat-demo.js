@@ -7,7 +7,7 @@
  * finished first exchange (never an empty box); a prompt tap plays one, and
  * after 6s in view the next one plays once by itself. Every figure comes from
  * the same data as the demos. */
-import { PEOPLE, CATEGORIES, LAST_MONTH, getSample, sampleBill, octoberLedger } from './data.js';
+import { PEOPLE, CATEGORIES, getSample, sampleBill, octoberLedger } from './data.js';
 import { splitSample } from '../../_kit/receipts.js';
 import { esc, money, icon, sleep, reduced, h, YOU_GLYPH } from './util.js';
 
@@ -21,11 +21,10 @@ async function buildScripts() {
   const L = await octoberLedger();
   const groc = L.byCat.groceries;
   const grocLines = L.entries.map((e) => { const ls = e.lines.filter((l) => l.cat === 'groceries'); return { e, n: ls.length, c: ls.reduce((a, l) => a + l.cents, 0) }; }).filter((x) => x.c > 0);
-  const grocDelta = LAST_MONTH.groceries - groc;
   const owed = gb.people.filter((p) => p !== 'you').reduce((a, p) => a + r.people[p].cents, 0);
 
   const splitCard = (saved) => `<div class="tc">
-    <div class="tc-h"><span class="tc-k">${saved ? `${icon.check} Saved` : 'Draft, not saved yet'}</span><span>Apartment 3B</span></div>
+    <div class="tc-h"><span class="tc-k">${saved ? `${icon.check} Saved` : 'Draft'}</span><span>Apartment 3B</span></div>
     <p class="tc-t">Green Basket Market <b class="money">${money(r.totalCents)}</b></p>
     <ul class="tc-people tc-grid" role="list">${gb.people.map((p) => `<li>${av(p)}<span class="tc-pn">${PEOPLE[p].name}</span><b class="money">${money(r.people[p].cents)}</b></li>`).join('')}</ul>
   </div>`;
@@ -58,11 +57,10 @@ async function buildScripts() {
         { t: 'user', attach: { id: 'green-basket', label: 'receipt.jpg' }, text: 'Split with my roommates. Oat milk and kale chips are Maya’s; avocados and cold brew are mine.' },
         { t: 'tool', name: 'Read and draft the bill' },
         { t: 'card', html: splitCard(false) },
-        { t: 'ai', text: 'Save it to Apartment 3B?', wide: true },
+        { t: 'ai', text: 'Save it to Apartment 3B?' },
         { t: 'user', text: 'Save it.', wait: 900 },
-        { t: 'tool', name: 'Save the bill', wide: true },
-        // the draft stays a draft in the log and the save is its own turn, at every width:
-        // phones keep your "Save it." (nothing is saved without your yes) and drop only the tool row
+        { t: 'tool', name: 'Save the bill' },
+        // every width shows the whole consent beat: the draft, the question, your yes, then the save
         { t: 'ai', html: `Saved. Maya, Jordan and Sam owe you <b class="money">${money(owed)}</b>.` },
         // the proof behind "you see everything it adds": the row the app's activity feed shows
         { t: 'act', html: '<b>Activity</b> <span aria-hidden="true">·</span> Added by your AI <span aria-hidden="true">·</span> just now' },
@@ -75,11 +73,11 @@ async function buildScripts() {
         { t: 'tool', name: 'Read your expenses', wide: true },
         { t: 'tool', name: 'Add up your share' },
         { t: 'card', html: `<div class="tc">
-          <div class="tc-h"><span class="tc-k"><i class="dot" style="--c:${CATEGORIES.groceries.color}"></i>Groceries · October</span><span>Your share only</span></div>
+          <div class="tc-h"><span class="tc-k"><i class="dot" style="--c:${CATEGORIES.groceries.color}"></i>Groceries · October</span><span>${grocLines.length} receipts</span></div>
           <p class="tc-t big money">${money(groc)}</p>
           <ul class="tc-rows" role="list">${grocLines.map(({ e, c, n }) => `<li><span><b>${esc(e.title)}</b><small>${e.date} · ${e.kind === 'personal' ? 'just you' : esc(e.group)}</small></span><span class="r"><b class="money">${money(c)}</b>${e.kind === 'personal' ? `<small>${n} grocery item${n === 1 ? '' : 's'}</small>` : e.totalCents !== c ? `<small class="money">of ${money(e.totalCents)}</small>` : ''}</span></li>`).join('')}</ul>
         </div>` },
-        { t: 'ai', html: `<b class="money">${money(groc)}</b>, your share only. That’s ${money(grocDelta)} less than September.` },
+        { t: 'ai', html: `<b class="money">${money(groc)}</b>, just your share of each receipt.` },
       ],
     },
     owe: {
@@ -116,7 +114,7 @@ export async function mountChat(root, opts = {}) {
         <span class="chat-id"><span class="chat-glyph" aria-hidden="true">${icon.sparkle}</span><span class="chat-name"><b>Your AI</b> <span>with Trezzit</span></span></span>
         <button type="button" class="chat-ctl" aria-label="Replay">${icon.replay}</button>
       </div>
-      <ol class="chat-log" aria-live="off" aria-label="Conversation"></ol>
+      <ol class="chat-log" role="log" aria-live="off" aria-label="Conversation"></ol>
       <div class="chat-try">
         <div class="chat-prompts" role="group" aria-label="Try a question">
           ${keys.map((k, i) => `<button type="button" class="prompt" data-k="${k}" aria-pressed="${i === 0}"><span class="pl">${esc(S[k].chip)}</span>${S[k].short ? `<span class="ps">${esc(S[k].short)}</span>` : ''}</button>`).join('')}

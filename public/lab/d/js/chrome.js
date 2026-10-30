@@ -31,10 +31,10 @@ export function initChrome() {
       if (code) { const r = document.createRange(); r.selectNodeContents(code); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
       b.title = 'Selected. Press Ctrl+C or ⌘C to copy.';
       label.textContent = 'Selected';
-      setTimeout(() => { label.textContent = was; }, 1800);
+      setTimeout(() => { label.textContent = was; }, 1500);
       return;
     }
-    setTimeout(() => { label.textContent = was; b.classList.remove('copied'); use?.setAttribute('href', '#i-copy'); }, 1800);
+    setTimeout(() => { label.textContent = was; b.classList.remove('copied'); use?.setAttribute('href', '#i-copy'); }, 1500);
   }));
 
   $$('[data-tabs]').forEach((list) => {

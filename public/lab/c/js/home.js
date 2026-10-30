@@ -30,9 +30,17 @@ const splitEl = document.getElementById('split-demo');
 // the scan's "Split this receipt" hands its result to the split, so the split is mounted no later than the scan
 const mountSplit = once(() => import('./split-demo.js').then((m) => m.mountSplit(splitEl, { sampleId: 'green-basket', listen: true, tipToggle: true, yours: false })));
 // home keeps to the apartment story: the shared groceries and one receipt that is just yours (no strangers in the split)
-lazy('scan-demo', (el) => { mountSplit(); return import('./scan-demo.js').then((m) => m.mountScan(el, { samples: ['green-basket', 'corner-pharmacy'], splitTarget: '#split', soloHref: 'just-me/' })); });
+// a receipt that is just yours: "See your share" goes to step 3 with "You paid alone" open and that receipt lit
+const sortSolo = () => {
+  const l = lazies.find((x) => x.el.id === 'ledger-demo');
+  Promise.resolve(l?.go()).then((api) => {
+    api?.setPay('alone', 'corner-pharmacy');
+    document.getElementById('understand')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  });
+};
+lazy('scan-demo', (el) => { mountSplit(); return import('./scan-demo.js').then((m) => m.mountScan(el, { samples: ['green-basket', 'corner-pharmacy'], splitTarget: '#split', onSolo: sortSolo })); });
 lazy('split-demo', () => mountSplit());
-lazy('ledger-demo', (el) => import('./ledger-demo.js').then((m) => m.mountLedger(el, { compact: true, byPayer: true, rentHref: 'roommates/#rent', highlight: 'pizza' })));
+lazy('ledger-demo', (el) => import('./ledger-demo.js').then((m) => m.mountLedger(el, { compact: true, byPayer: true, rentHref: 'roommates/#rent' })));
 lazy('chat-demo', (el) => import('./chat-demo.js').then((m) => m.mountChat(el)));
 // keyboard visitors tab faster than the lazy loaders can see: on the first Tab (or focus inside a section), mount everything
 const mountAll = once(() => lazies.forEach(({ go }) => go()));

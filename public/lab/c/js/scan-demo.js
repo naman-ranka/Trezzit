@@ -64,7 +64,7 @@ export function mountScan(root, opts = {}) {
           <p class="so-total"><span>Total</span><b class="money"></b></p>
           <ul class="so-checks" aria-label="Checked against the receipt"></ul>
           ${opts.splitTarget ? `<button type="button" class="c-btn c-btn-sm c-btn-primary so-split">Split this receipt ${icon.arrow}</button>` : ''}
-          ${opts.soloHref ? `<a class="c-btn c-btn-sm c-btn-quiet so-split so-solo" href="${esc(opts.soloHref)}" hidden>See it sorted ${icon.arrow}</a>` : ''}
+          ${opts.onSolo ? `<button type="button" class="c-btn c-btn-sm c-btn-quiet so-split so-solo" hidden>See your share ${icon.arrow}</button>` : opts.soloHref ? `<a class="c-btn c-btn-sm c-btn-quiet so-split so-solo" href="${esc(opts.soloHref)}" hidden>See your share ${icon.arrow}</a>` : ''}
         </div>
         <p class="so-notice" hidden></p>
       </div>
@@ -94,7 +94,7 @@ export function mountScan(root, opts = {}) {
       .map(([k, v]) => `${k} <span class="money">${money(toCents(v), cur)}</span>`);
     sumEl.innerHTML = parts.join(' <span aria-hidden="true">·</span> ');
   };
-  const splitBtn = root.querySelector('button.so-split');
+  const splitBtn = root.querySelector('button.so-split:not(.so-solo)');
   const soloLink = root.querySelector('.so-solo');
   // a receipt that is just yours has nothing to split: offer where it lands instead
   const setSolo = (id) => {
@@ -120,8 +120,10 @@ export function mountScan(root, opts = {}) {
   let last = null;
   let objectUrl = null;
 
+  const actions = root.querySelectorAll('.so-split');
   const setStage = (s) => {
     root.dataset.stage = s;
+    actions.forEach((a) => { if (s === 'done') a.removeAttribute('aria-disabled'); else a.setAttribute('aria-disabled', 'true'); });
     statusEl.querySelector('.txt').textContent = STAGE_LABEL[s] || s;
   };
   const press = (id) => root.querySelectorAll('.pick[data-id]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
@@ -198,7 +200,7 @@ export function mountScan(root, opts = {}) {
     }
     let shown = 0;
     try {
-      const result = await scan(input, {
+      const result = await (isFile ? scan : playLocal)(input, {
         signal,
         instant: instant || reduced(),
         onStage(stage, detail) {
@@ -266,8 +268,12 @@ export function mountScan(root, opts = {}) {
     run(f);
     fileInput.value = '';
   });
+  soloLink?.addEventListener('click', (e) => {
+    if (soloLink.getAttribute('aria-disabled') === 'true') { e.preventDefault(); return; }
+    if (opts.onSolo) opts.onSolo(last);
+  });
   splitBtn?.addEventListener('click', () => {
-    if (!last) return;
+    if (!last || splitBtn.getAttribute('aria-disabled') === 'true') return;
     bus.emit('receipt', last);
     const target = document.querySelector(opts.splitTarget);
     target?.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
@@ -282,10 +288,36 @@ export function mountScan(root, opts = {}) {
     layout(bill);
     setStage('idle');
     statusEl.querySelector('.txt').textContent = '';
-    if (opts.autoplay !== false) onVisible(root, () => { if (root.dataset.stage === 'idle') run(first); }, { threshold: 0.45 });
+    if (opts.autoplay !== false) onVisible(root, () => { if (root.dataset.stage === 'idle') run(first); }, { threshold: 0.3 });
   });
 
   root._scan = { run, get last() { return last; } };
   return root._scan;
 }
 let uid = 0;
+
+const wait = (ms, signal) => new Promise((resolve, reject) => {
+  if (signal?.aborted) { reject(new DOMException('Aborted', 'AbortError')); return; }
+  if (ms <= 0) { resolve(); return; }
+  const t = setTimeout(resolve, ms);
+  signal?.addEventListener('abort', () => { clearTimeout(t); reject(new DOMException('Aborted', 'AbortError')); }, { once: true });
+});
+/** A recorded sample, played with the kit's stages (uploading, reading, checking, done):
+ *  about 2.3 s on desktop, capped at 1.8 s on phones so the card is full before a thumb scrolls past. */
+async function playLocal(id, { onStage, instant, signal }) {
+  const { raw, bill } = await sampleBill(id);
+  const phone = matchMedia('(max-width: 719px)').matches;
+  const [up, read, check] = instant ? [0, 0, 0] : phone ? [200, 1150, 400] : [350, 1400, 550];
+  const emit = (stage, detail = {}) => onStage?.(stage, { sampleId: id, ...detail });
+  emit('uploading', { progress: 1 });
+  await wait(up, signal);
+  emit('reading', { items: [] });
+  const n = bill.items.length;
+  if (read) for (let i = 1; i <= n; i += 1) { await wait(read / Math.max(1, n), signal); emit('reading', { items: bill.items.slice(0, i) }); }
+  else emit('reading', { items: bill.items });
+  emit('checking', { validations: bill.backendValidations });
+  await wait(check, signal);
+  const result = { source: 'sample', sampleId: id, raw, bill };
+  emit('done', { result });
+  return result;
+}

@@ -109,9 +109,12 @@ proof.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') {
 proof.addEventListener('pointerleave', () => { hovered = false; pauseTour(); });
 proof.addEventListener('focusin', (e) => { if (e.target !== tourBtn) { focused = true; pauseTour(); } });
 proof.addEventListener('focusout', () => { focused = false; pauseTour(); });
+/* watch the bank lines, not the whole card: on a phone the card is taller than the space under
+   the headline, so half of it is never on screen at first load and the tour would never start */
+const lines = $('.pb-lines', hero);
 if (!reduced()) {
-  watchVisible(proof, (v) => { onScreen = v; pauseTour(); }, { threshold: 0.5 });
-  whenVisible(proof, () => { if (step === -1) nextStop(); }, { threshold: 0.5 });
+  watchVisible(lines, (v) => { onScreen = v; pauseTour(); }, { threshold: 0.6 });
+  whenVisible(lines, () => { if (step === -1) nextStop(); }, { threshold: 0.6 });
 }
 /* a phone hides the two extra statement lines: if one was selected, fall back to the first */
 addEventListener('resize', () => { if (current.offsetParent === null) select(tabs[0]); }, { passive: true });

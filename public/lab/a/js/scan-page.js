@@ -2,7 +2,7 @@
  * ?r=<sample id> (or ?r=live, from the landing page's own scan) picks the receipt to start with.
  * Arriving with #split (the landing scan's "Split it" for a sample other than the story's): the scan renders finished, at once,
  * and the page opens on step 2 after everything above it has its final height. */
-import { $ } from './util.js';
+import { $, focusAfterScroll } from './util.js';
 import { mountScan } from './scan-demo.js';
 import { mountSplit } from './split-play.js';
 import { SAMPLES, modelFrom } from './data.js';
@@ -25,6 +25,8 @@ const scanner = mountScan($('#scan-demo'), {
   onResult(model) { play.load(model.source === 'live' ? model : model.id); },
   onSplit() {
     $('#split').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    // focus follows the page down: onto the split grid's one tabbable dot
+    focusAfterScroll(() => $('#play-root .dot-b[tabindex="0"]'));
   },
 });
 const scanned = liveModel ? Promise.resolve() : scanner.run(start, { instant: arriving });
