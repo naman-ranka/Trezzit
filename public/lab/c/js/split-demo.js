@@ -3,7 +3,7 @@
  * remainder), so the totals always add up to the receipt exactly. */
 import { billFromScan, splitBill, toCents } from '../../_kit/split-engine.js';
 import { PEOPLE, CATEGORIES, SAMPLE_META, getSample, sampleBill } from './data.js';
-import { esc, money, countMoney, itemName, storeName, icon, bus, reduced, YOU_GLYPH } from './util.js';
+import { esc, money, countMoney, itemName, storeName, icon, bus, reduced, YOU_GLYPH, css } from './util.js';
 
 const ROOMIES = ['you', 'maya', 'jordan', 'sam'];
 const eq = (people) => ({ type: 'equal', people });
@@ -11,6 +11,7 @@ const eq = (people) => ({ type: 'equal', people });
 const andList = { format: (a) => (a.length < 3 ? a.join(' and ') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`) };
 
 export function mountSplit(root, opts = {}) {
+  css('split'); // its styles (linked by the page, or loaded by home.js before mounting)
   root.classList.add('split');
   if (opts.yours === false) root.classList.add('no-yours');
   const st = {
@@ -18,7 +19,10 @@ export function mountSplit(root, opts = {}) {
     expanded: !!opts.expanded, tipMode: 'proportional', result: null, payer: opts.payer || 'you',
   };
 
+  // .sp-body holds the people bar and the items: on phones the bar is sticky inside it only,
+  // so it lets go before "Adds up to" (the line that proves the math is never covered)
   root.innerHTML = `
+    <div class="sp-body">
     <div class="sp-head">
       <p class="sp-bill"><b class="sp-title"></b><span class="sp-sub"></span></p>
       <ul class="sp-people" role="list"></ul>
@@ -35,6 +39,7 @@ export function mountSplit(root, opts = {}) {
     <ul class="sp-items" role="list"></ul>
     <button type="button" class="sp-more c-link-btn" hidden></button>
     <div class="sp-extra" hidden></div>
+    </div>
     <div class="sp-foot">
       <p class="sp-check">${icon.check}<span></span></p>
       <button type="button" class="c-btn c-btn-sm c-btn-quiet sp-reset">${icon.replay} Reset</button>
@@ -102,7 +107,8 @@ export function mountSplit(root, opts = {}) {
       const from = toCents(b.textContent);
       // always (re)target the figure: a tap that undoes the last one must cancel its count
       if (from !== to) { li.classList.remove('flash'); void li.offsetWidth; li.classList.add('flash'); }
-      countMoney(b, from, to, 420);
+      // straight to the new figure: a count-up here would show totals that don't add up for a moment
+      countMoney(b, from, to, 0);
     });
   }
 

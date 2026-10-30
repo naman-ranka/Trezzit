@@ -10,7 +10,7 @@
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
       d.classList.add('anim');
       // safety net: never leave the hero in its pre-animation state
-      setTimeout(function () { var v = document.querySelector('.hero-viz'); if (v && !v.classList.contains('s1')) v.classList.add('s1', 's2', 's3', 's4'); }, 3500);
+      setTimeout(function () { var v = document.querySelector('.hero-viz'); if (v && !v.classList.contains('s1')) v.classList.add('s1', 's2', 's3', 's4'); }, 2000);
     }
   })(document.documentElement);
 </script>
@@ -107,7 +107,7 @@
 <!-- ============ THREE VERBS ============ -->
 <section class="verbs" id="how" aria-labelledby="how-t">
   <div class="wrap">
-    <h2 id="how-t" class="how-t rv">Every&nbsp;item. Every&nbsp;share. One&nbsp;place.</h2>
+    <h2 id="how-t" class="visually-hidden">How it works</h2>
 
     <article class="verb" id="capture" aria-labelledby="capture-t">
       <div class="verb-copy rv">
@@ -134,7 +134,7 @@
 
     <article class="verb" id="understand" aria-labelledby="understand-t">
       <div class="verb-copy rv">
-        <h3 id="understand-t"><span class="verb-n" aria-hidden="true">3</span>Your share, whoever&nbsp;paid.</h3>
+        <h3 id="understand-t"><span class="verb-n" aria-hidden="true">3</span>Everything you spent, in&nbsp;one&nbsp;place.</h3>
       </div>
       <div class="verb-demo rv">
         <div class="demo-frame" id="ledger-demo">
@@ -150,7 +150,7 @@
   <div class="wrap">
     <div class="ai-grid">
       <header class="ai-copy rv">
-        <h2 id="ai-t">Or ask Claude or ChatGPT to add&nbsp;it.</h2>
+        <h2 id="ai-t">Or let Claude or ChatGPT read and add&nbsp;to&nbsp;it.</h2>
         <ul class="trust" role="list">
           <li>Never moves money.</li>
           <li>Disconnect any time.</li>
@@ -158,16 +158,16 @@
         <p class="ai-links"><a class="c-btn c-btn-primary" href="ai/">Connect your AI</a></p>
       </header>
       <div class="ai-demo rv" id="chat-demo">
-        <noscript><p class="nojs">You: Split this with my roommates. Assistant: Saved. Maya, Jordan and Sam owe you $70.00.</p></noscript>
+        <noscript><p class="nojs">You: Here’s my October card statement. What’s missing from Trezzit? Your AI: Two charges aren’t in Trezzit yet. Got the hardware receipt?</p></noscript>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ============ CLOSE ============ -->
-<section class="close close-end" aria-labelledby="close-t">
+<section class="close close-end" aria-label="Get started">
   <div class="wrap">
-    <h2 id="close-t" class="close-h rv">See what you actually spent.</h2>
+    <h2 class="close-h rv">Trezzit shows what you spent: every item, alone or&nbsp;shared.</h2>
     <div class="cta-row rv">
       <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a>
       <a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split">Split a bill, no account</a>

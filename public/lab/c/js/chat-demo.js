@@ -1,15 +1,15 @@
 /* chat-demo.js: scripted, realistic exchanges with an AI assistant that has
  * Trezzit connected. Neutral chat styling (not a copy of any AI app's UI).
  *
- * Round 5 rebuild: the panel is sized to fit its tallest conversation, so it
- * never scrolls. The question is always at the top, nothing is clipped or
- * folded, and the end state shows the whole exchange. The panel opens on the
- * finished first exchange (never an empty box); a prompt tap plays one, and
- * after 6s in view the next one plays once by itself. Every figure comes from
- * the same data as the demos. */
+ * The panel is as tall as the conversation it shows (never scrolls, no blank
+ * band): messages stack from the top. It opens on the first question already
+ * asked, and the answer plays once a quarter of the panel is on screen. A prompt
+ * tap plays another one. Tool steps are only the Trezzit tools that exist;
+ * anything else (matching, comparing) is the AI's own reply. Every figure comes
+ * from the same data as the demos. */
 import { PEOPLE, CATEGORIES, getSample, sampleBill, octoberLedger } from './data.js';
 import { splitSample } from '../../_kit/receipts.js';
-import { esc, money, icon, sleep, reduced, h, YOU_GLYPH } from './util.js';
+import { esc, money, icon, sleep, reduced, h, YOU_GLYPH, css } from './util.js';
 
 const av = (p, sz = 'sm') => `<span class="av av-${sz}" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span>`;
 const thumb = (id) => new URL(`../assets/thumb-${id}.webp`, import.meta.url).href;
@@ -38,8 +38,7 @@ async function buildScripts() {
       chip: 'Check my statement', short: 'Statement',
       steps: [
         { t: 'user', attach: { label: 'october-statement.pdf', doc: true }, text: 'Here’s my October card statement. What’s missing from Trezzit?', narrow: { text: 'What’s missing from Trezzit?' } },
-        { t: 'tool', name: 'Read your payments', narrow: { name: 'Match your payments' } },
-        { t: 'tool', name: 'Match charges to bills', wide: true },
+        { t: 'tool', name: 'Read your payments' },
         { t: 'card', html: `<div class="tc">
           <div class="tc-h"><span class="tc-k">Statement vs Trezzit</span><span>6 charges</span></div>
           <ul class="tc-rows tight mono" role="list">
@@ -102,11 +101,13 @@ async function buildScripts() {
 
 export async function mountChat(root, opts = {}) {
   const S = await buildScripts();
-  // the write half first: the finished split (draft, your yes, Saved, the Activity row) is what the panel opens on
-  const keys = opts.scripts || ['split', 'statement', 'groceries'];
+  // home opens on the statement check (where Trezzit is going: your bank, matched without linking it);
+  // /ai passes its own order
+  const keys = opts.scripts || ['statement', 'groceries', 'split'];
   // phones: the panel must fit one screen under the nav, so long exchanges drop their optional turns
   const narrowMQ = matchMedia('(max-width: 479px)');
   const stepsOf = (k) => S[k].steps.filter((st) => !(st.wide && narrowMQ.matches) && !(st.narrowOnly && !narrowMQ.matches)).map((st) => (narrowMQ.matches && st.narrow ? { ...st, ...st.narrow } : st));
+  css('chat'); // its styles (linked by the page, or loaded by home.js before mounting)
   root.classList.add('chat');
   root.innerHTML = `
     <div class="chat-win">
@@ -114,7 +115,7 @@ export async function mountChat(root, opts = {}) {
         <span class="chat-id"><span class="chat-glyph" aria-hidden="true">${icon.sparkle}</span><span class="chat-name"><b>Your AI</b> <span>with Trezzit</span></span></span>
         <button type="button" class="chat-ctl" aria-label="Replay">${icon.replay}</button>
       </div>
-      <ol class="chat-log" role="log" aria-live="off" aria-label="Conversation"></ol>
+      <div class="chat-log" role="log" aria-live="off" aria-label="Conversation"></div>
       <div class="chat-try">
         <div class="chat-prompts" role="group" aria-label="Try a question">
           ${keys.map((k, i) => `<button type="button" class="prompt" data-k="${k}" aria-pressed="${i === 0}"><span class="pl">${esc(S[k].chip)}</span>${S[k].short ? `<span class="ps">${esc(S[k].short)}</span>` : ''}</button>`).join('')}
@@ -132,7 +133,7 @@ export async function mountChat(root, opts = {}) {
   let touched = false;
 
   const setCtl = () => {
-    const mode = state === 'done' ? 'replay' : paused ? 'play' : 'pause';
+    const mode = state === 'done' ? 'replay' : paused || state === 'idle' ? 'play' : 'pause';
     ctl.innerHTML = icon[mode];
     ctl.setAttribute('aria-label', mode === 'replay' ? 'Replay' : mode === 'play' ? 'Play' : 'Pause');
     ctl.dataset.mode = mode;
@@ -144,45 +145,47 @@ export async function mountChat(root, opts = {}) {
       const att = step.attach ? (step.attach.doc
         ? `<span class="att doc"><span class="doc-i" aria-hidden="true">PDF</span>${esc(step.attach.label)}</span>`
         : `<span class="att"><img src="${thumb(step.attach.id)}" alt="" width="20" height="28">${esc(step.attach.label)}</span>`) : '';
-      el = h(`<li class="msg u"><div class="bub">${att}<p>${esc(step.text)}</p></div></li>`);
+      el = h(`<div class="msg u"><div class="bub"><span class="visually-hidden">You:</span>${att}<p>${esc(step.text)}</p></div></div>`);
     } else if (step.t === 'tool') {
-      el = h(`<li class="msg tool${instant ? ' done' : ''}"><span class="tl-i">${icon.tool}</span><span>Trezzit <span aria-hidden="true">·</span> ${esc(step.name)}</span><span class="tl-s" aria-hidden="true">${icon.check}</span></li>`);
+      el = h(`<div class="msg tool${instant ? ' done' : ''}"><span class="tl-i">${icon.tool}</span><span><span class="visually-hidden">Trezzit tool:</span><span aria-hidden="true">Trezzit · </span>${esc(step.name)}</span><span class="tl-s" aria-hidden="true">${icon.check}</span></div>`);
     } else if (step.t === 'card') {
       if (step.replace) {
         const prev = [...target.querySelectorAll('.msg.card')].pop();
         if (prev) { prev.querySelector('.tc').outerHTML = step.html; if (!instant) prev.classList.add('swap'); return prev; }
       }
-      el = h(`<li class="msg card">${step.html}</li>`);
+      el = h(`<div class="msg card"><span class="visually-hidden">Your AI:</span>${step.html}</div>`);
     } else if (step.t === 'act') {
-      el = h(`<li class="msg act"><span class="act-i">${icon.check}</span><span>${step.html}</span></li>`);
+      el = h(`<div class="msg act"><span class="act-i">${icon.check}</span><span>${step.html}</span></div>`);
     } else {
-      el = h(`<li class="msg a"><p>${step.html || esc(step.text)}</p></li>`);
+      el = h(`<div class="msg a"><p><span class="visually-hidden">Your AI: </span>${step.html || esc(step.text)}</p></div>`);
     }
     if (!instant) el.classList.add('enter');
     target.appendChild(el);
     return el;
   }
 
-  // The panel fits the tallest conversation at the current width, so it never has to scroll.
-  // Measured off-screen with the real markup and styles; re-measured when the width changes.
+  // The panel is exactly as tall as the finished conversation it is showing, measured off-screen with
+  // the real markup and styles (re-measured when the width changes), so there is never a blank band.
   const probe = log.cloneNode(false);
   probe.removeAttribute('aria-label');
+  probe.removeAttribute('role');
   probe.setAttribute('aria-hidden', 'true');
   probe.className = 'chat-log chat-probe';
   win.appendChild(probe);
   let lastW = 0;
+  const heights = {};
+  const size = () => { if (heights[current]) log.style.height = `${heights[current]}px`; };
   function fit() {
     const w = log.clientWidth;
     if (!w || w === lastW) return;
     lastW = w;
-    let max = 0;
     keys.forEach((k) => {
       probe.innerHTML = '';
       stepsOf(k).forEach((s) => add(s, true, probe));
-      max = Math.max(max, probe.scrollHeight);
+      heights[k] = Math.ceil(probe.scrollHeight) + 2;
     });
     probe.innerHTML = '';
-    log.style.height = `${Math.ceil(max) + 2}px`;
+    size();
   }
   fit();
   if ('ResizeObserver' in window) new ResizeObserver(() => fit()).observe(win);
@@ -201,12 +204,13 @@ export async function mountChat(root, opts = {}) {
     if (my !== run) throw new Error('stale');
   }
 
-  async function play(k, { instant = reduced() } = {}) {
+  async function play(k, { instant = reduced(), from = 0 } = {}) {
     run += 1;
     const my = run;
     current = k;
     paused = false;
     gate?.();
+    size();
     root.querySelectorAll('.prompt').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
     const steps = stepsOf(k);
     log.setAttribute('aria-busy', 'true');
@@ -219,13 +223,16 @@ export async function mountChat(root, opts = {}) {
     state = 'playing'; setCtl();
     try {
       // the old exchange fades out first, then the new question starts at the top
-      if (log.children.length) {
-        log.classList.add('fading');
-        await wait(220, my);
+      // (from > 0: the question is already on screen, the answer carries on under it)
+      if (!from) {
+        if (log.children.length) {
+          log.classList.add('fading');
+          await wait(220, my);
+        }
+        log.innerHTML = '';
+        log.classList.remove('fading');
       }
-      log.innerHTML = '';
-      log.classList.remove('fading');
-      for (const s of steps) {
+      for (const s of steps.slice(from)) {
         if (s.t === 'user') await wait(s.wait || 200, my);
         if (s.t === 'tool') await wait(220, my);
         if (s.t === 'card') await wait(160, my);
@@ -251,22 +258,24 @@ export async function mountChat(root, opts = {}) {
   ctl.addEventListener('click', () => {
     touched = true;
     if (ctl.dataset.mode === 'replay') { play(current, { instant: false }); return; }
+    if (state === 'idle') { play(current, { instant: false, from: 1 }); return; }
     paused = !paused;
     state = paused ? 'paused' : 'playing';
     if (!paused) gate?.();
     setCtl();
   });
 
-  // First state: the finished first exchange, so the panel is never an empty box.
-  play(keys[0], { instant: true });
-  // After 6s in view (and no tap), the next conversation plays once by itself.
-  if (!reduced() && opts.autoplay !== false && keys.length > 1 && 'IntersectionObserver' in window) {
-    let t = 0;
+  // First state: the first question is already asked (never an empty box). Its answer plays once a
+  // quarter of the panel is on screen; with reduced motion the whole exchange is simply shown.
+  if (reduced() || opts.autoplay === false || !('IntersectionObserver' in window)) play(keys[0], { instant: true });
+  else {
+    add(stepsOf(keys[0])[0], true);
+    state = 'idle';
     const io = new IntersectionObserver(([e]) => {
-      clearTimeout(t);
-      if (touched) { io.disconnect(); return; }
-      if (e.isIntersecting) t = setTimeout(() => { io.disconnect(); if (!touched) play(keys[1], { instant: false }); }, 6000);
-    }, { threshold: 0.6 });
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      if (!touched) play(keys[0], { instant: false, from: 1 });
+    }, { threshold: 0.25 });
     io.observe(win);
   }
   setCtl();

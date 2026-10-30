@@ -1,12 +1,12 @@
 /* scan-demo.js: tap a sample receipt (recorded scan) or use your own photo
  * (live on trezzit.com only, via the kit's scan-client) and watch it read. */
 import { scan, isLive } from '../../_kit/scan-client.js';
-import { receiptHTML as kitReceiptHTML, ensureReceiptStyles } from '../../_kit/receipts.js';
+import { receiptHTML as kitReceiptHTML, ensureReceiptStyles, splitSample } from '../../_kit/receipts.js';
 // the printed "ITEMS 19" counts units; every label on the page counts lines (14), so the footer line goes
 const receiptHTML = (raw, o) => kitReceiptHTML(raw, o).replace(/<p>ITEMS \d+<\/p>\s*/, '');
 import { toCents } from '../../_kit/split-engine.js';
-import { SAMPLE_META, getSample, sampleBill } from './data.js';
-import { h, esc, money, reduced, onVisible, itemName, storeName, prettyDate, icon, bus } from './util.js';
+import { SAMPLE_META, CATEGORIES, getSample, sampleBill } from './data.js';
+import { h, esc, money, reduced, onVisible, itemName, storeName, prettyDate, icon, bus, css } from './util.js';
 
 const STAGE_LABEL = { idle: 'Ready', uploading: 'Uploading', reading: 'Reading items', checking: 'Checking the math', done: 'Done' };
 // one line of compact chips: the list's label says what they mean
@@ -34,6 +34,7 @@ const checkLI = (c, i, pending) => `<li class="${c.passed ? 'ok' : 'warn'}${pend
 export function mountScan(root, opts = {}) {
   // one mount per frame: a second call would rewrite the markup under a running scan
   if (root._scan) return root._scan;
+  css('scan'); // its styles (linked by the page, or loaded by home.js before mounting)
   ensureReceiptStyles();
   const ids = opts.samples || ['green-basket', 'taqueria-sol', 'corner-pharmacy', 'monthly-rent'];
   const base = new URL('../assets/', import.meta.url).href;
@@ -64,7 +65,7 @@ export function mountScan(root, opts = {}) {
           <p class="so-total"><span>Total</span><b class="money"></b></p>
           <ul class="so-checks" aria-label="Checked against the receipt"></ul>
           ${opts.splitTarget ? `<button type="button" class="c-btn c-btn-sm c-btn-primary so-split">Split this receipt ${icon.arrow}</button>` : ''}
-          ${opts.onSolo ? `<button type="button" class="c-btn c-btn-sm c-btn-quiet so-split so-solo" hidden>See your share ${icon.arrow}</button>` : opts.soloHref ? `<a class="c-btn c-btn-sm c-btn-quiet so-split so-solo" href="${esc(opts.soloHref)}" hidden>See your share ${icon.arrow}</a>` : ''}
+          ${opts.soloSummary ? '<p class="so-mine" hidden></p>' : opts.soloHref ? `<a class="c-btn c-btn-sm c-btn-quiet so-split so-solo" href="${esc(opts.soloHref)}" hidden>See your share ${icon.arrow}</a>` : ''}
         </div>
         <p class="so-notice" hidden></p>
       </div>
@@ -95,13 +96,20 @@ export function mountScan(root, opts = {}) {
     sumEl.innerHTML = parts.join(' <span aria-hidden="true">·</span> ');
   };
   const splitBtn = root.querySelector('button.so-split:not(.so-solo)');
-  const soloLink = root.querySelector('.so-solo');
-  // a receipt that is just yours has nothing to split: offer where it lands instead
+  const soloLink = root.querySelector('.so-solo') || root.querySelector('.so-mine');
+  // a receipt that is just yours has nothing to split: say where it went instead (home: in place, by category)
   const setSolo = (id) => {
     if (!soloLink || !splitBtn) return;
     const solo = !!id && getSample(id)?.people?.length === 1;
     soloLink.hidden = !solo;
     splitBtn.hidden = solo;
+    if (solo && opts.soloSummary) {
+      sampleBill(id).then(({ bill }) => {
+        const you = splitSample(getSample(id), bill).people.you;
+        const cats = Object.entries(you.byCategory || {}).filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
+        soloLink.innerHTML = `<span class="muted">All yours:</span> ${cats.map(([k, c]) => `<span class="cat"><i style="--c:${(CATEGORIES[k] || CATEGORIES.other).color}"></i>${esc((CATEGORIES[k] || CATEGORIES.other).label)} <b class="money">${money(c)}</b></span>`).join('')}`;
+      });
+    }
   };
   const notice = root.querySelector('.so-notice');
   const moreBtn = root.querySelector('.so-more');
@@ -269,8 +277,7 @@ export function mountScan(root, opts = {}) {
     fileInput.value = '';
   });
   soloLink?.addEventListener('click', (e) => {
-    if (soloLink.getAttribute('aria-disabled') === 'true') { e.preventDefault(); return; }
-    if (opts.onSolo) opts.onSolo(last);
+    if (soloLink.getAttribute('aria-disabled') === 'true') e.preventDefault();
   });
   splitBtn?.addEventListener('click', () => {
     if (!last || splitBtn.getAttribute('aria-disabled') === 'true') return;

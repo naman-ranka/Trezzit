@@ -1,7 +1,7 @@
 /* ledger-demo.js: "Understand". Your share only, sorted by category, with
  * this-vs-last-month and item-level search across every bill. */
 import { CATEGORIES, PEOPLE, LAST_MONTH, octoberLedger } from './data.js';
-import { esc, money, icon, onVisible, countMoney, reduced } from './util.js';
+import { esc, money, icon, onVisible, countMoney, reduced, css } from './util.js';
 
 const CAT_ICON = {
   groceries: '<path d="M4 7h12l-1.2 8.2a1.5 1.5 0 0 1-1.5 1.3H6.7a1.5 1.5 0 0 1-1.5-1.3zM7.5 7l2-3.5M12.5 7l-2-3.5" />',
@@ -43,6 +43,7 @@ export async function mountLedger(root, opts = {}) {
   const rest = cats.slice(3).reduce((a, [, c]) => a + c, 0);
   const barParts = (fixed ? [[fixed.youCents, cat('rent').color]] : []).concat(cats.slice(0, 3).map(([k, c]) => [c, cat(k).color]), rest ? [[rest, '#cbd2dc']] : []);
   const nRows = cats.length + (fixed ? 1 : 0);
+  css('ledger'); // its styles (linked by the page, or loaded by home.js before mounting)
   root.classList.add('ledger');
   if (opts.byPayer) root.classList.add('by-payer');
   // compact (home): fewer categories and rows on phones, so the demo stays one screen tall
@@ -69,7 +70,8 @@ export async function mountLedger(root, opts = {}) {
       <ul class="lg-pays" role="list" aria-label="By who paid">${PAY.map(([k, label, f]) => `<li><button type="button" class="lg-pay" data-pay="${k}" aria-pressed="false">
         <span class="lg-pk"><b>${label}</b></span><b class="money">${money(entries.filter(f).reduce((a, e) => a + e.youCents, 0))}</b></button></li>`).join('')}</ul>
     </div>`;
-  root.innerHTML = opts.byPayer ? `${findHTML}${payHTML}` : `${findHTML}
+  // the answer (the month's total, by who paid) comes before the details in reading and tab order
+  root.innerHTML = opts.byPayer ? `${payHTML}${findHTML}` : `${findHTML}
     <div class="lg-sum">
       <p class="lg-label">Spent in October <span class="lg-tag">Your share only</span></p>
       <p class="lg-total money"><span class="visually-hidden">${money(spent)}</span><span class="lg-n" aria-hidden="true">${money(spent)}</span></p>
@@ -115,9 +117,9 @@ export async function mountLedger(root, opts = {}) {
     const k = MAIN_CAT(e);
     const who = e.payer === 'you' ? 'you paid' : `${e.payer} paid`;
     // say what a row is in the words a visitor already has: just you, who paid, what the rent covers
-    // home (byPayer): no group name on every row (it is all the same apartment); rent is just "Maya paid · monthly"
+    // home (byPayer): no group name on every row (it is all the same apartment); rent is "Repeats monthly · Maya paid"
     const sub = e.kind === 'personal' ? `Just you · ${esc(e.date)}`
-      : e.id === 'monthly-rent' ? (opts.byPayer ? `<span class="lg-who">${esc(who[0].toUpperCase() + who.slice(1))}</span> · monthly` : `${esc(e.date)} · ${esc(who)} · rent, utilities, internet`)
+      : e.id === 'monthly-rent' ? (opts.byPayer ? `Repeats monthly · <span class="lg-who">${esc(who)}</span>` : `${esc(e.date)} · ${esc(who)} · rent, utilities, internet`)
         : opts.byPayer ? `${esc(e.date)} · <span class="lg-who">${esc(who)}</span>`
           : `${esc(e.group)} · ${esc(e.date)} · <span class="lg-who">${esc(who)}</span>`;
     return `<li class="lg-row" data-id="${esc(e.id)}">
@@ -258,6 +260,35 @@ export async function mountLedger(root, opts = {}) {
       await countMoney(totalEl, from, spent, 800);
       root.classList.remove('counting');
     }, { threshold: 0 });
+  }
+  // home: item search is the idea people miss, so it shows itself once. When the ledger is 40% on screen,
+  // "towels" types into the field, the matching line shows, then it clears. Never takes focus; any touch,
+  // key or click in the ledger stops it; skipped with reduced motion.
+  if (opts.demoSearch && !reduced() && 'IntersectionObserver' in window) {
+    let stop = false;
+    const halt = () => { stop = true; };
+    ['pointerdown', 'keydown', 'focusin'].forEach((t) => root.addEventListener(t, halt, { once: true }));
+    const io = new IntersectionObserver(async ([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const q = opts.demoSearch;
+      await new Promise((r) => setTimeout(r, 700));
+      root.classList.add('demoing');
+      countEl.setAttribute('aria-live', 'off');
+      // the list follows only once the word is distinctive ("towe"): short prefixes match many lines and would
+      // make the card grow and shrink under the reader
+      for (let i = 1; i <= q.length && !stop; i += 1) {
+        input.value = q.slice(0, i);
+        if (i >= Math.min(4, q.length)) { filterCat = null; filterPay = null; render(); }
+        await new Promise((r) => setTimeout(r, 80));
+      }
+      await new Promise((r) => setTimeout(r, 2500));
+      root.classList.remove('demoing');
+      countEl.setAttribute('aria-live', 'polite');
+      if (stop || input.value !== q) return;
+      input.value = ''; render();
+    }, { threshold: 0.4 });
+    io.observe(root);
   }
   return { data, setPay, root };
 }

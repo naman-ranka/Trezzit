@@ -3,7 +3,7 @@
  * sideRoot (recurring page) takes the 'Coming up' column, so it can lead the page; onChange(result) after every change. */
 import { splitBill, distributeEqually } from '../../_kit/split-engine.js';
 import { PEOPLE } from './data.js';
-import { money, countMoney, icon, esc, YOU_GLYPH } from './util.js';
+import { money, countMoney, icon, esc, YOU_GLYPH, css } from './util.js';
 
 const ROOM = ['you', 'maya', 'jordan', 'sam'];
 const PCT = { you: 25, maya: 25, jordan: 28, sam: 22 };
@@ -15,6 +15,7 @@ const MIN = 10000; // $100.00: a rent below that is a typo, not a rent
 const HIST = 63935; // your share each month so far
 
 export function mountRent(root, opts = {}) {
+  css('rent'); // its styles (linked by the page already; loads them if not)
 let rent = 240000;
 let mode = 'auto';
 function compute() {

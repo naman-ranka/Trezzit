@@ -25,6 +25,23 @@ export const sleep = (ms, signal) => new Promise((resolve, reject) => {
   signal?.addEventListener('abort', () => { clearTimeout(t); reject(new DOMException('Aborted', 'AbortError')); }, { once: true });
 });
 
+/** Loads css/demo-<name>.css once (a page that links it already resolves at once). Resolves when the
+ *  styles apply, so a demo never paints unstyled; a failed load resolves too (the demo still works). */
+const sheets = new Map();
+export function css(name) {
+  if (sheets.has(name)) return sheets.get(name);
+  const href = new URL(`../css/demo-${name}.css`, import.meta.url).href;
+  const have = [...document.querySelectorAll('link[rel="stylesheet"]')].find((l) => l.href === href);
+  const p = have ? Promise.resolve() : new Promise((resolve) => {
+    const l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = href;
+    l.onload = l.onerror = () => resolve();
+    document.head.appendChild(l);
+  });
+  sheets.set(name, p);
+  return p;
+}
+
 /** Calls cb once when el is at least `threshold` visible. */
 export function onVisible(el, cb, { threshold = 0.35, rootMargin = '0px' } = {}) {
   if (!('IntersectionObserver' in window)) { cb(); return () => {}; }
