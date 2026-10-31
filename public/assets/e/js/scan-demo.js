@@ -460,6 +460,10 @@ export function mountScan(root, opts = {}) {
       if (signal.aborted) return;
       if (result.source === 'live' && !result.bill.items.length) throw Object.assign(new Error('That doesn’t look like a receipt.'), { code: 'NO_ITEMS' });
       last = result;
+      root.toggleAttribute('data-own-result', result.source === 'live');
+      const againBtn = root.querySelector('.so-again');
+      const againLabel = result.source === 'live' ? 'Scan another photo' : 'Scan again';
+      againBtn.setAttribute('aria-label', againLabel); againBtn.title = againLabel;
       let fellBack = false;
       if (result.source === 'sample' && isFile) {
         // fell back (the scanner did not load): the sample that played is the one selected tab, and it says so
@@ -528,9 +532,17 @@ export function mountScan(root, opts = {}) {
 
   root.querySelectorAll('.pick[data-id]').forEach((b) => b.addEventListener('click', () => { closeConsent(); run(b.dataset.id); }));
   // the receipt is the control: the replay button, or a tap on the paper itself, reads it again
-  const again = () => { if (liveBusy) return; const id = last?.sampleId || root.querySelector('.pick[aria-pressed="true"]')?.dataset.id || opts.initial || ids[0]; closeConsent(); run(id); };
+  // After the visitor's own photo there is nothing to replay: a tap on their receipt leaves it alone, and the
+  // replay button asks for another photo rather than swapping in a sample (which reads as losing their scan).
+  const ownResult = () => last?.source === 'live';
+  const again = () => {
+    if (liveBusy) return;
+    if (ownResult()) { openConsent(); return; }
+    const id = last?.sampleId || root.querySelector('.pick[aria-pressed="true"]')?.dataset.id || opts.initial || ids[0];
+    closeConsent(); run(id);
+  };
   root.querySelector('.so-again').addEventListener('click', again);
-  stage.addEventListener('click', again);
+  stage.addEventListener('click', () => { if (!ownResult()) again(); });
   // while the notice is open it is the only thing in the frame (opts.consentAlone): no sample result beside it
   // (consentAlone) the open tab is the selected one: the sample's tab lets go until the notice closes
   let heldPick = null;

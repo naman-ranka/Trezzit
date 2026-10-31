@@ -335,3 +335,6 @@ ul.so-checks { display: none; }
 @media (max-width: 480px) { .so-foot .so-solo { max-width: 8.5em; } }
 a.so-solo, a.so-next { text-decoration: none; }
 @media (hover: hover) { a.so-solo:hover, a.so-next:hover { text-decoration: underline; } }
+
+/* the visitor's own receipt is not a replay button (scan-demo.js ownResult) */
+[data-own-result] .scan-stage { cursor: default; }
