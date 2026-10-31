@@ -1,0 +1,135 @@
+/* demo-month.css: styles for js/month-demo.js (home step 3), on top of demo-ledger.css. */
+.mo-vs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 12px; }
+.mo-vs p { display: grid; align-content: start; gap: 2px; min-width: 0; padding: 14px 16px 16px; border-radius: var(--r-md); }
+.mo-k { font-size: var(--t-sm); font-weight: 600; }
+.mo-vs small { font-size: var(--t-xs); line-height: 1.3; }
+.mo-bank { background: var(--fill); box-shadow: inset 0 0 0 1px var(--line); }
+.mo-bank .mo-k, .mo-bank small { color: var(--muted); }
+.mo-bank b { font-family: var(--font-mono); font-size: var(--t-lg); font-weight: 500; color: var(--text-2); letter-spacing: -0.02em; line-height: 1.35; margin-top: 6px; white-space: nowrap; }
+/* Trezzit's tile is the page's one selected state (white, 1.5px ink line): the contrast is in the type, not a black block */
+.mo-mine { background: var(--card); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.mo-mine .mo-k { color: var(--ink); }
+.mo-mine b { font-size: var(--t-xl); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; margin-top: 4px; color: var(--ink); white-space: nowrap; }
+.mo .lg-pays { margin-top: 14px; }
+.mo-foil { margin-top: 12px; padding: 10px 14px 12px; border-radius: var(--r-md); background: var(--fill); box-shadow: inset 0 0 0 1px var(--line); }
+.mo-fk { display: flex; align-items: center; gap: 8px; font-size: var(--t-xs); font-weight: 600; color: var(--muted); }
+.mo-fk .bank-i { width: 16px; height: 12px; border-radius: 3px; border: 1.5px solid currentColor; position: relative; flex: none; }
+.mo-fk .bank-i::after { content: ''; position: absolute; left: 0; right: 0; top: 2px; height: 1.5px; background: currentColor; }
+.mo-fq { font-weight: 500; color: var(--text-2); }
+.mo-fr { margin-top: 4px; font-family: var(--font-mono); font-size: var(--t-sm); color: var(--text-2); }
+.mo-none { color: var(--faint); }
+.mo-bl { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 8px; }
+.mo .lg-count { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 14px; }
+.mo-tz { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-xs); font-weight: 700; color: var(--ink); }
+.mo-tz::before { content: ''; width: 14px; height: 14px; background: url("../../_kit/brand/trezzit-mark.svg") center / contain no-repeat; }
+.mo-ai { display: inline-flex; align-items: center; gap: 4px; padding: 0 7px 0 5px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: var(--t-xs); line-height: 20px; vertical-align: 1px; }
+.mo-ai svg { width: 12px; height: 12px; }
+.mo .lg-row.lg-ai { border-radius: var(--r-sm); }
+.anim .mo .lg-row { animation: none; }
+.anim .mo.searching .lg-row { animation: rise .3s var(--ease) both; }
+@media (max-width: 879px) {
+  .mo.compact > .lg-sum-pay { border-top: 0; padding-top: 0; }
+}
+@media (max-width: 379px) {
+  .mo-vs p { padding: 12px; }
+  .mo-bank b { font-size: var(--t-md); }
+  .mo-mine b { font-size: var(--t-xl); }
+}
+/* E r1: payer rows and "Try" words use the one selected state too */
+.mo .lg-pay[aria-pressed='true'] { background: var(--card); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.mo .lg-pay[aria-pressed='true']::after { border-color: var(--ink); }
+.mo-try { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; font-size: var(--t-sm); color: var(--muted); }
+.mo-try > span { margin-right: 2px; }
+.mo-q { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); font: inherit; font-size: var(--t-sm); color: var(--text); cursor: pointer; transition: border-color .2s var(--ease); }
+.mo-q:hover { border-color: var(--ink); }
+.mo-q:focus-visible { box-shadow: var(--focus-ring); }
+.mo .lg-search { background: var(--card); border: 1px solid var(--line); }
+.ledger.demoing .lg-search { border-color: var(--ink); background: var(--card); box-shadow: none; }
+.mo .lg-search:focus-within { border-color: var(--ink); background: var(--card); box-shadow: 0 0 0 1px var(--ink); }
+.mo .lg-list:empty { display: none; }
+/* E r3: "You spent" is drawn the site's one way (muted label, bold figure) on a plain white tile: the ink
+   outline is the selected state, and nothing here is selectable. The search match is bold ink, not a
+   highlighter; "Added by AI" is plain accent text. */
+.mo-mine { box-shadow: inset 0 0 0 1px var(--line); }
+.mo-mine .mo-k { color: var(--muted); font-weight: 500; }
+.mo-bank .mo-k { font-weight: 500; }
+.mo .lg-rt mark { background: none; color: var(--ink); font-weight: 700; padding: 0; }
+.mo-ai { background: none; padding: 0; gap: 0; font-size: inherit; line-height: inherit; vertical-align: baseline; }
+/* ---------- E r4: the two tiles explain their own gap (the rent transfer, and your share of it); the payer
+   rows are totals (search is the one control here); the search answer's header is the mark plus "Trezzit",
+   with the total on the price column, 16px under the bank's foil. ---------- */
+.mo-vs .mo-why { margin-top: 6px; font-size: var(--t-xs); line-height: 1.3; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mo-vs .mo-why.mono { font-family: var(--font-mono); color: var(--text-3); }
+.mo-vs .mo-why .money { font-variant-numeric: tabular-nums; }
+.mo .lg-pay.is-static { cursor: default; }
+.mo .lg-pay.is-static:hover { background: none; }
+.mo .lg-pay.is-static::after { content: none; }
+.ledger.mo .lg-find .lg-count { margin-top: 16px; justify-content: space-between; flex-wrap: nowrap; }
+.ledger.mo .lg-find .lg-count:empty { display: none; }
+.ledger.mo .lg-count > b { font-size: var(--t-md); font-variant-numeric: tabular-nums; }
+@media (max-width: 767px) {
+  .mo.mo-pays-wide .lg-pays { display: none; }
+}
+@media (max-width: 599px) {
+  .mo-vs .mo-why { white-space: normal; }
+}
+/* ---------- E r5: on phones the search leads the frame (its answer lands above the keyboard, not under the
+   tiles); the October tiles follow it. Home has no payer rows at any width. ---------- */
+@media (max-width: 767px) {
+  .ledger.mo.mo-find-first > .lg-find { order: -2; border-top: 0; padding-top: 0; }
+  .ledger.mo.mo-find-first > .lg-sum-pay { order: -1; border-top: 1px solid var(--divider); padding-top: 18px; margin-top: 18px; }
+}
+/* ---------- E r6 (home): at two columns the October tiles stack (your bank above what you spent, like the
+   hero) and stretch to the search column's locked height, so neither column ends in empty space. A search
+   answer holds two rows; a longer answer says how many items it found. ---------- */
+@media (min-width: 880px) {
+  .ledger.mo.mo-find-first { align-items: stretch; }
+  .ledger.mo.mo-find-first > .lg-sum-pay { display: flex; flex-direction: column; }
+  .ledger.mo.mo-find-first .mo-vs { flex: 1; grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr 1fr; }
+  .ledger.mo.mo-find-first .mo-vs p { align-content: center; }
+}
+.mo-n { font-weight: 500; color: var(--muted); }
+/* every answer row is one line of name and one of source (ellipsis on phones), so two rows are always the same height */
+.mo .lg-list .lg-rt b, .mo .lg-list .lg-rt small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mo .lg-list .lg-rt { min-width: 0; }
+.mo .lg-list .lg-empty { white-space: normal; }
+.mo-fk { white-space: nowrap; overflow: hidden; min-width: 0; } .mo-fq { overflow: hidden; text-overflow: ellipsis; }
+.mo-bl > span:nth-child(2) { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mo .lg-list .mo-ainote { padding: 10px 0 8px 52px; font-size: var(--t-xs); line-height: 1.4; }
+/* sweep: at 880-899 the side-by-side tiles (just-me) cut "Rent, your share $639.35" by 3px */
+@media (min-width: 880px) and (max-width: 919px) {
+  .mo-vs p { padding-inline: 14px; }
+}
+/* sweep: on narrow phones the search answer's own name was cut ("Sunscreen S…" at 320, the price column
+   carries "$9.99 + tax"); a smaller icon column gives the name the room */
+@media (max-width: 399px) {
+  .mo .lg-row { grid-template-columns: 32px minmax(0, 1fr) auto; gap: 8px; }
+  .mo .lg-ri { width: 32px; height: 32px; }
+}
+@media (max-width: 359px) {
+  .mo .lg-row { grid-template-columns: 28px minmax(0, 1fr) auto; gap: 6px; }
+  .mo .lg-ri { width: 28px; height: 28px; }
+  .mo .lg-ri svg { width: 14px; height: 14px; }
+}
+/* ---------- E final (judge notes): home shows C's who-paid split as three compact rows under "You spent";
+   they add up to the figure above them and move with it when your AI adds a charge ---------- */
+.mo.mo-pays-compact ul.lg-pays { margin: 8px 0 0; border-top: 0; }
+.mo.mo-pays-compact .lg-pays li { border-bottom: 0; }
+.mo.mo-pays-compact .lg-pays li + li { border-top: 1px solid var(--divider); }
+.mo.mo-pays-compact .lg-pay { width: 100%; margin: 0; padding: 7px 2px; min-height: 0; gap: 12px; border-radius: 0; }
+.mo.mo-pays-compact .lg-pk b, .mo.mo-pays-compact .lg-pay > b { font-size: var(--t-sm); }
+.mo.mo-pays-compact .lg-pk b { font-weight: 500; color: var(--text); }
+.mo.mo-pays-compact .lg-pay > b { font-weight: 600; font-variant-numeric: tabular-nums; }
+@media (min-width: 880px) {
+  /* the tiles sit side by side again (as on phones) and the three rows take the height under them, so the
+     October column and the search column still end on one line */
+  .ledger.mo.mo-find-first.mo-pays-compact .mo-vs { flex: none; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto; }
+  .ledger.mo.mo-find-first.mo-pays-compact .mo-vs p { align-content: start; }
+  .mo.mo-pays-compact ul.lg-pays { margin-top: auto; padding-top: 12px; }
+}
+@media (min-width: 880px) and (max-width: 979px) {
+  .mo.mo-pays-compact .mo-vs p { padding-inline: 12px; }
+  .mo.mo-pays-compact .mo-mine b { font-size: var(--t-lg); }
+}
+/* axe: the bank's "No results" passes AA on the grey foil */
+.mo-none { color: var(--muted); }

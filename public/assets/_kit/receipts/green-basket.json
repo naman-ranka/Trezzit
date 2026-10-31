@@ -1,0 +1,326 @@
+{
+  "receipt": {
+    "storeInformation": {
+      "title": "GREEN BASKET MARKET",
+      "storeAddress": "123 Main Street, Anytown, USA",
+      "dateTimeOfPurchase": "2026-10-24",
+      "currency": "USD"
+    },
+    "items": [
+      {
+        "name": "EGGS LARGE 18CT",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "5.48",
+        "originalPrice": "5.48",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "5.48"
+      },
+      {
+        "name": "WHOLE MILK 1 GAL",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "4.28",
+        "originalPrice": "4.28",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "4.28"
+      },
+      {
+        "name": "SOURDOUGH LOAF",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "5.96",
+        "originalPrice": "5.96",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "5.96"
+      },
+      {
+        "name": "BANANAS",
+        "quantity": "2.250",
+        "unitPrice": "0.64",
+        "totalPrice": "1.44",
+        "originalPrice": "1.44",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "1.44"
+      },
+      {
+        "name": "OLIVE OIL EXTRA VIRGIN 1L",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "12.96",
+        "originalPrice": "12.96",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "12.96"
+      },
+      {
+        "name": "JASMINE RICE 5LB",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "7.48",
+        "originalPrice": "7.48",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "7.48"
+      },
+      {
+        "name": "BABY SPINACH 5OZ",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "3.96",
+        "originalPrice": "3.96",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "3.96"
+      },
+      {
+        "name": "GREEK YOGURT 32OZ",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "5.48",
+        "originalPrice": "5.48",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "5.48"
+      },
+      {
+        "name": "LIMES",
+        "quantity": "3.000",
+        "unitPrice": "0.32",
+        "totalPrice": "0.96",
+        "originalPrice": "0.96",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "0.96"
+      },
+      {
+        "name": "AVOCADOS",
+        "quantity": "3.000",
+        "unitPrice": "1.25",
+        "totalPrice": "3.75",
+        "originalPrice": "3.75",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "3.75"
+      },
+      {
+        "name": "COLD BREW 32OZ",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "6.25",
+        "originalPrice": "6.25",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "6.25"
+      },
+      {
+        "name": "OAT MILK",
+        "quantity": "2.000",
+        "unitPrice": "3.29",
+        "totalPrice": "6.58",
+        "originalPrice": "6.58",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "6.58"
+      },
+      {
+        "name": "KALE CHIPS",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "3.42",
+        "originalPrice": "3.42",
+        "itemType": "Item",
+        "tax": "0.00",
+        "taxReasoning": "Not marked taxable on the receipt",
+        "applyTax": false,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "0.00",
+        "itemTotalAfterTax": "3.42"
+      },
+      {
+        "name": "HAND TOWELS 4PK",
+        "quantity": "1.000",
+        "unitPrice": null,
+        "totalPrice": "29.63",
+        "originalPrice": "29.63",
+        "itemType": "Item",
+        "tax": "8.00",
+        "taxReasoning": "Marked taxable (T) on the receipt; taxed at the printed rate",
+        "applyTax": true,
+        "includeInSubtotal": true,
+        "confidence": 100,
+        "isExtraCharge": false,
+        "taxAmount": "2.37",
+        "itemTotalAfterTax": "32.00"
+      }
+    ],
+    "discounts": [],
+    "tip": {
+      "amount": "0.00"
+    },
+    "taxSummary": {
+      "totalTaxAmount": "2.37",
+      "taxRate": "8.00",
+      "taxBreakdown": [
+        {
+          "rate": "8.00",
+          "amount": "2.37",
+          "description": "Tax"
+        }
+      ]
+    },
+    "taxMode": "single",
+    "taxRates": [
+      {
+        "rate": "8.00",
+        "description": "Tax",
+        "appliesTo": "Items marked T",
+        "sourceComponents": []
+      }
+    ],
+    "subtotalBeforeChargesAndTaxes": "97.63",
+    "grandTotal": "100.00",
+    "taxIncludedInPrices": false,
+    "paymentDetails": {
+      "paymentMethod": "VISA"
+    },
+    "warnings": [
+      "Sum of item prices (97.63) matches the printed subtotal."
+    ],
+    "backend_validations": [
+      {
+        "check": "items_total_check",
+        "expected": "97.63",
+        "actual": "97.63",
+        "passed": true,
+        "message": "Items included in subtotal match subtotalBeforeChargesAndTaxes"
+      },
+      {
+        "check": "grand_total_check",
+        "expected": "100.00",
+        "actual": "100.00",
+        "passed": true,
+        "message": "Grand total matches subtotal, charges, taxes, tip, and discounts"
+      },
+      {
+        "check": "tax_distribution_check",
+        "expected": "2.37",
+        "actual": "2.37",
+        "passed": true,
+        "message": "Per-item tax amounts sum to total tax"
+      }
+    ]
+  },
+  "backend_validations": [
+    {
+      "check": "items_total_check",
+      "expected": "97.63",
+      "actual": "97.63",
+      "passed": true,
+      "message": "Items included in subtotal match subtotalBeforeChargesAndTaxes"
+    },
+    {
+      "check": "grand_total_check",
+      "expected": "100.00",
+      "actual": "100.00",
+      "passed": true,
+      "message": "Grand total matches subtotal, charges, taxes, tip, and discounts"
+    },
+    {
+      "check": "tax_distribution_check",
+      "expected": "2.37",
+      "actual": "2.37",
+      "passed": true,
+      "message": "Per-item tax amounts sum to total tax"
+    }
+  ],
+  "tax_distribution": {
+    "total_tax": "2.37",
+    "items_taxed": 1
+  },
+  "discount_info": null,
+  "warnings": [],
+  "errors": [],
+  "provider": "gemini",
+  "model": "gemini-3.1-flash-lite",
+  "status": "completed",
+  "receipt_keys": []
+}

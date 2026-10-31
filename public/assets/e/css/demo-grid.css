@@ -1,0 +1,214 @@
+/* demo-grid.css: styles for js/grid-demo.js only (A's tap grid, drawn in C's system). */
+.tg { --col: 76px; --pw: 84px; position: relative; }
+.tg-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.tg-bill { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; min-width: 0; }
+.tg-bill b { font-size: var(--t-lg); color: var(--ink); letter-spacing: -0.02em; }
+.tg-bill > span { color: var(--muted); font-size: var(--t-sm); }
+.tg-rcpt { flex: none; gap: 6px; }
+.tg-people, .tg-row { display: grid; grid-template-columns: minmax(0, 1fr) var(--pw) repeat(var(--n, 4), var(--col)); align-items: center; }
+.tg-people { align-items: end; padding: 0 0 12px; border-bottom: 1px solid var(--line); background: var(--card); }
+.tg-hint { align-self: end; padding-bottom: 2px; font-size: var(--t-sm); font-weight: 500; color: var(--muted); text-wrap: balance; }
+.tg-p { display: grid; justify-items: center; gap: 2px; text-align: center; min-width: 0; padding: 0 2px; border-radius: var(--r-sm); }
+.tg-p .av { width: 34px; height: 34px; font-size: var(--t-sm); margin-bottom: 2px; }
+.tg-pn { font-size: var(--t-xs); color: var(--muted); line-height: 1.15; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tg-p[data-p='you'] .tg-pn { color: var(--ink); font-weight: 600; }
+.tg-pa { font-size: var(--t-md); font-weight: 700; color: var(--ink); letter-spacing: -0.02em; line-height: 1.2; white-space: nowrap; }
+.tg-people.flash { animation: tgflash 1.2s var(--ease); }
+@keyframes tgflash { 0%, 35% { background: var(--accent-soft); box-shadow: 0 0 0 8px var(--accent-soft); } 100% { background: var(--card); box-shadow: 0 0 0 8px transparent; } }
+.tg-row { min-height: 52px; border-bottom: 1px solid var(--divider); }
+.tg-nm { display: flex; align-items: center; gap: 10px; min-width: 0; padding-right: 8px; color: var(--text); font-size: var(--t-md); line-height: 1.25; }
+.tg-nm > span { min-width: 0; }
+.tg-nm small { font-size: var(--t-xs); color: var(--muted); white-space: nowrap; }
+.tg-cat { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.tg-pr { text-align: right; padding-right: 12px; font-size: var(--t-md); font-weight: 500; color: var(--ink); }
+.tg-dc { display: grid; place-items: center; min-width: 0; }
+.tg-dot { width: 100%; max-width: 64px; height: 44px; display: grid; place-items: center; border-radius: var(--r-sm); cursor: pointer; transition: background-color .15s var(--ease); }
+@media (hover: hover) { .tg-dot:hover { background: var(--wash); } }
+.tg-dot i { width: 18px; height: 18px; border-radius: 50%; background: var(--card); box-shadow: inset 0 0 0 2px var(--line-4); transition: background-color 180ms var(--ease), box-shadow 180ms var(--ease), transform 180ms var(--ease); }
+.tg-dot.on i { background: var(--c); box-shadow: inset 0 0 0 2px var(--c); }
+.tg-dot.part i { background: radial-gradient(circle, var(--c) 0 4px, var(--card) 4.5px); box-shadow: inset 0 0 0 2px var(--c); }
+.tg-dot:active i { transform: scale(.85); }
+.tg-dot:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.tg.pre .tg-dot i { transform: scale(0); }
+.tg.enter .tg-row:nth-child(2) .tg-dot i { transition-delay: 40ms; }
+.tg.enter .tg-row:nth-child(3) .tg-dot i { transition-delay: 80ms; }
+.tg.enter .tg-row:nth-child(4) .tg-dot i { transition-delay: 120ms; }
+.tg.enter .tg-row:nth-child(5) .tg-dot i { transition-delay: 160ms; }
+.tg.enter .tg-row:nth-child(6) .tg-dot i { transition-delay: 200ms; }
+.tg.enter .tg-row:nth-child(7) .tg-dot i { transition-delay: 240ms; }
+.tg-prop { grid-column: 3 / -1; font-size: var(--t-sm); color: var(--muted); }
+.tg-row.nope .tg-dot i { animation: nope .36s var(--ease); }
+.tg-grp { cursor: pointer; }
+.tg-exp { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font: inherit; font-weight: 600; color: var(--ink); text-align: left; border-radius: var(--r-sm); }
+.tg-exp small { font-size: var(--t-sm); font-weight: 500; color: var(--muted); }
+.tg-exp svg { flex: none; color: var(--muted); transition: transform .2s var(--ease); }
+.tg-grp.is-open .tg-exp svg { transform: rotate(180deg); }
+.tg-exp:focus-visible { box-shadow: var(--focus-ring); }
+.tg-sub { background: var(--wash); border-radius: var(--r-sm); margin: 4px 0; }
+.tg-sub-row { min-height: 44px; border-bottom-color: var(--line); }
+.tg-sub-row:last-child { border-bottom: 0; }
+.tg-sub-row .tg-nm { padding-left: 18px; font-size: var(--t-sm); color: var(--muted); }
+.tg-sub-row .tg-pr { font-size: var(--t-sm); color: var(--text); }
+.tg-sub-row .tg-dot { height: 40px; }
+@media (hover: hover) { .tg-sub-row .tg-dot:hover { background: var(--line); } }
+.tg-foot { display: grid; grid-template-columns: minmax(0, 1fr) auto 44px; grid-template-areas: 'you check reset'; align-items: center; gap: 4px 16px; padding-top: 14px; }
+.tg-you { grid-area: you; font-size: var(--t-md); color: var(--ink); letter-spacing: -0.01em; }
+.tg-you > b { font-weight: 700; }
+.tg-them { display: block; font-size: var(--t-sm); color: var(--muted); letter-spacing: 0; }
+.tg-them b { color: var(--pos); font-weight: 600; }
+.tg-check { grid-area: check; display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-sm); font-weight: 500; color: var(--pos); white-space: nowrap; }
+.tg-check b { color: inherit; }
+.tg-check.bad { color: var(--neg); }
+.tg-check.is-why { color: var(--ink); }
+.tg-reset { grid-area: reset; width: 44px; height: 44px; border-radius: var(--r-sm); display: grid; place-items: center; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); transition: opacity .2s var(--ease); }
+.tg-reset:hover { background: var(--wash); }
+.tg-reset:focus-visible { box-shadow: inset 0 0 0 1px var(--line-strong), var(--focus-ring); }
+.tg-reset.is-off { visibility: hidden; }
+.tg-dlg { border: 0; padding: 0; border-radius: var(--r-lg); max-width: min(420px, calc(100vw - 32px)); max-height: min(86vh, 900px); box-shadow: 0 40px 80px -30px rgb(var(--sh) / .5); background: var(--fill); }
+.tg-dlg::backdrop { background: rgb(var(--sh) / .45); }
+.tg-dlg-in { position: relative; padding: 48px 20px 24px; }
+.tg-x { position: absolute; top: 6px; right: 6px; width: 44px; height: 44px; border-radius: var(--r-sm); font-size: var(--t-xl); line-height: 1; color: var(--ink); }
+@media (hover: hover) { .tg-x:hover { background: var(--card); } }
+.tg-x:focus-visible { box-shadow: var(--focus-ring); }
+.tg-paper { display: flex; justify-content: center; }
+.tg-paper .tz-receipt { --tz-receipt-width: 300px; font-size: var(--t-xs); filter: drop-shadow(0 10px 18px rgb(var(--sh) / .14)); }
+@media (max-width: 899px) {
+  .tg { --col: 64px; --pw: 72px; }
+}
+/* phones: name over price, narrower columns, and the people row sticks under the nav while you tap */
+@media (max-width: 639px) {
+  .tg { --col: minmax(44px, 54px); }
+  .tg-people, .tg-row { grid-template-columns: minmax(0, 1fr) repeat(var(--n, 4), var(--col)); }
+  .tg-pr-h { display: none; }
+  .tg-row { grid-template-rows: auto auto; padding: 6px 0; min-height: 56px; }
+  .tg-row .tg-nm { grid-column: 1; grid-row: 1; font-size: var(--t-sm); }
+  .tg-row .tg-pr { grid-column: 1; grid-row: 2; text-align: left; padding: 0 0 0 18px; font-size: var(--t-sm); font-weight: 400; color: var(--muted); }
+  .tg-row .tg-dc { grid-row: 1 / span 2; }
+  .tg-sub-row .tg-pr { padding-left: 18px; }
+  .tg-nm small { display: none; }
+  .tg-exp { min-height: 0; padding: 2px 0; }
+  .tg-exp small { display: none; }
+  .tg-hint { font-size: var(--t-sm); line-height: 1.3; padding-right: 6px; }
+  .tg-people { position: sticky; top: 64px; z-index: 4; padding-top: 8px; box-shadow: 0 1px 0 var(--line); border-bottom: 0; }
+  .tg-p .av { width: 28px; height: 28px; font-size: var(--t-xs); }
+  .tg-pn { font-size: var(--t-xs); }
+  .tg-pa { font-size: var(--t-sm); }
+  .tg-bill b { font-size: var(--t-md); }
+  .tg-bill > span { font-size: var(--t-sm); }
+  .tg-foot { grid-template-columns: minmax(0, 1fr) 44px; grid-template-areas: 'you reset' 'check reset'; }
+  .tg-you { font-size: var(--t-md); }
+  .tg-check { font-size: var(--t-sm); }
+}
+@media (max-width: 379px) {
+  .tg-pa { font-size: var(--t-xs); letter-spacing: -0.03em; }
+  .tg-hint { font-size: var(--t-xs); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tg-dot i, .tg-p .av { transition: none; }
+}
+@media (max-width: 419px) {
+  .tg-people, .tg-row { grid-template-columns: minmax(0, 1fr) repeat(var(--n, 4), 52px); }
+  .tg-pa { font-size: var(--t-xs); letter-spacing: -0.03em; }
+}
+@media (max-width: 379px) {
+  .tg-people, .tg-row { grid-template-columns: minmax(0, 1fr) repeat(var(--n, 4), 48px); }
+  .tg-pa { font-size: var(--t-xs); }
+}
+/* E r1: the grid reads as one compact table (names, prices and dots within ~760px), centred in its frame */
+.tg-top, .tg-body, .tg-foot { max-width: 760px; margin-inline: auto; }
+.tg-paper .tz-receipt { font-size: var(--t-xs); }
+/* E r2: the grid fills its frame (one content edge with the scan and the month); the tip control for
+   dinners sits above it; the hint is three words */
+.tg-top, .tg-body, .tg-foot { max-width: none; }
+.tg-tip { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; font-size: var(--t-sm); font-weight: 600; color: var(--muted); }
+.tg-tip .seg button { min-height: 36px; }
+.tg-tiprow .tg-prop { color: var(--muted); }
+.tg-hint { white-space: nowrap; }
+@media (max-width: 639px) {
+  .tg-prop { grid-column: 2 / -1; grid-row: 1 / span 2; text-align: center; font-size: var(--t-xs); }
+}
+/* E r3: the header is the store and who paid (step 1 already shows the rest); the footer is only the proof,
+   right-aligned to the price edge, with reset on the left so the check never moves; phones use short names */
+.tg-foot { grid-template-columns: 44px minmax(0, 1fr) !important; grid-template-areas: 'reset check' !important; }
+.tg-check { justify-self: end; }
+.tg-short { display: none; }
+@media (max-width: 479px) {
+  .tg-long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .tg-short { display: inline; }
+  .tg-exp small, .tg-nm small { display: inline; font-size: var(--t-xs); font-weight: 500; }
+}
+/* ---------- E r5: the hint says the one thing the receipt check would raise (prices include tax); reset is a
+   word, not an icon; one muted line answers "do they all have to join?"; on phones the sticky people row
+   fades once the last item has passed under it. ---------- */
+.tg-hint { display: grid; gap: 1px; }
+.tg-tax { font-size: var(--t-xs); font-weight: 400; color: var(--muted); }
+.tg-foot { grid-template-columns: auto minmax(0, 1fr) !important; }
+.tg-reset { width: auto; height: 36px; padding: 0 14px; border-radius: 999px; font-size: var(--t-sm); font-weight: 500; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); position: relative; }
+.tg-reset::after { content: ''; position: absolute; inset: -4px 0; }
+.tg-reset:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.tg-note { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--divider); font-size: var(--t-sm); color: var(--muted); }
+.tg-people { transition: opacity .18s var(--ease); }
+.tg-people.is-gone { opacity: 0; pointer-events: none; }
+/* ---------- E r6: hover washes only where there is a pointer to hover with (a tapped dot never keeps a grey
+   square on phones); the last-person guard speaks beside the proof, which never leaves; the note is the way
+   to the roommates page ---------- */
+@media (hover: none) {
+  .tg-reset:hover { background: none; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+}
+.tg-foot { position: relative; }
+.tg-why { grid-area: check; justify-self: start; align-self: center; font-size: var(--t-sm); font-weight: 500; color: var(--muted); opacity: 0; transition: opacity .2s var(--ease); pointer-events: none; white-space: nowrap; }
+.tg-why.on { opacity: 1; }
+.tg-note a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin: -12px 0 -12px; }
+.tg-note a:hover { color: var(--ink); text-decoration: underline; }
+.tg-note a span { color: var(--accent); }
+@media (max-width: 599px) {
+  /* phones: no room beside the proof, so the reason takes the note's line for a moment */
+  .tg-why { position: absolute; left: 0; right: 0; top: calc(100% + 26px); min-height: 22px; white-space: normal; }
+  .tg-note a { transition: opacity .2s var(--ease); }
+  .why-on .tg-note a { opacity: 0; }
+}
+/* ---------- E sweep (320-419): the hint gets its own line above the people (it overflowed the name column and
+   ran under "You" / "$30.00"); the fold count hides so "Shared" and its chevron stay out of the dot column ---------- */
+@media (max-width: 419px) {
+  .tg-hint { grid-column: 1 / -1; grid-row: 1; display: flex; flex-wrap: wrap; gap: 0 6px; white-space: normal; padding: 0 0 8px; }
+  .tg-people > .tg-p { grid-row: 2; }
+  .tg-people > .tg-pr-h { display: block; grid-row: 2; grid-column: 1; }
+  .tg-exp small, .tg-nm .tg-exp small { display: none; }
+}
+@media (max-width: 379px) {
+  #split .demo-frame.tg, .verb-demo > .demo-frame.tg { padding-inline: 10px; }
+  .tg-exp { gap: 4px; }
+  .tg-exp svg { width: 12px; height: 12px; }
+}
+@media (max-width: 339px) {
+  .tg-nm { gap: 6px; padding-right: 4px; }
+  .tg-row .tg-nm { font-size: var(--t-xs); }
+  .tg-exp svg { display: none; }
+}
+/* 420-639: the per-person totals ("$30.00$30.00") sat 3px apart in 54px columns; 58px gives them air */
+@media (min-width: 420px) and (max-width: 639px) {
+  .tg { --col: 58px; }
+}
+/* ---------- E final (judge notes): one live summary line under the grid (what you spent, what your roommates
+   owe you); the folded row reads "Shared groceries ×9" at every width; no tax hint (the price says it on hover) ---------- */
+.tg-sum { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; margin: 12px auto 0; max-width: 760px; padding-top: 10px; border-top: 1px solid var(--divider); font-size: var(--t-sm); color: var(--muted); }
+.tg-sum b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tg-sum a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; min-height: 44px; margin-block: -10px; }
+.tg-sum a > span { color: var(--accent); }
+@media (hover: hover) { .tg-sum a:hover { color: var(--ink); text-decoration: underline; } }
+.tg-sum a:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 2px; }
+#split-demo .tg-sum { max-width: none; }
+@media (max-width: 479px) {
+  /* phones: the two figures as two hairline rows, label left and amount right (like step 3's rows) */
+  .tg-sum { display: grid; gap: 0; padding-top: 4px; }
+  .tg-sum-dot { display: none; }
+  .tg-sum > span, .tg-sum > a { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 36px; margin: 0; }
+  .tg-sum > a { border-top: 1px solid var(--divider); }
+  .tg-sum > a b { margin-left: auto; }
+}
+@media (max-width: 479px) {
+  /* phones show (and screen readers read) the short name only; the long one is not rendered at all */
+  .tg-long { display: none; }
+  .tg-grp .tg-exp small { display: none !important; }
+}
+@media (max-width: 479px) { .tg-sum > .tg-sum-dot { display: none; } }

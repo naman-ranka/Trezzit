@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('anim');
+  document.documentElement.classList.add('js');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Splitwise alternative that splits by item | Trezzit</title>
+<meta name="description" content="Bring your Splitwise groups over. Split receipts line by line and see what you actually spent, not just who owes whom.">
+<link rel="canonical" href="https://trezzit.com/splitwise-alternative">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Trezzit">
+<meta property="og:url" content="https://trezzit.com/splitwise-alternative">
+<meta property="og:title" content="Coming from Splitwise? Split by item in Trezzit">
+<meta property="og:description" content="Bring your Splitwise groups over. Split receipts line by line and see what you actually spent, not just who owes whom.">
+<meta property="og:image" content="https://trezzit.com/assets/og/splitwise-alternative.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A Splitwise CSV export becoming a Trezzit group, then a receipt split item by item.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Coming from Splitwise? Split by item in Trezzit">
+<meta name="twitter:description" content="Bring your Splitwise groups over. Split receipts line by line and see what you actually spent, not just who owes whom.">
+<meta name="twitter:image" content="https://trezzit.com/assets/og/splitwise-alternative.png">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151517" media="(prefers-color-scheme: dark)">
+<script>
+  // Dark theme: a choice stored by the nav toggle beats the OS setting. Set before first paint, so no flash.
+  (function (d) { var t; try { t = localStorage.getItem('trezzit-theme'); } catch (e) {} if (t !== 'dark' && t !== 'light') return; d.setAttribute('data-theme', t); var m = document.querySelectorAll('meta[name="theme-color"]'); for (var i = 0; i < m.length; i++) m[i].setAttribute('content', t === 'dark' ? '#151517' : '#ffffff'); })(document.documentElement);
+</script>
+<link rel="icon" href="/assets/_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="/assets/_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/_kit/tokens.css">
+<link rel="stylesheet" href="/assets/e/css/c.css">
+<link rel="stylesheet" href="/assets/e/css/site.css">
+<link rel="modulepreload" href="/assets/e/js/util.js">
+<link rel="modulepreload" href="/assets/e/js/page.js">
+<script type="module" src="/assets/e/js/splitwise-page.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Trezzit",
+          "item": "https://trezzit.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Coming from Splitwise",
+          "item": "https://trezzit.com/splitwise-alternative"
+        }
+      ],
+      "@id": "https://trezzit.com/splitwise-alternative#breadcrumb"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I import my Splitwise groups?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, one group per CSV export. Trezzit brings over the expenses, settle-ups and people, and checks every balance against your export before saving anything."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Will my balances match Splitwise?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "They have to. Every person’s balance is compared with the Total balance row of your export, to the cent. If any differs, nothing is imported and you see which ones."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do my friends need Trezzit too?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Add them as people who can join later with a link, or invite someone you already know on Trezzit by email. For a single bill, a share link works for anyone, no account needed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Trezzit connect to my bank?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. There is no bank login, and Trezzit never moves money. It records what you spent; settling up happens however you already pay each other."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Trezzit free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. There is no paid plan."
+          }
+        }
+      ],
+      "@id": "https://trezzit.com/splitwise-alternative#faq"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/" aria-label="Trezzit home"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="26" height="26"><span>Trezzit</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="/#how">How it works</a>
+      <a href="/split">Split a bill</a>
+      <a href="/mcp">With AI</a>
+    </nav>
+    <div class="nav-cta">
+      <button type="button" class="theme-tg" data-theme-toggle aria-label="Dark theme" aria-pressed="false"><svg class="i-moon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.2 12.6A6.6 6.6 0 0 1 7.4 3.8a6.6 6.6 0 1 0 8.8 8.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><svg class="i-sun" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.2v2M10 15.8v2M2.2 10h2M15.8 10h2M4.5 4.5l1.4 1.4M14.1 14.1l1.4 1.4M4.5 15.5l1.4-1.4M14.1 5.9l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
+      <a class="c-btn c-btn-sm c-btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="pg pg-sw">
+
+<section class="pg-hero" aria-labelledby="pg-t">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Trezzit</a></li><li><span aria-current="page">Coming from Splitwise</span></li></ol></nav>
+    <h1 id="pg-t">Coming from Splitwise?</h1>
+    <p class="lede">Bring your groups over from a Splitwise export. Then split receipts line by line, and see what you actually spent, not just who owes&nbsp;whom.</p>
+    <div class="cta-row">
+      <a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Sign up and import</a>
+      <a class="c-btn c-btn-quiet c-btn-lg" href="/split">Split one bill first</a>
+    </div>
+    <p class="micro">Trezzit is free. No bank login needed.</p>
+  </div>
+</section>
+
+<section class="pg-sec" id="import" aria-labelledby="imp-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="imp-t">What the import brings over</h2><p>Export a group from Splitwise as a CSV file, then open it in Trezzit.</p></header>
+    <div class="prose">
+      <ul>
+        <li><strong>Every expense</strong> in the file, with its Splitwise date, description, category and cost, who paid, and each person’s exact share.</li>
+        <li><strong>Every settle-up</strong>, as a payment between the same two people.</li>
+        <li><strong>The people.</strong> You match each name in the file to yourself, to someone already in the group, to a new person who can join later with a link, or to someone you already know on Trezzit, who gets an email invite.</li>
+        <li><strong>Categories</strong> such as groceries, dining out, rent and utilities map to Trezzit’s own. The rest come in without one.</li>
+        <li><strong>A check.</strong> Before anything is saved, every person’s balance is compared with the Total balance row of your export, to the cent. If any is off, nothing is imported.</li>
+      </ul>
+      <p>In the app, go to <strong>Groups</strong>, start a new group and choose <strong>Import a CSV</strong> under “Coming from Splitwise?”. You can also import into a group that has no expenses yet. You review every step before anything is written.</p>
+      <h3>Limits, honestly</h3>
+      <p>One group per file, in one currency, with up to 1,000 transactions over at most 3 years and up to 50 people. Files can be up to 2 MB, and one import can invite up to 20 people by email. An export has no items, receipt photos or comments, so each old expense arrives as one line.</p>
+    </div>
+  </div>
+</section>
+
+<section class="pg-sec" id="by-item" aria-labelledby="item-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="item-t">Splitting by item, not by total</h2><p>A split by total answers who owes whom. A split by item also says what each person spent, and on what.</p></header>
+    <div class="sw-demo">
+      <div class="demo-frame" id="sw-grid" aria-label="Try it: who had what on a $100.00 grocery run">
+        <noscript><p class="nojs">Green Basket Market, $100.00: You $30.00, Maya $30.00, Jordan $20.00, Sam $20.00. Adds up to $100.00.</p></noscript>
+      </div>
+      <div class="prose">
+        <p>Scan the receipt and each line becomes its own item. Tap who had it. Hand towels for the apartment go four ways; Maya’s oat milk is Maya’s. Tax and tip follow in proportion, and the shares add up to the receipt exactly.</p>
+        <p>Your part lands in your own spending, by category, next to the things you bought alone. Your bank shows you paid $100.00; Trezzit shows you spent $30.00: $22.00 of groceries and $8.00 of household things.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pg-sec" id="compare" aria-labelledby="cmp-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="cmp-t">Before and after the move</h2></header>
+    <div class="tbl tbl-wide" tabindex="0" role="region" aria-labelledby="cmp-t">
+      <table>
+        <thead><tr><th scope="col"></th><th scope="col">In your Splitwise export</th><th scope="col">In Trezzit</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">An expense</th><td>One row: date, description, category, cost, and each person’s net</td><td>A bill with who paid and each person’s exact share, same date, and its category where one maps</td></tr>
+          <tr><th scope="row">A settle-up</th><td>A payment row</td><td>A payment between the same two people</td></tr>
+          <tr><th scope="row">Balances</th><td>The Total balance row</td><td>Checked against it to the cent before anything is saved</td></tr>
+          <tr><th scope="row">New receipts</th><td>Not in the file</td><td>Split item by item, tax and tip in proportion</td></tr>
+          <tr><th scope="row">What you spent</th><td>Not in the file</td><td>Your share of every bill and your own expenses, by category</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="pg-sec" id="faq" aria-labelledby="faq-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="faq-t">Questions</h2></header>
+    <div class="faq">
+      <details><summary>Can I import my Splitwise groups?</summary><p>Yes, one group per CSV export. Trezzit brings over the expenses, settle-ups and people, and checks every balance against your export before saving anything.</p></details>
+      <details><summary>Will my balances match Splitwise?</summary><p>They have to. Every person’s balance is compared with the Total balance row of your export, to the cent. If any differs, nothing is imported and you see which ones.</p></details>
+      <details><summary>Do my friends need Trezzit too?</summary><p>No. Add them as people who can join later with a link, or invite someone you already know on Trezzit by email. For a single bill, a <a href="/split">share link</a> works for anyone, no account needed.</p></details>
+      <details><summary>Does Trezzit connect to my bank?</summary><p>No. There is no bank login, and Trezzit never moves money. It records what you spent; settling up happens however you already pay each other.</p></details>
+      <details><summary>Is Trezzit free?</summary><p>Yes. There is no paid plan.</p></details>
+    </div>
+    <p class="pg-more">Ready? <a href="https://app.trezzit.com/signup">Sign up and import your group</a></p>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="/"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="22" height="22"><span>Trezzit</span></a>
+      <nav aria-label="Footer">
+        <div><p class="foot-h">Trezzit</p><ul role="list"><li><a href="/split">Split a bill</a></li><li><a href="/splitwise-alternative">Coming from Splitwise</a></li><li><a href="/mcp">With Claude or ChatGPT</a></li></ul></div>
+        <div><p class="foot-h">App</p><ul role="list"><li><a href="https://app.trezzit.com/signup">Sign up</a></li><li><a href="https://app.trezzit.com/login">Log in</a></li><li><a href="/support">Support</a></li></ul></div>
+        <div><p class="foot-h">Legal</p><ul role="list"><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="/your-data">Your data</a></li><li><a href="/delete-account">Delete account</a></li></ul></div>
+      </nav>
+    </div>
+    <p class="foot-legal">Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a> · <a href="https://instagram.com/trezzit_app" rel="noopener">Instagram</a> · <a href="https://www.linkedin.com/in/namany" rel="noopener">LinkedIn</a></p>
+    <p class="foot-legal">Claude, ChatGPT and Splitwise are trademarks of their owners. Trezzit is not affiliated with or endorsed by them.</p>
+  </div>
+</footer>
+</body>
+</html>
