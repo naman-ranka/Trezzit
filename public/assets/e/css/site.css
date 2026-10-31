@@ -292,3 +292,125 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
 .pg-uc .uc-wide .tg-sum { max-width: none; }
 /* the balance rows render after the first paint: their three 44px rows are reserved, so nothing under them moves */
 #bal-list:empty { min-height: 134px; }
+
+/* ---------- release 2, review round 2 ---------- */
+/* a worked example's table waits behind one closed disclosure (the card above already shows the numbers) */
+.pg-uc .ex-d { max-width: var(--measure); }
+.pg-uc .ex-d > summary { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; list-style: none; color: var(--accent); font-weight: 600; font-size: var(--t-md); }
+.pg-uc .ex-d > summary::-webkit-details-marker { display: none; }
+.pg-uc .ex-d > summary::after { content: ''; flex: none; width: 7px; height: 7px; margin: -4px 0 0 2px; border-right: 1.6px solid currentColor; border-bottom: 1.6px solid currentColor; transform: rotate(45deg); transition: transform .2s var(--ease); }
+.pg-uc .ex-d[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.pg-uc .ex-d > summary:hover { text-decoration: underline; }
+.pg-uc .ex-d > summary:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--r-sm); }
+.pg-uc .ex-d[open] > .tbl { margin-top: 8px; }
+.pg-uc #example .sh { margin-bottom: 6px; }
+/* /roommates: the hero is the rent card alone at every width; the balance sits under the groceries grid it follows */
+@media (min-width: 1000px) {
+  .rm-hero .wrap { grid-template-rows: auto; grid-template-areas: 'copy card'; }
+}
+#groceries .rent-bal { position: static; }
+#groceries .rent-bal .bal { margin-top: 16px; max-width: var(--measure); }
+.bal-w { white-space: nowrap; min-width: 0; }
+.bal-row > b { white-space: nowrap; }
+/* phones: one compact Splitwise line under the hero's CTA; the one by the grid is for wide screens */
+.uc-sw-m { display: none; }
+.uc-sw-m a { color: var(--accent); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; min-height: 44px; margin-block: -12px; }
+@media (max-width: 719px) {
+  .uc-sw-m { display: block; margin-top: 8px; }
+  .pg-uc .uc-sw { display: none; }
+}
+/* the rent reads as editable at rest where there is no hover (dashed underline, and "Type your rent" beside it) */
+@media (hover: none) {
+  .rec-edit .money-in-field { border-bottom-color: var(--line-strong); }
+}
+/* phones: 13px figures with at least 8px between them (rent shares, grid totals) */
+@media (max-width: 399px) {
+  .rent-card ul.rec-shares { gap: 8px; }
+  .rent-card .rec-shares .sp-person { padding-inline: 0; min-width: 0; }
+  .rent-card .rec-shares .sp-pa { font-size: var(--t-xs); letter-spacing: 0; }
+}
+/* the grocery grid on narrow phones: the same frame padding home's grid gets, and "Shared ×9" for the folded row */
+@media (max-width: 379px) {
+  #rm-grid.tg, #sw-grid.tg { padding-inline: 10px; }
+}
+@media (max-width: 419px) {
+  .tg .tg-fw { display: none; }
+}
+/* footer: one-line links only where the four columns have room for them */
+@media (min-width: 900px) and (max-width: 1099px) {
+  .foot nav a { white-space: normal; }
+}
+/* the close: the same size as home's */
+.pg-close .close-h { font-size: var(--t-display); letter-spacing: -0.04em; line-height: 1.04; }
+/* /track: "What you see." is two numbered cards */
+@media (min-width: 860px) {
+  .pg-steps.pg-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.faq .mono-in { font-family: 'Receipt Mono', var(--font-mono); font-size: var(--t-sm); white-space: nowrap; padding: 1px 6px; border-radius: 6px; background: var(--fill); border: 1px solid var(--line); }
+/* /track "Your photo": the open tab is the selected one, and the frame is only as tall as the notice */
+.pg-jm .scan .pick-own[aria-expanded='true'] { border-style: solid; border-color: var(--ink); background: var(--card); box-shadow: inset 0 0 0 .5px var(--ink); }
+.pg-jm .demo-frame.res-jm:has(.consent-on) { min-height: 0; }
+.pg-jm .scan .pick b { white-space: nowrap; }
+/* dark: the cream receipt is dimmed and the fade over it goes */
+:root[data-theme='dark'] .pg-jm .scan-paper .tz-receipt { filter: brightness(.9) drop-shadow(0 10px 18px rgb(var(--sh) / .14)); }
+:root[data-theme='dark'] .pg-jm .scan-fade { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .pg-jm .scan-paper .tz-receipt { filter: brightness(.9) drop-shadow(0 10px 18px rgb(var(--sh) / .14)); }
+  :root:not([data-theme='light']) .pg-jm .scan-fade { display: none; }
+}
+/* /track month: the search column sits centred beside the taller October column */
+@media (min-width: 880px) {
+  .pg-jm .ledger.mo > .lg-find { align-self: center; }
+}
+/* /track narrow phones: the answer's source wraps rather than hiding the date */
+@media (max-width: 399px) {
+  .pg-jm .mo .lg-list .lg-rt small { white-space: normal; }
+}
+/* legal pages: the TOC rides beside the text from 900px (62ch + 240px fit there); anchors land ~16px under the
+   header (the page's scroll-padding alone, no extra margin on the target) */
+@media (min-width: 900px) {
+  .pg-legal .doc:has(> .doc-toc) { max-width: none; display: grid; grid-template-columns: minmax(0, 62ch) 220px; column-gap: clamp(32px, 5vw, 96px); align-items: start; }
+  .pg-legal .doc:has(> .doc-toc) > * { grid-column: 1; }
+  .pg-legal .doc:has(> .doc-toc) > .doc-toc { grid-column: 2; grid-row: 1 / span 400; position: sticky; top: 88px; max-height: calc(100vh - 104px); overflow: auto; overscroll-behavior: contain; margin-top: 8px; padding: 0 0 0 18px; background: none; border: 0; border-left: 1px solid var(--line); border-radius: 0; }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc ol { columns: 1; }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc a { padding: 4px 0; color: var(--muted); }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc a:hover { color: var(--accent); }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc a[aria-current] { color: var(--ink); }
+  .pg-legal .toc-d > summary { min-height: 0; margin: 0 0 8px; cursor: default; pointer-events: none; }
+  .pg-legal .toc-d > summary::after { content: none; }
+  .pg-legal .toc-d[open] > ol { margin-top: 0; }
+}
+@media (min-width: 1080px) {
+  .pg-legal .doc:has(> .doc-toc) { grid-template-columns: minmax(0, 62ch) 240px; column-gap: clamp(48px, 6vw, 96px); }
+}
+.pg-legal .doc [id][id] { scroll-margin-top: 0; }
+/* /delete-account: the quiet button's outline reaches 3:1 on the page in both themes */
+.pg-legal .doc a.c-btn-quiet { border-color: var(--faint); }
+:root[data-theme='dark'] .pg-legal .doc a.c-btn-quiet { border-color: var(--line-4); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .pg-legal .doc a.c-btn-quiet { border-color: var(--line-4); }
+}
+/* the grid at 320-379 (every page): no category dot in the rows, so the names keep a 66px column ("Cold brew",
+   "Shared ×9" on one line); the four people columns take what is left, up to 58px (at least 8px between totals) */
+@media (max-width: 379px) {
+  .tg .tg-people, .tg .tg-row { grid-template-columns: minmax(66px, 1fr) repeat(var(--n, 4), minmax(0, 58px)); }
+  .tg .tg-row .tg-nm > .tg-cat { display: none; }
+  .tg .tg-row .tg-nm { padding-right: 2px; }
+  .tg .tg-row .tg-pr { padding-left: 0; }
+  .tg .tg-sub-row .tg-nm, .tg .tg-sub-row .tg-pr { padding-left: 8px; }
+  .tg .tg-pa { letter-spacing: -0.05em; }
+}
+@media (max-width: 339px) {
+  #rm-grid.tg, #sw-grid.tg, main #split .demo-frame.tg { padding-inline: 6px; }
+}
+/* /roommates phones: the balance rows fit one line ("Jordan owes you  $806.35"); each bill's note goes under its name */
+@media (max-width: 399px) {
+  .rent-bal .bal { padding-inline: 14px; }
+  .rent-bal .bal-row { gap: 8px; font-size: var(--t-sm); }
+  .rent-bal .bal-row > b { font-size: var(--t-sm); }
+}
+@media (max-width: 479px) {
+  .rent-bal .bal-why small { display: block; }
+  .rec-edit .rec-help { grid-column: 2; grid-row: 2; }
+  .rec-edit .rec-rsub { grid-column: 1 / -1; grid-row: 3; }
+}

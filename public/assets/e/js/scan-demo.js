@@ -371,8 +371,25 @@ export function mountScan(root, opts = {}) {
   root.querySelector('.so-again').addEventListener('click', again);
   stage.addEventListener('click', again);
   // while the notice is open it is the only thing in the frame (opts.consentAlone): no sample result beside it
-  const openConsent = () => { consent.hidden = false; if (opts.consentAlone) root.classList.add('consent-on'); ownBtn?.setAttribute('aria-expanded', 'true'); consent.querySelector('label').focus?.(); };
-  const closeConsent = () => { consent.hidden = true; root.classList.remove('consent-on'); ownBtn?.setAttribute('aria-expanded', 'false'); };
+  // (consentAlone) the open tab is the selected one: the sample's tab lets go until the notice closes
+  let heldPick = null;
+  const openConsent = () => {
+    consent.hidden = false;
+    if (opts.consentAlone) {
+      root.classList.add('consent-on');
+      heldPick = root.querySelector('.pick[data-id][aria-pressed="true"]');
+      heldPick?.setAttribute('aria-pressed', 'false');
+    }
+    ownBtn?.setAttribute('aria-expanded', 'true');
+    consent.querySelector('label').focus?.();
+  };
+  const closeConsent = () => {
+    consent.hidden = true;
+    root.classList.remove('consent-on');
+    ownBtn?.setAttribute('aria-expanded', 'false');
+    if (heldPick && !root.querySelector('.pick[data-id][aria-pressed="true"]')) heldPick.setAttribute('aria-pressed', 'true');
+    heldPick = null;
+  };
   ownBtn?.addEventListener('click', () => (consent.hidden ? openConsent() : closeConsent()));
   consent.querySelector('.sc-cancel')?.addEventListener('click', () => { closeConsent(); ownBtn?.focus(); });
   consent.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeConsent(); ownBtn?.focus(); } });

@@ -50,9 +50,9 @@ root.innerHTML = `<div class="rec${opts.compact || opts.sideRoot ? ' rec-compact
     </div>
     <div class="rec-edit">
       <label for="rent-in">Rent</label>
-      <label class="money-in-field" for="rent-in">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-sub rent-help"></label>
+      <label class="money-in-field" for="rent-in">$<input id="rent-in" aria-label="Monthly rent" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-sub rent-help"></label>
       <span id="rent-sub" class="rec-rsub"></span>
-      <span id="rent-help" class="rec-help"></span>
+      <span id="rent-help" class="rec-help">Type your rent</span>
       <span class="visually-hidden" role="status" data-say></span>
     </div>
     <ul class="rec-lines" role="list"></ul>
@@ -83,7 +83,7 @@ function render() {
   // one name for the rent's split, said once, on its own line: by room size, with your percent beside your share
   // the rent itself is the editable row (its split on one sub-line under the amount); the bills follow
   const method = { 0: 'By room size', 1: 'Equally', 2: 'Equally', 3: 'Equally', 4: 'Just Jordan' };
-  root.querySelector('#rent-sub').textContent = `${method[0]} · you ${money(r.items[0].shares.you)}`;
+  root.querySelector('#rent-sub').textContent = `${method[0]} (${ROOM.map((p) => PCT[p]).join('/')}%) · you ${money(r.items[0].shares.you)}`;
   linesEl.innerHTML = r.items.slice(1).map((it, j) => `<li><span>${esc(it.name)}</span><b class="money">${money(it.totalCents)}</b><span>${method[j + 1]}${it.shares.you ? ` · you ${money(it.shares.you)}` : ''}</span></li>`).join('')
     + `<li class="rec-total"><span>Each month</span><b class="money">${money(r.totalCents)}</b></li>`;
   ROOM.forEach((p) => {
@@ -144,15 +144,16 @@ function setRent(cents, fromInput = false) {
 // the field and the math never disagree: only a well-formed amount changes the rent;
 // anything else keeps the last good rent until the field is left (then it snaps back)
 const RANGE = 'Between $100 and $10,000';
+const NUM = 'Numbers only'; // a letter is refused with this, never with the range message
 const VALID = /^\d[\d,]*(\.\d{0,2})?$/;
 input.addEventListener('beforeinput', (e) => {
-  if (e.data && /[^0-9.,]/.test(e.data)) { e.preventDefault(); flashHelp(RANGE); }
+  if (e.data && /[^0-9.,]/.test(e.data)) { e.preventDefault(); flashHelp(NUM); }
 });
 let lastText = input.value;
 input.addEventListener('input', () => {
   const raw = input.value.trim();
   if (raw === '') return; // clearing to retype: the math keeps the last rent until a new one is typed
-  if (!VALID.test(raw)) { input.value = lastText; flashHelp(RANGE); return; } // refuse a malformed edit ("1.2.3")
+  if (!VALID.test(raw)) { input.value = lastText; flashHelp(NUM); return; } // refuse a malformed edit ("1.2.3")
   lastText = raw;
   const v = Math.round(Number(raw.replace(/,/g, '')) * 100);
   if (!Number.isFinite(v)) return;

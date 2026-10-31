@@ -1,5 +1,5 @@
-/* /roommates: the rent card leads, beside one running
- * balance for the apartment. The balance is computed live from the rent card, plus this month's
+/* /roommates: the rent card leads; one running balance for the apartment follows the groceries grid.
+ * The balance is computed live from the rent card, plus this month's
  * groceries (the grid's current split, from the kit engine) and Netflix: per person, from your side.
  * Same October as home: you pay the rent and the groceries, Maya pays Netflix. */
 import { initPage } from './page.js';
@@ -10,19 +10,6 @@ import { splitSample } from '../../_kit/receipts.js';
 import { money, countMoney, css, onVisible } from './util.js';
 
 initPage();
-
-// phones: the hero is the rent card alone; the balance moves under the groceries grid, the bill its rows follow
-const balBox = document.querySelector('.rent-bal');
-const heroWrap = balBox?.parentElement;
-const phone = matchMedia('(max-width: 719px)');
-const placeBal = () => {
-  if (!balBox) return;
-  const grid = document.getElementById('rm-grid');
-  if (phone.matches && grid && balBox.previousElementSibling !== grid) grid.after(balBox);
-  else if (!phone.matches && balBox.parentElement !== heroWrap) heroWrap.appendChild(balBox);
-};
-placeBal();
-phone.addEventListener?.('change', placeBal);
 
 // the grocery grid further down mounts as it nears the screen (its frame reserves its height)
 const gridEl = document.getElementById('rm-grid');
@@ -40,24 +27,29 @@ const payerName = (p) => (p === 'you' ? 'you' : PEOPLE[p].name);
 // every row opens to the 2-3 bills behind it, so the net never looks like a math slip
 function renderBalance() {
   if (!groc || !rent || !balEl) return;
-  const bills = [groc, rent, NETFLIX];
-  const first = !balEl.children.length;
+  const bills = [rent, groc, NETFLIX];
+  const first = !balEl.dataset.live;
+  balEl.dataset.live = '1';
   ['maya', 'jordan', 'sam'].forEach((p) => {
     // what p owes you: their share of what you paid, less your share of what they paid
     const parts = bills.map((b) => ({ b, c: b.payer === 'you' ? b.shares[p] || 0 : b.payer === p ? -(b.shares.you || 0) : 0 })).filter((x) => x.c);
     const v = parts.reduce((a, x) => a + x.c, 0);
+    // the rows are in the HTML (their first figures included), so nothing moves when this runs; bind them once
     let li = balEl.querySelector(`[data-p="${p}"]`);
     if (!li) {
       li = document.createElement('li');
       li.dataset.p = p;
       li.innerHTML = `<button type="button" class="bal-row" aria-expanded="false" aria-controls="bal-why-${p}"><span class="av av-sm" style="--av:${PEOPLE[p].color}" aria-hidden="true">${PEOPLE[p].name[0]}</span><span class="bal-w"></span><b class="money"></b><span class="bal-chev" aria-hidden="true"></span></button><ul class="bal-why" id="bal-why-${p}" role="list" hidden></ul>`;
+      balEl.appendChild(li);
+    }
+    if (!li.dataset.bound) {
+      li.dataset.bound = '1';
       const btn = li.querySelector('.bal-row');
       btn.addEventListener('click', () => {
         const open = btn.getAttribute('aria-expanded') !== 'true';
         btn.setAttribute('aria-expanded', String(open));
         li.querySelector('.bal-why').hidden = !open;
       });
-      balEl.appendChild(li);
     }
     li.querySelector('.bal-w').textContent = v < 0 ? `You owe ${PEOPLE[p].name}` : v > 0 ? `${PEOPLE[p].name} owes you` : `${PEOPLE[p].name} and you are even`;
     li.className = v < 0 ? 'neg' : v > 0 ? 'pos' : '';

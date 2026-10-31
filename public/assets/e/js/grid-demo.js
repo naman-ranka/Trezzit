@@ -102,7 +102,7 @@ export async function mountGrid(root, opts = {}) {
           </div>
           <div class="tg-rows" role="rowgroup">
             ${folded.length ? `<div class="tg-row tg-grp" role="row" data-lines="${folded.join(',')}">
-              <span class="tg-nm" role="rowheader">${catDot(m.lines[folded[0]])}<button type="button" class="tg-exp" aria-expanded="false" aria-controls="tg-sub-${uid}"><span><span class="tg-long">${esc(foldCat)}</span><span class="tg-short">${esc(foldCat)} ×${folded.length}</span></span><small>×${folded.length}</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span>
+              <span class="tg-nm" role="rowheader">${catDot(m.lines[folded[0]])}<button type="button" class="tg-exp" aria-expanded="false" aria-controls="tg-sub-${uid}"><span><span class="tg-long">${esc(foldCat)}</span><span class="tg-short">${/^Shared ./.test(foldCat) ? `Shared<span class="tg-fw"> ${esc(foldCat.slice(7))}</span>` : esc(foldCat)} ×${folded.length}</span></span><small>×${folded.length}</small><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span>
               <span class="tg-pr money" role="gridcell" data-sum="${folded.join(',')}"></span>${dots(`${foldCat}, ${folded.length} items`)}</div>
             <div class="tg-sub" id="tg-sub-${uid}" role="none" hidden>${folded.map((i) => row(m.lines[i], true)).join('')}</div>` : ''}
             ${m.lines.filter((l) => !folded.includes(l.index)).map((l) => row(l, false)).join('')}

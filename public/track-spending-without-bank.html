@@ -83,6 +83,14 @@
         },
         {
           "@type": "Question",
+          "name": "Why is there no bank link?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A bank sees one line per payment: CORNER PHARMACY −$48.22. It can’t tell allergy relief from a birthday card, or your share of the rent from your roommates’."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "How does Trezzit sort items into categories?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -146,7 +154,7 @@
     <div class="sc-copy">
       <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Trezzit</a></li><li><span aria-current="page">Track spending</span></li></ol></nav>
       <h1 id="pg-t">Just yours, item by&nbsp;item.</h1>
-      <p class="lede">Your bank shows what you paid. Scan receipts and Trezzit sorts each item, so you see what you&nbsp;spent.</p>
+      <p class="lede">No bank link. Scan receipts and Trezzit sorts each item, so you see what you&nbsp;spent.</p>
       <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a></div>
       <p class="micro">Free. No bank login.</p>
     </div>
@@ -165,22 +173,12 @@
   </div>
 </section>
 
-<section class="pg-sec" id="no-bank" aria-labelledby="nb-t">
-  <div class="wrap">
-    <header class="sh"><h2 id="nb-t">Why there’s no bank link.</h2></header>
-    <div class="prose">
-      <p>A bank sees one line per payment: <span class="mono-in">CORNER PHARMACY −$48.22</span>. It can’t tell allergy relief from a birthday card, or your share of the rent from your roommates’.</p>
-    </div>
-  </div>
-</section>
-
 <section class="pg-sec" id="what-you-see" aria-labelledby="see-t">
   <div class="wrap">
     <header class="sh"><h2 id="see-t">What you see.</h2></header>
-    <ol class="pg-steps pg-points">
+    <ol class="pg-steps pg-two">
       <li><h3>Your share of everything.</h3><p>A bill you split counts only your part. A dinner a friend paid for still counts. Personal and shared, in one place.</p></li>
       <li><h3>By category, by month.</h3><p>See where it went this month, last month or any dates you pick.</p></li>
-      <li><h3>Every item, searchable.</h3><p>Search “sunscreen” and find the line, not just the store.</p></li>
     </ol>
   </div>
 </section>
@@ -188,6 +186,7 @@
 <section class="pg-sec" id="example" aria-labelledby="ex-t">
   <div class="wrap">
     <header class="sh"><h2 id="ex-t">A worked example.</h2><p>One October. Left your account: <b class="money">−$2,792.02</b>. Actually yours: <b class="money">$749.10</b>.</p></header>
+    <details class="ex-d"><summary>See October’s math</summary>
     <div class="tbl tbl-rm tbl-oct" tabindex="0" role="region" aria-label="October: your bank beside what you spent">
       <table>
         <thead><tr><th scope="col">October</th><th scope="col" class="r">Your bank</th><th scope="col" class="r">You spent</th></tr></thead>
@@ -202,9 +201,7 @@
         <tfoot><tr><th scope="row">Total</th><td class="r money">−$2,792.02</td><td class="r money">$749.10</td></tr></tfoot>
       </table>
     </div>
-    <div class="prose">
-      <p>The deli lunch is the honest limit: with no bank feed, what you don’t add isn’t counted.</p>
-    </div>
+    </details>
   </div>
 </section>
 
@@ -213,6 +210,7 @@
     <header class="sh"><h2 id="faq-t">Questions.</h2></header>
     <div class="faq">
       <details><summary>Can I track spending without linking my bank?</summary><p>Yes. You add receipts and bills, by scanning or typing them, and Trezzit keeps your share of each. There is no bank login, and Trezzit never moves money.</p></details>
+      <details><summary>Why is there no bank link?</summary><p>A bank sees one line per payment: <span class="mono-in">CORNER PHARMACY −$48.22</span>. It can’t tell allergy relief from a birthday card, or your share of the rent from your roommates’.</p></details>
       <details><summary>How does Trezzit sort items into categories?</summary><p>With AI features on, Trezzit suggests a category for each item, and you can change any of them. With AI features off, you pick categories yourself.</p></details>
       <details><summary>Do shared bills count?</summary><p>Only your share. Pay $100.00 for groceries where $70.00 was your roommates’, and Trezzit counts your $30.00. A dinner a friend paid for counts too, at your share.</p></details>
       <details><summary>What happens to my receipt photos?</summary><p>When you scan a receipt with AI features on, the photo is sent to Google Gemini to read it, and a small sample of scans is reviewed with Anthropic’s Claude to improve accuracy. AI features stay off until you turn them on. See the <a href="/privacy">privacy policy</a>.</p></details>

@@ -144,17 +144,12 @@
     <div class="sc-copy">
       <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Trezzit</a></li><li><span aria-current="page">Roommates</span></li></ol></nav>
       <h1 id="pg-t">Split rent with roommates. Four fair&nbsp;shares.</h1>
-      <p class="lede">Pay the $2,632.40 rent and bills, and see the $639.35 that’s actually yours. Groceries split by item.</p>
+      <p class="lede">You pay $2,632.40 in rent and bills. See the $639.35 that’s actually&nbsp;yours.</p>
       <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Start your apartment group</a></div>
       <p class="micro">Free. No bank login.</p>
+      <p class="micro uc-sw-m">Coming from Splitwise? <a href="/splitwise-alternative">Import your groups <span aria-hidden="true">→</span></a></p>
     </div>
     <div class="sc-side rent-card"><div class="demo-frame" id="rent-demo" aria-label="Monthly rent for Apartment 3B"><noscript><p class="nojs">Monthly rent and bills, $2,632.40: You $639.35, Maya $639.35, Jordan $786.35, Sam $567.35.</p></noscript></div></div>
-    <div class="rent-bal"><div class="bal" aria-labelledby="bal-t" role="group">
-      <p class="bal-t" id="bal-t">Apartment 3B, this month</p>
-      <ul class="bal-list" id="bal-list" role="list"></ul>
-      <noscript><p class="nojs">Maya owes you $664.85. Jordan owes you $806.35. Sam owes you $587.35.</p></noscript>
-      <p class="bal-note">Add roommates by name. They join when they want.</p>
-    </div></div>
   </div>
 </section>
 
@@ -164,6 +159,15 @@
     <div class="demo-frame uc-wide" id="rm-grid" aria-label="Try it: who had what on a $100.00 grocery run">
       <noscript><p class="nojs">Green Basket Market, $100.00: You $30.00, Maya $30.00, Jordan $20.00, Sam $20.00. Adds up to $100.00.</p></noscript>
     </div>
+    <div class="rent-bal"><div class="bal" aria-labelledby="bal-t" role="group">
+      <p class="bal-t" id="bal-t">Apartment 3B, this month</p>
+      <ul class="bal-list" id="bal-list" role="list">
+        <li data-p="maya" class="pos"><button type="button" class="bal-row" aria-expanded="true" aria-controls="bal-why-maya"><span class="av av-sm" style="--av:var(--p-maya)" aria-hidden="true">M</span><span class="bal-w">Maya owes you</span><b class="money">$664.85</b><span class="bal-chev" aria-hidden="true"></span></button><ul class="bal-why" id="bal-why-maya" role="list"><li><span><b>Rent and bills</b> <small>you paid · Maya’s share</small></span><span class="money">+$639.35</span></li><li><span><b>Groceries</b> <small>you paid · Maya’s share</small></span><span class="money">+$30.00</span></li><li><span><b>Netflix</b> <small>Maya paid · your share</small></span><span class="money">−$4.50</span></li></ul></li>
+        <li data-p="jordan" class="pos"><button type="button" class="bal-row" aria-expanded="false" aria-controls="bal-why-jordan"><span class="av av-sm" style="--av:var(--p-jordan)" aria-hidden="true">J</span><span class="bal-w">Jordan owes you</span><b class="money">$806.35</b><span class="bal-chev" aria-hidden="true"></span></button><ul class="bal-why" id="bal-why-jordan" role="list" hidden><li><span><b>Rent and bills</b> <small>you paid · Jordan’s share</small></span><span class="money">+$786.35</span></li><li><span><b>Groceries</b> <small>you paid · Jordan’s share</small></span><span class="money">+$20.00</span></li></ul></li>
+        <li data-p="sam" class="pos"><button type="button" class="bal-row" aria-expanded="false" aria-controls="bal-why-sam"><span class="av av-sm" style="--av:var(--p-sam)" aria-hidden="true">S</span><span class="bal-w">Sam owes you</span><b class="money">$587.35</b><span class="bal-chev" aria-hidden="true"></span></button><ul class="bal-why" id="bal-why-sam" role="list" hidden><li><span><b>Rent and bills</b> <small>you paid · Sam’s share</small></span><span class="money">+$567.35</span></li><li><span><b>Groceries</b> <small>you paid · Sam’s share</small></span><span class="money">+$20.00</span></li></ul></li>
+      </ul>
+      <p class="bal-note">Add roommates by name. They join when they want.</p>
+    </div></div>
     <p class="pg-more uc-sw">Coming from Splitwise? <a href="/splitwise-alternative">Bring your groups over <span aria-hidden="true">→</span></a></p>
   </div>
 </section>
@@ -182,6 +186,7 @@
 <section class="pg-sec" id="example" aria-labelledby="ex-t">
   <div class="wrap">
     <header class="sh"><h2 id="ex-t">A worked example.</h2><p>Apartment 3B’s monthly bill: rent by room size, utilities four ways, Jordan’s parking space.</p></header>
+    <details class="ex-d"><summary>See the math</summary>
     <div class="tbl tbl-rm" tabindex="0" role="region" aria-label="Apartment 3B’s monthly bill, by person">
       <table>
         <thead><tr><th scope="col">Each month</th><th scope="col" class="r">You</th><th scope="col" class="r">Maya</th><th scope="col" class="r">Jordan</th><th scope="col" class="r">Sam</th></tr></thead>
@@ -195,6 +200,7 @@
         <tfoot><tr><th scope="row">Total <span class="money">$2,632.40</span></th><td class="r money">$639.35</td><td class="r money">$639.35</td><td class="r money">$786.35</td><td class="r money">$567.35</td></tr></tfoot>
       </table>
     </div>
+    </details>
   </div>
 </section>
 
