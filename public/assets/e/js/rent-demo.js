@@ -52,10 +52,11 @@ root.innerHTML = `<div class="rec${opts.compact || opts.sideRoot ? ' rec-compact
       <label for="rent-in">Rent</label>
       <label class="money-in-field" for="rent-in">$<input id="rent-in" inputmode="decimal" pattern="[0-9,]*([.][0-9]{0,2})?" value="2,400.00" aria-describedby="rent-sub rent-help"></label>
       <span id="rent-sub" class="rec-rsub"></span>
-      <span id="rent-help" class="rec-help" aria-live="polite"></span>
+      <span id="rent-help" class="rec-help"></span>
+      <span class="visually-hidden" role="status" data-say></span>
     </div>
     <ul class="rec-lines" role="list"></ul>
-    <ul class="sp-people rec-shares" role="list" aria-live="polite">${ROOM.map((p) => `<li class="sp-person" data-p="${p}"><span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span><span class="sp-pn">${PEOPLE[p].name}</span><b class="money sp-pa"></b></li>`).join('')}</ul>
+    <ul class="sp-people rec-shares" role="list">${ROOM.map((p) => `<li class="sp-person" data-p="${p}"><span class="av" style="--av:${PEOPLE[p].color}" aria-hidden="true">${p === 'you' ? YOU_GLYPH : PEOPLE[p].name[0]}</span><span class="sp-pn">${PEOPLE[p].name}</span><b class="money sp-pa"></b></li>`).join('')}</ul>
     <p class="sp-check rec-check">${icon.check}<span></span></p>
   </div>
   ${opts.compact || opts.sideRoot ? '' : SIDE}
@@ -69,7 +70,7 @@ const mirror = document.createElement('span');
 mirror.setAttribute('aria-hidden', 'true');
 mirror.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;pointer-events:none;left:0;top:0';
 input.parentElement.appendChild(mirror);
-const fitInput = () => { const cs = getComputedStyle(input); mirror.style.font = cs.font; mirror.style.fontVariantNumeric = cs.fontVariantNumeric; mirror.style.letterSpacing = cs.letterSpacing; mirror.textContent = input.value || '0'; input.style.width = `${Math.ceil(mirror.getBoundingClientRect().width) + 4}px`; };
+const fitInput = () => { const cs = getComputedStyle(input); mirror.style.font = cs.font; mirror.style.fontVariantNumeric = cs.fontVariantNumeric; mirror.style.letterSpacing = cs.letterSpacing; mirror.textContent = input.value || '0'; input.style.width = `${Math.ceil(mirror.getBoundingClientRect().width) + 1}px`; };
 input.addEventListener('input', fitInput);
 fitInput();
 const linesEl = root.querySelector('.rec-lines');
@@ -115,17 +116,27 @@ function render() {
   prev = r;
 }
 
+const sayEl = root.querySelector('[data-say]');
+let sayT = 0;
+// one short status, spoken once the typing pauses (never a list of four amounts per keystroke)
+function say(msg, wait = 900) {
+  clearTimeout(sayT);
+  sayT = setTimeout(() => { sayEl.textContent = msg; }, wait);
+}
+const sayShare = () => { const r = compute(); say(`Your share ${money(r.people.you.cents)} of ${money(r.totalCents)}.`); };
 const help = root.querySelector('#rent-help');
 const HELP = help.textContent;
 let helpT = 0;
 function flashHelp(msg) {
   help.textContent = msg;
   help.classList.add('warn');
+  say(msg, 300);
   clearTimeout(helpT);
   helpT = setTimeout(() => { help.textContent = HELP; help.classList.remove('warn'); }, 2200);
 }
+const MAX = 1000000; // $10,000.00
 function setRent(cents, fromInput = false) {
-  rent = Math.max(MIN, Math.min(1000000, Math.round(cents)));
+  rent = Math.max(MIN, Math.min(MAX, Math.round(cents)));
   if (!fromInput) { input.value = (rent / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); lastText = input.value; }
   fitInput();
   render();
@@ -145,18 +156,29 @@ input.addEventListener('input', () => {
   lastText = raw;
   const v = Math.round(Number(raw.replace(/,/g, '')) * 100);
   if (!Number.isFinite(v)) return;
-  if (v > 1000000) { setRent(1000000); flashHelp(RANGE); return; }
-  if (v < MIN) return; // "2" on the way to "2600": the math waits; leaving the field snaps it to the minimum
+  // out of range ("2" on the way to "2600", or one zero too many): the math waits; leaving the field clamps it
+  if (v < MIN || v > MAX) return;
   setRent(v, true);
+  sayShare();
 });
-// leaving the field (or Enter) formats it; a rent under $100.00 snaps to $100.00 and says why
+// leaving the field (or Enter) formats it; only then is an amount outside $100 to $10,000 clamped, and it says why
+let before = rent;
+input.addEventListener('focus', () => { before = rent; });
 function commit() {
   const v = Math.round(Number(input.value.trim().replace(/,/g, '')) * 100);
-  if (input.value.trim() && Number.isFinite(v) && v < MIN) { setRent(MIN); flashHelp(RANGE); return; }
+  if (input.value.trim() && Number.isFinite(v) && (v < MIN || v > MAX)) {
+    setRent(v); flashHelp(RANGE);
+    const r = compute(); say(`${RANGE}. Your share ${money(r.people.you.cents)} of ${money(r.totalCents)}.`, 300);
+    return;
+  }
   setRent(rent);
 }
 input.addEventListener('blur', commit);
-input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); commit(); }
+  // Esc puts back the rent the field had when you came in
+  else if (e.key === 'Escape') { e.preventDefault(); setRent(before); sayShare(); }
+});
 function bindMode() {
   const radios = [...side.querySelectorAll('[data-mode]')];
   const pick = (b, focus) => {

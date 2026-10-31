@@ -1,6 +1,6 @@
 /* /roommates: the rent card leads, beside one running
  * balance for the apartment. The balance is computed live from the rent card, plus this month's
- * groceries (home's default split, from the kit engine) and Netflix: per person, from your side.
+ * groceries (the grid's current split, from the kit engine) and Netflix: per person, from your side.
  * Same October as home: you pay the rent and the groceries, Maya pays Netflix. */
 import { initPage } from './page.js';
 import { mountRent } from './rent-demo.js';
@@ -11,9 +11,22 @@ import { money, countMoney, css, onVisible } from './util.js';
 
 initPage();
 
+// phones: the hero is the rent card alone; the balance moves under the groceries grid, the bill its rows follow
+const balBox = document.querySelector('.rent-bal');
+const heroWrap = balBox?.parentElement;
+const phone = matchMedia('(max-width: 719px)');
+const placeBal = () => {
+  if (!balBox) return;
+  const grid = document.getElementById('rm-grid');
+  if (phone.matches && grid && balBox.previousElementSibling !== grid) grid.after(balBox);
+  else if (!phone.matches && balBox.parentElement !== heroWrap) heroWrap.appendChild(balBox);
+};
+placeBal();
+phone.addEventListener?.('change', placeBal);
+
 // the grocery grid further down mounts as it nears the screen (its frame reserves its height)
 const gridEl = document.getElementById('rm-grid');
-if (gridEl) onVisible(gridEl, () => Promise.all([import('./grid-demo.js'), css('grid')]).then(([m]) => m.mountGrid(gridEl, { sampleId: 'green-basket', summary: true, taxHint: false })), { threshold: 0, rootMargin: '0px 0px 400px 0px' });
+if (gridEl) onVisible(gridEl, () => Promise.all([import('./grid-demo.js'), css('grid')]).then(([m]) => m.mountGrid(gridEl, { sampleId: 'green-basket', summary: true, taxHint: false, onChange: (res) => setGroc(res) })), { threshold: 0, rootMargin: '0px 0px 400px 0px' });
 
 const ROOM = ['you', 'maya', 'jordan', 'sam'];
 const even = (cents) => Object.fromEntries(distributeEqually(cents, 4).map((c, i) => [ROOM[i], c]));
@@ -57,11 +70,13 @@ function renderBalance() {
 }
 
 // the Green Basket run as home splits it by default (you paid; the same $30 / $30 / $20 / $20)
-sampleBill('green-basket').then(({ bill }) => {
-  const r = splitSample(getSample('green-basket'), bill);
+// the groceries line follows the grid below: every tap there re-splits the run, and the balance moves with it
+function setGroc(r) {
   groc = { name: 'Groceries', payer: 'you', shares: Object.fromEntries(ROOM.map((p) => [p, r.people[p]?.cents || 0])) };
   renderBalance();
-});
+}
+// until the grid mounts, the run as home splits it by default (the same $30 / $30 / $20 / $20)
+sampleBill('green-basket').then(({ bill }) => { if (!groc) setGroc(splitSample(getSample('green-basket'), bill)); });
 mountRent(document.getElementById('rent-demo'), {
   compact: true,
   onChange: (r) => {

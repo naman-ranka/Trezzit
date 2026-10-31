@@ -304,3 +304,6 @@ ul.so-checks { display: none; }
 /* the receipt keeps what a photo of it shows: the store, the date, the lines and the totals (no address,
    register, card or footer lines) */
 .scan-paper .tz-r-head p:not(.tz-r-store):not(.tz-r-meta), .scan-paper .tz-r-foot p, .scan-paper .tz-r-sums > div:last-child { display: none; }
+/* /track: while the 'Your photo' notice is open, it is the only thing in the frame */
+.scan.consent-on .scan-body { display: none; }
+.scan.consent-on .scan-consent { margin-top: 0; }

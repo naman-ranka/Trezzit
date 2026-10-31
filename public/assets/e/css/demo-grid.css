@@ -212,3 +212,14 @@
   .tg-grp .tg-exp small { display: none !important; }
 }
 @media (max-width: 479px) { .tg-sum > .tg-sum-dot { display: none; } }
+/* r2 review: at least 8px between the people's totals at every width ("$30.00$30.00" read as one figure) */
+@media (max-width: 379px) {
+  .tg-people, .tg-row { grid-template-columns: minmax(0, 1fr) repeat(var(--n, 4), 51px); }
+  .tg-pa { letter-spacing: -0.04em; }
+}
+@media (min-width: 420px) and (max-width: 639px) {
+  .tg { --col: 61px; }
+}
+@media (min-width: 640px) and (max-width: 899px) {
+  .tg { --col: 68px; }
+}

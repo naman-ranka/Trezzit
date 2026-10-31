@@ -125,3 +125,16 @@ ul.rec-shares { grid-template-columns: repeat(2, 1fr) !important; }
   .rent-card ul.rec-shares { gap: 4px; }
   .rent-card .rec-shares .sp-pa { font-size: var(--t-sm); letter-spacing: -0.02em; }
 }
+/* r2 fix: the amount reads as an amount ("$2,400.00", no gap after the "$"); the field's underline shows only
+   on hover (dashed) and focus (solid), never at rest */
+.rec-edit .money-in-field { border-bottom-color: transparent; }
+.rec-edit .money-in-field input { padding: 0; }
+@media (max-width: 359px) {
+  .rent-card ul.rec-shares { gap: 6px; }
+  .rent-card .rec-shares .sp-person { padding-inline: 2px; }
+}
+@media (max-width: 339px) {
+  .rent-card .rec-shares .sp-pa { font-size: var(--t-xs); }
+}
+.rec-edit .money-in-field input { font-variant-numeric: normal; }
+.rec-edit .money-in-field input { margin-left: -2px; }

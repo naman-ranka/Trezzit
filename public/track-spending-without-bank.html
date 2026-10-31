@@ -102,7 +102,7 @@
           "name": "What happens to my receipt photos?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "When you scan a receipt with AI features on, the photo is sent to Google Gemini to read it. AI features stay off until you turn them on. See the privacy policy."
+            "text": "When you scan a receipt with AI features on, the photo is sent to Google Gemini to read it, and a small sample of scans is reviewed with Anthropic’s Claude to improve accuracy. AI features stay off until you turn them on. See the privacy policy."
           }
         },
         {
@@ -110,7 +110,7 @@
           "name": "Is Trezzit free?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. There is no paid plan."
+            "text": "Yes, Trezzit is free today. There is no paid plan."
           }
         }
       ],
@@ -158,7 +158,7 @@
 
 <section class="pg-sec sc-demo" id="month" aria-labelledby="month-t">
   <div class="wrap">
-    <header class="sh"><h2 id="month-t">Your month, personal and shared.</h2><p>Search any item. Your bank can only search store names.</p></header>
+    <header class="sh"><h2 id="month-t">Your month, personal and shared.</h2><p>Search any item. Your bank only knows the store.</p></header>
     <div class="demo-frame" id="ledger-demo" aria-label="October: your bank beside what you spent">
       <noscript><p class="nojs">October. Your bank: −$2,792.02. You spent $749.10: you paid alone $48.22, you split it $669.35, someone else paid $31.53.</p></noscript>
     </div>
@@ -167,28 +167,27 @@
 
 <section class="pg-sec" id="no-bank" aria-labelledby="nb-t">
   <div class="wrap">
-    <header class="sh"><h2 id="nb-t">Why there’s no bank link</h2></header>
+    <header class="sh"><h2 id="nb-t">Why there’s no bank link.</h2></header>
     <div class="prose">
       <p>A bank sees one line per payment: <span class="mono-in">CORNER PHARMACY −$48.22</span>. It can’t tell allergy relief from a birthday card, or your share of the rent from your roommates’.</p>
-      <p>Trezzit starts from the receipt instead. You add receipts and bills; a scan reads the items and prices, and each item gets a category. You never give Trezzit a bank login, and it never moves money.</p>
     </div>
   </div>
 </section>
 
 <section class="pg-sec" id="what-you-see" aria-labelledby="see-t">
   <div class="wrap">
-    <header class="sh"><h2 id="see-t">What you see</h2></header>
+    <header class="sh"><h2 id="see-t">What you see.</h2></header>
     <ol class="pg-steps pg-points">
-      <li><h3>Your share of everything</h3><p>A bill you split counts only your part. A dinner a friend paid for still counts. Personal and shared, in one place.</p></li>
-      <li><h3>By category, by month</h3><p>See where it went this month, last month or any dates you pick.</p></li>
-      <li><h3>Every item, searchable</h3><p>Search “sunscreen” and find the line, not just the store.</p></li>
+      <li><h3>Your share of everything.</h3><p>A bill you split counts only your part. A dinner a friend paid for still counts. Personal and shared, in one place.</p></li>
+      <li><h3>By category, by month.</h3><p>See where it went this month, last month or any dates you pick.</p></li>
+      <li><h3>Every item, searchable.</h3><p>Search “sunscreen” and find the line, not just the store.</p></li>
     </ol>
   </div>
 </section>
 
 <section class="pg-sec" id="example" aria-labelledby="ex-t">
   <div class="wrap">
-    <header class="sh"><h2 id="ex-t">A worked example</h2><p>One October, as your bank saw it and as you spent it.</p></header>
+    <header class="sh"><h2 id="ex-t">A worked example.</h2><p>One October. Left your account: <b class="money">−$2,792.02</b>. Actually yours: <b class="money">$749.10</b>.</p></header>
     <div class="tbl tbl-rm tbl-oct" tabindex="0" role="region" aria-label="October: your bank beside what you spent">
       <table>
         <thead><tr><th scope="col">October</th><th scope="col" class="r">Your bank</th><th scope="col" class="r">You spent</th></tr></thead>
@@ -204,32 +203,30 @@
       </table>
     </div>
     <div class="prose">
-      <p>The pharmacy receipt alone is four categories: health <strong>$23.20</strong> (allergy relief and vitamin D), personal care <strong>$18.34</strong> (toothpaste and sunscreen), gifts <strong>$5.39</strong> (a card) and groceries <strong>$1.29</strong> (sparkling water). Each item carries its own tax.</p>
       <p>The deli lunch is the honest limit: with no bank feed, what you don’t add isn’t counted.</p>
-    </div>
-  </div>
-</section>
-
-<section class="pg-sec" id="privacy" aria-labelledby="pv-t">
-  <div class="wrap">
-    <header class="sh"><h2 id="pv-t">Your receipts</h2></header>
-    <div class="prose">
-      <p>Reading receipts and sorting items are AI features, and they stay off until you turn them on. When they’re on, a receipt photo is sent to Google Gemini to read it, under terms that don’t allow training on your data. Trezzit doesn’t ask for or store bank account or card numbers. The <a href="/privacy">privacy policy</a> has the details.</p>
     </div>
   </div>
 </section>
 
 <section class="pg-sec" id="faq" aria-labelledby="faq-t">
   <div class="wrap">
-    <header class="sh"><h2 id="faq-t">Questions</h2></header>
+    <header class="sh"><h2 id="faq-t">Questions.</h2></header>
     <div class="faq">
       <details><summary>Can I track spending without linking my bank?</summary><p>Yes. You add receipts and bills, by scanning or typing them, and Trezzit keeps your share of each. There is no bank login, and Trezzit never moves money.</p></details>
       <details><summary>How does Trezzit sort items into categories?</summary><p>With AI features on, Trezzit suggests a category for each item, and you can change any of them. With AI features off, you pick categories yourself.</p></details>
       <details><summary>Do shared bills count?</summary><p>Only your share. Pay $100.00 for groceries where $70.00 was your roommates’, and Trezzit counts your $30.00. A dinner a friend paid for counts too, at your share.</p></details>
-      <details><summary>What happens to my receipt photos?</summary><p>When you scan a receipt with AI features on, the photo is sent to Google Gemini to read it. AI features stay off until you turn them on. See the <a href="/privacy">privacy policy</a>.</p></details>
-      <details><summary>Is Trezzit free?</summary><p>Yes. There is no paid plan.</p></details>
+      <details><summary>What happens to my receipt photos?</summary><p>When you scan a receipt with AI features on, the photo is sent to Google Gemini to read it, and a small sample of scans is reviewed with Anthropic’s Claude to improve accuracy. AI features stay off until you turn them on. See the <a href="/privacy">privacy policy</a>.</p></details>
+      <details><summary>Is Trezzit free?</summary><p>Yes, Trezzit is free today. There is no paid plan.</p></details>
     </div>
     <p class="pg-more">Sharing a place? <a href="/roommates">Split rent and groceries with roommates</a></p>
+  </div>
+</section>
+
+<section class="close close-end pg-close" aria-label="Get started">
+  <div class="wrap">
+    <p class="close-h">See what you actually spent.</p>
+    <div class="cta-row"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Track your spending</a></div>
+    <p class="micro">Free. No bank login.</p>
   </div>
 </section>
 

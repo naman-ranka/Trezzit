@@ -181,8 +181,9 @@ export async function mountMonth(root, opts = {}) {
     findEl.style.minHeight = '';
     // the tallest of the answers people try first (two rows each), so none of them moves the page
     let max = 0;
-    // (the demo's answer, and every shorter prefix it types on the way: the shells show from the first letter)
-    for (let i = 1; i <= sample.length; i += 1) { input.value = sample.slice(0, i); render(); max = Math.max(max, findEl.offsetHeight); }
+    // (the demo's answer, and every shorter prefix it types on the way: the shells show from the first letter;
+    // an instant answer types nothing, so only the answer itself)
+    for (let i = opts.demoInstant ? sample.length : 1; i <= sample.length; i += 1) { input.value = sample.slice(0, i); render(); max = Math.max(max, findEl.offsetHeight); }
     // and the row your AI adds, with its note (home)
     const ai = showAI; const fl = flashAI; const fp = filterPay;
     showAI = true; flashAI = false; filterPay = null; input.value = ''; render(); max = Math.max(max, findEl.offsetHeight);
@@ -232,7 +233,8 @@ export async function mountMonth(root, opts = {}) {
   // item search is the idea people miss, so it shows itself once: when the month is 40% on screen,
   // "water" types into the field, the bank finds nothing and Trezzit finds two items, then it clears.
   // Never takes focus; any touch, key or click in the month stops it; skipped with reduced motion.
-  if (opts.demoSearch && (reduced() || !('IntersectionObserver' in window))) { input.value = opts.demoSearch; render(); }
+  // opts.demoInstant (/track): the answer is there from the start, no empty band waiting for the typing
+  if (opts.demoSearch && (opts.demoInstant || reduced() || !('IntersectionObserver' in window))) { input.value = opts.demoSearch; render(); }
   else if (opts.demoSearch) {
     let stop = false;
     // stopping mid-demo leaves an empty field and the list it matches (never half a word)

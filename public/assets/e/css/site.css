@@ -224,3 +224,71 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
 @media (min-width: 720px) { .pg-jm .demo-frame.res-jm { min-height: 510px; } }
 @media (min-width: 1000px) { .pg-jm .demo-frame.res-jm { min-height: 470px; } }
 .pg-jm .res-jm .so-mid { min-height: 214px; }
+
+/* ---------- release 2, review round 1 ---------- */
+/* use-case pages: one measure for prose, FAQ, tables and section heads */
+.pg-uc { --measure: 46rem; }
+.pg-uc .prose, .pg-uc .faq, .pg-uc .faq details > p, .pg-uc .tbl, .pg-uc .tbl-rm, .pg-uc .tbl-oct { max-width: var(--measure); }
+/* the groceries grid fills the container, one content edge with every other frame */
+.pg-uc .demo-frame.uc-wide { max-width: none; }
+.pg-uc .uc-sw { margin-top: 14px; font-size: var(--t-sm); }
+.pg-uc .uc-sw a { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; margin-block: -12px; }
+/* the closing call to action: compact, like home's close */
+.pg-close .cta-row { justify-content: center; }
+.pg-close .micro { margin-top: 12px; }
+.pg-close .close-h { margin-bottom: 18px; }
+/* the worked example on phones: names only (the amount and the split note are in the card above), and at least
+   8px between the figures */
+@media (max-width: 479px) {
+  .tbl-rm th small, .tbl-rm tbody th .money, .tbl-rm tfoot th .money { display: none; }
+  .tbl-rm th, .tbl-rm td { padding-inline: 4px; }
+  .tbl-rm td.r + td.r, .tbl-rm th.r + th.r { padding-left: 8px; }
+}
+/* /roommates phones: the hero is the rent card alone; the balance follows the groceries grid it depends on */
+@media (max-width: 719px) {
+  .rm-hero .rent-bal { display: none; }
+  #groceries .rent-bal .bal { margin-top: 16px; }
+}
+/* breadcrumb: a 44px tap target on phones, with no change to the layout */
+@media (max-width: 899px) {
+  .crumbs a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; padding: 0 8px; margin: -12px -8px; }
+}
+/* footer: "With Claude or ChatGPT" on one line where the columns have room */
+@media (min-width: 900px) {
+  .foot nav a { white-space: nowrap; }
+}
+
+/* legal pages: a 62ch measure; the TOC is a closed disclosure below 1080px and a sticky, scrollable column beside
+   the text from 1080px, marking the section you are in */
+.pg-legal .doc { max-width: 62ch; }
+.pg-legal .doc a:not(.c-btn) { font-weight: 500; }
+.pg-legal .doc a.c-btn-quiet { color: var(--ink); }
+.pg-legal .toc-d > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin: -12px 0; cursor: pointer; }
+.pg-legal .toc-d > summary::-webkit-details-marker { display: none; }
+.pg-legal .toc-d > summary::after { content: ''; flex: none; width: 8px; height: 8px; margin: -4px 4px 0 0; border-right: 1.6px solid var(--muted); border-bottom: 1.6px solid var(--muted); transform: rotate(45deg); transition: transform .2s var(--ease); }
+.pg-legal .toc-d[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.pg-legal .doc-toc .toc-d > summary h2 { margin: 0; }
+.pg-legal .toc-d[open] > ol { margin-top: 12px; }
+.pg-legal .doc-toc { padding-block: 12px; }
+.pg-legal .doc-toc a[aria-current] { color: var(--ink); font-weight: 600; }
+@media (min-width: 1080px) {
+  .pg-legal .doc:has(> .doc-toc) { max-width: none; display: grid; grid-template-columns: minmax(0, 62ch) 240px; column-gap: clamp(48px, 6vw, 96px); align-items: start; }
+  .pg-legal .doc:has(> .doc-toc) > * { grid-column: 1; }
+  .pg-legal .doc:has(> .doc-toc) > .doc-toc { grid-column: 2; grid-row: 1 / span 400; position: sticky; top: 88px; max-height: calc(100vh - 104px); overflow: auto; overscroll-behavior: contain; margin-top: 8px; padding: 0 0 0 18px; background: none; border: 0; border-left: 1px solid var(--line); border-radius: 0; }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc ol { columns: 1; }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc a { padding: 4px 0; color: var(--muted); }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc a:hover { color: var(--accent); }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc a[aria-current] { color: var(--ink); }
+  .pg-legal .toc-d > summary { min-height: 0; margin: 0 0 8px; cursor: default; pointer-events: none; }
+  .pg-legal .toc-d > summary::after { content: none; }
+  .pg-legal .toc-d[open] > ol { margin-top: 0; }
+}
+/* print: the policy text only */
+@media print {
+  .nav, .skip, .foot, .doc-toc, .theme-tg, .pg-legal .doc .anchor { display: none !important; }
+  .pg-legal .doc { max-width: none; padding: 0; }
+  .pg-legal .doc:has(> .doc-toc) { display: block; }
+}
+.pg-uc .uc-wide .tg-sum { max-width: none; }
+/* the balance rows render after the first paint: their three 44px rows are reserved, so nothing under them moves */
+#bal-list:empty { min-height: 134px; }
