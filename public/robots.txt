@@ -2,8 +2,8 @@
 #
 # The marketing site is fully crawlable. /s/ and /demo only redirect
 # (to the app's shared-bill pages, which are private by design), so
-# there is nothing there for a crawler to fetch. /lab/ (old landing-page
-# prototypes) stays crawlable so crawlers can read its noindex.
+# there is nothing there for a crawler to fetch. /lab (the old landing-page
+# prototypes) redirects to the home page.
 
 User-agent: *
 Allow: /

@@ -33,7 +33,7 @@ Static HTML with Tailwind CSS and GSAP. Deployed on Vercel.
 
 Pages are flat files with clean URLs and no trailing slash (`cleanUrls` and `"trailingSlash": false` in `vercel.json`): `public/index.html` (home), `split.html` (the no-account splitter), `splitwise-alternative.html`, `mcp.html`, the legal pages and `404.html`. They share one design system under `public/assets/e/` (CSS, JS, media) and the kit in `public/assets/_kit/` (tokens, fonts, split engine, scan client, sample receipts), referenced by root-absolute paths.
 
-Every indexable page carries a title, description, canonical, Open Graph and Twitter tags (images in `public/assets/og/`, 1200x630) and JSON-LD: one `@graph` of WebSite, Organization and SoftwareApplication on the home page; BreadcrumbList on the others, plus FAQPage on `/split` and `/splitwise-alternative` that matches their visible questions. `public/sitemap.xml` lists the indexable pages. `public/robots.txt` keeps `/s/` and `/demo` out; `/lab/` (the old landing prototypes) is crawlable so its `noindex` is read, and `/lab/e/*` redirects to the pages it became.
+Every indexable page carries a title, description, canonical, Open Graph and Twitter tags (images in `public/assets/og/`, 1200x630) and JSON-LD: one `@graph` of WebSite, Organization and SoftwareApplication on the home page; BreadcrumbList on the others, plus FAQPage on `/split` and `/splitwise-alternative` that matches their visible questions. `public/sitemap.xml` lists the indexable pages. `public/robots.txt` keeps `/s/` and `/demo` out; `/lab` (the old landing prototypes, now removed) redirects home, and `/lab/e/ai` to `/mcp`.
 
 ---
 

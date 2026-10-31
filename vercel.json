@@ -24,7 +24,12 @@
       "statusCode": 301
     },
     {
-      "source": "/lab/e/:path*",
+      "source": "/lab",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/lab/:path*",
       "destination": "/",
       "statusCode": 301
     }
