@@ -337,9 +337,9 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
 @media (max-width: 479px) {
   .tg .tg-fw { display: none; }
 }
-/* footer: one-line links only where the four columns have room for them */
-@media (min-width: 900px) and (max-width: 1099px) {
-  .foot nav a { white-space: normal; }
+/* footer from 900px: one-line links, and the four columns size to their links (no column runs into the next) */
+@media (min-width: 900px) {
+  .foot nav { grid-template-columns: repeat(4, max-content); justify-content: space-between; column-gap: 24px; }
 }
 /* the close: the same size as home's */
 .pg-close .close-h { font-size: var(--t-display); letter-spacing: -0.04em; line-height: 1.04; }
@@ -416,3 +416,4 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
   .rec-edit .rec-help { grid-column: 2; grid-row: 2; }
   .rec-edit .rec-rsub { grid-column: 1 / -1; grid-row: 3; }
 }
+.pg-jm .scan.consent-on { min-height: 0 !important; }
