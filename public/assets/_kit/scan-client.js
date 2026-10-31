@@ -32,7 +32,20 @@ export const LIVE_ORIGIN = 'https://trezzit.com';
 const PREVIEW_HOST = /^trezzit-(?:git-[a-z0-9-]+|[a-z0-9]+)-namanrankas-projects\.vercel\.app$/;
 export const isStagingPreview = () => typeof location !== 'undefined' && location.protocol === 'https:' && PREVIEW_HOST.test(location.hostname);
 export const API = isStagingPreview() ? 'https://api.staging.trezzit.com' : 'https://api.trezzit.com';
-export const APP = isStagingPreview() ? 'https://app.staging.trezzit.com' : 'https://app.trezzit.com';
+/* Previews only: ?app=<a frontend preview origin> (remembered for the tab) loads the embed from, and hands off
+ * to, that build of the app instead of app.staging, so a frontend branch can be tried before it reaches staging.
+ * Only this team's frontend previews are accepted; trezzit.com ignores it. */
+const FRONTEND_PREVIEW = /^https:\/\/trezzit-frontend-[a-z0-9-]+-namanrankas-projects\.vercel\.app$/;
+function previewApp() {
+  if (!isStagingPreview()) return null;
+  try {
+    const asked = new URLSearchParams(location.search).get('app');
+    if (asked && FRONTEND_PREVIEW.test(asked)) sessionStorage.setItem('trezzit-preview-app', asked);
+    const kept = sessionStorage.getItem('trezzit-preview-app');
+    return kept && FRONTEND_PREVIEW.test(kept) ? kept : null;
+  } catch { return null; }
+}
+export const APP = isStagingPreview() ? (previewApp() || 'https://app.staging.trezzit.com') : 'https://app.trezzit.com';
 export const AI_CONSENT_VERSION = '2026-10';
 export const STAGES = ['uploading', 'reading', 'checking', 'done'];
 
