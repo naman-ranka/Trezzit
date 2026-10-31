@@ -1,4 +1,4 @@
-/* roommates page: the rent demo leads (home already plays the grocery split), beside one running
+/* /roommates: the rent card leads, beside one running
  * balance for the apartment. The balance is computed live from the rent card, plus this month's
  * groceries (home's default split, from the kit engine) and Netflix: per person, from your side.
  * Same October as home: you pay the rent and the groceries, Maya pays Netflix. */
@@ -7,9 +7,13 @@ import { mountRent } from './rent-demo.js';
 import { distributeEqually } from '../../_kit/split-engine.js';
 import { PEOPLE, getSample, sampleBill } from './data.js';
 import { splitSample } from '../../_kit/receipts.js';
-import { money, countMoney } from './util.js';
+import { money, countMoney, css, onVisible } from './util.js';
 
 initPage();
+
+// the grocery grid further down mounts as it nears the screen (its frame reserves its height)
+const gridEl = document.getElementById('rm-grid');
+if (gridEl) onVisible(gridEl, () => Promise.all([import('./grid-demo.js'), css('grid')]).then(([m]) => m.mountGrid(gridEl, { sampleId: 'green-basket', summary: true, taxHint: false })), { threshold: 0, rootMargin: '0px 0px 400px 0px' });
 
 const ROOM = ['you', 'maya', 'jordan', 'sam'];
 const even = (cents) => Object.fromEntries(distributeEqually(cents, 4).map((c, i) => [ROOM[i], c]));

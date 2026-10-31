@@ -118,3 +118,109 @@
 .pg-mcp .ai-hero-copy .url-box { margin-top: 20px; max-width: 34rem; }
 .pg-mcp .doc-toc { margin-bottom: 8px; }
 .pg-mcp .prose { max-width: 48rem; }
+
+/* ---------- use-case pages (/roommates, /track-spending-without-bank): E's demo hero, then the plain-page sections ---------- */
+.pg-uc .sc-copy .crumbs { margin-bottom: 18px; }
+.pg-uc .sc-copy .lede { margin-top: 18px; max-width: 34ch; text-wrap: pretty; }
+.pg-uc .sc-copy .cta-row { justify-content: flex-start; margin-top: 24px; }
+.pg-uc .sc-copy .micro { margin-top: 12px; }
+.pg-uc .pg-sec:first-of-type { padding-top: clamp(24px, 4vw, 56px); }
+.pg-uc .demo-frame.uc-wide { margin-inline: 0; max-width: 760px; }
+.pg-uc .tbl + .prose, .pg-uc .pg-steps + .prose { margin-top: clamp(20px, 2.4vw, 28px); }
+/* a worked example's line names carry their amount and, under it, how the line is split */
+.tbl th small { display: block; margin-top: 2px; color: var(--muted); font-weight: 400; font-size: var(--t-xs); }
+.tbl th .money { white-space: nowrap; }
+.tbl-rm { max-width: 46rem; }
+.tbl-rm table { min-width: 0; }
+.tbl-rm th, .tbl-rm td { padding-inline: 10px; }
+.tbl-rm th:first-child { padding-left: 14px; }
+.tbl-rm td:last-child, .tbl-rm th:last-child { padding-right: 14px; }
+@media (max-width: 480px) {
+  .tbl-rm table { font-size: var(--t-xs); }
+  .tbl-rm th, .tbl-rm td { padding-inline: 5px; }
+  .tbl-rm th:first-child { padding-left: 12px; }
+  .tbl-rm td:last-child, .tbl-rm th:last-child { padding-right: 12px; }
+}
+/* four footer columns: two by two on phones */
+@media (max-width: 720px) {
+  .foot nav { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 16px; }
+}
+.prose .mono-in { font-family: 'Receipt Mono', var(--font-mono); font-size: var(--t-sm); white-space: nowrap; padding: 1px 6px; border-radius: 6px; background: var(--fill); border: 1px solid var(--line); }
+/* points, not steps: the same three cards without the numbers */
+.pg-points h3::before { content: none; }
+.tbl-oct { max-width: 36rem; }
+/* home hero: "No bank login needed." opens /track-spending-without-bank, quietly */
+a.nobank { text-decoration: none; }
+a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- legal pages (/privacy, /terms, /your-data, /delete-account, /support): long text at a comfortable
+   measure; the "On this page" list rides beside it on wide screens. The text itself is the policy's, unchanged. ---------- */
+.pg-legal .doc { max-width: 68ch; padding: clamp(28px, 5vh, 56px) 0 clamp(56px, 7vw, 96px); font-size: var(--t-md); line-height: 1.65; color: var(--text); }
+.pg-legal .doc > * + * { margin-top: 16px; }
+.pg-legal .doc h1 { font-size: var(--t-2xl); letter-spacing: -0.04em; line-height: 1.05; font-weight: 700; color: var(--ink); text-wrap: balance; }
+.pg-legal .doc-meta { font-size: var(--t-sm); color: var(--muted); }
+.pg-legal .doc-meta strong { color: var(--text); font-weight: 600; }
+.pg-legal .doc h2 { font-size: var(--t-lg); letter-spacing: -0.02em; line-height: 1.25; font-weight: 700; color: var(--ink); margin-top: 44px; scroll-margin-top: 88px; }
+.pg-legal .doc p[id] { scroll-margin-top: 88px; }
+.pg-legal .doc h2 + * { margin-top: 12px; }
+.pg-legal .doc strong { color: var(--ink); font-weight: 600; }
+.pg-legal .doc a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: var(--accent-line); }
+.pg-legal .doc a:hover { text-decoration-color: currentColor; }
+.pg-legal .doc a.c-btn { color: var(--on-fill); text-decoration: none; }
+.pg-legal .doc ul, .pg-legal .doc ol { padding-left: 22px; display: grid; gap: 10px; }
+.pg-legal .doc li::marker { color: var(--faint); }
+.pg-legal .doc code { font-family: 'Receipt Mono', var(--font-mono); font-size: var(--t-sm); overflow-wrap: anywhere; }
+.pg-legal .doc .anchor { color: var(--faint); font-weight: 400; text-decoration: none; margin-left: 6px; opacity: 0; transition: opacity .15s var(--ease); }
+.pg-legal .doc h2:hover .anchor, .pg-legal .doc .anchor:focus-visible { opacity: 1; }
+@media (hover: none) {
+  .pg-legal .doc .anchor { display: none; }
+}
+/* "On this page": a quiet card; a sticky column beside the text on wide screens */
+.pg-legal .doc-toc { margin-top: 28px; padding: 16px 18px 14px; border-radius: var(--r-md); background: var(--fill); border: 1px solid var(--line); font-size: var(--t-sm); line-height: 1.4; }
+.pg-legal .doc-toc h2 { margin: 0 0 8px; font-size: var(--t-xs); font-weight: 600; letter-spacing: .03em; color: var(--muted); }
+.pg-legal .doc-toc ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.pg-legal .doc-toc a { display: block; padding: 5px 0; color: var(--text); text-decoration: none; }
+.pg-legal .doc-toc a:hover { color: var(--accent); }
+@media (min-width: 640px) {
+  .pg-legal .doc-toc ol { display: block; columns: 2; column-gap: 24px; }
+  .pg-legal .doc-toc li { break-inside: avoid; }
+}
+@media (min-width: 1100px) {
+  .pg-legal .doc:has(> .doc-toc) { max-width: none; display: grid; grid-template-columns: minmax(0, 68ch) minmax(0, 260px); column-gap: clamp(48px, 6vw, 96px); align-items: start; }
+  .pg-legal .doc:has(> .doc-toc) > * { grid-column: 1; }
+  .pg-legal .doc:has(> .doc-toc) > .doc-toc { grid-column: 2; grid-row: 1 / span 400; position: sticky; top: 88px; margin-top: 8px; padding: 0 0 0 18px; background: none; border: 0; border-left: 1px solid var(--line); border-radius: 0; }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc ol { columns: 1; }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc a { padding: 4px 0; color: var(--muted); }
+  .pg-legal .doc:has(> .doc-toc) .doc-toc a:hover { color: var(--accent); }
+}
+/* tables: the site's hairline table, scrolling inside itself on phones */
+.pg-legal .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--card); }
+.pg-legal .table-scroll:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.pg-legal .table-scroll table { width: 100%; border-collapse: collapse; font-size: var(--t-sm); line-height: 1.45; }
+.pg-legal .table-scroll[aria-label] table { min-width: 0; }
+.pg-legal .table-scroll table[data-cols="3"] { min-width: 560px; }
+.pg-legal .table-scroll th, .pg-legal .table-scroll td { text-align: left; vertical-align: top; padding: 10px 14px; border-top: 1px solid var(--divider); }
+.pg-legal .table-scroll thead th { border-top: 0; color: var(--muted); font-weight: 600; font-size: var(--t-xs); letter-spacing: .02em; background: var(--fill); }
+.pg-legal .table-scroll tbody td:first-child { color: var(--ink); font-weight: 600; }
+
+/* /split: the sample-receipt frame reserves the height it mounts to (measured 320-1920 in 1px steps around each
+   step), so nothing under it moves when the scan appears */
+.pg-split #scan-demo { min-height: 759px; }
+@media (min-width: 375px) { .pg-split #scan-demo { min-height: 746px; } }
+@media (min-width: 402px) { .pg-split #scan-demo { min-height: 690px; } }
+@media (min-width: 481px) { .pg-split #scan-demo { min-height: 701px; } }
+@media (min-width: 600px) { .pg-split #scan-demo { min-height: 717px; } }
+@media (min-width: 720px) { .pg-split #scan-demo { min-height: 609px; } }
+@media (min-width: 814px) { .pg-split #scan-demo { min-height: 587px; } }
+/* /mcp: the server URL takes its own full-width line under the label and Copy, so it is never cut off */
+.pg-mcp .url-box { grid-template-columns: minmax(0, 1fr) auto; }
+.pg-mcp .url-box code { grid-column: 1 / -1; grid-row: 2; }
+.pg-mcp .url-box button { grid-column: 2; grid-row: 1; }
+/* /track-spending-without-bank: the pharmacy frame reserves the height it settles at once the read lands
+   (re-measured 320-1920 on this page, after the scan finishes) */
+.pg-jm .demo-frame.res-jm { min-height: 642px; }
+@media (min-width: 347px) { .pg-jm .demo-frame.res-jm { min-height: 630px; } }
+@media (min-width: 600px) { .pg-jm .demo-frame.res-jm { min-height: 646px; } }
+@media (min-width: 720px) { .pg-jm .demo-frame.res-jm { min-height: 510px; } }
+@media (min-width: 1000px) { .pg-jm .demo-frame.res-jm { min-height: 470px; } }
+.pg-jm .res-jm .so-mid { min-height: 214px; }
