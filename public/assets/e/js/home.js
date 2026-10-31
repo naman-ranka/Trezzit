@@ -31,7 +31,7 @@ const arm = once(() => {
 
 const splitEl = document.getElementById('split-demo');
 // the grid mounts with the scan, so step 2 is ready by the time the scan finishes
-const mountGrid = once(() => Promise.all([import('./grid-demo.js'), css('grid')]).then(([m]) => m.mountGrid(splitEl, { sampleId: 'green-basket', listen: true, summary: true, taxHint: false })));
+const mountGrid = once(() => Promise.all([import('./grid-demo.js'), css('grid')]).then(([m]) => m.mountGrid(splitEl, { sampleId: 'green-basket', listen: true, summary: true, summaryHref: '/roommates', taxHint: false })));
 // the AI adds a charge to the month: the month is mounted no later than the chat
 const monthEl = document.getElementById('ledger-demo');
 const mountMonth = once(() => Promise.all([import('./month-demo.js'), css('ledger'), css('month')]).then(([m]) => m.mountMonth(monthEl, { demoSearch: 'water', compactPayers: true, findFirst: true })));

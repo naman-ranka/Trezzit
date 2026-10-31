@@ -86,7 +86,7 @@ export function mountScan(root, opts = {}) {
       </div>
     </div>
     <div class="scan-consent" hidden role="dialog" aria-modal="false" aria-label="Scan your own receipt">
-      <p>${isLive() ? 'To read it, your photo is sent to Google Gemini.' : 'Real scans run on trezzit.com. Here your photo stays on your device, and a sample receipt plays instead.'} <a href="/privacy">Privacy</a></p>
+      <p>${isLive() ? esc(opts.consentNote || 'To read it, your photo is sent to Google Gemini.') : 'Real scans run on trezzit.com. Here your photo stays on your device, and a sample receipt plays instead.'} <a href="/privacy">Privacy</a></p>
       <div class="sc-actions">
         <label class="c-btn c-btn-sm c-btn-primary">Choose a photo<input type="file" accept="image/*,application/pdf" class="visually-hidden"></label>
         <button type="button" class="c-btn c-btn-sm c-btn-quiet sc-cancel">Cancel</button>
@@ -370,8 +370,26 @@ export function mountScan(root, opts = {}) {
   const again = () => { const id = last?.sampleId || root.querySelector('.pick[aria-pressed="true"]')?.dataset.id || opts.initial || ids[0]; closeConsent(); run(id); };
   root.querySelector('.so-again').addEventListener('click', again);
   stage.addEventListener('click', again);
-  const openConsent = () => { consent.hidden = false; ownBtn?.setAttribute('aria-expanded', 'true'); consent.querySelector('label').focus?.(); };
-  const closeConsent = () => { consent.hidden = true; ownBtn?.setAttribute('aria-expanded', 'false'); };
+  // while the notice is open it is the only thing in the frame (opts.consentAlone): no sample result beside it
+  // (consentAlone) the open tab is the selected one: the sample's tab lets go until the notice closes
+  let heldPick = null;
+  const openConsent = () => {
+    consent.hidden = false;
+    if (opts.consentAlone) {
+      root.classList.add('consent-on');
+      heldPick = root.querySelector('.pick[data-id][aria-pressed="true"]');
+      heldPick?.setAttribute('aria-pressed', 'false');
+    }
+    ownBtn?.setAttribute('aria-expanded', 'true');
+    consent.querySelector('label').focus?.();
+  };
+  const closeConsent = () => {
+    consent.hidden = true;
+    root.classList.remove('consent-on');
+    ownBtn?.setAttribute('aria-expanded', 'false');
+    if (heldPick && !root.querySelector('.pick[data-id][aria-pressed="true"]')) heldPick.setAttribute('aria-pressed', 'true');
+    heldPick = null;
+  };
   ownBtn?.addEventListener('click', () => (consent.hidden ? openConsent() : closeConsent()));
   consent.querySelector('.sc-cancel')?.addEventListener('click', () => { closeConsent(); ownBtn?.focus(); });
   consent.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeConsent(); ownBtn?.focus(); } });

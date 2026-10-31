@@ -21,7 +21,8 @@
 .mo-bl { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 8px; }
 .mo .lg-count { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 14px; }
 .mo-tz { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-xs); font-weight: 700; color: var(--ink); }
-.mo-tz::before { content: ''; width: 14px; height: 14px; background: url("../../_kit/brand/trezzit-mark.svg") center / contain no-repeat; }
+/* the mark as a mask filled with --ink, so it follows the theme (a background image escapes the dark filter) */
+.mo-tz::before { content: ''; flex: none; width: 14px; height: 14px; background: var(--ink); -webkit-mask: url("../../_kit/brand/trezzit-mark.svg") center / contain no-repeat; mask: url("../../_kit/brand/trezzit-mark.svg") center / contain no-repeat; }
 .mo-ai { display: inline-flex; align-items: center; gap: 4px; padding: 0 7px 0 5px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: var(--t-xs); line-height: 20px; vertical-align: 1px; }
 .mo-ai svg { width: 12px; height: 12px; }
 .mo .lg-row.lg-ai { border-radius: var(--r-sm); }
