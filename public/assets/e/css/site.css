@@ -329,11 +329,12 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
   .rent-card .rec-shares .sp-person { padding-inline: 0; min-width: 0; }
   .rent-card .rec-shares .sp-pa { font-size: var(--t-xs); letter-spacing: 0; }
 }
-/* the grocery grid on narrow phones: the same frame padding home's grid gets, and "Shared ×9" for the folded row */
+/* the grocery grid on narrow phones: the same frame padding home's grid gets, and "Shared ×9" for the folded row
+   wherever the short names are used (below 480px) */
 @media (max-width: 379px) {
   #rm-grid.tg, #sw-grid.tg { padding-inline: 10px; }
 }
-@media (max-width: 419px) {
+@media (max-width: 479px) {
   .tg .tg-fw { display: none; }
 }
 /* footer: one-line links only where the four columns have room for them */
@@ -395,7 +396,8 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
 @media (max-width: 379px) {
   .tg .tg-people, .tg .tg-row { grid-template-columns: minmax(66px, 1fr) repeat(var(--n, 4), minmax(0, 58px)); }
   .tg .tg-row .tg-nm > .tg-cat { display: none; }
-  .tg .tg-row .tg-nm { padding-right: 2px; }
+  .tg .tg-row .tg-nm { padding-right: 2px; font-size: var(--t-xs); }
+  .tg .tg-exp svg { display: none; }
   .tg .tg-row .tg-pr { padding-left: 0; }
   .tg .tg-sub-row .tg-nm, .tg .tg-sub-row .tg-pr { padding-left: 8px; }
   .tg .tg-pa { letter-spacing: -0.05em; }
