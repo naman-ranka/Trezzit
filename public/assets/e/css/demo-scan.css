@@ -313,3 +313,25 @@ ul.so-checks { display: none; }
 .so-notice .so-acts { display: flex; flex-wrap: wrap; gap: 0 18px; margin-top: 2px; }
 .so-notice .c-link-btn { color: var(--amber-ink); text-decoration: underline; text-underline-offset: 3px; min-height: 40px; }
 .scan.is-err .so-total, .scan.is-err .so-total > * { visibility: hidden !important; }
+/* ---------- new-user test fixes: samples say they are samples; quiet next steps; failures in a compact card ---------- */
+.scan .pick small.pick-tag { display: block; font-size: var(--t-xs); font-weight: 500; color: var(--muted); }
+.so-foot .so-next { margin-left: auto; font-size: var(--t-md); }
+.so-foot .so-next svg { width: 16px; height: 16px; }
+.so-next[hidden], .so-solo[hidden] { display: none !important; }
+.so-notice .so-msg { display: block; }
+/* a failed (or stopped) scan: the photo and what to do, centred in the frame at its locked height */
+.scan.is-err { display: flex; flex-direction: column; }
+.scan.is-err .scan-body { flex: 1 1 auto; align-content: center; }
+.scan.is-err .scan-out { align-self: center; }
+.scan.is-err .so-mid, .scan.is-err .so-foot, .scan.is-err .so-prog { display: none; }
+.scan.is-err .so-store { min-height: 0; margin-top: 0; }
+.scan.is-err.no-photo .scan-stage { display: none; }
+.scan.is-err.no-photo .scan-body { grid-template-columns: minmax(0, 1fr); }
+.scan.is-err.consent-on .scan-body { display: none; }
+/* "All yours, by category" may take two lines beside the total, never a row of its own */
+.so-foot .so-solo { flex: 0 1 auto; max-width: 12em; justify-content: flex-end; text-align: right; }
+.so-foot .so-solo span { min-width: 0; }
+.so-foot .so-solo svg { width: 16px; height: 16px; flex: none; }
+@media (max-width: 480px) { .so-foot .so-solo { max-width: 8.5em; } }
+a.so-solo, a.so-next { text-decoration: none; }
+@media (hover: hover) { a.so-solo:hover, a.so-next:hover { text-decoration: underline; } }

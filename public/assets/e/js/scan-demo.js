@@ -33,6 +33,12 @@ const checksFor = (bill) => {
 const LIVE_LABEL = { uploading: 'Uploading…', validating: 'Checking the math…', retrying: 'Reading it again…' };
 /* what the privacy policy says about a scanned photo (Google Gemini reads it; a small sample is reviewed with Claude) */
 const AI_NOTE = 'To read it, your photo is sent to Google Gemini, and a small sample of scans is reviewed with Anthropic’s Claude to improve accuracy.';
+/* a store name the reader could not find ("N/A", "Unknown") is no heading: the photo's own name stays */
+const NO_NAME = /^(n\/?a|none|null|unknown|-+)$/i;
+/* failures that may pass on their own: "Try again" sends the same photo once more */
+const TRANSIENT = new Set(['NETWORK', 'SCAN_TIMEOUT', 'SERVICE_BUSY', 'UNAVAILABLE', 'SERVER_ERROR']);
+/* sessionStorage key: a live scan was running when the page was left (Back, Forward, reload) */
+const LEFT_KEY = 'trezzit-scan-left';
 const checkLI = (c, i, pending) => `<li class="${c.passed ? 'ok' : 'warn'}${pending ? ' pending' : ''}" style="--i:${i}">${icon.check}<span>${esc(CHECK_LABEL[c.check] || c.message)}</span></li>`;
 
 /**
@@ -57,7 +63,7 @@ export function mountScan(root, opts = {}) {
     <div class="scan-pick" role="group" aria-label="Pick a receipt to scan"${ids.length < 2 && !own ? ' hidden' : ''}>
       ${ids.map((id) => `<button type="button" class="pick" data-id="${id}" aria-pressed="false">
         <img src="${base}thumb-${id}.webp" alt="" width="36" height="52" loading="lazy" decoding="async">
-        <span><b>${esc(opts.names?.[id] || SAMPLE_META[id].short)}</b>${opts.kinds === false ? '' : `<small>${esc(SAMPLE_META[id].kind)}</small>`}</span></button>`).join('')}
+        <span><b>${esc(opts.names?.[id] || SAMPLE_META[id].short)}</b>${opts.kinds === false ? '' : `<small>${esc(SAMPLE_META[id].kind)}</small>`}${own ? '<small class="pick-tag">Sample</small>' : ''}</span></button>`).join('')}
       ${own ? `<button type="button" class="pick pick-own" data-own aria-expanded="false">
         <span class="pick-ico">${icon.upload}</span><span><b>Your photo</b>${opts.kinds === false ? '' : '<small>Photo or PDF</small>'}</span></button>` : ''}
     </div>
@@ -85,7 +91,8 @@ export function mountScan(root, opts = {}) {
           <p class="so-status" aria-live="polite"><span class="dot"></span><span class="txt"></span></p></div>
           <ul class="so-checks" aria-label="Checked against the receipt"></ul>
           ${opts.splitTarget ? `<button type="button" class="c-link-btn so-split">Split this receipt ${icon.arrow}</button>` : ''}
-          ${opts.soloSummary ? '<p class="so-mine" hidden></p>' : opts.soloHref ? `<a class="c-btn c-btn-sm c-btn-quiet so-split so-solo" href="${esc(opts.soloHref)}" hidden>See your share ${icon.arrow}</a>` : ''}
+          ${opts.soloSummary ? '<p class="so-mine" hidden></p>' : opts.soloHref ? `<a class="c-link-btn so-split so-solo" href="${esc(opts.soloHref)}" hidden><span>${esc(opts.soloLabel || 'See your share')}</span>${icon.arrow}</a>` : ''}
+          ${opts.liveNext ? `<a class="c-link-btn so-next" href="${esc(opts.liveNext.href)}" hidden>${esc(opts.liveNext.label)} ${icon.arrow}</a>` : ''}
         </div>
         <p class="so-notice" hidden aria-live="polite"></p>
       </div>
@@ -142,6 +149,7 @@ export function mountScan(root, opts = {}) {
     catsEl.hidden = false;
   };
   const notice = root.querySelector('.so-notice');
+  const nextLink = root.querySelector('.so-next'); // after your own photo's read: the page's next step
   const prog = root.querySelector('.so-prog i');
   const txt = statusEl.querySelector('.txt');
   const setProg = (f) => { prog.style.transform = `scaleX(${Math.max(0, Math.min(1, f))})`; };
@@ -175,7 +183,13 @@ export function mountScan(root, opts = {}) {
     setLive(s === 'done' || s === 'idle' ? '' : STAGE_LABEL[s] || s);
     if (s === 'idle') setProg(0);
   };
-  const press = (id) => root.querySelectorAll('.pick[data-id]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
+  // one selected tab at a time; while the photo notice is open, "Your photo" is the selected one and the sample
+  // that plays behind it is remembered for when the notice closes
+  const press = (id) => {
+    const btns = root.querySelectorAll('.pick[data-id]');
+    if (!consent.hidden) { heldPick = [...btns].find((b) => b.dataset.id === id) || null; btns.forEach((b) => b.setAttribute('aria-pressed', 'false')); return; }
+    btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
+  };
 
   // phones: the window opens at the first item line (the store's address and register lines are noise there)
   const phoneMQ = matchMedia('(max-width: 719px)');
@@ -213,7 +227,8 @@ export function mountScan(root, opts = {}) {
     sumEl.innerHTML = '';
     storeEl.innerHTML = store || '';
     notice.hidden = true;
-    root.classList.remove('is-done', 'is-note', 'is-bad', 'is-err', 'has-cats', 'rolling');
+    root.classList.remove('is-done', 'is-note', 'is-bad', 'is-err', 'no-photo', 'has-cats', 'rolling');
+    if (nextLink) nextLink.hidden = true;
     winK = 0;
     setRest(null);
     setCats(null);
@@ -272,6 +287,7 @@ export function mountScan(root, opts = {}) {
     setRest(bill);
   }
 
+  let liveFile = null; // the photo being (or last) scanned
   let liveBusy = false; // a photo is being scanned: a tap on it (or on replay) must not throw the scan away
   /* ---- a live scan: the lines appear as the stream reads them (no made-up progress) ---- */
   // how many rows the folded list shows at this width (the CSS decides: 4 or 6), measured on placeholder rows
@@ -297,7 +313,7 @@ export function mountScan(root, opts = {}) {
       status(s) { status = s; show(); },
       connection(on) { offline = !on; show(); },
       draft(d) {
-        if (d.store) storeEl.innerHTML = `<b>${esc(storeName(d.store))}</b>${prettyDate(d.date) ? `<span>${esc(prettyDate(d.date))}</span>` : ''}`;
+        if (d.store && !NO_NAME.test(String(d.store).trim())) storeEl.innerHTML = `<b>${esc(storeName(d.store))}</b>${prettyDate(d.date) ? `<span>${esc(prettyDate(d.date))}</span>` : ''}`;
         if (d.items.length < list.children.length) { list.innerHTML = ''; winK = 0; root.classList.remove('rolling'); } // a retry starts over
         d.items.forEach((it, i) => {
           const row = list.children[i];
@@ -326,21 +342,46 @@ export function mountScan(root, opts = {}) {
     });
     while (list.children.length > bill.items.length) list.lastElementChild.remove();
   }
-  /** A failed live scan: the scan's own sentence, then what can be done (try again, or a sample). */
-  function showError(err, file) {
+  /** A failed live scan, in a compact card at a stable height: what happened, then what can be done.
+   *  Not a receipt (or nothing read): choose another photo; a passing problem (network, busy, slow): try the
+   *  same photo again; the hourly limit: a sample only. "Use a sample" is always there. */
+  function showError(err, file, { stopped = false } = {}) {
     setStage('idle');
     unroll();
     list.innerHTML = '';
     setRest(null);
     rest0();
     root.classList.add('is-err');
-    const limited = err?.code === 'RATE_LIMITED';
-    const msg = err?.message || 'That did not work.';
-    notice.innerHTML = `${esc(limited ? `${msg} Photo scans are limited to 10 an hour.` : msg)}
-      <span class="so-acts">${file && !limited ? '<button type="button" class="c-link-btn so-retry">Try again</button>' : ''}<button type="button" class="c-link-btn so-sample">Use a sample</button></span>`;
+    root.classList.toggle('no-photo', !objectUrl || !file);
+    storeEl.innerHTML = `<b>${esc((file && file.name) || 'Your photo')}</b>`;
+    press(null);
+    ownBtn?.setAttribute('aria-pressed', 'true');
+    const code = err?.code || '';
+    let msg = err?.message || 'That didn’t work.';
+    let act = 'pick'; // what the first action is: 'pick' another photo, 'retry' this one, or none
+    if (stopped) { msg = 'Your scan stopped when you left the page.'; act = 'again'; }
+    else if (code === 'NO_RECEIPT' || code === 'NO_ITEMS') msg = 'That doesn’t look like a receipt.';
+    else if (code === 'RATE_LIMITED') { msg = `${msg} Photo scans are limited to 10 an hour.`; act = ''; }
+    else if (TRANSIENT.has(code)) act = 'retry';
+    if (code === 'NETWORK' && typeof navigator !== 'undefined' && navigator.onLine === false) msg = 'You’re offline. Check your connection and try again.';
+    const first = act === 'retry' && file ? '<button type="button" class="c-link-btn so-retry">Try again</button>'
+      : act === 'pick' || act === 'again' ? `<button type="button" class="c-link-btn so-pick">${act === 'again' ? 'Scan again' : 'Choose another photo'}</button>` : '';
+    notice.innerHTML = `<span class="so-msg">${esc(msg)}</span><span class="so-acts">${first}<button type="button" class="c-link-btn so-sample">Use a sample</button></span>`;
     notice.hidden = false;
-    notice.querySelector('.so-retry')?.addEventListener('click', () => run(file));
-    notice.querySelector('.so-sample').addEventListener('click', () => run(opts.initial || ids[0]));
+    notice.querySelector('.so-retry')?.addEventListener('click', () => { ownBtn?.focus({ preventScroll: true }); run(file); });
+    // the photo notice was read before this photo was sent, so another photo goes straight to the picker
+    // (after leaving the page, the notice is shown again first)
+    notice.querySelector('.so-pick')?.addEventListener('click', () => { if (act === 'again') { openConsent(); } else fileInput.click(); });
+    notice.querySelector('.so-sample').addEventListener('click', () => { run(opts.initial || ids[0]); root.querySelector('.pick[aria-pressed="true"]')?.focus(); });
+    if (!stopped) keepInView(notice);
+  }
+  /** Brings el into view if it is not (no smooth scroll with reduced motion). */
+  function keepInView(el, block = 'nearest') {
+    requestAnimationFrame(() => {
+      const r = el.getBoundingClientRect();
+      if (r.top >= 72 && r.bottom <= innerHeight) return;
+      el.scrollIntoView({ block, behavior: reduced() ? 'auto' : 'smooth' });
+    });
   }
 
   async function run(input, { instant = false, note = '' } = {}) {
@@ -357,7 +398,7 @@ export function mountScan(root, opts = {}) {
       nItems = bill.items.length;
       showPaper(receiptHTML(raw, { sample: getSample(input), shadow: false }));
       reset(storeLine(raw.receipt));
-      if (note) { notice.textContent = note; notice.hidden = false; root.querySelector('[data-own]')?.setAttribute('aria-pressed', 'true'); }
+      if (note) { notice.textContent = note; notice.hidden = false; }
       layout(bill);
       opts.onStart?.(input);
     } else {
@@ -370,13 +411,20 @@ export function mountScan(root, opts = {}) {
       ownBtn?.setAttribute('aria-pressed', 'true');
       nItems = 0;
     }
-    if (!isFile && !note) ownBtn?.removeAttribute('aria-pressed');
+    if (!isFile) ownBtn?.removeAttribute('aria-pressed');
     let shown = 0;
     // a live scan reports itself (onStatus, onDraft); onStage then only drives a sample played instead
     const live = isFile ? liveState() : null;
     liveBusy = isFile;
+    if (isFile) liveFile = input;
     let streamed = false;
     const ifLive = (fn) => (...a) => { if (signal.aborted) return; if (!streamed) { streamed = true; live.start(); } fn(...a); };
+    if (isFile) {
+      // the status shows at once ("Uploading…"), and the photo and that line are brought into view
+      streamed = true;
+      live.start();
+      keepInView(stage, 'start');
+    }
     try {
       const result = await (isFile ? scan : playLocal)(input, {
         signal,
@@ -410,15 +458,19 @@ export function mountScan(root, opts = {}) {
         },
       });
       if (signal.aborted) return;
-      if (result.source === 'live' && !result.bill.items.length) throw Object.assign(new Error('No items were found on that photo. Try a sharper photo, or a sample.'), { code: 'NO_ITEMS' });
+      if (result.source === 'live' && !result.bill.items.length) throw Object.assign(new Error('That doesn’t look like a receipt.'), { code: 'NO_ITEMS' });
       last = result;
+      let fellBack = false;
       if (result.source === 'sample' && isFile) {
-        // fell back: show the sample we played
-        press(result.sampleId);
+        // fell back (the scanner did not load): the sample that played is the one selected tab, and it says so
+        fellBack = true;
+        ownBtn?.removeAttribute('aria-pressed');
+        press(ids.includes(result.sampleId) ? result.sampleId : null);
         setSolo(result.sampleId);
         showPaper(receiptHTML(result.raw, { sample: getSample(result.sampleId), shadow: false }));
         settlePaper();
         storeEl.innerHTML = storeLine(result.raw.receipt);
+        finalRows(result.bill);
       }
       if (result.source === 'live') {
         storeEl.innerHTML = storeLine(result.raw.receipt);
@@ -429,7 +481,13 @@ export function mountScan(root, opts = {}) {
       setSum(result.bill);
       const catId = result.source === 'sample' ? (result.sampleId || input) : null;
       if (catId && opts.cats !== false) { setCats(catId, result.bill); root.classList.add('has-cats'); }
-      if (result.notice || note) { notice.textContent = note || result.notice; notice.hidden = false; }
+      if (fellBack) {
+        notice.innerHTML = `<span class="so-msg">Scanning couldn’t start, so this is a sample.</span><span class="so-acts"><button type="button" class="c-link-btn so-retry">Try again</button></span>`;
+        notice.querySelector('.so-retry').addEventListener('click', () => { ownBtn?.focus({ preventScroll: true }); run(input); });
+        notice.hidden = false;
+        keepInView(notice);
+      } else if (result.notice || note) { notice.textContent = note || result.notice; notice.hidden = false; }
+      if (nextLink && result.source === 'live') nextLink.hidden = false;
       nItems = result.bill.items.length;
       if (isFile) {
         const v = checksFor(result.bill);
@@ -477,26 +535,30 @@ export function mountScan(root, opts = {}) {
   // (consentAlone) the open tab is the selected one: the sample's tab lets go until the notice closes
   let heldPick = null;
   const openConsent = () => {
+    // a sample still reading behind the notice finishes at once, so it is never left half-read
+    if (!liveBusy && ['uploading', 'reading', 'checking'].includes(root.dataset.stage)) run(last?.sampleId || root.querySelector('.pick[aria-pressed="true"]')?.dataset.id || opts.initial || ids[0], { instant: true });
+    heldPick = root.querySelector('.pick[data-id][aria-pressed="true"]');
+    heldPick?.setAttribute('aria-pressed', 'false');
     consent.hidden = false;
-    if (opts.consentAlone) {
-      root.classList.add('consent-on');
-      heldPick = root.querySelector('.pick[data-id][aria-pressed="true"]');
-      heldPick?.setAttribute('aria-pressed', 'false');
-    }
+    // the notice is the only thing in the frame, right under the tabs ("Your photo" stays in view)
+    if (opts.consentAlone !== false) root.classList.add('consent-on');
     ownBtn?.setAttribute('aria-expanded', 'true');
     if (isLive()) loadScanner().catch(() => {}); // fetch the scanner while the notice is read (nothing is sent)
-    consent.querySelector('label').focus?.();
+    fileInput.focus({ preventScroll: true });
+    keepInView(consent);
   };
   const closeConsent = () => {
+    if (consent.hidden) return;
     consent.hidden = true;
     root.classList.remove('consent-on');
     ownBtn?.setAttribute('aria-expanded', 'false');
-    if (heldPick && !root.querySelector('.pick[data-id][aria-pressed="true"]')) heldPick.setAttribute('aria-pressed', 'true');
+    if (heldPick && !root.querySelector('.pick[data-id][aria-pressed="true"]') && ownBtn?.getAttribute('aria-pressed') !== 'true') heldPick.setAttribute('aria-pressed', 'true');
     heldPick = null;
   };
   ownBtn?.addEventListener('click', () => (consent.hidden ? openConsent() : closeConsent()));
   consent.querySelector('.sc-cancel')?.addEventListener('click', () => { closeConsent(); ownBtn?.focus(); });
-  consent.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeConsent(); ownBtn?.focus(); } });
+  // Escape closes the notice wherever focus is
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !consent.hidden) { closeConsent(); ownBtn?.focus(); } });
   fileInput.addEventListener('change', () => {
     const f = fileInput.files?.[0];
     if (!f) return;
@@ -515,6 +577,32 @@ export function mountScan(root, opts = {}) {
     const target = document.querySelector(opts.splitTarget);
     target?.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
   });
+
+  // Leaving the page stops a live scan (Back, Forward, reload, another tab's link). Coming back never replays a
+  // sample as if it were the visitor's photo: the card says the scan stopped, with "Scan again" and "Use a sample".
+  let leftMidScan = false;
+  addEventListener('pagehide', () => {
+    if (!liveBusy) return;
+    leftMidScan = true;
+    try { sessionStorage.setItem(LEFT_KEY, `${Date.now()} ${location.pathname}`); } catch { /* storage off: the restore below still works */ }
+    ctrl?.abort();
+    liveBusy = false;
+  });
+  addEventListener('pageshow', (e) => {
+    if (!e.persisted || !leftMidScan) return;
+    leftMidScan = false;
+    try { sessionStorage.removeItem(LEFT_KEY); } catch { /* ignore */ }
+    showError(null, liveFile, { stopped: true });
+  });
+  let cameBack = false;
+  try {
+    // kept per page: another page with a scan card (/split) leaves it alone
+    const [at, path] = String(sessionStorage.getItem(LEFT_KEY) || '').split(' ');
+    if (path === location.pathname) sessionStorage.removeItem(LEFT_KEY);
+    const nav = performance.getEntriesByType?.('navigation')?.[0]?.type;
+    cameBack = path === location.pathname && Number(at) > 0 && Date.now() - Number(at) < 30 * 60 * 1000 && (nav === 'back_forward' || nav === 'reload');
+  } catch { /* storage off */ }
+  if (cameBack && own) showError(null, null, { stopped: true });
 
   // First state: the canonical receipt, read when it comes into view (instantly with reduced motion).
   const first = opts.initial || ids[0];
@@ -541,7 +629,9 @@ export function mountScan(root, opts = {}) {
     const ghost = root.cloneNode(true);
     ghost.removeAttribute('id');
     ghost.setAttribute('aria-hidden', 'true');
-    ghost.classList.remove('booting');
+    ghost.classList.remove('booting', 'is-err', 'no-photo', 'consent-on', 'is-bad');
+    ghost.querySelector('.scan-consent').hidden = true;
+    ghost.querySelector('.so-notice').hidden = true;
     ghost.classList.add('is-done');
     ghost.dataset.stage = 'done';
     ghost.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:${w}px;min-height:0`;
@@ -557,6 +647,7 @@ export function mountScan(root, opts = {}) {
       const gr = ghost.querySelector('.so-rest');
       if (gr) { gr.hidden = false; gr.firstChild.textContent = '+ 10 more items and tax'; gr.querySelector('.money').textContent = '$00.00'; }
       ghost.querySelectorAll('button.so-split:not(.so-solo)').forEach((x) => { x.hidden = getSample(id)?.people?.length === 1; });
+      ghost.querySelectorAll('a.so-solo').forEach((x) => { x.hidden = getSample(id)?.people?.length !== 1; });
       max = Math.max(max, ghost.offsetHeight);
     }
     ghost.remove();

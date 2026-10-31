@@ -12,6 +12,8 @@ mountScan(document.getElementById('scan-demo'), {
   // the photo notice says what the privacy policy says, and hides the sample result while it is open
   consentNote: 'To read it, your photo is sent to Google Gemini, and a small sample of scans is reviewed with Anthropic’s Claude to improve accuracy.',
   consentAlone: true,
+  // after your own photo's read, the page's one next step (the same link as its button)
+  liveNext: { href: 'https://app.trezzit.com/signup', label: 'Track your spending' },
 });
 // the same month as home (bank vs what you spent, who paid, item search), searching for a pharmacy item
 mountMonth(document.getElementById('ledger-demo'), { demoSearch: 'sunscreen', demoInstant: true });
