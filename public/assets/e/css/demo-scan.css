@@ -307,3 +307,9 @@ ul.so-checks { display: none; }
 /* /track: while the 'Your photo' notice is open, it is the only thing in the frame */
 .scan.consent-on .scan-body { display: none; }
 .scan.consent-on .scan-consent { margin-top: 0; }
+/* ---------- live scan (your photo, through the app's scan embed): a line whose price is still being read
+   shows a faint ellipsis; a failed scan says why, with "Try again" and "Use a sample" under it ---------- */
+.so-item .money:empty::after { content: '…'; color: var(--faint); }
+.so-notice .so-acts { display: flex; flex-wrap: wrap; gap: 0 18px; margin-top: 2px; }
+.so-notice .c-link-btn { color: var(--amber-ink); text-decoration: underline; text-underline-offset: 3px; min-height: 40px; }
+.scan.is-err .so-total, .scan.is-err .so-total > * { visibility: hidden !important; }

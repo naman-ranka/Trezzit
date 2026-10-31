@@ -1,10 +1,11 @@
 /* scan-demo.js: tap a sample receipt (recorded scan) or use your own photo
- * (live on trezzit.com only, via the kit's scan-client) and watch it read.
+ * (live on trezzit.com only: the kit's scan-client runs the app's scan embed) and watch it read.
  * E: C's card with A's read: the paper moves under the beam line by line, read lines keep a faint tint,
  * the status counts "Reading items 6 of 14" and ends on "Adds up to $100.00" (or says what doesn't).
- * "Your photo" is always offered: on trezzit.com it is scanned for real after the Gemini disclosure;
+ * "Your photo" is always offered: on trezzit.com it is scanned for real after the AI disclosure, its lines
+ * appear as the scan streams them, and "Split this receipt" opens the app's /split with that scan;
  * anywhere else it stays on the device and the closest recorded sample plays, with a notice. */
-import { scan, isLive, closestSample } from '../../_kit/scan-client.js';
+import { scan, isLive, closestSample, loadScanner } from '../../_kit/scan-client.js';
 import { receiptHTML as kitReceiptHTML, ensureReceiptStyles, splitSample } from '../../_kit/receipts.js';
 // the printed "ITEMS 19" counts units; every label on the page counts lines (14), so the footer line goes
 const receiptHTML = (raw, o) => kitReceiptHTML(raw, o).replace(/<p>ITEMS \d+<\/p>\s*/, '');
@@ -28,6 +29,10 @@ const checksFor = (bill) => {
   const bad = v.find((c) => !c.passed);
   return [bad ? { passed: false, message: `${CHECK_LABEL[bad.check] || 'Total'} doesn’t match the receipt` } : { passed: true, message: 'Matches the receipt' }];
 };
+/* a live scan's status words (the server's stages), shown where the sample read says "Reading items 6 of 14" */
+const LIVE_LABEL = { uploading: 'Uploading…', validating: 'Checking the math…', retrying: 'Reading it again…' };
+/* what the privacy policy says about a scanned photo (Google Gemini reads it; a small sample is reviewed with Claude) */
+const AI_NOTE = 'To read it, your photo is sent to Google Gemini, and a small sample of scans is reviewed with Anthropic’s Claude to improve accuracy.';
 const checkLI = (c, i, pending) => `<li class="${c.passed ? 'ok' : 'warn'}${pending ? ' pending' : ''}" style="--i:${i}">${icon.check}<span>${esc(CHECK_LABEL[c.check] || c.message)}</span></li>`;
 
 /**
@@ -82,11 +87,11 @@ export function mountScan(root, opts = {}) {
           ${opts.splitTarget ? `<button type="button" class="c-link-btn so-split">Split this receipt ${icon.arrow}</button>` : ''}
           ${opts.soloSummary ? '<p class="so-mine" hidden></p>' : opts.soloHref ? `<a class="c-btn c-btn-sm c-btn-quiet so-split so-solo" href="${esc(opts.soloHref)}" hidden>See your share ${icon.arrow}</a>` : ''}
         </div>
-        <p class="so-notice" hidden></p>
+        <p class="so-notice" hidden aria-live="polite"></p>
       </div>
     </div>
     <div class="scan-consent" hidden role="dialog" aria-modal="false" aria-label="Scan your own receipt">
-      <p>${isLive() ? esc(opts.consentNote || 'To read it, your photo is sent to Google Gemini.') : 'Real scans run on trezzit.com. Here your photo stays on your device, and a sample receipt plays instead.'} <a href="/privacy">Privacy</a></p>
+      <p>${isLive() ? esc(opts.consentNote || AI_NOTE) : 'Real scans run on trezzit.com. Here your photo stays on your device, and a sample receipt plays instead.'} <a href="/privacy">Privacy</a></p>
       <div class="sc-actions">
         <label class="c-btn c-btn-sm c-btn-primary">Choose a photo<input type="file" accept="image/*,application/pdf" class="visually-hidden"></label>
         <button type="button" class="c-btn c-btn-sm c-btn-quiet sc-cancel">Cancel</button>
@@ -208,7 +213,7 @@ export function mountScan(root, opts = {}) {
     sumEl.innerHTML = '';
     storeEl.innerHTML = store || '';
     notice.hidden = true;
-    root.classList.remove('is-done', 'is-note', 'is-bad', 'has-cats', 'rolling');
+    root.classList.remove('is-done', 'is-note', 'is-bad', 'is-err', 'has-cats', 'rolling');
     winK = 0;
     setRest(null);
     setCats(null);
@@ -228,7 +233,11 @@ export function mountScan(root, opts = {}) {
     const shown = rows.map((li, i) => [li, i]).filter(([li]) => getComputedStyle(li).display !== 'none');
     const n = rows.length - shown.length;
     const shownC = shown.reduce((a, [, i]) => a + toCents(bill.items[i]?.amount || 0), 0);
-    const rest = toCents(bill.total) - shownC;
+    // what the folded lines (plus tax and tip) come to, from the lines themselves: when a scan's lines miss the
+    // printed total, the visible figures add up to what was read, never to a total they do not make
+    const tipC = bill.items.some((it) => it.itemType === 'Tip') ? 0 : toCents(bill.tip);
+    const readC = bill.items.reduce((a, it) => a + toCents(it.amount), 0) + toCents(bill.tax) + tipC - Math.round((bill.discountAmount || 0) * 100);
+    const rest = readC - shownC;
     restEl.hidden = rest <= 0;
     const extra = toCents(bill.tax) > 0 ? 'tax' : toCents(bill.tip) > 0 ? 'tip' : '';
     restEl.firstChild.textContent = n ? `+ ${n} more item${n === 1 ? '' : 's'}${extra ? ` and ${extra}` : ''}` : extra.replace(/^./, (c) => c.toUpperCase()) || 'Other';
@@ -263,6 +272,77 @@ export function mountScan(root, opts = {}) {
     setRest(bill);
   }
 
+  let liveBusy = false; // a photo is being scanned: a tap on it (or on replay) must not throw the scan away
+  /* ---- a live scan: the lines appear as the stream reads them (no made-up progress) ---- */
+  // how many rows the folded list shows at this width (the CSS decides: 4 or 6), measured on placeholder rows
+  const windowSize = () => {
+    list.innerHTML = Array.from({ length: 8 }, (_, i) => itemLI({ name: '', amount: 0 }, i, true)).join('');
+    const n = [...list.children].filter((li) => getComputedStyle(li).display !== 'none').length;
+    list.innerHTML = '';
+    return n || 6;
+  };
+  const draftRow = (it, i) => `<li class="so-item" style="--i:${i}"><span>${esc(itemName(it.name))}</span><span class="money">${it.price != null ? money(toCents(it.price)) : ''}</span></li>`;
+  function liveState() {
+    let status = 'uploading'; let lines = 0; let offline = false; let cap = 6;
+    const show = () => {
+      setStage(status === 'uploading' ? 'uploading' : status === 'validating' ? 'checking' : 'reading');
+      const words = offline ? 'Waiting for a connection…'
+        : LIVE_LABEL[status] || (lines ? `Reading… ${lines} item${lines === 1 ? '' : 's'}` : 'Reading…');
+      txt.textContent = words;
+      setLive(words);
+      restEl.hidden = false; // the row that carries the words while it reads
+    };
+    return {
+      start() { cap = windowSize(); show(); },
+      status(s) { status = s; show(); },
+      connection(on) { offline = !on; show(); },
+      draft(d) {
+        if (d.store) storeEl.innerHTML = `<b>${esc(storeName(d.store))}</b>${prettyDate(d.date) ? `<span>${esc(prettyDate(d.date))}</span>` : ''}`;
+        if (d.items.length < list.children.length) { list.innerHTML = ''; winK = 0; root.classList.remove('rolling'); } // a retry starts over
+        d.items.forEach((it, i) => {
+          const row = list.children[i];
+          if (!row) { list.appendChild(h(draftRow(it, i))); return; }
+          const [name, price] = row.children; // a line read again (its price arrived): updated in place, no new animation
+          const nm = itemName(it.name); const pr = it.price != null ? money(toCents(it.price)) : '';
+          if (name.textContent !== nm) name.textContent = nm;
+          if (price.textContent !== pr) price.textContent = pr;
+        });
+        lines = d.items.length;
+        if (lines > cap) { winK = cap; roll(lines); }
+        // the photo moves one step under the beam per line read
+        const max = Math.max(0, paper.scrollHeight - stage.clientHeight);
+        paper.style.transform = `translateY(${-Math.min(max, lines * 18)}px)`;
+        show();
+      },
+    };
+  }
+  /** The live scan's final lines, replacing the drafts in place (a renamed line updates, new ones rise in). */
+  function finalRows(bill) {
+    bill.items.forEach((it, i) => {
+      const html = itemLI(it, i, false);
+      const row = list.children[i];
+      if (!row) list.appendChild(h(html));
+      else if (row.textContent !== h(html).textContent) row.replaceWith(h(html));
+    });
+    while (list.children.length > bill.items.length) list.lastElementChild.remove();
+  }
+  /** A failed live scan: the scan's own sentence, then what can be done (try again, or a sample). */
+  function showError(err, file) {
+    setStage('idle');
+    unroll();
+    list.innerHTML = '';
+    setRest(null);
+    rest0();
+    root.classList.add('is-err');
+    const limited = err?.code === 'RATE_LIMITED';
+    const msg = err?.message || 'That did not work.';
+    notice.innerHTML = `${esc(limited ? `${msg} Photo scans are limited to 10 an hour.` : msg)}
+      <span class="so-acts">${file && !limited ? '<button type="button" class="c-link-btn so-retry">Try again</button>' : ''}<button type="button" class="c-link-btn so-sample">Use a sample</button></span>`;
+    notice.hidden = false;
+    notice.querySelector('.so-retry')?.addEventListener('click', () => run(file));
+    notice.querySelector('.so-sample').addEventListener('click', () => run(opts.initial || ids[0]));
+  }
+
   async function run(input, { instant = false, note = '' } = {}) {
     // off trezzit.com a photo never leaves the device: the closest recorded sample plays, and says so up front
     if (typeof input !== 'string' && !isLive()) return run(ids.includes(closestSample(input)) ? closestSample(input) : ids[0], { instant, note: 'Real scans run on trezzit.com, so this is a sample receipt.' });
@@ -287,15 +367,28 @@ export function mountScan(root, opts = {}) {
       objectUrl = input.type.startsWith('image/') ? URL.createObjectURL(input) : null;
       showPaper(objectUrl ? `<img class="scan-photo" src="${objectUrl}" alt="">` : '<div class="scan-pdf">PDF</div>');
       reset(`<b>${esc(input.name || 'Your photo')}</b>`);
+      ownBtn?.setAttribute('aria-pressed', 'true');
       nItems = 0;
     }
+    if (!isFile && !note) ownBtn?.removeAttribute('aria-pressed');
     let shown = 0;
+    // a live scan reports itself (onStatus, onDraft); onStage then only drives a sample played instead
+    const live = isFile ? liveState() : null;
+    liveBusy = isFile;
+    let streamed = false;
+    const ifLive = (fn) => (...a) => { if (signal.aborted) return; if (!streamed) { streamed = true; live.start(); } fn(...a); };
     try {
       const result = await (isFile ? scan : playLocal)(input, {
         signal,
         instant: instant || reduced(),
+        ...(isFile ? {
+          onStatus: ifLive((st) => live.status(st)),
+          onDraft: ifLive((d) => live.draft(d)),
+          onConnection: ifLive((on) => live.connection(on)),
+          onProgress: (pct) => { if (!signal.aborted && pct > 0) setProg(0.02 + 0.13 * Math.min(100, pct) / 100); }, // the upload's own progress only
+        } : {}),
         onStage(stage, detail) {
-          if (signal.aborted) return;
+          if (signal.aborted || streamed) return;
           setStage(stage);
           if (stage === 'uploading') setProg(0.06);
           if (stage === 'reading' && detail.items) {
@@ -317,6 +410,7 @@ export function mountScan(root, opts = {}) {
         },
       });
       if (signal.aborted) return;
+      if (result.source === 'live' && !result.bill.items.length) throw Object.assign(new Error('No items were found on that photo. Try a sharper photo, or a sample.'), { code: 'NO_ITEMS' });
       last = result;
       if (result.source === 'sample' && isFile) {
         // fell back: show the sample we played
@@ -326,7 +420,10 @@ export function mountScan(root, opts = {}) {
         settlePaper();
         storeEl.innerHTML = storeLine(result.raw.receipt);
       }
-      if (result.source === 'live') storeEl.innerHTML = storeLine(result.raw.receipt);
+      if (result.source === 'live') {
+        storeEl.innerHTML = storeLine(result.raw.receipt);
+        finalRows(result.bill);
+      }
       // the status says "Adds up" only once the total has finished counting, so the two never disagree
       totalEl.textContent = money(toCents(result.bill.total), result.bill.currency || 'USD');
       setSum(result.bill);
@@ -352,10 +449,16 @@ export function mountScan(root, opts = {}) {
       const sum = b.items.reduce((a, it) => a + toCents(it.amount), 0) + toCents(b.tax) + tipC - Math.round((b.discountAmount || 0) * 100);
       const ok = sum === toCents(b.total);
       root.classList.toggle('is-bad', !ok);
-      txt.innerHTML = ok ? `${icon.check}Adds up to ${money(toCents(b.total), b.currency || 'USD')}` : 'Check the total before saving';
+      // when the lines do not make the printed total, say both figures (never "Adds up")
+      txt.innerHTML = ok ? `${icon.check}Adds up to ${money(toCents(b.total), b.currency || 'USD')}`
+        : `The receipt says ${money(toCents(b.total), b.currency || 'USD')}; the lines make ${money(sum, b.currency || 'USD')}`;
+      liveBusy = false;
       opts.onDone?.(result);
     } catch (err) {
-      if (err?.name !== 'AbortError') { setStage('idle'); notice.textContent = 'That did not work. Try a sample receipt.'; notice.hidden = false; }
+      if (signal.aborted || err?.name === 'AbortError' || err?.code === 'ABORTED') return;
+      liveBusy = false;
+      if (isFile) { showError(err, input); return; }
+      setStage('idle'); notice.textContent = 'That did not work. Try a sample receipt.'; notice.hidden = false;
     }
   }
 
@@ -367,7 +470,7 @@ export function mountScan(root, opts = {}) {
 
   root.querySelectorAll('.pick[data-id]').forEach((b) => b.addEventListener('click', () => { closeConsent(); run(b.dataset.id); }));
   // the receipt is the control: the replay button, or a tap on the paper itself, reads it again
-  const again = () => { const id = last?.sampleId || root.querySelector('.pick[aria-pressed="true"]')?.dataset.id || opts.initial || ids[0]; closeConsent(); run(id); };
+  const again = () => { if (liveBusy) return; const id = last?.sampleId || root.querySelector('.pick[aria-pressed="true"]')?.dataset.id || opts.initial || ids[0]; closeConsent(); run(id); };
   root.querySelector('.so-again').addEventListener('click', again);
   stage.addEventListener('click', again);
   // while the notice is open it is the only thing in the frame (opts.consentAlone): no sample result beside it
@@ -381,6 +484,7 @@ export function mountScan(root, opts = {}) {
       heldPick?.setAttribute('aria-pressed', 'false');
     }
     ownBtn?.setAttribute('aria-expanded', 'true');
+    if (isLive()) loadScanner().catch(() => {}); // fetch the scanner while the notice is read (nothing is sent)
     consent.querySelector('label').focus?.();
   };
   const closeConsent = () => {
@@ -405,6 +509,8 @@ export function mountScan(root, opts = {}) {
   });
   splitBtn?.addEventListener('click', () => {
     if (!last || splitBtn.getAttribute('aria-disabled') === 'true') return;
+    // your own photo goes to the app's /split, scan and all (same tab: one place to be, Back returns here)
+    if (last.source === 'live' && last.handoff) { location.assign(last.handoff); return; }
     bus.emit('receipt', last);
     const target = document.querySelector(opts.splitTarget);
     target?.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
