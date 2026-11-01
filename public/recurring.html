@@ -76,7 +76,15 @@
           "name": "Can I split Netflix or Spotify with friends?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Add the subscription to a group with the people who share it, split it, and make it repeat monthly. Every month comes with the same split."
+            "text": "Yes. Add it to a group, split it, and make it repeat monthly."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can roommates split utilities that change each month?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Set it to Remind me and check the amount before it’s added."
           }
         },
         {
@@ -84,15 +92,7 @@
           "name": "Do my friends need Trezzit?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Not to start. Add them to the group by name and split with them right away. When they’re ready, they join with an invite link, and the bills you added with them move to their account."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can a bill I already added repeat?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Open it and make it repeat. Its items, split and categories come along."
+            "text": "Not to start: add them by name, and they join with an invite link when they’re ready."
           }
         },
         {
@@ -101,22 +101,6 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "No. A gym membership or a phone plan can repeat in your own spending, just yours."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I pause a repeating bill?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. A paused bill adds nothing while it’s paused. When you resume it, the months it missed are due again, so skip any you don’t want."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Does Trezzit pay the bill?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. Trezzit records who owes what and never moves money. You pay the bill however you already do."
           }
         }
       ],
@@ -156,7 +140,19 @@
       <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Set up a repeating bill</a></div>
       <p class="micro">Free. No bank login.</p>
     </div>
-    <div class="sc-side"><div class="demo-frame" id="rec-side" aria-label="Coming up: your repeating bills"><noscript><p class="nojs">Coming up: Nov 1, monthly rent, your share $639.35. Nov 8, Spotify, $5.00. Nov 12, Netflix, $4.50. Nov 15, gym membership, $39.00. Nov 20, electricity, the amount varies, Remind me.</p></noscript></div><p class="side-note">Your bank shows the $19.99 you pay for Spotify. Your spending shows your&nbsp;$5.00.</p></div>
+    <div class="sc-side"><div class="demo-frame" id="rec-side" aria-label="Coming up: your repeating bills"><noscript><p class="nojs">Coming up: Nov 1, monthly rent, your share $639.35. Nov 8, Spotify, $5.00. Nov 12, Netflix, $4.50. Nov 15, gym membership, $39.00. Nov 20, electricity, the amount varies, Remind me.</p></noscript></div><p class="side-note">Your bank shows the <b class="money">$19.99</b> you pay for Spotify. Your spending shows your&nbsp;<b class="money">$5.00</b>.</p>
+    <details class="ex-d"><summary>See the math</summary>
+    <div class="tbl tbl-rm tbl-st tbl-rc" tabindex="0" role="region" aria-label="Two subscriptions split four ways">
+      <table>
+        <thead><tr><th scope="col">Each month</th><th scope="col" class="r">You</th><th scope="col" class="r">Maya</th><th scope="col" class="r">Jordan</th><th scope="col" class="r">Sam</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Netflix <span class="money">$17.99</span><small>Maya pays · equally</small></th><td data-l="You" class="r money">$4.50</td><td data-l="Maya" class="r money">$4.50</td><td data-l="Jordan" class="r money">$4.50</td><td data-l="Sam" class="r money">$4.49</td></tr>
+          <tr><th scope="row">Spotify <span class="money">$19.99</span><small>You pay · equally</small></th><td data-l="You" class="r money">$5.00</td><td data-l="Maya" class="r money">$5.00</td><td data-l="Jordan" class="r money">$5.00</td><td data-l="Sam" class="r money">$4.99</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ex-note">Neither splits evenly four ways, so one share is a cent less. Every month still adds up to exactly $17.99 and&nbsp;$19.99.</p>
+    </details></div>
   </div>
 </section>
 
@@ -178,34 +174,15 @@
   </div>
 </section>
 
-<section class="pg-sec" id="example" aria-labelledby="ex-t">
-  <div class="wrap">
-    <header class="sh"><h2 id="ex-t">A worked example.</h2><p>Two subscriptions for four, every month.</p></header>
-    <details class="ex-d"><summary>See the math</summary>
-    <div class="tbl tbl-rm tbl-st tbl-rc" tabindex="0" role="region" aria-label="Two subscriptions split four ways">
-      <table>
-        <thead><tr><th scope="col">Each month</th><th scope="col" class="r">You</th><th scope="col" class="r">Maya</th><th scope="col" class="r">Jordan</th><th scope="col" class="r">Sam</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Netflix <span class="money">$17.99</span><small>Maya pays · equally</small></th><td data-l="You" class="r money">$4.50</td><td data-l="Maya" class="r money">$4.50</td><td data-l="Jordan" class="r money">$4.50</td><td data-l="Sam" class="r money">$4.49</td></tr>
-          <tr><th scope="row">Spotify <span class="money">$19.99</span><small>You pay · equally</small></th><td data-l="You" class="r money">$5.00</td><td data-l="Maya" class="r money">$5.00</td><td data-l="Jordan" class="r money">$5.00</td><td data-l="Sam" class="r money">$4.99</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="ex-note">Neither splits evenly four ways, so one share is a cent less. Every month still adds up to exactly $17.99 and&nbsp;$19.99.</p>
-    </details>
-  </div>
-</section>
 
 <section class="pg-sec" id="faq" aria-labelledby="faq-t">
   <div class="wrap">
     <header class="sh"><h2 id="faq-t">Questions.</h2></header>
     <div class="faq">
-      <details><summary>Can I split Netflix or Spotify with friends?</summary><p>Yes. Add the subscription to a group with the people who share it, split it, and make it repeat monthly. Every month comes with the same split.</p></details>
-      <details><summary>Do my friends need Trezzit?</summary><p>Not to start. Add them to the group by name and split with them right away. When they’re ready, they join with an invite link, and the bills you added with them move to their account.</p></details>
-      <details><summary>Can a bill I already added repeat?</summary><p>Yes. Open it and make it repeat. Its items, split and categories come along.</p></details>
+      <details><summary>Can I split Netflix or Spotify with friends?</summary><p>Yes. Add it to a group, split it, and make it repeat monthly.</p></details>
+      <details><summary>Can roommates split utilities that change each month?</summary><p>Yes. Set it to Remind me and check the amount before it’s added.</p></details>
+      <details><summary>Do my friends need Trezzit?</summary><p>Not to start: add them by name, and they join with an invite link when they’re ready.</p></details>
       <details><summary>Is it only for shared bills?</summary><p>No. A gym membership or a phone plan can repeat in your own spending, just yours.</p></details>
-      <details><summary>Can I pause a repeating bill?</summary><p>Yes. A paused bill adds nothing while it’s paused. When you resume it, the months it missed are due again, so skip any you don’t want.</p></details>
-      <details><summary>Does Trezzit pay the bill?</summary><p>No. Trezzit records who owes what and never moves money. You pay the bill however you already do.</p></details>
     </div>
     <p class="pg-more">Sharing a place? <a href="/roommates">Split rent and groceries with roommates</a></p>
   </div>

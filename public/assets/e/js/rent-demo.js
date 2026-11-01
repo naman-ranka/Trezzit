@@ -100,12 +100,12 @@ function render() {
   if (!upEl.querySelector('.rec-mode')) {
     const row = (m, d, t, s, a, k = '') => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b><small>${s}</small></span><span class="up-r"><b class="money">${a}</b>${k}</span></li>`;
     const both = (a, b) => `<span class="up-alt" data-alt><span data-v="auto">${a}</span><span data-v="review">${b}</span></span>`;
-    upEl.innerHTML = row('Nov', 1, 'Monthly rent', both('Your share · adds itself', 'Your share · waits for you'), '<span data-k="rent-you"></span>', `<span class="up-how">${both('Auto', 'Remind me')}</span>`)
+    upEl.innerHTML = row('Nov', 1, 'Monthly rent', both('Your share<span class="up-x"> · adds itself</span>', 'Your share<span class="up-x"> · waits for you</span>'), '<span data-k="rent-you"></span>', `<span class="up-how">${both('Auto', 'Remind me')}</span>`)
       + MODE
       + row('Nov', 8, 'Spotify', 'You pay · split 4 ways', money(spot[0]))
       + row('Nov', 12, 'Netflix', 'Maya pays · split 4 ways', money(flix[0]))
       + row('Nov', 15, 'Gym membership', 'Just you', '$39.00')
-      + row('Nov', 20, 'Electricity', 'Varies · you check it first', 'Varies', '<span class="up-how">Remind me</span>');
+      + row('Nov', 20, 'Electricity', 'You check it first', 'Varies', '<span class="up-how">Remind me</span>');
     bindMode();
   }
   upEl.querySelector('[data-k="rent-you"]').textContent = money(you);

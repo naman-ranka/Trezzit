@@ -428,9 +428,6 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
 .settle-tag { font-size: var(--t-xs); font-weight: 600; letter-spacing: 0; color: var(--muted); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); }
 /* /recurring: the rent card keeps the roommates card's measure */
 #rec-demo { max-width: 820px; margin-inline: 0; }
-/* the rent card mounts on load and sits in the first screen from 1000px: its height is reserved (measured 320-1920) */
-#rec-demo { min-height: 702px; }
-@media (min-width: 380px) { #rec-demo { min-height: 686px; } }
 /* a worked example's one-line note under its table */
 .pg-uc .ex-note { margin-top: 10px; max-width: var(--measure); color: var(--muted); font-size: var(--t-sm); line-height: 1.5; }
 .tbl-rc { max-width: 36rem; }
@@ -511,41 +508,100 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
 }
 /* the rent field: dashed underline at rest where there is no hover, and a focus ring on the whole field */
 .rec-edit .money-in-field:focus-within { box-shadow: var(--focus-ring); border-radius: var(--r-sm); }
-/* release 3 round 1: reserved demo heights, re-measured per pixel 320-1300 and every 10px to 1920, in both tip
-   modes and both rent modes (the tallest of the two), so nothing below moves on load or on a tap */
-main #split-demo.res-trips { min-height: 829px; }
-@media (min-width: 420px) { main #split-demo.res-trips { min-height: 799px; } }
-@media (min-width: 480px) { main #split-demo.res-trips { min-height: 740px; } }
-@media (min-width: 600px) { main #split-demo.res-trips { min-height: 756px; } }
-@media (min-width: 640px) { main #split-demo.res-trips { min-height: 719px; } }
-main #trip-demo { min-height: 897px; }
-@media (min-width: 327px) { main #trip-demo { min-height: 873px; } }
-@media (min-width: 328px) { main #trip-demo { min-height: 847px; } }
-@media (min-width: 349px) { main #trip-demo { min-height: 824px; } }
-@media (min-width: 357px) { main #trip-demo { min-height: 798px; } }
-@media (min-width: 361px) { main #trip-demo { min-height: 774px; } }
-@media (min-width: 369px) { main #trip-demo { min-height: 751px; } }
-@media (min-width: 402px) { main #trip-demo { min-height: 724px; } }
-@media (min-width: 445px) { main #trip-demo { min-height: 701px; } }
-@media (min-width: 529px) { main #trip-demo { min-height: 679px; } }
-@media (min-width: 600px) { main #trip-demo { min-height: 695px; } }
-@media (min-width: 900px) { main #trip-demo { min-height: 426px; } }
-@media (min-width: 1105px) { main #trip-demo { min-height: 404px; } }
-@media (min-width: 1200px) { main #trip-demo { min-height: 414px; } }
-main #rec-side { min-height: 764px; }
-@media (min-width: 328px) { main #rec-side { min-height: 738px; } }
-@media (min-width: 335px) { main #rec-side { min-height: 715px; } }
-@media (min-width: 342px) { main #rec-side { min-height: 692px; } }
-@media (min-width: 354px) { main #rec-side { min-height: 669px; } }
-@media (min-width: 383px) { main #rec-side { min-height: 638px; } }
-@media (min-width: 384px) { main #rec-side { min-height: 615px; } }
-@media (min-width: 387px) { main #rec-side { min-height: 592px; } }
-@media (min-width: 400px) { main #rec-side { min-height: 638px; } }
-@media (min-width: 417px) { main #rec-side { min-height: 619px; } }
-@media (min-width: 420px) { main #rec-side { min-height: 599px; } }
-@media (min-width: 600px) { main #rec-side { min-height: 615px; } }
-main #rec-demo { min-height: 703px; }
-@media (min-width: 377px) { main #rec-demo { min-height: 686px; } }
-@media (min-width: 490px) { main #rec-demo { min-height: 665px; } }
-@media (min-width: 600px) { main #rec-demo { min-height: 683px; } }
-@media (min-width: 1000px) { main #rec-demo { min-height: 573px; } }
+
+/* ---------- release 3, review round 2 ---------- */
+/* a worked example's "See the math" sits right under the demo (or the bank line) it explains */
+.pg-uc .demo-frame + .ex-d, .pg-uc .side-note + .ex-d, .pg-uc .rent-card > .ex-d { margin-top: 8px; }
+/* bank lines (/trips weekend, /recurring hero): body-small, secondary colour, both amounts bold */
+.side-note b, .trip-msg b { color: var(--ink); font-weight: 600; }
+/* /recurring rent card from 1000px: the four shares in one row on top, the bill's lines under them */
+@media (min-width: 1000px) {
+  #rec-demo .rec-sched { grid-template-columns: minmax(0, 1fr); }
+  #rec-demo .rec-sched > * { grid-column: 1; grid-row: auto; }
+  #rec-demo .rec-sched > .rec-top { order: 0; }
+  #rec-demo .rec-sched > .rec-shares { order: 1; grid-column: 1; grid-row: auto; margin: 4px 0 8px; }
+  #rec-demo .rec-sched > .rec-edit { order: 2; }
+  #rec-demo .rec-sched > .rec-lines { order: 3; }
+  #rec-demo .rec-sched > .rec-check { order: 4; }
+  #rec-demo ul.rec-shares { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+}
+/* /trips hero from 520px: the two actions side by side at one height, the primary first; a label that needs two
+   lines wraps inside its button rather than dropping the button to a row of its own */
+@media (min-width: 520px) {
+  .tr-hero .cta-row { flex-wrap: nowrap; align-items: stretch; }
+  .tr-hero .cta-row .c-btn { flex: 1 1 0; max-width: 260px; min-width: 0; padding-inline: 16px; white-space: normal; text-align: center; line-height: 1.25; }
+}
+/* use-case heroes: the title and lede measures in em, not ch (the same widths in DM Sans), so the fallback face
+   that shows while DM Sans loads breaks the lines in the same places and nothing below moves when it swaps in */
+@media (max-width: 999px) {
+  .pg-uc .sc-hero h1 { max-width: 12.672em; }
+}
+.pg-uc .sc-copy .lede { max-width: 23.256em; }
+/* /trips grid beside the copy (1000-1199px): narrower price and dot columns, so "Bean and cheese burrito" keeps
+   one line */
+@media (min-width: 1000px) and (max-width: 1199px) {
+  #split-demo.tg { --col: 62px; --pw: 72px; }
+}
+@media (min-width: 1000px) and (max-width: 1039px) {
+  #split-demo.tg .tg-row .tg-nm { padding-right: 4px; letter-spacing: -0.01em; }
+  #split-demo.tg { --pw: 66px; }
+}
+/* the few widths where the two faces still break a hero line differently (a line that fits by under 3px in one
+   face): the taller count is reserved, so the swap moves nothing */
+@media (min-width: 356px) and (max-width: 365px) { .pg-tr .sc-hero h1 { min-height: 3lh; } .pg-rm .sc-copy .lede { min-height: 3lh; } }
+@media (min-width: 416px) and (max-width: 424px) { .pg-rc .sc-hero h1 { min-height: 3lh; } }
+@media (min-width: 406px) and (max-width: 414px) { .pg-jm .sc-hero h1 { min-height: 2lh; } }
+@media (min-width: 433px) and (max-width: 449px) { .pg-rm .sc-hero h1 { min-height: 3lh; } }
+@media (min-width: 364px) and (max-width: 370px) { .pg-rm .uc-sw-m { min-height: 2lh; } }
+/* /trips weekend: where a tip flip would rewrap the Taqueria note or the bank line, the two-line height is kept */
+@media (min-width: 402px) and (max-width: 414px) { .trip-bills small:has([data-note='taq']) { display: block; min-height: 2lh; } }
+@media (min-width: 517px) and (max-width: 530px), (min-width: 1082px) and (max-width: 1106px) { .trip-msg { min-height: 2lh; } }
+/* /recurring "Coming up" below 420px: the Auto / Remind me switch stays on the right of its label (the label
+   wraps), and every row keeps to two lines: tighter frame and row padding, small sub-lines, and the rent's
+   sub-line drops the mode words its tag already shows */
+@media (max-width: 419px) {
+  main #rec-side { padding-inline: 12px; }
+  .up-row, .up-row:has(.up-r) { padding-inline: 8px; column-gap: 8px; }
+  .up-row small, .up-row .up-how { font-size: var(--t-xs); }
+  .up-row .up-x { display: none; }
+  .upcoming .rec-mode { flex-wrap: nowrap; padding-left: 8px; }
+  .upcoming .rec-mode > #mode-l { min-width: 0; }
+  .upcoming .rec-mode .seg { flex: none; }
+  .upcoming .rec-mode .seg button { padding-inline: 10px; font-size: var(--t-xs); }
+}
+
+/* release 3 round 2: reserved demo heights (the tallest of both tip modes and both rent modes), measured per pixel
+   320-1300 and every 10px to 1920 after the copy cuts; the grocery grid on /roommates mounts as it nears the screen,
+   so its frame is reserved too and the balance under it never moves */
+/* #split-demo: 4 steps */
+main#main #split-demo.res-trips { min-height: 827px; }
+@media (min-width: 420px) { main#main #split-demo.res-trips { min-height: 797px; } }
+@media (min-width: 480px) { main#main #split-demo.res-trips { min-height: 754px; } }
+@media (min-width: 640px) { main#main #split-demo.res-trips { min-height: 717px; } }
+/* #trip-demo: 11 steps */
+main#main #trip-demo { min-height: 871px; }
+@media (min-width: 328px) { main#main #trip-demo { min-height: 845px; } }
+@media (min-width: 349px) { main#main #trip-demo { min-height: 822px; } }
+@media (min-width: 357px) { main#main #trip-demo { min-height: 796px; } }
+@media (min-width: 361px) { main#main #trip-demo { min-height: 772px; } }
+@media (min-width: 369px) { main#main #trip-demo { min-height: 749px; } }
+@media (min-width: 402px) { main#main #trip-demo { min-height: 722px; } }
+@media (min-width: 415px) { main#main #trip-demo { min-height: 699px; } }
+@media (min-width: 531px) { main#main #trip-demo { min-height: 693px; } }
+@media (min-width: 900px) { main#main #trip-demo { min-height: 424px; } }
+@media (min-width: 1107px) { main#main #trip-demo { min-height: 412px; } }
+/* #rec-side: 3 steps */
+main#main #rec-side { min-height: 613px; }
+@media (min-width: 334px) { main#main #rec-side { min-height: 597px; } }
+@media (min-width: 600px) { main#main #rec-side { min-height: 613px; } }
+/* #rec-demo: 4 steps */
+main#main #rec-demo { min-height: 701px; }
+@media (min-width: 377px) { main#main #rec-demo { min-height: 684px; } }
+@media (min-width: 490px) { main#main #rec-demo { min-height: 681px; } }
+@media (min-width: 1120px) { main#main #rec-demo { min-height: 700px; } }
+/* #rm-grid: 5 steps */
+main#main #rm-grid { min-height: 692px; }
+@media (min-width: 380px) { main#main #rm-grid { min-height: 706px; } }
+@media (min-width: 420px) { main#main #rm-grid { min-height: 681px; } }
+@media (min-width: 480px) { main#main #rm-grid { min-height: 638px; } }
+@media (min-width: 640px) { main#main #rm-grid { min-height: 605px; } }

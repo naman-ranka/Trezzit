@@ -19,10 +19,8 @@ let setTaq = null;
 mountGrid(document.getElementById('split-demo'), {
   sampleId: 'taqueria-sol', payer: 'alex', tipToggle: true,
   onChange: (r, st) => {
-    taqLive = { shares: Object.fromEntries(TRIO.map((p) => [p, r.people[p]?.cents || 0])), note: st.tipMode === 'equal' ? 'By item, tip equally' : 'By item, tip in proportion' };
+    taqLive = { shares: Object.fromEntries(TRIO.map((p) => [p, r.people[p]?.cents || 0])), note: st.tipMode === 'equal' ? 'By item, tip equally' : 'By item, tip by order' };
     setTaq?.(taqLive);
-    // the hero's "your part is $27.03" is the grid's live figure, so the line beside the demo never disagrees with it
-    document.querySelectorAll('[data-taq-you]').forEach((el) => { el.textContent = money(taqLive.shares.you); });
   },
 });
 
@@ -35,7 +33,7 @@ async function tripDemo(root) {
   const eqShares = (c) => splitAmount(c, { type: 'equal', people: TRIO }, TRIO).shares;
   const bills = [
     { id: 'cabin', title: 'Cabin, two nights', payer: 'alex', cents: 48000, shares: eqShares(48000), note: 'Split 3 ways' },
-    { id: 'taq', title: 'Taqueria Sol', payer: 'alex', cents: taq.totalCents, shares: Object.fromEntries(TRIO.map((p) => [p, taq.people[p].cents])), note: 'By item, tip in proportion' },
+    { id: 'taq', title: 'Taqueria Sol', payer: 'alex', cents: taq.totalCents, shares: Object.fromEntries(TRIO.map((p) => [p, taq.people[p].cents])), note: 'By item, tip by order' },
     { id: 'gas', title: 'Gas', payer: 'priya', cents: 6240, shares: eqShares(6240), note: 'Split 3 ways' },
     { id: 'food', title: 'Cabin groceries', payer: 'you', cents: 5730, shares: eqShares(5730), note: 'Split 3 ways' },
   ];
