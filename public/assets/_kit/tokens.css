@@ -20,6 +20,28 @@
   src: url('./fonts/dm-sans-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
+/* While DM Sans loads (font-display: swap), text is set in a local Arial-metric face scaled to DM Sans's width
+   and line box, so the swap does not move the page (tuned on the pages against Arial/Liberation Sans: DM Sans sets about 4%
+   wider at 400 and 1.6% at 700; ascent 0.992 em, descent 0.31 em). Bold has its own local face: a synthetic
+   bold is narrower and would rewrap headings. */
+@font-face {
+  font-family: 'DM Sans Fallback';
+  font-weight: 100 549;
+  src: local('Arial'), local('ArialMT'), local('Helvetica'), local('Liberation Sans'), local('Arimo');
+  size-adjust: 104.2%;
+  ascent-override: 95.2%;
+  descent-override: 29.8%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'DM Sans Fallback';
+  font-weight: 550 1000;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Helvetica Bold'), local('Liberation Sans Bold'), local('Arimo Bold');
+  size-adjust: 101.6%;
+  ascent-override: 97.6%;
+  descent-override: 30.5%;
+  line-gap-override: 0%;
+}
 
 :root {
   /* brand */
@@ -69,7 +91,7 @@
   --shadow-lg: 0 18px 40px rgba(22, 45, 89, 0.12), 0 2px 6px rgba(22, 45, 89, 0.06);
 
   /* type */
-  --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'DM Sans', 'DM Sans Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --text-body: 17px;          /* landing body: 17px+, nothing under 14px */
   --text-small: 14px;

@@ -12,16 +12,16 @@
  * Samples never touch the network beyond their own JSON (about 2.5 s of
  * staged timing; instant with prefers-reduced-motion or { instant: true }).
  *
- * A File is scanned for real ONLY when location.origin is https://trezzit.com
- * (the API's CORS allows that origin alone), or on a Vercel preview of this site against the staging API: shrink to <= 2048 px / 4.5 MB,
- * POST multipart files[] + ai_consent=2026-10 + follow=1 to
- * https://api.trezzit.com/api/demo/scan/, follow a 202 by polling its
- * status_url with X-Scan-Token. Anywhere else, or on any error or timeout,
- * it falls back to the closest sample and sets result.notice.
+ * A File is scanned for real ONLY when location.origin is https://trezzit.com, or on a Vercel preview of this
+ * site (against staging): through the app's scan embed (EMBED_URL, loaded on first use), which shrinks the
+ * photo, uploads it, streams the lines as they are read (onDraft, onStatus), falls back to the old
+ * /api/demo/scan/ itself, and builds the /split hand-off link. A failed scan rejects with the embed's
+ * ScanError; anywhere else, or when the embed cannot load, the closest sample plays and result.notice says so.
  * The page must show the AI disclosure before calling scan(file).
  *
- * Result: { source: 'sample' | 'live', sampleId, raw, bill, notice? }
- *   raw  = the /api/demo/scan/ body; bill = normalizeScan(raw).
+ * Result: { source: 'sample' | 'live', sampleId, raw, bill, notice?, scan?, handoff? }
+ *   raw  = the /api/demo/scan/ body; bill = normalizeScan(raw) (live: the app's own mapper);
+ *   live only: scan = { scanId, readToken, path }, handoff = the APP/split?from=landing#scan=… link.
  */
 
 import { SAMPLES, getSample, loadScan } from './receipts.js';
@@ -32,13 +32,22 @@ export const LIVE_ORIGIN = 'https://trezzit.com';
 const PREVIEW_HOST = /^trezzit-(?:git-[a-z0-9-]+|[a-z0-9]+)-namanrankas-projects\.vercel\.app$/;
 export const isStagingPreview = () => typeof location !== 'undefined' && location.protocol === 'https:' && PREVIEW_HOST.test(location.hostname);
 export const API = isStagingPreview() ? 'https://api.staging.trezzit.com' : 'https://api.trezzit.com';
-export const APP = isStagingPreview() ? 'https://app.staging.trezzit.com' : 'https://app.trezzit.com';
+/* Previews only: ?app=<a frontend preview origin> (remembered for the tab) loads the embed from, and hands off
+ * to, that build of the app instead of app.staging, so a frontend branch can be tried before it reaches staging.
+ * Only this team's frontend previews are accepted; trezzit.com ignores it. */
+const FRONTEND_PREVIEW = /^https:\/\/trezzit-frontend-[a-z0-9-]+-namanrankas-projects\.vercel\.app$/;
+function previewApp() {
+  if (!isStagingPreview()) return null;
+  try {
+    const asked = new URLSearchParams(location.search).get('app');
+    if (asked && FRONTEND_PREVIEW.test(asked)) sessionStorage.setItem('trezzit-preview-app', asked);
+    const kept = sessionStorage.getItem('trezzit-preview-app');
+    return kept && FRONTEND_PREVIEW.test(kept) ? kept : null;
+  } catch { return null; }
+}
+export const APP = isStagingPreview() ? (previewApp() || 'https://app.staging.trezzit.com') : 'https://app.trezzit.com';
 export const AI_CONSENT_VERSION = '2026-10';
 export const STAGES = ['uploading', 'reading', 'checking', 'done'];
-const MAX_EDGE = 2048;
-const BUDGET_BYTES = 4.5 * 1024 * 1024;
-const TIMEOUT_MS = 60000;
-const POLL_MS = 1500;
 
 export const isLive = () => typeof location !== 'undefined' && (location.origin === LIVE_ORIGIN || isStagingPreview());
 export const prefersReducedMotion = () => typeof matchMedia === 'function'
@@ -141,85 +150,64 @@ async function playSample(id, { onStage, instant, signal, notice }) {
   return result;
 }
 
-/* ---------- live ---------- */
+/* ---------- live: the app's own scan, through its embed ---------- */
 
-async function decode(file) {
-  if (typeof createImageBitmap === 'function') {
-    try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch { /* fall through */ }
+/* The scan embed (Trezzit_Frontend src/embed/scan.ts): the app's scan client, shrinker, mapper and /split
+ * hand-off link in one ES module, served with CORS from the app. Loaded only when a visitor scans a photo. */
+export const EMBED_URL = `${APP}/embed/scan.js`;
+
+let scanner = null;
+/** The embed's scanner for API, loaded once (a failed load is tried again next time). */
+export function loadScanner() {
+  if (!scanner) {
+    scanner = import(EMBED_URL)
+      .then((m) => m.createScanner({ apiBase: API, aiConsent: AI_CONSENT_VERSION }))
+      .catch((err) => { scanner = null; throw err; });
   }
-  const url = URL.createObjectURL(file);
-  try {
-    const img = new Image();
-    img.src = url;
-    await img.decode();
-    return img;
-  } finally { URL.revokeObjectURL(url); }
+  return scanner;
 }
 
-/** Shrink an image to <= 2048 px longest edge, JPEG q0.85 (second pass 1600 px q0.7), under 4.5 MB. */
-export async function prepareImage(file) {
-  if (file.type === 'application/pdf') {
-    if (file.size > BUDGET_BYTES) throw new Error('PDF too large');
-    return file;
-  }
-  const src = await decode(file);
-  const w = src.width; const h = src.height;
-  for (const [edge, q] of [[MAX_EDGE, 0.85], [1600, 0.7]]) {
-    const scale = Math.min(1, edge / Math.max(w, h));
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.round(w * scale); canvas.height = Math.round(h * scale);
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
-    const blob = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', q));
-    if (blob && blob.size <= BUDGET_BYTES) {
-      return new File([blob], (file.name || 'receipt').replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
-    }
-  }
-  throw new Error('Image too large after resizing');
-}
+/** A draft line (scanSse.ts: {n, name, price|null}) as a bill item, for onStage('reading'). */
+const draftItem = (it) => ({ name: it.name, amount: it.price ?? '', quantity: '1', taxPercent: '0', isExtraCharge: false, itemType: 'Item', pending: it.price == null });
 
-async function liveScan(file, { onStage, signal }) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(new DOMException('Timed out', 'TimeoutError')), TIMEOUT_MS);
-  signal?.addEventListener('abort', () => ctrl.abort(signal.reason), { once: true });
-  const s = ctrl.signal;
-  try {
-    onStage?.('uploading', { progress: 0 });
-    const body = new FormData();
-    body.append('files[]', await prepareImage(file));
-    body.append('ai_consent', AI_CONSENT_VERSION);
-    body.append('follow', '1');
-    let res = await fetch(`${API}/api/demo/scan/`, { method: 'POST', body, signal: s, credentials: 'omit' });
-    onStage?.('reading', { items: [] });
-    if (res.status === 202) {
-      const pending = await res.json();
-      const statusUrl = new URL(pending.status_url, API).href;
-      const headers = { 'X-Scan-Token': pending.read_token };
-      for (;;) {
-        await sleep(POLL_MS, s);
-        res = await fetch(statusUrl, { headers, signal: s, credentials: 'omit' });
-        if (res.status !== 202) break;
-      }
-    }
-    if (!res.ok) throw new Error(`Scan failed: HTTP ${res.status}`);
-    const raw = await res.json();
-    if (!pickReceipt(raw) || ['failed', 'error'].includes(raw.status)) throw new Error('No receipt in scan result');
-    const bill = normalizeScan(raw);
-    if (bill.items.length === 0) throw new Error('No items read');
-    onStage?.('reading', { items: bill.items });
-    onStage?.('checking', { validations: bill.backendValidations });
-    const result = { source: 'live', sampleId: null, raw, bill };
-    onStage?.('done', { result });
-    return result;
-  } finally { clearTimeout(timer); }
+async function liveScan(file, embed, { onStage, onDraft, onStatus, onProgress, onConnection, signal }) {
+  onStage?.('uploading', { progress: 0 });
+  const outcome = await embed.scan([file], {
+    signal,
+    onStatus(status) {
+      onStatus?.(status);
+      if (status === 'validating') onStage?.('checking', { validations: [] });
+      else if (status !== 'uploading') onStage?.('reading', {});
+    },
+    onDraft(draft) {
+      onDraft?.(draft);
+      onStage?.('reading', { items: draft.items.map(draftItem), store: draft.store, date: draft.date });
+    },
+    onProgress,
+    onConnection,
+  });
+  const bill = embed.mapResult(outcome.response);
+  onStage?.('checking', { validations: bill.backendValidations });
+  const result = {
+    source: 'live',
+    sampleId: null,
+    raw: outcome.response,
+    bill,
+    scan: { scanId: outcome.scanId, readToken: outcome.readToken, path: outcome.path },
+    // the /split link with this scan in its fragment (#scan=&t=, or #demo= on the old path), built by the app's own code
+    handoff: embed.handoffUrl(outcome, APP),
+  };
+  onStage?.('done', { result });
+  return result;
 }
 
 /* ---------- entry point ---------- */
 
 /**
- * scan(fileOrSampleId, { onStage?, instant?, signal?, live? }) -> Promise<result>
- * `live` defaults to isLive(); forcing it true off trezzit.com will fail CORS and fall back.
+ * scan(fileOrSampleId, { onStage?, onDraft?, onStatus?, onProgress?, onConnection?, instant?, signal?, live? }) -> Promise<result>
+ * `live` defaults to isLive(); forcing it true off trezzit.com will fail CORS.
+ * A live scan that fails rejects with the embed's ScanError ({ code, message, status, retryAfter }; `message` is
+ * the sentence to show; code ABORTED when `signal` stopped it). Only an embed that cannot load falls back to a sample.
  */
 export async function scan(input, opts = {}) {
   if (typeof input === 'string') {
@@ -231,11 +219,12 @@ export async function scan(input, opts = {}) {
   if (!live) {
     return playSample(fallbackId, { ...opts, notice: 'Live scanning runs on trezzit.com, so here is a sample receipt instead.' });
   }
+  let embed;
   try {
-    return await liveScan(input, opts);
+    embed = await loadScanner();
   } catch (err) {
-    if (err?.name === 'AbortError' && opts.signal?.aborted) throw err;
-    console.info('[scan-client] live scan fell back to a sample:', err?.message || err);
-    return playSample(fallbackId, { ...opts, instant: true, notice: "We couldn't read that one just now, so here's a sample receipt instead." });
+    console.info('[scan-client] the scan embed did not load; playing a sample:', err?.message || err);
+    return playSample(fallbackId, { ...opts, instant: true, notice: 'Scanning could not start just now, so this is a sample receipt.' });
   }
+  return liveScan(input, embed, opts);
 }

@@ -37,7 +37,7 @@ const monthEl = document.getElementById('ledger-demo');
 const mountMonth = once(() => Promise.all([import('./month-demo.js'), css('ledger'), css('month')]).then(([m]) => m.mountMonth(monthEl, { demoSearch: 'water', compactPayers: true, findFirst: true })));
 // one receipt runs through the page: step 1 reads Green Basket (or the pharmacy, or your photo), "Split this
 // receipt" hands it to step 2, and step 3 counts your share
-lazy('scan-demo', (el) => { mountGrid(); return Promise.all([import('./scan-demo.js'), css('scan')]).then(([m]) => m.mountScan(el, { samples: ['green-basket', 'corner-pharmacy'], names: { 'green-basket': 'Green Basket' }, kinds: false, own: 'always', splitTarget: '#split', cats: false, fromTop: true, threshold: 0.6 })); });
+lazy('scan-demo', (el) => { mountGrid(); return Promise.all([import('./scan-demo.js'), css('scan')]).then(([m]) => m.mountScan(el, { samples: ['green-basket', 'corner-pharmacy'], names: { 'green-basket': 'Green Basket' }, kinds: false, own: 'always', splitTarget: '#split', soloHref: '/track-spending-without-bank', soloLabel: 'All yours, by category', cats: false, fromTop: true, threshold: 0.6 })); });
 lazy('split-demo', () => mountGrid());
 lazy('ledger-demo', () => mountMonth());
 lazy('chat-demo', (el) => { mountMonth(); return Promise.all([import('./chat-demo.js'), css('chat')]).then(([m]) => m.mountChat(el, { scripts: ['statement'], tools: false, preview: true })); });
