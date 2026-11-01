@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('anim');
+  document.documentElement.classList.add('js');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Split trip expenses with friends, item by item | Trezzit</title>
+<meta name="description" content="Each person pays for what they ordered, plus their part of tax and tip. The whole trip can settle in fewer payments.">
+<link rel="canonical" href="https://trezzit.com/trips">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Trezzit">
+<meta property="og:url" content="https://trezzit.com/trips">
+<meta property="og:title" content="Split trip expenses with friends, item by item">
+<meta property="og:description" content="Each person pays for what they ordered, plus their part of tax and tip. The whole trip can settle in fewer payments.">
+<meta property="og:image" content="https://trezzit.com/assets/og/trips.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A $84.87 dinner at Taqueria Sol split by what each person ordered, tax and tip included: You $27.03, Alex $29.88, Priya $27.96.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Split trip expenses with friends, item by item">
+<meta name="twitter:description" content="Each person pays for what they ordered, plus their part of tax and tip. The whole trip can settle in fewer payments.">
+<meta name="twitter:image" content="https://trezzit.com/assets/og/trips.png">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151517" media="(prefers-color-scheme: dark)">
+<script>
+  // Dark theme: a choice stored by the nav toggle beats the OS setting. Set before first paint, so no flash.
+  (function (d) { var t; try { t = localStorage.getItem('trezzit-theme'); } catch (e) {} if (t !== 'dark' && t !== 'light') return; d.setAttribute('data-theme', t); var m = document.querySelectorAll('meta[name="theme-color"]'); for (var i = 0; i < m.length; i++) m[i].setAttribute('content', t === 'dark' ? '#151517' : '#ffffff'); })(document.documentElement);
+</script>
+<link rel="icon" href="/assets/_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="/assets/_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/_kit/tokens.css">
+<link rel="stylesheet" href="/assets/e/css/c.css">
+<link rel="stylesheet" href="/assets/e/css/demo-grid.css">
+<link rel="stylesheet" href="/assets/e/css/site.css">
+<link rel="modulepreload" href="/assets/e/js/util.js">
+<link rel="modulepreload" href="/assets/e/js/page.js">
+<link rel="modulepreload" href="/assets/e/js/data.js">
+<link rel="modulepreload" href="/assets/e/js/grid-demo.js">
+<link rel="modulepreload" href="/assets/_kit/split-engine.js">
+<link rel="modulepreload" href="/assets/_kit/scan-client.js">
+<link rel="modulepreload" href="/assets/_kit/receipts.js">
+<script type="module" src="/assets/e/js/trips.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Trezzit",
+          "item": "https://trezzit.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Trips",
+          "item": "https://trezzit.com/trips"
+        }
+      ],
+      "@id": "https://trezzit.com/trips#breadcrumb"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I split a dinner bill with tip?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Give each item to whoever had it, then split the tip equally or by what each person ordered."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do my friends need Trezzit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not to start: add them by name, and they join with an invite link when they’re ready."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I split one bill without an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Split a bill with no account at all."
+          }
+        }
+      ],
+      "@id": "https://trezzit.com/trips#faq"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/" aria-label="Trezzit home"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="26" height="26"><span>Trezzit</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="/#how">How it works</a>
+      <a href="/split">Split a bill</a>
+      <a href="/mcp">With AI</a>
+    </nav>
+    <div class="nav-cta">
+      <button type="button" class="theme-tg" data-theme-toggle aria-label="Dark theme" aria-pressed="false"><svg class="i-moon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.2 12.6A6.6 6.6 0 0 1 7.4 3.8a6.6 6.6 0 1 0 8.8 8.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><svg class="i-sun" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.2v2M10 15.8v2M2.2 10h2M15.8 10h2M4.5 4.5l1.4 1.4M14.1 14.1l1.4 1.4M4.5 15.5l1.4-1.4M14.1 5.9l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
+      <a class="c-btn c-btn-sm c-btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="pg pg-uc pg-tr">
+
+<section class="sc-hero sc-hero-demo tr-hero" aria-labelledby="pg-t">
+  <div class="wrap">
+    <div class="sc-copy">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Trezzit</a></li><li><span aria-current="page">Trips</span></li></ol></nav>
+      <h1 id="pg-t">Split a trip or dinner by what you&nbsp;ordered.</h1>
+      <p class="lede">Each friend pays for what they had, tax and tip&nbsp;included.</p>
+      <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Start a trip group</a><a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split" data-app-split>Split one bill, no&nbsp;account</a></div>
+      <p class="micro">Free. No bank login.</p>
+    </div>
+    <div class="sc-side"><div class="demo-frame res-trips" id="split-demo" aria-label="Try it: who had what at Taqueria Sol"><noscript><p class="nojs">Taqueria Sol, $84.87, Alex paid: You $27.03, Alex $29.88, Priya $27.96. Adds up to $84.87.</p></noscript></div></div>
+  </div>
+</section>
+
+<section class="pg-sec" id="weekend" aria-labelledby="wk-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="wk-t">A whole weekend, settled.</h2><p>Four bills, three people, two&nbsp;payments.</p></header>
+    <div class="demo-frame" id="trip-demo" aria-label="Weekend at the lake: four bills and how they settle">
+      <noscript><p class="nojs">Weekend at the lake, four bills, $684.57. Your bank shows the $57.30 you paid. You actually spent $226.93. Simplified: you pay Alex $169.63, Priya pays Alex $165.46.</p></noscript>
+    </div>
+    <details class="ex-d tr-math"><summary>See the math, bill by bill</summary>
+    <div class="tbl tbl-rm tbl-st tbl-tr" tabindex="0" role="region" aria-label="The weekend at the lake, by person">
+      <table>
+        <thead><tr><th scope="col">The weekend</th><th scope="col" class="r">You</th><th scope="col" class="r">Alex</th><th scope="col" class="r">Priya</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Cabin, two nights <span class="money">$480.00</span><small>Alex paid · split 3 ways</small></th><td data-l="You" class="r money">$160.00</td><td data-l="Alex" class="r money">$160.00</td><td data-l="Priya" class="r money">$160.00</td></tr>
+          <tr><th scope="row">Taqueria Sol <span class="money">$84.87</span><small>Alex paid · by item, tip by order</small></th><td data-l="You" class="r money">$27.03</td><td data-l="Alex" class="r money">$29.88</td><td data-l="Priya" class="r money">$27.96</td></tr>
+          <tr><th scope="row">Gas <span class="money">$62.40</span><small>Priya paid · split 3 ways</small></th><td data-l="You" class="r money">$20.80</td><td data-l="Alex" class="r money">$20.80</td><td data-l="Priya" class="r money">$20.80</td></tr>
+          <tr><th scope="row">Cabin groceries <span class="money">$57.30</span><small>You paid · split 3 ways</small></th><td data-l="You" class="r money">$19.10</td><td data-l="Alex" class="r money">$19.10</td><td data-l="Priya" class="r money">$19.10</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><th scope="row">Shares <span class="money">$684.57</span></th><td data-l="You" class="r money">$226.93</td><td data-l="Alex" class="r money">$229.78</td><td data-l="Priya" class="r money">$227.86</td></tr>
+          <tr><th scope="row">Paid</th><td data-l="You" class="r money">$57.30</td><td data-l="Alex" class="r money">$564.87</td><td data-l="Priya" class="r money">$62.40</td></tr>
+          <tr><th scope="row">Balance</th><td data-l="You" class="r money">−$169.63</td><td data-l="Alex" class="r money">+$335.09</td><td data-l="Priya" class="r money">−$165.46</td></tr>
+        </tfoot>
+      </table>
+    </div>
+    </details>
+  </div>
+</section>
+
+<section class="pg-sec" id="how-it-works" aria-labelledby="how-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="how-t">How a trip works in Trezzit.</h2></header>
+    <ol class="pg-steps">
+      <li><h3>One group for the trip.</h3><p>Cabin, gas and dinners: split trip expenses with friends, any group&nbsp;size.</p></li>
+      <li><h3>Every bill, by item.</h3><p>Tap who had what. Tax follows each&nbsp;item.</p></li>
+      <li><h3>Settle in fewer payments.</h3><p>Turn on Simplified and debts combine. Nobody’s total changes.</p></li>
+    </ol>
+  </div>
+</section>
+
+
+<section class="pg-sec" id="faq" aria-labelledby="faq-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="faq-t">Questions.</h2></header>
+    <div class="faq">
+      <details><summary>How do I split a dinner bill with tip?</summary><p>Give each item to whoever had it, then split the tip equally or by what each person ordered.</p></details>
+      <details><summary>Do my friends need Trezzit?</summary><p>Not to start: add them by name, and they join with an invite link when they’re ready.</p></details>
+      <details><summary>Can I split one bill without an account?</summary><p>Yes. <a href="/split">Split a bill</a> with no account at all.</p></details>
+    </div>
+    <p class="pg-more">Paying for something every month? <a href="/recurring">Split recurring bills</a></p>
+  </div>
+</section>
+
+<section class="close close-end pg-close" aria-label="Get started">
+  <div class="wrap">
+    <p class="close-h">Everyone pays for what they&nbsp;had.</p>
+    <div class="cta-row"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Start a trip group</a></div>
+    <p class="micro">Free. No bank login.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="/"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="22" height="22"><span>Trezzit</span></a>
+      <nav aria-label="Footer">
+        <div><p class="foot-h">Trezzit</p><ul role="list"><li><a href="/split">Split a bill</a></li><li><a href="/splitwise-alternative">Coming from Splitwise</a></li><li><a href="/mcp">With Claude or ChatGPT</a></li></ul></div>
+        <div><p class="foot-h">Use cases</p><ul role="list"><li><a href="/roommates">Roommates</a></li><li><a href="/trips" aria-current="page">Trips</a></li><li><a href="/recurring">Recurring bills</a></li><li><a href="/track-spending-without-bank">Your own spending</a></li></ul></div>
+        <div><p class="foot-h">App</p><ul role="list"><li><a href="https://app.trezzit.com/signup">Sign up</a></li><li><a href="https://app.trezzit.com/login">Log in</a></li><li><a href="/support">Support</a></li></ul></div>
+        <div><p class="foot-h">Legal</p><ul role="list"><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="/your-data">Your data</a></li><li><a href="/delete-account">Delete account</a></li></ul></div>
+      </nav>
+    </div>
+    <p class="foot-legal">Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a> · <a href="https://instagram.com/trezzit_app" rel="noopener">Instagram</a> · <a href="https://www.linkedin.com/in/namany" rel="noopener">LinkedIn</a></p>
+    <p class="foot-legal">Claude, ChatGPT and Splitwise are trademarks of their owners. Trezzit is not affiliated with or endorsed by them.</p>
+  </div>
+</footer>
+</body>
+</html>

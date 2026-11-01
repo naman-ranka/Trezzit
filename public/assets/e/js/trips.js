@@ -1,5 +1,8 @@
-/* trips page: the taqueria split with a tip toggle, and a whole weekend settled */
+/* /trips: the taqueria split with a tip toggle (hero), then the whole weekend settled. The settle-up is the app's
+ * Simplified debt view (a group setting, off by default): the same greedy pass over each person's net as the
+ * backend's GroupBalanceService._generate_simplified_pairwise_structure, so its rows are what the app would show. */
 import { initPage } from './page.js';
+import { APP } from '../../_kit/scan-client.js';
 import { mountGrid } from './grid-demo.js';
 import { splitAmount } from '../../_kit/split-engine.js';
 import { splitSample } from '../../_kit/receipts.js';
@@ -7,6 +10,8 @@ import { PEOPLE, getSample, sampleBill } from './data.js';
 import { money, countMoney, esc, YOU_GLYPH } from './util.js';
 
 initPage();
+// "Split a bill, no account" opens the app's /split (the staging app on a preview of this site)
+document.querySelectorAll('a[data-app-split]').forEach((a) => { a.href = `${APP}/split`; });
 const TRIO = ['you', 'alex', 'priya'];
 // the same tap grid as home (one way to say who had what), with the tip control above it. Every tap or tip flip feeds the weekend below, so the two demos never disagree.
 let taqLive = null;
@@ -14,7 +19,7 @@ let setTaq = null;
 mountGrid(document.getElementById('split-demo'), {
   sampleId: 'taqueria-sol', payer: 'alex', tipToggle: true,
   onChange: (r, st) => {
-    taqLive = { shares: Object.fromEntries(TRIO.map((p) => [p, r.people[p]?.cents || 0])), note: st.tipMode === 'equal' ? 'By item, tip equally' : 'By item, tip in proportion' };
+    taqLive = { shares: Object.fromEntries(TRIO.map((p) => [p, r.people[p]?.cents || 0])), note: st.tipMode === 'equal' ? 'By item, tip equally' : 'By item, tip by order' };
     setTaq?.(taqLive);
   },
 });
@@ -28,7 +33,7 @@ async function tripDemo(root) {
   const eqShares = (c) => splitAmount(c, { type: 'equal', people: TRIO }, TRIO).shares;
   const bills = [
     { id: 'cabin', title: 'Cabin, two nights', payer: 'alex', cents: 48000, shares: eqShares(48000), note: 'Split 3 ways' },
-    { id: 'taq', title: 'Taqueria Sol', payer: 'alex', cents: taq.totalCents, shares: Object.fromEntries(TRIO.map((p) => [p, taq.people[p].cents])), note: 'By item, tip in proportion' },
+    { id: 'taq', title: 'Taqueria Sol', payer: 'alex', cents: taq.totalCents, shares: Object.fromEntries(TRIO.map((p) => [p, taq.people[p].cents])), note: 'By item, tip by order' },
     { id: 'gas', title: 'Gas', payer: 'priya', cents: 6240, shares: eqShares(6240), note: 'Split 3 ways' },
     { id: 'food', title: 'Cabin groceries', payer: 'you', cents: 5730, shares: eqShares(5730), note: 'Split 3 ways' },
   ];
@@ -47,8 +52,9 @@ async function tripDemo(root) {
         <p><span>You paid</span><b class="money" data-k="paid"></b></p>
         <p><span>You spent</span><b class="money" data-k="spent"></b></p>
       </div>
+      <p class="trip-msg">Your bank shows <span data-k="paid-t"></span>. You actually spent <b class="money" data-k="spent-t"></b>.</p>
       <div class="settle">
-        <h3>Settle up</h3>
+        <h3>Settle up <span class="settle-tag">Simplified</span></h3>
         <ul role="list" aria-live="polite"></ul>
         <p class="settle-n"></p>
       </div>
@@ -91,6 +97,9 @@ async function tripDemo(root) {
     paidEl.dataset.c = paid; spentEl.dataset.c = spent;
     countMoney(paidEl, prevPaid, paid, first ? 0 : 400);
     countMoney(spentEl, prevSpent, spent, first ? 0 : 400);
+    // the bank's view against yours, in one line, from the same two figures
+    root.querySelector('[data-k="paid-t"]').innerHTML = paid ? `the <b class="money">${money(paid)}</b> you paid` : 'nothing you paid';
+    root.querySelector('[data-k="spent-t"]').textContent = money(spent);
   }
   const noteEl = root.querySelector('.settle-n');
   let noteT = 0;

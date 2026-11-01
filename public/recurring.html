@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('anim');
+  document.documentElement.classList.add('js');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Split recurring bills and subscriptions | Trezzit</title>
+<meta name="description" content="Rent, utilities and subscriptions repeat with their split. Each one adds itself on its due date, or waits for you.">
+<link rel="canonical" href="https://trezzit.com/recurring">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Trezzit">
+<meta property="og:url" content="https://trezzit.com/recurring">
+<meta property="og:title" content="Split recurring bills and subscriptions">
+<meta property="og:description" content="Rent, utilities and subscriptions repeat with their split. Each one adds itself on its due date, or waits for you.">
+<meta property="og:image" content="https://trezzit.com/assets/og/recurring.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Coming up: monthly rent on Nov 1, your share $639.35; Netflix on Nov 12, $4.50; a gym membership on Nov 15, $39.00.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Split recurring bills and subscriptions">
+<meta name="twitter:description" content="Rent, utilities and subscriptions repeat with their split. Each one adds itself on its due date, or waits for you.">
+<meta name="twitter:image" content="https://trezzit.com/assets/og/recurring.png">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151517" media="(prefers-color-scheme: dark)">
+<script>
+  // Dark theme: a choice stored by the nav toggle beats the OS setting. Set before first paint, so no flash.
+  (function (d) { var t; try { t = localStorage.getItem('trezzit-theme'); } catch (e) {} if (t !== 'dark' && t !== 'light') return; d.setAttribute('data-theme', t); var m = document.querySelectorAll('meta[name="theme-color"]'); for (var i = 0; i < m.length; i++) m[i].setAttribute('content', t === 'dark' ? '#151517' : '#ffffff'); })(document.documentElement);
+</script>
+<link rel="icon" href="/assets/_kit/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/_kit/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/_kit/brand/apple-touch-icon.png">
+<link rel="preload" href="/assets/_kit/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/_kit/tokens.css">
+<link rel="stylesheet" href="/assets/e/css/c.css">
+<link rel="stylesheet" href="/assets/e/css/demo-rent.css">
+<link rel="stylesheet" href="/assets/e/css/site.css">
+<link rel="modulepreload" href="/assets/e/js/util.js">
+<link rel="modulepreload" href="/assets/e/js/page.js">
+<link rel="modulepreload" href="/assets/e/js/data.js">
+<link rel="modulepreload" href="/assets/e/js/rent-demo.js">
+<link rel="modulepreload" href="/assets/_kit/split-engine.js">
+<link rel="modulepreload" href="/assets/_kit/scan-client.js">
+<link rel="modulepreload" href="/assets/_kit/receipts.js">
+<script type="module" src="/assets/e/js/recurring.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Trezzit",
+          "item": "https://trezzit.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Recurring bills",
+          "item": "https://trezzit.com/recurring"
+        }
+      ],
+      "@id": "https://trezzit.com/recurring#breadcrumb"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I split Netflix or Spotify with friends?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Add it to a group, split it, and make it repeat monthly."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can roommates split utilities that change each month?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Set it to Remind me and check the amount before it’s added."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do my friends need Trezzit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not to start: add them by name, and they join with an invite link when they’re ready."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it only for shared bills?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. A gym membership or a phone plan can repeat in your own spending, just yours."
+          }
+        }
+      ],
+      "@id": "https://trezzit.com/recurring#faq"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="/" aria-label="Trezzit home"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="26" height="26"><span>Trezzit</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="/#how">How it works</a>
+      <a href="/split">Split a bill</a>
+      <a href="/mcp">With AI</a>
+    </nav>
+    <div class="nav-cta">
+      <button type="button" class="theme-tg" data-theme-toggle aria-label="Dark theme" aria-pressed="false"><svg class="i-moon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.2 12.6A6.6 6.6 0 0 1 7.4 3.8a6.6 6.6 0 1 0 8.8 8.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><svg class="i-sun" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.2v2M10 15.8v2M2.2 10h2M15.8 10h2M4.5 4.5l1.4 1.4M14.1 14.1l1.4 1.4M4.5 15.5l1.4-1.4M14.1 5.9l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <a class="nav-login" href="https://app.trezzit.com/login">Log in</a>
+      <a class="c-btn c-btn-sm c-btn-primary" href="https://app.trezzit.com/signup">Sign up</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="pg pg-uc pg-rc">
+
+<section class="sc-hero sc-hero-demo rc-hero" aria-labelledby="pg-t">
+  <div class="wrap">
+    <div class="sc-copy">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Trezzit</a></li><li><span aria-current="page">Recurring bills</span></li></ol></nav>
+      <h1 id="pg-t">Rent, bills and subscriptions, split&nbsp;once.</h1>
+      <p class="lede">Every month, already filled&nbsp;in.</p>
+      <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Set up a repeating bill</a></div>
+      <p class="micro">Free. No bank login.</p>
+    </div>
+    <div class="sc-side"><div class="demo-frame" id="rec-side" aria-label="Coming up: your repeating bills"><noscript><p class="nojs">Coming up: Nov 1, monthly rent, your share $639.35. Nov 8, Spotify, $5.00. Nov 12, Netflix, $4.50. Nov 15, gym membership, $39.00. Nov 20, electricity, the amount varies, Remind me.</p></noscript></div><p class="side-note">Your bank shows the <b class="money">$19.99</b> you pay for Spotify. Your spending shows your&nbsp;<b class="money">$5.00</b>.</p>
+    <details class="ex-d"><summary>See the math</summary>
+    <div class="tbl tbl-rm tbl-st tbl-rc" tabindex="0" role="region" aria-label="Two subscriptions split four ways">
+      <table>
+        <thead><tr><th scope="col">Each month</th><th scope="col" class="r">You</th><th scope="col" class="r">Maya</th><th scope="col" class="r">Jordan</th><th scope="col" class="r">Sam</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Netflix <span class="money">$17.99</span><small>Maya pays · equally</small></th><td data-l="You" class="r money">$4.50</td><td data-l="Maya" class="r money">$4.50</td><td data-l="Jordan" class="r money">$4.50</td><td data-l="Sam" class="r money">$4.49</td></tr>
+          <tr><th scope="row">Spotify <span class="money">$19.99</span><small>You pay · equally</small></th><td data-l="You" class="r money">$5.00</td><td data-l="Maya" class="r money">$5.00</td><td data-l="Jordan" class="r money">$5.00</td><td data-l="Sam" class="r money">$4.99</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ex-note">Neither splits evenly four ways, so one share is a cent less. Every month still adds up to exactly $17.99 and&nbsp;$19.99.</p>
+    </details></div>
+  </div>
+</section>
+
+<section class="pg-sec" id="rent" aria-labelledby="rent-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="rent-t">Rent went up? Change it once.</h2><p>Every share follows, to the cent, in the months it adds next.</p></header>
+    <div class="rent-card"><div class="demo-frame" id="rec-demo" aria-label="Try it: the monthly rent for Apartment 3B"><noscript><p class="nojs">Monthly rent and bills, $2,632.40: You $639.35, Maya $639.35, Jordan $786.35, Sam $567.35.</p></noscript></div></div>
+  </div>
+</section>
+
+<section class="pg-sec" id="how-it-works" aria-labelledby="how-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="how-t">How repeating bills work.</h2></header>
+    <ol class="pg-steps">
+      <li><h3>Any bill can repeat.</h3><p>Weekly, monthly, quarterly or yearly. The split comes with it.</p></li>
+      <li><h3>Auto or Remind me.</h3><p>Auto adds it on the due date. Remind me waits for you to check it.</p></li>
+      <li><h3>Skip a month, or end it.</h3><p>Skip a month nobody paid. Ending keeps every month it already added.</p></li>
+    </ol>
+  </div>
+</section>
+
+
+<section class="pg-sec" id="faq" aria-labelledby="faq-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="faq-t">Questions.</h2></header>
+    <div class="faq">
+      <details><summary>Can I split Netflix or Spotify with friends?</summary><p>Yes. Add it to a group, split it, and make it repeat monthly.</p></details>
+      <details><summary>Can roommates split utilities that change each month?</summary><p>Yes. Set it to Remind me and check the amount before it’s added.</p></details>
+      <details><summary>Do my friends need Trezzit?</summary><p>Not to start: add them by name, and they join with an invite link when they’re ready.</p></details>
+      <details><summary>Is it only for shared bills?</summary><p>No. A gym membership or a phone plan can repeat in your own spending, just yours.</p></details>
+    </div>
+    <p class="pg-more">Sharing a place? <a href="/roommates">Split rent and groceries with roommates</a></p>
+  </div>
+</section>
+
+<section class="close close-end pg-close" aria-label="Get started">
+  <div class="wrap">
+    <p class="close-h">Set it once. Split every&nbsp;month.</p>
+    <div class="cta-row"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Set up a repeating bill</a></div>
+    <p class="micro">Free. No bank login.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="/"><img src="/assets/_kit/brand/trezzit-mark.svg" alt="" width="22" height="22"><span>Trezzit</span></a>
+      <nav aria-label="Footer">
+        <div><p class="foot-h">Trezzit</p><ul role="list"><li><a href="/split">Split a bill</a></li><li><a href="/splitwise-alternative">Coming from Splitwise</a></li><li><a href="/mcp">With Claude or ChatGPT</a></li></ul></div>
+        <div><p class="foot-h">Use cases</p><ul role="list"><li><a href="/roommates">Roommates</a></li><li><a href="/trips">Trips</a></li><li><a href="/recurring" aria-current="page">Recurring bills</a></li><li><a href="/track-spending-without-bank">Your own spending</a></li></ul></div>
+        <div><p class="foot-h">App</p><ul role="list"><li><a href="https://app.trezzit.com/signup">Sign up</a></li><li><a href="https://app.trezzit.com/login">Log in</a></li><li><a href="/support">Support</a></li></ul></div>
+        <div><p class="foot-h">Legal</p><ul role="list"><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li><li><a href="/your-data">Your data</a></li><li><a href="/delete-account">Delete account</a></li></ul></div>
+      </nav>
+    </div>
+    <p class="foot-legal">Trezzit LLC · <a href="mailto:support@trezzit.com">support@trezzit.com</a> · <a href="https://instagram.com/trezzit_app" rel="noopener">Instagram</a> · <a href="https://www.linkedin.com/in/namany" rel="noopener">LinkedIn</a></p>
+    <p class="foot-legal">Claude, ChatGPT, Netflix, Spotify and Splitwise are trademarks of their owners. Trezzit is not affiliated with or endorsed by them.</p>
+  </div>
+</footer>
+</body>
+</html>
