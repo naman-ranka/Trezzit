@@ -76,15 +76,7 @@
           "name": "How do I split a dinner bill with tip?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Give each item to whoever had it. Tax follows each item, and the tip is split in proportion to what each person ordered, or equally if you prefer."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What if everyone ordered something different?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "That’s what splitting by item is for. Any item can also be split by shares, by percentage or by exact amounts, so two people can share a starter while a third pays only for their own."
+            "text": "Give each item to whoever had it. Tax follows each item. The tip splits equally, or in proportion to what each person ordered, with one tap."
           }
         },
         {
@@ -105,26 +97,10 @@
         },
         {
           "@type": "Question",
-          "name": "Can a trip settle in fewer payments?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Turn on Simplified in the group’s balances. Debts are combined so the group settles in fewer payments, and nobody’s total changes."
-          }
-        },
-        {
-          "@type": "Question",
           "name": "What currency does a trip use?",
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "The one you pick when you create the group. Every bill in the group uses it, and Trezzit doesn’t convert between currencies."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Does a dinner a friend paid for count in my spending?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, at your share. When Alex pays for dinner, your part of it still counts in what you spent."
           }
         },
         {
@@ -167,11 +143,10 @@
   <div class="wrap">
     <div class="sc-copy">
       <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Trezzit</a></li><li><span aria-current="page">Trips</span></li></ol></nav>
-      <h1 id="pg-t">Split the trip with friends. Tip by what you&nbsp;ordered.</h1>
-      <p class="lede">Alex paid $84.87 for dinner. Your part, tax and tip included, is&nbsp;$27.03.</p>
-      <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Start a trip group</a></div>
+      <h1 id="pg-t">Split a trip or dinner by what you&nbsp;ordered.</h1>
+      <p class="lede">Each friend pays for what they had, tax and tip included. In this example, your part is&nbsp;<span data-taq-you>$27.03</span>.</p>
+      <div class="cta-row cta-left"><a class="c-btn c-btn-primary c-btn-lg" href="https://app.trezzit.com/signup">Start a trip group</a><a class="c-btn c-btn-quiet c-btn-lg" href="https://app.trezzit.com/split" data-app-split>Split one bill now, no account</a></div>
       <p class="micro">Free. No bank login.</p>
-      <p class="micro uc-one">Just one dinner? <a href="https://app.trezzit.com/split" data-app-split>Split a bill, no account <span aria-hidden="true">→</span></a></p>
     </div>
     <div class="sc-side"><div class="demo-frame res-trips" id="split-demo" aria-label="Try it: who had what at Taqueria Sol"><noscript><p class="nojs">Taqueria Sol, $84.87, Alex paid: You $27.03, Alex $29.88, Priya $27.96. Adds up to $84.87.</p></noscript></div></div>
   </div>
@@ -179,28 +154,11 @@
 
 <section class="pg-sec" id="weekend" aria-labelledby="wk-t">
   <div class="wrap">
-    <header class="sh"><h2 id="wk-t">A whole weekend, settled.</h2><p>Four bills, three people, two payments.</p></header>
+    <header class="sh"><h2 id="wk-t">A whole weekend, settled.</h2><p>Four bills, three people, two payments with Simplified&nbsp;on.</p></header>
     <div class="demo-frame" id="trip-demo" aria-label="Weekend at the lake: four bills and how they settle">
-      <noscript><p class="nojs">Weekend at the lake, four bills, $684.57. Simplified: you pay Alex $169.63, Priya pays Alex $165.46.</p></noscript>
+      <noscript><p class="nojs">Weekend at the lake, four bills, $684.57. Your bank shows the $57.30 you paid. You actually spent $226.93. Simplified: you pay Alex $169.63, Priya pays Alex $165.46.</p></noscript>
     </div>
-  </div>
-</section>
-
-<section class="pg-sec" id="how-it-works" aria-labelledby="how-t">
-  <div class="wrap">
-    <header class="sh"><h2 id="how-t">How a trip works in Trezzit.</h2></header>
-    <ol class="pg-steps">
-      <li><h3>One group for the trip.</h3><p>Add friends by name. They join with an invite link when they’re ready.</p></li>
-      <li><h3>Every bill, by item.</h3><p>Tap who had what. Tax follows each item, and the tip goes in proportion or equally.</p></li>
-      <li><h3>Fewer payments at the end.</h3><p>Turn on Simplified and debts combine. Nobody’s total changes.</p></li>
-    </ol>
-  </div>
-</section>
-
-<section class="pg-sec" id="example" aria-labelledby="ex-t">
-  <div class="wrap">
-    <header class="sh"><h2 id="ex-t">A worked example.</h2><p>The weekend at the lake, bill by bill.</p></header>
-    <details class="ex-d"><summary>See the math</summary>
+    <details class="ex-d tr-math"><summary>See the math, bill by bill</summary>
     <div class="tbl tbl-rm tbl-st tbl-tr" tabindex="0" role="region" aria-label="The weekend at the lake, by person">
       <table>
         <thead><tr><th scope="col">The weekend</th><th scope="col" class="r">You</th><th scope="col" class="r">Alex</th><th scope="col" class="r">Priya</th></tr></thead>
@@ -221,17 +179,26 @@
   </div>
 </section>
 
+<section class="pg-sec" id="how-it-works" aria-labelledby="how-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="how-t">How a trip works in Trezzit.</h2></header>
+    <ol class="pg-steps">
+      <li><h3>One group for the trip.</h3><p>Any group size. Add friends by name; they join with an invite link when they’re ready.</p></li>
+      <li><h3>Every bill, by item.</h3><p>Tap who had what. Tax follows each item; the tip splits equally or in proportion.</p></li>
+      <li><h3>Settle in fewer payments.</h3><p>Turn on Simplified and debts combine. Nobody’s total changes.</p></li>
+    </ol>
+  </div>
+</section>
+
+
 <section class="pg-sec" id="faq" aria-labelledby="faq-t">
   <div class="wrap">
     <header class="sh"><h2 id="faq-t">Questions.</h2></header>
     <div class="faq">
-      <details><summary>How do I split a dinner bill with tip?</summary><p>Give each item to whoever had it. Tax follows each item, and the tip is split in proportion to what each person ordered, or equally if you prefer.</p></details>
-      <details><summary>What if everyone ordered something different?</summary><p>That’s what splitting by item is for. Any item can also be split by shares, by percentage or by exact amounts, so two people can share a starter while a third pays only for their own.</p></details>
+      <details><summary>How do I split a dinner bill with tip?</summary><p>Give each item to whoever had it. Tax follows each item. The tip splits equally, or in proportion to what each person ordered, with one tap.</p></details>
       <details><summary>Can I scan the receipt?</summary><p>Yes. When you scan a receipt with AI features on, the photo is sent to Google Gemini to read it, and a small sample of scans is reviewed with Anthropic’s Claude to improve accuracy. AI features stay off until you turn them on. See the <a href="/privacy">privacy policy</a>.</p></details>
       <details><summary>Do my friends need Trezzit?</summary><p>Not to start. Add them by name and split with them right away. When they’re ready, they join with an invite link, and the bills you added with them move to their account.</p></details>
-      <details><summary>Can a trip settle in fewer payments?</summary><p>Yes. Turn on Simplified in the group’s balances. Debts are combined so the group settles in fewer payments, and nobody’s total changes.</p></details>
       <details><summary>What currency does a trip use?</summary><p>The one you pick when you create the group. Every bill in the group uses it, and Trezzit doesn’t convert between currencies.</p></details>
-      <details><summary>Does a dinner a friend paid for count in my spending?</summary><p>Yes, at your share. When Alex pays for dinner, your part of it still counts in what you spent.</p></details>
       <details><summary>Does Trezzit move money?</summary><p>No, and it never asks for a bank login. You pay each other however you already do, then record the payment in Trezzit.</p></details>
     </div>
     <p class="pg-more">Paying for something every month? <a href="/recurring">Split recurring bills</a></p>

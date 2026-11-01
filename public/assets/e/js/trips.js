@@ -21,6 +21,8 @@ mountGrid(document.getElementById('split-demo'), {
   onChange: (r, st) => {
     taqLive = { shares: Object.fromEntries(TRIO.map((p) => [p, r.people[p]?.cents || 0])), note: st.tipMode === 'equal' ? 'By item, tip equally' : 'By item, tip in proportion' };
     setTaq?.(taqLive);
+    // the hero's "your part is $27.03" is the grid's live figure, so the line beside the demo never disagrees with it
+    document.querySelectorAll('[data-taq-you]').forEach((el) => { el.textContent = money(taqLive.shares.you); });
   },
 });
 
@@ -52,6 +54,7 @@ async function tripDemo(root) {
         <p><span>You paid</span><b class="money" data-k="paid"></b></p>
         <p><span>You spent</span><b class="money" data-k="spent"></b></p>
       </div>
+      <p class="trip-msg">Your bank shows <span data-k="paid-t"></span>. You actually spent <b class="money" data-k="spent-t"></b>.</p>
       <div class="settle">
         <h3>Settle up <span class="settle-tag">Simplified</span></h3>
         <ul role="list" aria-live="polite"></ul>
@@ -96,6 +99,9 @@ async function tripDemo(root) {
     paidEl.dataset.c = paid; spentEl.dataset.c = spent;
     countMoney(paidEl, prevPaid, paid, first ? 0 : 400);
     countMoney(spentEl, prevSpent, spent, first ? 0 : 400);
+    // the bank's view against yours, in one line, from the same two figures
+    root.querySelector('[data-k="paid-t"]').innerHTML = paid ? `the <b class="money">${money(paid)}</b> you paid` : 'nothing you paid';
+    root.querySelector('[data-k="spent-t"]').textContent = money(spent);
   }
   const noteEl = root.querySelector('.settle-n');
   let noteT = 0;

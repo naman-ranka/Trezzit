@@ -452,3 +452,100 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
   .tbl-st th small { display: block; }
   .tbl-rc { --cols: 4; }
 }
+
+/* ---------- release 3, review round 1 ---------- */
+/* /trips hero: the primary action and the dinner-right-now one side by side; on phones each takes the row */
+@media (max-width: 519px) {
+  .tr-hero .cta-row .c-btn { flex: 1 1 100%; }
+}
+/* /trips weekend: "You paid" and "You spent" are one tile style; the bank line sits under them; the settle-up
+   card is as tall as its rows */
+.trip-you p, .trip-you p:last-child { background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+.trip-you p span, .trip-you p:last-child span { color: var(--muted); }
+.trip-you p b, .trip-you p:last-child b { color: var(--ink); }
+.trip > .trip-side, .trip-side > .settle { align-self: start; }
+.trip-msg { margin: -4px 0 0; font-size: var(--t-sm); line-height: 1.45; color: var(--muted); }
+.trip-msg b { color: var(--ink); font-weight: 600; }
+.tr-math { margin-top: 16px; }
+/* /trips phones: each item's name takes the row's first line, its price and dots the second (rows half as tall) */
+@media (max-width: 479px) {
+  #split-demo.tg .tg-rows > .tg-row { grid-template-rows: auto auto; row-gap: 0; padding: 8px 0 2px; min-height: 0; }
+  #split-demo.tg .tg-rows > .tg-row > .tg-nm { grid-column: 1 / -1; grid-row: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--t-sm); padding-right: 0; }
+  #split-demo.tg .tg-rows > .tg-row > .tg-nm > span { overflow: hidden; text-overflow: ellipsis; }
+  #split-demo.tg .tg-rows > .tg-row > .tg-pr { grid-column: 1; grid-row: 2; align-self: center; padding-left: 0; }
+  #split-demo.tg .tg-rows > .tg-row > .tg-dc { grid-row: 2; margin-top: -4px; }
+  #split-demo.tg .tg-rows > .tg-row .tg-dot { height: 40px; }
+  #split-demo.tg .tg-rows > .tg-row .tg-nm > .tg-cat { display: none; }
+}
+/* /recurring: the bank's view of a subscription against yours, one line under "Coming up" */
+.side-note { margin-top: 14px; font-size: var(--t-sm); line-height: 1.45; color: var(--muted); max-width: var(--measure); }
+/* "Coming up": the rent's two sub-lines and two mode tags share one cell; only the current one shows, so a flip of
+   the mode never moves the row, the toggle or anything under them */
+.up-alt { display: inline-grid; }
+.up-alt > span { grid-area: 1 / 1; }
+.up-how .up-alt { justify-items: end; }
+.up-alt[data-show='auto'] > [data-v='review'], .up-alt[data-show='review'] > [data-v='auto'] { visibility: hidden; }
+.up-row { column-gap: 12px; }
+.up-row > span:nth-child(2) { min-width: 0; }
+.up-row > span:nth-child(2) > b { overflow-wrap: anywhere; }
+.up-r { white-space: nowrap; }
+@media (max-width: 399px) {
+  .up-row, .up-row:has(.up-r) { grid-template-columns: 34px minmax(0, 1fr) auto; column-gap: 8px; padding-inline: 10px; }
+  .up-row .mr-d, .up-row .mr-d:not(#x) { width: 34px; min-width: 34px; }
+  .up-row .mr-d small { letter-spacing: .02em; }
+  .up-row .up-r b, .up-row > span:nth-child(2) > b { font-size: var(--t-sm); }
+  .up-row .up-how { font-size: var(--t-xs); }
+}
+@media (max-width: 379px) {
+  .tr-hero .cta-row .c-btn { padding-inline: 14px; white-space: normal; }
+}
+/* the rent card fills the frame from 1000px: the bill on the left, the four shares beside it (no empty band) */
+#rec-demo { margin-inline: auto; }
+@media (min-width: 1000px) {
+  #rec-demo { max-width: none; }
+  #rec-demo .rec-sched { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); column-gap: clamp(32px, 4vw, 56px); align-items: start; }
+  #rec-demo .rec-sched > * { grid-column: 1; }
+  #rec-demo .rec-sched > .rec-shares { grid-column: 2; grid-row: 1 / span 3; align-self: start; margin-top: 4px; }
+  #rec-demo ul.rec-shares { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px; }
+  #rec-demo .rec-shares .sp-person { padding: 14px; border-radius: var(--r-md); box-shadow: inset 0 0 0 1px var(--line); }
+}
+/* the rent field: dashed underline at rest where there is no hover, and a focus ring on the whole field */
+.rec-edit .money-in-field:focus-within { box-shadow: var(--focus-ring); border-radius: var(--r-sm); }
+/* release 3 round 1: reserved demo heights, re-measured per pixel 320-1300 and every 10px to 1920, in both tip
+   modes and both rent modes (the tallest of the two), so nothing below moves on load or on a tap */
+main #split-demo.res-trips { min-height: 829px; }
+@media (min-width: 420px) { main #split-demo.res-trips { min-height: 799px; } }
+@media (min-width: 480px) { main #split-demo.res-trips { min-height: 740px; } }
+@media (min-width: 600px) { main #split-demo.res-trips { min-height: 756px; } }
+@media (min-width: 640px) { main #split-demo.res-trips { min-height: 719px; } }
+main #trip-demo { min-height: 897px; }
+@media (min-width: 327px) { main #trip-demo { min-height: 873px; } }
+@media (min-width: 328px) { main #trip-demo { min-height: 847px; } }
+@media (min-width: 349px) { main #trip-demo { min-height: 824px; } }
+@media (min-width: 357px) { main #trip-demo { min-height: 798px; } }
+@media (min-width: 361px) { main #trip-demo { min-height: 774px; } }
+@media (min-width: 369px) { main #trip-demo { min-height: 751px; } }
+@media (min-width: 402px) { main #trip-demo { min-height: 724px; } }
+@media (min-width: 445px) { main #trip-demo { min-height: 701px; } }
+@media (min-width: 529px) { main #trip-demo { min-height: 679px; } }
+@media (min-width: 600px) { main #trip-demo { min-height: 695px; } }
+@media (min-width: 900px) { main #trip-demo { min-height: 426px; } }
+@media (min-width: 1105px) { main #trip-demo { min-height: 404px; } }
+@media (min-width: 1200px) { main #trip-demo { min-height: 414px; } }
+main #rec-side { min-height: 764px; }
+@media (min-width: 328px) { main #rec-side { min-height: 738px; } }
+@media (min-width: 335px) { main #rec-side { min-height: 715px; } }
+@media (min-width: 342px) { main #rec-side { min-height: 692px; } }
+@media (min-width: 354px) { main #rec-side { min-height: 669px; } }
+@media (min-width: 383px) { main #rec-side { min-height: 638px; } }
+@media (min-width: 384px) { main #rec-side { min-height: 615px; } }
+@media (min-width: 387px) { main #rec-side { min-height: 592px; } }
+@media (min-width: 400px) { main #rec-side { min-height: 638px; } }
+@media (min-width: 417px) { main #rec-side { min-height: 619px; } }
+@media (min-width: 420px) { main #rec-side { min-height: 599px; } }
+@media (min-width: 600px) { main #rec-side { min-height: 615px; } }
+main #rec-demo { min-height: 703px; }
+@media (min-width: 377px) { main #rec-demo { min-height: 686px; } }
+@media (min-width: 490px) { main #rec-demo { min-height: 665px; } }
+@media (min-width: 600px) { main #rec-demo { min-height: 683px; } }
+@media (min-width: 1000px) { main #rec-demo { min-height: 573px; } }

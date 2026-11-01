@@ -31,6 +31,7 @@ function compute() {
 }
 
 const flix = distributeEqually(1799, 4); // Netflix Standard, Maya pays
+const spot = distributeEqually(1999, 4); // Spotify Premium Family, you pay
 // the mode toggle sits under the one row it changes (the next rent), not above the list
 const MODE = `<li class="rec-mode"><span id="mode-l">Rent on the 1st</span>
       <div class="seg" role="radiogroup" aria-labelledby="mode-l">
@@ -94,24 +95,21 @@ function render() {
   opts.onChange?.(r);
   if (opts.compact) { prev = r; return; }
   const you = r.people.you.cents;
-  // the control under Nov 1 says how rent arrives; the rows after it carry no repeated status
-  // the app's two modes, in its words (Auto / Remind me): Auto adds the bill on its date, Remind me waits for you
-  // like the app's rows, only Auto is marked (it is the state where money appears without you)
-  const how = mode === 'auto' ? 'Auto' : '';
-  const rows = [
-    ['Nov', 1, 'Monthly rent', mode === 'auto' ? 'Your share · adds itself' : 'Your share · waits for you', money(you), how],
-    ['Nov', 12, 'Netflix', 'Maya pays · split 4 ways', money(flix[0]), ''],
-    ['Nov', 15, 'Gym membership', 'Just you', '$39.00', ''],
-    ['Dec', 1, 'Monthly rent', 'Your share', money(you), how],
-  ].map(([m, d, t, s, a, k]) => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><span class="up-r"><b class="money">${a}</b>${k ? `<span class="up-how">${k}</span>` : ''}</span></li>`);
-  // the toggle is drawn once, then kept (re-rendering it would drop keyboard focus)
+  // the rows are drawn once and then only their figures change, so nothing in the list moves when the mode flips:
+  // both wordings of the rent's sub-line and both mode tags share one grid cell, and only the current one is visible
   if (!upEl.querySelector('.rec-mode')) {
-    upEl.innerHTML = rows[0] + MODE + rows.slice(1).join('');
+    const row = (m, d, t, s, a, k = '') => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b><small>${s}</small></span><span class="up-r"><b class="money">${a}</b>${k}</span></li>`;
+    const both = (a, b) => `<span class="up-alt" data-alt><span data-v="auto">${a}</span><span data-v="review">${b}</span></span>`;
+    upEl.innerHTML = row('Nov', 1, 'Monthly rent', both('Your share · adds itself', 'Your share · waits for you'), '<span data-k="rent-you"></span>', `<span class="up-how">${both('Auto', 'Remind me')}</span>`)
+      + MODE
+      + row('Nov', 8, 'Spotify', 'You pay · split 4 ways', money(spot[0]))
+      + row('Nov', 12, 'Netflix', 'Maya pays · split 4 ways', money(flix[0]))
+      + row('Nov', 15, 'Gym membership', 'Just you', '$39.00')
+      + row('Nov', 20, 'Electricity', 'Varies · you check it first', 'Varies', '<span class="up-how">Remind me</span>');
     bindMode();
-  } else {
-    const live = [...upEl.querySelectorAll('.up-row')];
-    rows.forEach((html, i) => { live[i].outerHTML = html; });
   }
+  upEl.querySelector('[data-k="rent-you"]').textContent = money(you);
+  upEl.querySelectorAll('[data-alt]').forEach((el) => { el.dataset.show = mode; });
   // history only: Jun to Oct is what you spent (Nov is still to come)
   const total = MONTHS.length * HIST;
   countMoney(histEl, prev ? Number(histEl.dataset.c) : total, total, prev ? 380 : 0);
@@ -148,14 +146,18 @@ function setRent(cents, fromInput = false) {
 // anything else keeps the last good rent until the field is left (then it snaps back)
 const RANGE = 'Between $100 and $10,000';
 const NUM = 'Numbers only'; // a letter is refused with this, never with the range message
+const CENTS = 'Two decimals at most';
 const VALID = /^\d[\d,]*(\.\d{0,2})?$/;
 input.addEventListener('beforeinput', (e) => {
-  if (e.data && /[^0-9.,]/.test(e.data)) { e.preventDefault(); flashHelp(NUM); }
+  // a pasted "$2,850.00" is fine: the "$" and spaces are dropped on input; letters are refused
+  if (e.data && /[^0-9.,$\s]/.test(e.data)) { e.preventDefault(); flashHelp(NUM); }
 });
 let lastText = input.value;
 input.addEventListener('input', () => {
-  const raw = input.value.trim();
+  if (/[$\s]/.test(input.value)) input.value = input.value.replace(/[$\s]/g, '');
+  const raw = input.value;
   if (raw === '') return; // clearing to retype: the math keeps the last rent until a new one is typed
+  if (/^\d[\d,]*\.\d{3,}$/.test(raw)) { input.value = lastText; flashHelp(CENTS); return; } // a third decimal: cents only
   if (!VALID.test(raw)) { input.value = lastText; flashHelp(NUM); return; } // refuse a malformed edit ("1.2.3")
   lastText = raw;
   const v = Math.round(Number(raw.replace(/,/g, '')) * 100);
@@ -169,13 +171,14 @@ input.addEventListener('input', () => {
 let before = rent;
 input.addEventListener('focus', () => { before = rent; });
 function commit() {
-  const v = Math.round(Number(input.value.trim().replace(/,/g, '')) * 100);
+  const v = Math.round(Number(input.value.replace(/[$,\s]/g, '')) * 100);
   if (input.value.trim() && Number.isFinite(v) && (v < MIN || v > MAX)) {
-    setRent(v); flashHelp(RANGE);
+    setRent(v); before = rent; flashHelp(RANGE);
     const r = compute(); say(`${RANGE}. Your share ${money(r.people.you.cents)} of ${money(r.totalCents)}.`, 300);
     return;
   }
   setRent(rent);
+  before = rent; // Esc after Enter puts back this rent, the one just committed
 }
 input.addEventListener('blur', commit);
 input.addEventListener('keydown', (e) => {
