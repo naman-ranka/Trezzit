@@ -417,3 +417,38 @@ a.nobank:hover { color: var(--ink); text-decoration: underline; text-underline-o
   .rec-edit .rec-rsub { grid-column: 1 / -1; grid-row: 3; }
 }
 .pg-jm .scan.consent-on { min-height: 0 !important; }
+
+/* ---------- release 3: /trips and /recurring ---------- */
+/* /trips: the hero's second line, "Just one dinner? Split a bill, no account", as quiet as the Splitwise line */
+.uc-one { margin-top: 8px; }
+.uc-one a { color: var(--accent); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; min-height: 44px; margin-block: -12px; }
+.uc-one a:hover { text-decoration: underline; }
+/* the weekend's settle-up names the group setting it shows (the app's Simplified debt view) */
+.settle h3 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.settle-tag { font-size: var(--t-xs); font-weight: 600; letter-spacing: 0; color: var(--muted); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); }
+/* /recurring: the rent card keeps the roommates card's measure */
+#rec-demo { max-width: 820px; margin-inline: 0; }
+/* the rent card mounts on load and sits in the first screen from 1000px: its height is reserved (measured 320-1920) */
+#rec-demo { min-height: 702px; }
+@media (min-width: 380px) { #rec-demo { min-height: 686px; } }
+/* a worked example's one-line note under its table */
+.pg-uc .ex-note { margin-top: 10px; max-width: var(--measure); color: var(--muted); font-size: var(--t-sm); line-height: 1.5; }
+.tbl-rc { max-width: 36rem; }
+/* worked examples on phones (below 480px): one stacked block per line — its name and split note on top, then each
+   person's figure under their name — so no column is squeezed and nothing scrolls sideways */
+@media (max-width: 479px) {
+  .tbl-st { overflow: visible; }
+  .tbl-st table, .tbl-st tbody, .tbl-st tfoot { display: block; }
+  .tbl-st thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .tbl-st tr { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); column-gap: 8px; row-gap: 6px; padding: 12px 14px; border-top: 1px solid var(--divider); }
+  .tbl-st tbody tr:first-child { border-top: 0; }
+  .tbl-st tfoot tr { border-top: 1px solid var(--divider); }
+  .tbl-st tfoot tr:first-child { border-top: 1px solid var(--line-strong); }
+  .tbl-st tr > th, .tbl-st tr > td { padding: 0 !important; border: 0; }
+  .tbl-st tr > th { grid-column: 1 / -1; }
+  .tbl-st td.r { text-align: left; }
+  .tbl-st td::before { content: attr(data-l); display: block; font-size: var(--t-xs); font-weight: 500; color: var(--muted); }
+  .tbl-st th small, .tbl-st tbody th .money, .tbl-st tfoot th .money { display: revert; }
+  .tbl-st th small { display: block; }
+  .tbl-rc { --cols: 4; }
+}

@@ -1,5 +1,8 @@
-/* trips page: the taqueria split with a tip toggle, and a whole weekend settled */
+/* /trips: the taqueria split with a tip toggle (hero), then the whole weekend settled. The settle-up is the app's
+ * Simplified debt view (a group setting, off by default): the same greedy pass over each person's net as the
+ * backend's GroupBalanceService._generate_simplified_pairwise_structure, so its rows are what the app would show. */
 import { initPage } from './page.js';
+import { APP } from '../../_kit/scan-client.js';
 import { mountGrid } from './grid-demo.js';
 import { splitAmount } from '../../_kit/split-engine.js';
 import { splitSample } from '../../_kit/receipts.js';
@@ -7,6 +10,8 @@ import { PEOPLE, getSample, sampleBill } from './data.js';
 import { money, countMoney, esc, YOU_GLYPH } from './util.js';
 
 initPage();
+// "Split a bill, no account" opens the app's /split (the staging app on a preview of this site)
+document.querySelectorAll('a[data-app-split]').forEach((a) => { a.href = `${APP}/split`; });
 const TRIO = ['you', 'alex', 'priya'];
 // the same tap grid as home (one way to say who had what), with the tip control above it. Every tap or tip flip feeds the weekend below, so the two demos never disagree.
 let taqLive = null;
@@ -48,7 +53,7 @@ async function tripDemo(root) {
         <p><span>You spent</span><b class="money" data-k="spent"></b></p>
       </div>
       <div class="settle">
-        <h3>Settle up</h3>
+        <h3>Settle up <span class="settle-tag">Simplified</span></h3>
         <ul role="list" aria-live="polite"></ul>
         <p class="settle-n"></p>
       </div>

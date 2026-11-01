@@ -34,9 +34,9 @@ const flix = distributeEqually(1799, 4); // Netflix Standard, Maya pays
 // the mode toggle sits under the one row it changes (the next rent), not above the list
 const MODE = `<li class="rec-mode"><span id="mode-l">Rent on the 1st</span>
       <div class="seg" role="radiogroup" aria-labelledby="mode-l">
-        <button type="button" role="radio" aria-checked="true" tabindex="0" data-mode="auto">Add automatically</button>
-        <button type="button" role="radio" aria-checked="false" tabindex="-1" data-mode="review">Ask me first</button>
-      </div></li>`;
+        <button type="button" role="radio" aria-checked="true" tabindex="0" data-mode="auto">Auto</button>
+        <button type="button" role="radio" aria-checked="false" tabindex="-1" data-mode="review">Remind me</button>
+      </div><span class="visually-hidden" role="status" data-mode-say></span></li>`;
 const SIDE = `<div class="rec-side">
     <p class="rec-sub">Coming up</p>
     <ul class="upcoming" role="list"></ul>
@@ -95,12 +95,15 @@ function render() {
   if (opts.compact) { prev = r; return; }
   const you = r.people.you.cents;
   // the control under Nov 1 says how rent arrives; the rows after it carry no repeated status
+  // the app's two modes, in its words (Auto / Remind me): Auto adds the bill on its date, Remind me waits for you
+  // like the app's rows, only Auto is marked (it is the state where money appears without you)
+  const how = mode === 'auto' ? 'Auto' : '';
   const rows = [
-    ['Nov', 1, 'Monthly rent', 'Rent + utilities · your share', money(you)],
-    ['Nov', 12, 'Netflix', 'Maya pays · split 4 ways', money(flix[0])],
-    ['Nov', 15, 'Gym membership', 'Just you', '$39.00'],
-    ['Dec', 1, 'Monthly rent', '', money(you)],
-  ].map(([m, d, t, s, a]) => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><span class="up-r"><b class="money">${a}</b></span></li>`);
+    ['Nov', 1, 'Monthly rent', mode === 'auto' ? 'Your share · adds itself' : 'Your share · waits for you', money(you), how],
+    ['Nov', 12, 'Netflix', 'Maya pays · split 4 ways', money(flix[0]), ''],
+    ['Nov', 15, 'Gym membership', 'Just you', '$39.00', ''],
+    ['Dec', 1, 'Monthly rent', 'Your share', money(you), how],
+  ].map(([m, d, t, s, a, k]) => `<li class="up-row"><span class="mr-d"><small>${m}</small>${d}</span><span><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><span class="up-r"><b class="money">${a}</b>${k ? `<span class="up-how">${k}</span>` : ''}</span></li>`);
   // the toggle is drawn once, then kept (re-rendering it would drop keyboard focus)
   if (!upEl.querySelector('.rec-mode')) {
     upEl.innerHTML = rows[0] + MODE + rows.slice(1).join('');
@@ -187,6 +190,7 @@ function bindMode() {
     radios.forEach((x) => { x.setAttribute('aria-checked', String(x === b)); x.tabIndex = x === b ? 0 : -1; });
     if (focus) b.focus();
     render();
+    side.querySelector('[data-mode-say]').textContent = mode === 'auto' ? 'Auto: rent adds itself on the 1st.' : 'Remind me: rent waits for you on the 1st.';
   };
   radios.forEach((b) => b.addEventListener('click', () => pick(b)));
   // a radio group: one tab stop, arrow keys move and select

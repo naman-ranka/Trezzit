@@ -24,6 +24,16 @@
       "statusCode": 301
     },
     {
+      "source": "/lab/e/trips",
+      "destination": "/trips",
+      "statusCode": 301
+    },
+    {
+      "source": "/lab/e/recurring",
+      "destination": "/recurring",
+      "statusCode": 301
+    },
+    {
       "source": "/lab",
       "destination": "/",
       "statusCode": 301
