@@ -605,3 +605,33 @@ main#main #rm-grid { min-height: 692px; }
 @media (min-width: 420px) { main#main #rm-grid { min-height: 681px; } }
 @media (min-width: 480px) { main#main #rm-grid { min-height: 638px; } }
 @media (min-width: 640px) { main#main #rm-grid { min-height: 605px; } }
+
+/* ===== Get the app (assets/e/js/get-app.js). Hidden until a store is live: the JS adds these. =====
+ * The badges are the stores' official artwork at one height (40px, 36px in the hero), never recoloured.
+ * Apple's black badge carries its own grey keyline, so it reads on the dark ground too. */
+.ga { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.ga-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.ga-label { margin: 0; font-size: var(--t-sm); color: var(--muted); }
+.ga-badge { display: inline-flex; border-radius: 8px; line-height: 0; transition: opacity var(--dur-micro, 200ms) ease; }
+.ga-badge:hover { opacity: .86; }
+.ga-badge:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.ga-badge img { height: 40px; width: auto; display: block; }
+.ga-hero { margin-top: 18px; }
+.ga-hero .ga-badge img { height: 36px; }
+.ga-close { margin-top: 22px; }
+.ga-close + .close-sub { margin-top: 26px; }
+.ga-footer { margin-top: 28px; align-items: flex-start; }
+.ga-footer .ga-row { justify-content: flex-start; }
+
+/* trezzit.com/app */
+.pg-get-app .get-app { max-width: 560px; margin: 0 auto; padding: clamp(48px, 9vw, 112px) 0 clamp(56px, 8vw, 104px); text-align: center; display: flex; flex-direction: column; align-items: center; }
+.get-app-icon { width: 88px; height: 88px; border-radius: 20px; box-shadow: var(--shadow-md); margin-bottom: 24px; }
+.pg-get-app h1 { font-size: clamp(32px, 5vw, 44px); letter-spacing: -0.03em; line-height: 1.08; }
+.pg-get-app .lede { margin-top: 14px; }
+.get-app-body { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 28px; width: 100%; }
+.get-app-body .cta-row { margin-top: 0; }
+.get-app-soon { margin: 0; font-weight: 600; color: var(--ink); }
+.get-app-qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.get-app-qr svg { width: 152px; height: 152px; padding: 10px; background: #fff; color: #0f172a; border-radius: 16px; border: 1px solid var(--line); }
+.get-app-qr figcaption { font-size: var(--t-sm); color: var(--muted); }
+.pg-get-app .micro { margin-top: 28px; }
