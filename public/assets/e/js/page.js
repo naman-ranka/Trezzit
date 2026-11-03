@@ -1,5 +1,6 @@
 /* page.js: chrome shared by every lab C page: nav state, scroll reveals, copy buttons. */
 import { reduced, icon } from './util.js';
+import { initGetApp } from './get-app.js';
 
 /* Dark theme: the OS decides until the visitor presses the nav toggle; the choice is stored and the inline
  * script in <head> applies it before first paint on the next page. */
@@ -24,6 +25,7 @@ function initTheme() {
 
 export function initPage() {
   initTheme();
+  initGetApp();
   const nav = document.querySelector('.nav');
   if (nav) {
     const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
