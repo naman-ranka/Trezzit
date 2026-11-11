@@ -93,13 +93,12 @@
     <div class="ai-hero-copy">
       <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Trezzit</a></li><li><span aria-current="page">With Claude or ChatGPT</span></li></ol></nav>
       <p class="dir-pill">Now in the Claude and ChatGPT directories</p>
-      <h1 id="sc-t">Claude or ChatGPT can read and add your expenses.</h1>
-      <p class="lede">Connect Trezzit to an AI assistant to track what you actually spent, across personal and shared expenses and down to each item. Ask it to add an expense, split a receipt, check who owes what, or total last month’s spending. It works with your own Trezzit account, only after you allow it.</p>
+      <h1 id="sc-t">Track what you spent, just by&nbsp;asking.</h1>
+      <p class="lede">Trezzit works inside Claude and ChatGPT. Add an expense, split a receipt or total your month in plain&nbsp;words.</p>
       <div class="cta-row cta-left">
         <a class="c-btn c-btn-primary c-btn-lg" href="https://claude.ai/directory/trezzit" rel="noopener">Add to Claude</a>
         <a class="c-btn c-btn-quiet c-btn-lg" href="https://chatgpt.com/plugins/plugin_asdk_app_6ae3b7e86c18819195b3570273812df8?open_in_app" rel="noopener">Add to ChatGPT</a>
       </div>
-      <p class="dir-note">On the Claude mobile app, Trezzit isn’t in search yet. Use the button above.</p>
       <ul class="trust" role="list">
         <li>Trezzit never moves money.</li>
       </ul>
@@ -108,75 +107,88 @@
   </div>
 </section>
 
-<section class="pg-sec" id="guide" aria-label="Setup guide">
+<section class="pg-sec" id="connect" aria-labelledby="connect-t">
   <div class="wrap">
-    <div class="prose">
-<nav class="doc-toc" aria-labelledby="toc-t">
-    <p class="foot-h" id="toc-t">On this page</p>
-    <ol>
-        <li><a href="#what-you-can-do">What you can do</a></li>
-        <li><a href="#example-prompts">Example prompts</a></li>
-        <li><a href="#connect-claude">Connect in Claude</a></li>
-        <li><a href="#connect-chatgpt">Connect in ChatGPT</a></li>
-        <li><a href="#other-apps">Other AI apps</a></li>
-        <li><a href="#access">What the AI can see and do</a></li>
-        <li><a href="#money">Trezzit never moves money</a></li>
-        <li><a href="#good-to-know">Good to know</a></li>
-        <li><a href="#privacy">Privacy and the action log</a></li>
-        <li><a href="#disconnect">Disconnect</a></li>
-        <li><a href="#troubleshooting">Troubleshooting</a></li>
-        <li><a href="#tools">All tools</a></li>
-    </ol>
-</nav>
+    <header class="sh"><h2 id="connect-t">Connect in a minute.</h2><p>Pick your assistant. You sign in to Trezzit and choose what it can do.</p></header>
+    <div class="mc-cards">
+      <article class="mc-card" id="connect-claude" aria-labelledby="cc-t">
+        <div class="mc-card-h"><h3 id="cc-t">Claude</h3><span class="mc-tag">In the directory</span></div>
+        <ol class="mc-steps">
+          <li><span>Open Trezzit in the Claude directory and select <strong>Connect</strong>.</span></li>
+          <li><span>Sign in to Trezzit and select <strong>Allow access</strong>.</span></li>
+          <li><span>In a chat, turn Trezzit on from the tools menu and ask away.</span></li>
+        </ol>
+        <p class="mc-note"><strong>On the Claude mobile app?</strong> Trezzit isn’t in search there yet. Use the button below, or connect on web or desktop.</p>
+        <div class="mc-card-cta"><a class="c-btn c-btn-primary c-btn-lg" href="https://claude.ai/directory/trezzit" rel="noopener">Add to Claude</a></div>
+      </article>
+      <article class="mc-card" id="connect-chatgpt" aria-labelledby="cg-t">
+        <div class="mc-card-h"><h3 id="cg-t">ChatGPT</h3><span class="mc-tag">In the directory</span></div>
+        <ol class="mc-steps">
+          <li><span>Open Trezzit in ChatGPT and select <strong>Connect</strong>.</span></li>
+          <li><span>Sign in to Trezzit and select <strong>Allow access</strong>.</span></li>
+          <li><span>Mention Trezzit in a chat, or pick it from the tools menu.</span></li>
+        </ol>
+        <div class="mc-card-cta"><a class="c-btn c-btn-primary c-btn-lg" href="https://chatgpt.com/plugins/plugin_asdk_app_6ae3b7e86c18819195b3570273812df8?open_in_app" rel="noopener">Add to ChatGPT</a></div>
+      </article>
+    </div>
+    <div class="mc-other" id="other-apps">
+      <div>
+        <h3>Another AI app?</h3>
+        <p>Anything that supports remote MCP servers with OAuth sign-in can use the server URL. In Claude Code:</p>
+        <pre tabindex="0"><code>claude mcp add --transport http trezzit https://api.trezzit.com/api/mcp</code></pre>
+      </div>
+      <div class="url-box"><span class="url-l">Server URL</span><code id="server-url">https://api.trezzit.com/api/mcp</code><button type="button" class="c-btn c-btn-sm c-btn-quiet" data-copy="https://api.trezzit.com/api/mcp" aria-describedby="server-url"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><rect x="7" y="7" width="9.5" height="9.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-6A1.5 1.5 0 0 0 4 5v6a1.5 1.5 0 0 0 1.5 1.5H7" fill="none" stroke="currentColor" stroke-width="1.7"/></svg> Copy</button></div>
+    </div>
+  </div>
+</section>
 
-<h2 id="what-you-can-do">What you can do <a class="anchor" href="#what-you-can-do" aria-label="Link to this section">#</a></h2>
-<ul>
-    <li><strong>Add expenses by talking.</strong> Save a personal expense, or split a group bill equally, by percentage, by custom amounts, or item by item from a receipt.</li>
-    <li><strong>Check balances.</strong> Who owes whom, in each group and overall.</li>
-    <li><strong>See what you actually spent.</strong> Your personal expenses plus your share of every shared bill, searchable down to item names and totalled by category or month. Export a group's history as a table.</li>
-    <li><strong>Match your bank statement.</strong> List what you paid and what was settled, so the AI can match it line by line.</li>
-    <li><strong>Record a settle-up.</strong> Note that you paid someone back outside Trezzit.</li>
-    <li><strong>Manage recurring bills.</strong> Rent, subscriptions and utilities: add this month's, skip one, change or end the series.</li>
-</ul>
+<section class="pg-sec" id="example-prompts" aria-labelledby="ask-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="ask-t">Then just ask.</h2><p>It shows you what it’s about to save. Say “draft” to preview first.</p></header>
+    <ul class="mc-prompts" role="list">
+      <li>Add a $23.40 pharmacy run to my personal expenses.</li>
+      <li>Add a $84.20 dinner to Thursday Dinner Club. I paid, split equally.</li>
+      <li>Who owes me money in Apartment 3B, and how much?</li>
+      <li>How much did I actually spend on groceries last month?</li>
+      <li>Find every coffee I bought this year and what each one cost me.</li>
+      <li>List what I paid this month so I can match my bank statement.</li>
+      <li>I paid Priya back $45 for the electric bill. Record it.</li>
+      <li>Add this month’s internet bill to the apartment, same as last time.</li>
+    </ul>
+  </div>
+</section>
 
-<h2 id="example-prompts">Example prompts <a class="anchor" href="#example-prompts" aria-label="Link to this section">#</a></h2>
-<ul class="prompts">
-    <li>"Add a $23.40 pharmacy run to my personal expenses."</li>
-    <li>"Add a $84.20 dinner to Thursday Dinner Club, I paid, split equally between everyone."</li>
-    <li>"Who owes me money in Apartment 3B, and how much?"</li>
-    <li>"How much did I actually spend on groceries last month, personal and shared?"</li>
-    <li>"Find every coffee I bought this year and show what each one cost me."</li>
-    <li>"List what I paid this month so I can match my bank statement."</li>
-    <li>"I paid Priya back $45 for the electric bill. Record it."</li>
-    <li>"Add this month's internet bill to the apartment, same as last time."</li>
-</ul>
-<p>The assistant shows you what it is about to save. Writes can also be previewed first: ask it to "draft" a bill before saving.</p>
+<section class="pg-sec" id="what-you-can-do" aria-labelledby="do-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="do-t">What you can do.</h2></header>
+    <ul class="mc-grid" role="list">
+      <li class="mc-feat"><span class="mc-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4.5v11M4.5 10h11"/></svg></span><h3>Add expenses by talking</h3><p>A personal expense, or a group bill split equally, by percentage, by amount, or item by item from a receipt.</p></li>
+      <li class="mc-feat"><span class="mc-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15.5V9M10 15.5v-11M16 15.5V7"/></svg></span><h3>See what you actually spent</h3><p>Your own expenses plus your share of every shared bill, down to item names, totalled by category or month.</p></li>
+      <li class="mc-feat"><span class="mc-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7h10M10.5 4l3 3-3 3M16.5 13h-10M9.5 10l-3 3 3 3"/></svg></span><h3>Check balances</h3><p>Who owes whom, in each group and overall.</p></li>
+      <li class="mc-feat"><span class="mc-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8l6.5-4 6.5 4M5 8.5v6M10 8.5v6M15 8.5v6M3.5 16h13"/></svg></span><h3>Match your bank statement</h3><p>List what you paid and what was settled, so the AI can match it line by line.</p></li>
+      <li class="mc-feat"><span class="mc-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 10.5l3 3 6-7"/></svg></span><h3>Record a settle-up</h3><p>Note that you paid someone back outside Trezzit.</p></li>
+      <li class="mc-feat"><span class="mc-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 8A6 6 0 0 0 5 6.5L3.5 8M4.5 12A6 6 0 0 0 15 13.5l1.5-1.5M3.5 4.5V8H7M16.5 15.5V12H13"/></svg></span><h3>Manage recurring bills</h3><p>Rent, subscriptions and utilities: add this month’s, skip one, change or end the series.</p></li>
+    </ul>
+  </div>
+</section>
 
-<h2 id="connect-claude">Connect in Claude <a class="anchor" href="#connect-claude" aria-label="Link to this section">#</a></h2>
-<ol>
-    <li>Open <a href="https://claude.ai/directory/trezzit" rel="noopener">Trezzit in the Claude directory</a> and select <strong>Connect</strong>.</li>
-    <li>Sign in to Trezzit if asked, check what Claude is asking for, and select <strong>Allow access</strong>.</li>
-    <li>In a chat, turn Trezzit on from the tools menu and ask away.</li>
-</ol>
-<p><strong>On the Claude mobile app,</strong> Trezzit doesn’t show up in search yet. Use the link above, or connect on the web or desktop.</p>
-<p>Claude usually asks before running an action that changes data, unless you tell it to always allow that action.</p>
+<section class="pg-sec mc-band" id="control" aria-labelledby="ctl-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="ctl-t">You stay in control.</h2><p>When you connect, Trezzit shows exactly what the app is asking for. You can say no.</p></header>
+    <ul class="mc-grid mc-safe" role="list">
+      <li class="mc-feat" id="money"><span class="mc-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3l5.5 2v4.5c0 3.5-2.300 6-5.5 7.5-3.200-1.5-5.5-4-5.5-7.5V5z"/><path d="M7.5 10l1.800 1.800 3.200-3.600"/></svg></span><h3>Trezzit never moves money</h3><p>It’s a record of your spending. No tool sends, requests or holds money, and a settle-up only notes a payment made outside Trezzit.</p></li>
+      <li class="mc-feat"><span class="mc-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3"/><path d="M4 16.5c.700-3 3-4.5 6-4.5s5.300 1.5 6 4.5"/></svg></span><h3>Only your own data</h3><p>The AI sees the same bills and people you see in the app. Other members’ email addresses are never shared with it.</p></li>
+      <li class="mc-feat"><span class="mc-ic" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5v6M6 5.5a6 6 0 1 0 8 0"/></svg></span><h3>Disconnect any time</h3><p>In Trezzit, open <strong>Profile → Privacy &amp; data → Connected AI apps</strong>. The app loses access right away.</p></li>
+    </ul>
+  </div>
+</section>
 
-<h2 id="connect-chatgpt">Connect in ChatGPT <a class="anchor" href="#connect-chatgpt" aria-label="Link to this section">#</a></h2>
-<ol>
-    <li>Open <a href="https://chatgpt.com/plugins/plugin_asdk_app_6ae3b7e86c18819195b3570273812df8?open_in_app" rel="noopener">Trezzit in ChatGPT</a> and select <strong>Connect</strong>.</li>
-    <li>Sign in to Trezzit and select <strong>Allow access</strong>.</li>
-    <li>Mention Trezzit in a chat, or pick it from the tools menu, and ask your question.</li>
-</ol>
-
-<h2 id="other-apps">Other AI apps <a class="anchor" href="#other-apps" aria-label="Link to this section">#</a></h2>
-<p>Any app that supports remote MCP servers with OAuth sign-in can connect with the server URL.</p>
-<div class="url-box"><span class="url-l">Server URL</span><code id="server-url">https://api.trezzit.com/api/mcp</code><button type="button" class="c-btn c-btn-sm c-btn-quiet" data-copy="https://api.trezzit.com/api/mcp" aria-describedby="server-url"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><rect x="7" y="7" width="9.5" height="9.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-6A1.5 1.5 0 0 0 4 5v6a1.5 1.5 0 0 0 1.5 1.5H7" fill="none" stroke="currentColor" stroke-width="1.7"/></svg> Copy</button></div>
-<p>In Claude Code, for example:</p>
-<pre tabindex="0"><code>claude mcp add --transport http trezzit https://api.trezzit.com/api/mcp</code></pre>
-
-<h2 id="access">What the AI can see and do <a class="anchor" href="#access" aria-label="Link to this section">#</a></h2>
-<p>When you connect, Trezzit shows you exactly what the app is asking for. You can say no.</p>
-<div class="tbl" tabindex="0" role="region" aria-label="What the AI can see and do">
+<section class="pg-sec" id="details" aria-labelledby="det-t">
+  <div class="wrap">
+    <header class="sh"><h2 id="det-t">The details.</h2></header>
+    <div class="faq mc-faq">
+      <details id="access"><summary>What the AI can see and do</summary>
+        <div class="tbl" tabindex="0" role="region" aria-label="What the AI can see and do">
     <table data-cols="2">
         <thead><tr><th scope="col">Permission</th><th scope="col">What it allows</th></tr></thead>
         <tbody>
@@ -187,39 +199,35 @@
         </tbody>
     </table>
 </div>
-<p>The AI only ever sees your own data: the same bills and people you see in the app. Other members' email addresses are never shared with it.</p>
-
-<h2 id="money">Trezzit never moves money <a class="anchor" href="#money" aria-label="Link to this section">#</a></h2>
-<p>Trezzit is a record of your personal and shared spending. It has no access to bank accounts or cards, and no tool sends, requests or holds money. "Record settlement" writes down that you paid someone back by cash, bank transfer or a payment app; the payment itself happens outside Trezzit.</p>
-
-<h2 id="good-to-know">Good to know <a class="anchor" href="#good-to-know" aria-label="Link to this section">#</a></h2>
-<ul>
+      </details>
+      <details id="good-to-know"><summary>Good to know</summary>
+        <ul>
     <li><strong>Deleting.</strong> The AI can delete only a bill it added in the last 30 minutes, and only before anyone else recorded a payment on it. Everything else is deleted in the app.</li>
     <li><strong>Split links are public.</strong> "Create public split link" makes a web page anyone with the link can open, for people who aren't on Trezzit. It can't be revoked from the AI app.</li>
     <li><strong>Receipts.</strong> Uploading a receipt photo through the AI needs an assistant that can run code with internet access. Otherwise, scan the receipt in the Trezzit app.</li>
     <li><strong>Limits.</strong> Write actions are rate limited. If the AI hits the limit, it's told when it can try again.</li>
     <li><strong>Currencies.</strong> Amounts are in each group's currency. Currencies without cents (such as JPY) are added in the app.</li>
 </ul>
-
-<h2 id="privacy">Privacy and the action log <a class="anchor" href="#privacy" aria-label="Link to this section">#</a></h2>
-<p>Trezzit never sees your conversation with the AI, only the requests it sends to Trezzit. For each one we keep a short record: which action ran, when, whether it worked, and which bill or group it touched. We don't keep the words in the request. You can see this log, and clear it, in <strong>Profile → Privacy &amp; data → Connected AI apps</strong>. What the AI app does with the data it receives is covered by that app's own privacy policy. Full details are in our <a href="/privacy#connected-ai-apps">Privacy Policy</a>.</p>
-
-<h2 id="disconnect">Disconnect <a class="anchor" href="#disconnect" aria-label="Link to this section">#</a></h2>
-<ul>
+      </details>
+      <details id="privacy"><summary>Privacy and the action log</summary>
+        <p>Trezzit never sees your conversation with the AI, only the requests it sends to Trezzit. For each one we keep a short record: which action ran, when, whether it worked, and which bill or group it touched. We don't keep the words in the request. You can see this log, and clear it, in <strong>Profile → Privacy &amp; data → Connected AI apps</strong>. What the AI app does with the data it receives is covered by that app's own privacy policy. Full details are in our <a href="/privacy#connected-ai-apps">Privacy Policy</a>.</p>
+      </details>
+      <details id="disconnect"><summary>Disconnect</summary>
+        <ul>
     <li>In Trezzit: <strong>Profile → Privacy &amp; data → Connected AI apps</strong>, then <strong>Disconnect</strong>. The app loses access right away.</li>
     <li>In the AI app: remove or disconnect Trezzit in its connector settings.</li>
     <li>Resetting your password or deleting your Trezzit account disconnects every AI app.</li>
 </ul>
-
-<h2 id="troubleshooting">Troubleshooting <a class="anchor" href="#troubleshooting" aria-label="Link to this section">#</a></h2>
-<p><strong>"Insufficient scope" when adding a bill.</strong> The app was allowed to view only. Disconnect it and connect again, allowing "Create and edit expenses".</p>
+      </details>
+      <details id="troubleshooting"><summary>Troubleshooting</summary>
+        <p><strong>"Insufficient scope" when adding a bill.</strong> The app was allowed to view only. Disconnect it and connect again, allowing "Create and edit expenses".</p>
 <p><strong>The AI says it isn't connected, or sign-in loops.</strong> Disconnect Trezzit in the AI app and connect again. Make sure you sign in to the same Trezzit account you use in the app.</p>
 <p><strong>"AI features are off" when scanning a receipt.</strong> Reading receipts uses AI, which you turn on yourself. In the Trezzit app, open <strong>Profile → Privacy &amp; data</strong>, turn AI features on, and try again.</p>
 <p><strong>It picked the wrong person or group.</strong> Ask it to use the full name or the group's name, or to list your groups first.</p>
 <p><strong>Something else?</strong> Email <a href="mailto:support@trezzit.com">support@trezzit.com</a> with the AI app's name and what you asked.</p>
-
-<h2 id="tools">All tools <a class="anchor" href="#tools" aria-label="Link to this section">#</a></h2>
-<div class="tbl" tabindex="0" role="region" aria-label="All tools">
+      </details>
+      <details id="tools"><summary>All tools</summary>
+        <div class="tbl" tabindex="0" role="region" aria-label="All tools">
     <table data-cols="2">
         <thead><tr><th scope="col">Tool</th><th scope="col">What it does</th></tr></thead>
         <tbody>
@@ -246,7 +254,19 @@
         </tbody>
     </table>
 </div>
+      </details>
     </div>
+  </div>
+</section>
+
+<section class="close close-end pg-close" aria-label="Get started">
+  <div class="wrap">
+    <p class="close-h">Add Trezzit to your&nbsp;AI.</p>
+    <div class="cta-row">
+      <a class="c-btn c-btn-primary c-btn-lg" href="https://claude.ai/directory/trezzit" rel="noopener">Add to Claude</a>
+      <a class="c-btn c-btn-quiet c-btn-lg" href="https://chatgpt.com/plugins/plugin_asdk_app_6ae3b7e86c18819195b3570273812df8?open_in_app" rel="noopener">Add to ChatGPT</a>
+    </div>
+    <p class="micro">Free. Trezzit never moves money.</p>
   </div>
 </section>
 </main>
