@@ -92,12 +92,14 @@
   <div class="wrap">
     <div class="ai-hero-copy">
       <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Trezzit</a></li><li><span aria-current="page">With Claude or ChatGPT</span></li></ol></nav>
+      <p class="dir-pill">Now in the Claude and ChatGPT directories</p>
       <h1 id="sc-t">Claude or ChatGPT can read and add your expenses.</h1>
       <p class="lede">Connect Trezzit to an AI assistant to track what you actually spent, across personal and shared expenses and down to each item. Ask it to add an expense, split a receipt, check who owes what, or total last month’s spending. It works with your own Trezzit account, only after you allow it.</p>
-      <div class="url-box"><span class="url-l">Server URL</span><code id="server-url">https://api.trezzit.com/api/mcp</code><button type="button" class="c-btn c-btn-sm c-btn-quiet" data-copy="https://api.trezzit.com/api/mcp" aria-describedby="server-url"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><rect x="7" y="7" width="9.5" height="9.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-6A1.5 1.5 0 0 0 4 5v6a1.5 1.5 0 0 0 1.5 1.5H7" fill="none" stroke="currentColor" stroke-width="1.7"/></svg> Copy</button></div>
       <div class="cta-row cta-left">
-        <a class="c-btn c-btn-primary c-btn-lg" href="#connect-claude">Connect your AI</a>
+        <a class="c-btn c-btn-primary c-btn-lg" href="https://claude.ai/directory/trezzit" rel="noopener">Add to Claude</a>
+        <a class="c-btn c-btn-quiet c-btn-lg" href="https://chatgpt.com/plugins/plugin_asdk_app_6ae3b7e86c18819195b3570273812df8?open_in_app" rel="noopener">Add to ChatGPT</a>
       </div>
+      <p class="dir-note">On the Claude mobile app, Trezzit isn’t in search yet. Use the button above.</p>
       <ul class="trust" role="list">
         <li>Trezzit never moves money.</li>
       </ul>
@@ -152,22 +154,24 @@
 
 <h2 id="connect-claude">Connect in Claude <a class="anchor" href="#connect-claude" aria-label="Link to this section">#</a></h2>
 <ol>
-    <li>In Claude, open <strong>Settings → Connectors</strong>.</li>
-    <li>Find <strong>Trezzit</strong> in the directory and select <strong>Connect</strong>. Or choose <strong>Add custom connector</strong>, name it Trezzit and paste the server URL above.</li>
+    <li>Open <a href="https://claude.ai/directory/trezzit" rel="noopener">Trezzit in the Claude directory</a> and select <strong>Connect</strong>.</li>
     <li>Sign in to Trezzit if asked, check what Claude is asking for, and select <strong>Allow access</strong>.</li>
     <li>In a chat, turn Trezzit on from the tools menu and ask away.</li>
 </ol>
+<p><strong>On the Claude mobile app,</strong> Trezzit doesn’t show up in search yet. Use the link above, or connect on the web or desktop.</p>
 <p>Claude usually asks before running an action that changes data, unless you tell it to always allow that action.</p>
 
 <h2 id="connect-chatgpt">Connect in ChatGPT <a class="anchor" href="#connect-chatgpt" aria-label="Link to this section">#</a></h2>
 <ol>
-    <li>In ChatGPT, open the apps directory and search for <strong>Trezzit</strong>. Until Trezzit is listed there, add it in developer mode with the server URL above.</li>
-    <li>Select <strong>Connect</strong>, sign in to Trezzit, and select <strong>Allow access</strong>.</li>
+    <li>Open <a href="https://chatgpt.com/plugins/plugin_asdk_app_6ae3b7e86c18819195b3570273812df8?open_in_app" rel="noopener">Trezzit in ChatGPT</a> and select <strong>Connect</strong>.</li>
+    <li>Sign in to Trezzit and select <strong>Allow access</strong>.</li>
     <li>Mention Trezzit in a chat, or pick it from the tools menu, and ask your question.</li>
 </ol>
 
 <h2 id="other-apps">Other AI apps <a class="anchor" href="#other-apps" aria-label="Link to this section">#</a></h2>
-<p>Any app that supports remote MCP servers with OAuth sign-in can connect with the server URL. In Claude Code, for example:</p>
+<p>Any app that supports remote MCP servers with OAuth sign-in can connect with the server URL.</p>
+<div class="url-box"><span class="url-l">Server URL</span><code id="server-url">https://api.trezzit.com/api/mcp</code><button type="button" class="c-btn c-btn-sm c-btn-quiet" data-copy="https://api.trezzit.com/api/mcp" aria-describedby="server-url"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><rect x="7" y="7" width="9.5" height="9.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-6A1.5 1.5 0 0 0 4 5v6a1.5 1.5 0 0 0 1.5 1.5H7" fill="none" stroke="currentColor" stroke-width="1.7"/></svg> Copy</button></div>
+<p>In Claude Code, for example:</p>
 <pre tabindex="0"><code>claude mcp add --transport http trezzit https://api.trezzit.com/api/mcp</code></pre>
 
 <h2 id="access">What the AI can see and do <a class="anchor" href="#access" aria-label="Link to this section">#</a></h2>

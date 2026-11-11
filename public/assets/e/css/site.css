@@ -115,7 +115,14 @@
 }
 /* /mcp: the hero's lede and server URL sit in the copy column */
 .pg-mcp .ai-hero-copy .lede { margin-top: 16px; font-size: var(--t-md); max-width: 40rem; }
-.pg-mcp .ai-hero-copy .url-box { margin-top: 20px; max-width: 34rem; }
+.pg-mcp .prose .url-box { margin: 16px 0; max-width: 34rem; }
+.pg-mcp .dir-pill { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; margin: 0 0 16px; padding: 5px 14px 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); font-size: var(--t-sm); font-weight: 500; color: var(--text); white-space: nowrap; }
+.pg-mcp .dir-pill::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--pos); }
+@media (max-width: 479px) {
+  .pg-mcp .dir-pill { font-size: var(--t-xs); }
+  .pg-mcp .ai-hero .cta-row .c-btn { flex: 1 1 100%; }
+}
+.pg-mcp .dir-note { margin: 12px 0 0; font-size: var(--t-sm); color: var(--muted); }
 .pg-mcp .doc-toc { margin-bottom: 8px; }
 .pg-mcp .prose { max-width: 48rem; }
 
