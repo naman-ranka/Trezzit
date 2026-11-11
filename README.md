@@ -35,6 +35,12 @@ Pages are flat files with clean URLs and no trailing slash (`cleanUrls` and `"tr
 
 Every indexable page carries a title, description, canonical, Open Graph and Twitter tags (images in `public/assets/og/`, 1200x630) and JSON-LD: one `@graph` of WebSite, Organization and SoftwareApplication on the home page; BreadcrumbList on the others, plus FAQPage on `/split`, `/splitwise-alternative`, `/roommates`, `/trips`, `/recurring` and `/track-spending-without-bank` that matches their visible questions. `public/sitemap.xml` lists the indexable pages. `public/robots.txt` keeps `/s/` and `/demo` out; `/lab` (the old landing prototypes, now removed) redirects home, `/lab/e/ai` to `/mcp`, and `/lab/e/trips` and `/lab/e/recurring` to their pages.
 
+## Get the app (store badges)
+
+Every "get the app" prompt reads one file, `public/assets/e/js/stores.js`, and stays hidden until a store is live: a matched badge in the home hero on phones, badges under each page's last call to action, both badges and "iPhone app" / "Android app" links in the footer, and `/app`, the one link to share or print (a phone goes straight to its store, a computer sees both badges and a QR code). The badges are Apple's and Google's official artwork in `public/assets/stores/`, unaltered.
+
+At launch: set `live: true` for the store (and the App Store `appId`, digits only) in `stores.js`, then run `node scripts/app-banner.mjs`, which writes iOS Safari's Smart App Banner meta into every page and makes `/app` indexable. `node scripts/app-banner.mjs --check` fails if the pages are out of step. Before launch, add `?get-app=preview` to any page to see the prompts (that tab only; `?get-app=off` clears it).
+
 ---
 
 ## Development
