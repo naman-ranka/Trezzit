@@ -115,7 +115,12 @@
 }
 /* /mcp: the hero's lede and server URL sit in the copy column */
 .pg-mcp .ai-hero-copy .lede { margin-top: 16px; font-size: var(--t-md); max-width: 40rem; }
-.pg-mcp .ai-hero-copy .url-box { margin-top: 20px; max-width: 34rem; }
+.pg-mcp .dir-pill { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; margin: 0 0 16px; padding: 5px 14px 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); font-size: var(--t-sm); font-weight: 500; color: var(--text); white-space: nowrap; }
+.pg-mcp .dir-pill::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--pos); }
+@media (max-width: 479px) {
+  .pg-mcp .dir-pill { font-size: var(--t-xs); }
+  .pg-mcp .ai-hero .cta-row .c-btn { flex: 1 1 100%; }
+}
 .pg-mcp .doc-toc { margin-bottom: 8px; }
 .pg-mcp .prose { max-width: 48rem; }
 
@@ -605,3 +610,57 @@ main#main #rm-grid { min-height: 692px; }
 @media (min-width: 420px) { main#main #rm-grid { min-height: 681px; } }
 @media (min-width: 480px) { main#main #rm-grid { min-height: 638px; } }
 @media (min-width: 640px) { main#main #rm-grid { min-height: 605px; } }
+
+/* /mcp r2: a product page (connect cards, prompts, what it does, control) with the reference folded into "The details". */
+.pg-mcp .ai-hero-copy .lede { font-size: var(--t-lg); max-width: 30rem; }
+.pg-mcp .sh { max-width: 640px; }
+.pg-mcp .sh p { font-size: var(--t-md); }
+.pg-mcp .pg-sec { scroll-margin-top: 72px; }
+.mc-cards { display: grid; gap: 16px; }
+.mc-card { display: flex; flex-direction: column; padding: 24px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--card); scroll-margin-top: 96px; }
+.mc-card-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.mc-card-h h3 { font-size: var(--t-xl); letter-spacing: -0.03em; line-height: 1.1; color: var(--ink); }
+.mc-tag { display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px 4px 10px; border-radius: 999px; background: var(--pos-soft); color: var(--pos-ink); font-size: var(--t-xs); font-weight: 600; white-space: nowrap; }
+.mc-tag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--pos); }
+.mc-steps { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 12px; counter-reset: mc; }
+.mc-steps li { counter-increment: mc; display: flex; gap: 12px; align-items: flex-start; font-size: var(--t-md); line-height: 1.45; color: var(--text); }
+.mc-steps li::before { content: counter(mc); flex: none; width: 24px; height: 24px; margin-top: 1px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-size: var(--t-xs); font-weight: 700; }
+.mc-steps strong, .mc-note strong, .mc-feat strong { color: var(--ink); }
+.mc-note { margin-top: 18px; padding: 12px 14px; border-radius: var(--r-sm); background: var(--fill); font-size: var(--t-sm); line-height: 1.45; color: var(--muted); }
+.mc-card-cta { margin-top: auto; padding-top: 22px; }
+.mc-card-cta .c-btn { width: 100%; }
+.mc-other { margin-top: 16px; padding: 22px 24px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--fill); display: grid; gap: 16px; scroll-margin-top: 96px; }
+.mc-other > * { min-width: 0; }
+.mc-other h3 { font-size: var(--t-lg); letter-spacing: -0.02em; color: var(--ink); }
+.mc-other p { margin-top: 6px; font-size: var(--t-sm); line-height: 1.5; color: var(--muted); }
+.mc-other pre { margin-top: 10px; font-family: var(--font-mono); font-size: var(--t-xs); line-height: 1.5; color: var(--text); white-space: pre-wrap; overflow-wrap: anywhere; }
+.mc-other .url-box { margin-top: 0; }
+.mc-prompts { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; justify-items: start; }
+.mc-prompts li { padding: 12px 18px; border-radius: 20px 20px 20px 6px; background: var(--fill); border: 1px solid var(--line); font-size: var(--t-md); line-height: 1.4; color: var(--ink); }
+.mc-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.mc-feat { padding: 22px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--card); scroll-margin-top: 96px; }
+.mc-ic { display: grid; place-items: center; width: 38px; height: 38px; margin-bottom: 16px; border-radius: 11px; background: var(--accent-soft); color: var(--accent); }
+.mc-safe .mc-ic { background: var(--pos-soft); color: var(--pos); }
+.mc-feat h3 { font-size: var(--t-lg); letter-spacing: -0.02em; line-height: 1.2; color: var(--ink); }
+.mc-feat p { margin-top: 8px; font-size: var(--t-md); line-height: 1.5; color: var(--muted); }
+.pg-mcp .mc-band { margin-top: clamp(36px, 5vw, 72px); padding-block: clamp(36px, 5vw, 64px); background: var(--fill); }
+.mc-faq { max-width: 52rem; }
+.mc-faq details { scroll-margin-top: 80px; }
+.mc-faq details > :not(summary) { margin-bottom: 18px; font-size: var(--t-md); line-height: 1.6; color: var(--text); }
+.mc-faq details > p + p { margin-top: -6px; }
+.mc-faq details > ul { padding-left: 22px; display: grid; gap: 8px; }
+.mc-faq details strong { color: var(--ink); }
+.mc-faq details a { color: var(--accent); font-weight: 600; }
+@media (min-width: 640px) { .mc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 760px) { .mc-prompts { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; } .mc-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .mc-card { padding: 28px; } }
+@media (min-width: 960px) {
+  .mc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .mc-other { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; column-gap: 40px; }
+}
+@media (max-width: 479px) { .pg-mcp .close .cta-row .c-btn { flex: 1 1 100%; } }
+@media (max-width: 639px) {
+  .mc-feat { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; padding: 18px; }
+  .mc-feat .mc-ic { grid-row: 1 / span 2; margin-bottom: 0; }
+  .mc-feat h3 { align-self: center; min-height: 38px; display: flex; align-items: center; }
+  .mc-feat p { grid-column: 2; margin-top: 2px; font-size: var(--t-sm); }
+}
