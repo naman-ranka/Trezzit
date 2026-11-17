@@ -62,9 +62,9 @@ plain CSS and ES modules from `public/assets/`.
 ## Structure
 
 - `public/*.html`: one flat file per URL (`cleanUrls`, no trailing slash).
-  Home, `/split`, `/splitwise-alternative`, `/mcp`, four use-case pages, five
-  legal pages, `404`. The nav and footer are repeated in every file; a change
-  to either is a change to all fourteen.
+  Home, `/split`, `/splitwise-alternative`, `/mcp`, `/app`, four use-case
+  pages, five legal pages, `404`. The nav and footer are repeated in every
+  file; a change to either is a change to all fifteen.
 - `public/assets/e/`: the site's CSS and JS (`site.css`, `c.css`, `e.css`,
   one `demo-*.css` and `*-demo.js` per interactive demo, one small entry
   module per page). Colours are tokens, so dark theme follows if you use them.
@@ -103,6 +103,32 @@ plain CSS and ES modules from `public/assets/`.
   `/privacy#who-helps-us-run-trezzit`; the connector's metadata points to
   `/mcp`; shared bill links may use `trezzit.com/s/<token>`.
 
+## Get the app
+
+- **Which device.** An inline script in every page's `<head>` sets
+  `<html data-os>` before first paint: `ios`, `android`, `desktop`, or `app`
+  (opened with `?in-app=1`, remembered for the tab: no store offer). The
+  "Get the app" block at the end of `site.css` does the rest with three
+  classes: `.ga-phone` shows only on a phone, `.ga-desk` everywhere else,
+  `.ga-store` never inside the app. Both versions of a button are in the
+  HTML, so nothing moves after load and, with JavaScript off, every page
+  shows the web button and both badges.
+- **Where.** A phone gets "Get the app" (its own store) first and the web
+  as a text link: the nav button on every page, the home hero and closing
+  CTA, and the four use-case pages. A computer keeps the sign-up button and
+  gets the badges, with a QR code on home and `/app`. The footer of every
+  page has both badges. `/splitwise-alternative` has no store button beside
+  "Sign up and import": nobody has checked the import in the phone apps.
+- **`/app`** is what the web app's QR codes hold. A phone that opens it is
+  sent to its store by a script in its `<head>` (crawlers are left alone, so
+  the page can be indexed); a computer sees the badges and the code. It is
+  the only page with Safari's Smart App Banner meta.
+- **The store links** are written out in the HTML and once in
+  `e/js/get-app.js`. The QR code, `assets/stores/get-app-qr.svg`, is a
+  committed picture of `https://trezzit.com/app`.
+- **The badges** are the stores' official artwork: never recoloured or
+  redrawn, never under 40px high, and never beside "free" or a price.
+
 ## What only the owner changes
 
 - **The text of the legal pages** (`privacy`, `terms`, `your-data`,
@@ -122,8 +148,9 @@ plain CSS and ES modules from `public/assets/`.
   points to (#19). Never rename or remove any of these.
 - **Tool names and what `/mcp` says the connector can do**: reviewed with the
   directory submissions.
-- Anything about the phone apps in the stores. Badges and `/app` are built
-  and waiting behind one switch in #15; don't add store wording another way.
+- Anything about the phone apps in the stores. Both apps are live and the
+  store prompts are on the site (see "Get the app" below); don't add store
+  wording another way.
 
 ## Traps recent work hit
 

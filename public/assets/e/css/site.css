@@ -664,3 +664,74 @@ main#main #rm-grid { min-height: 692px; }
   .mc-feat h3 { align-self: center; min-height: 38px; display: flex; align-items: center; }
   .mc-feat p { grid-column: 2; margin-top: 2px; font-size: var(--t-sm); }
 }
+
+/* ===== Get the app: BEGIN (one block: store badges, the nav and CTA swap, the footer row, /app) =====
+ * <html data-os> is set by the inline script in every page's <head>, before first paint:
+ *   ios | android   a phone: "Get the app" leads and the web is the text link (.ga-phone shows, .ga-desk hides)
+ *   desktop         the web sign-up button, with the badges (and a QR code where there is room)
+ *   app             opened from inside the Trezzit app (?in-app=1): no store offer at all (.ga-store hides)
+ *   (none)          no JavaScript: the desktop layout, so both badges show.
+ * The badges are Apple's and Google's official artwork (assets/stores/), unaltered and never under 40px high. */
+html:not([data-os="ios"]):not([data-os="android"]) .ga-phone { display: none !important; }
+html[data-os="ios"] .ga-desk, html[data-os="android"] .ga-desk { display: none !important; }
+html[data-os="app"] .ga-store { display: none !important; }
+html[data-os="ios"] .ga-own .ga-android, html[data-os="android"] .ga-own .ga-ios { display: none !important; }
+
+.ga-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.ga-badge { display: inline-flex; flex: none; line-height: 0; border-radius: 8px; transition: opacity .2s var(--ease); }
+.ga-badge:hover { opacity: .86; }
+.ga-badge:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.ga-badge img { display: block; height: 40px; width: auto; }
+
+/* the web, as the second way in on a phone */
+.ga-alt { margin: 6px 0 0; font-size: var(--t-sm); color: var(--muted); }
+.ga-alt a { display: inline-block; padding: 11px 4px; color: var(--text); font-weight: 600; text-decoration: underline; text-decoration-color: var(--line-4); text-decoration-thickness: 1px; text-underline-offset: 5px; }
+.ga-alt a:hover { color: var(--ink); text-decoration-color: currentColor; }
+html[data-os="ios"] .ga-alt + .micro, html[data-os="android"] .ga-alt + .micro { margin-top: 0; }
+
+/* home hero, computer: the sign-up button with a "Get the app" card beside it */
+.hero .cta-row { align-items: center; }
+.ga-card { display: inline-flex; align-items: center; gap: 12px; padding: 8px 14px 8px 8px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); box-shadow: var(--shadow-sm); text-align: left; }
+.ga-qr { flex: none; display: block; width: 72px; height: 72px; border-radius: 10px; border: 1px solid var(--line); background: #fff; }
+.ga-card-t { margin: 0 6px 0 0; }
+.ga-card-t b { display: block; color: var(--ink); font-size: var(--t-sm); line-height: 1.25; white-space: nowrap; }
+.ga-card-t span { display: block; color: var(--muted); font-size: var(--t-xs); line-height: 1.3; white-space: nowrap; }
+@media (max-width: 759px) { /* no room (or no use) for the code: the label over the two badges */
+  .ga-card { flex-direction: column; gap: 8px; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; text-align: center; }
+  .ga-card .ga-qr, .ga-card-t span { display: none; }
+  .ga-card-t { margin: 4px 0 0; }
+  .ga-card .ga-badges { justify-content: center; }
+}
+
+/* use-case pages, computer: both badges on one quiet line under the page's own button */
+.ga-under { margin-top: 14px; }
+
+/* footer, every page: both badges above the legal lines */
+.ga-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 20px; }
+.ga-foot-l { display: none; margin: 0 8px 0 0; color: var(--muted); }
+@media (min-width: 760px) {
+  .ga-foot { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+  .ga-foot-l { display: block; }
+}
+
+/* nav on the narrowest phones: "Get the app" is wider than "Sign up", so the theme toggle gives up its place (the OS setting still applies) */
+@media (max-width: 359px) {
+  .nav-cta .c-btn-sm.ga-phone { padding: 0 10px; }
+  html[data-os="ios"] .nav .theme-tg, html[data-os="android"] .nav .theme-tg { display: none; }
+}
+
+/* trezzit.com/app */
+.pg-get .wrap { padding-block: clamp(40px, 7vw, 64px) clamp(56px, 9vw, 96px); text-align: center; }
+.ga-icon { display: block; width: 96px; height: 96px; margin: 0 auto; border-radius: 22.5%; box-shadow: var(--shadow-sm); }
+.pg-get h1 { margin-top: 26px; font-size: clamp(34px, 5.2vw, 56px); letter-spacing: -0.03em; line-height: 1.08; }
+.pg-get .lede { margin: 12px auto 0; max-width: 24em; font-size: var(--t-lg); color: var(--muted); }
+.pg-get .ga-badges { justify-content: center; margin-top: 32px; }
+.pg-get .ga-badge img { height: 56px; }
+.ga-scan { display: inline-flex; align-items: center; gap: 16px; margin-top: 36px; padding: 14px 22px 14px 14px; border: 1px solid var(--line); border-radius: 20px; background: var(--card); text-align: left; color: var(--muted); font-size: var(--t-sm); }
+.ga-scan .ga-qr { width: 104px; height: 104px; }
+.ga-scan p { margin: 0; }
+.ga-scan b { display: block; color: var(--ink); font-size: var(--t-md); }
+@media (max-width: 599px) { .ga-scan { display: none; } }
+.pg-get .ga-alt { margin-top: 14px; }
+@media print { .ga-foot, .ga-card, .ga-under { display: none !important; } }
+/* ===== Get the app: END ===== */
