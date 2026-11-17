@@ -20,6 +20,7 @@ public/
     e/      the site's CSS, JS and media
     _kit/   design tokens, fonts, brand marks, split engine, scan client, sample receipts
     og/     share images, one per page
+    email/  images that emails link to by URL (launch/: the app launch email); keep them, sent emails still load them
 vercel.json   clean URLs, redirects, headers
 ```
 
