@@ -2,7 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://trezzit.com/</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-17</lastmod>
+  </url>
+  <url>
+    <loc>https://trezzit.com/app</loc>
+    <lastmod>2026-11-17</lastmod>
   </url>
   <url>
     <loc>https://trezzit.com/split</loc>
@@ -18,19 +22,19 @@
   </url>
   <url>
     <loc>https://trezzit.com/roommates</loc>
-    <lastmod>2026-10-31</lastmod>
+    <lastmod>2026-11-17</lastmod>
   </url>
   <url>
     <loc>https://trezzit.com/track-spending-without-bank</loc>
-    <lastmod>2026-10-31</lastmod>
+    <lastmod>2026-11-17</lastmod>
   </url>
   <url>
     <loc>https://trezzit.com/trips</loc>
-    <lastmod>2026-11-01</lastmod>
+    <lastmod>2026-11-17</lastmod>
   </url>
   <url>
     <loc>https://trezzit.com/recurring</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-17</lastmod>
   </url>
   <url>
     <loc>https://trezzit.com/privacy</loc>
@@ -50,6 +54,6 @@
   </url>
   <url>
     <loc>https://trezzit.com/support</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-11-17</lastmod>
   </url>
 </urlset>
