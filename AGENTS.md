@@ -55,6 +55,11 @@ plain CSS and ES modules from `public/assets/`.
 - Deploy: a merge to `main` is the production deploy to trezzit.com (Vercel).
   Every pushed branch gets a Vercel preview. Work on a branch, open a PR as a
   draft, the owner merges.
+- A request or answer for another agent session about a PR (a review, a
+  verdict, merge order) goes as a comment on that PR, first line
+  `Handoff to <who>: <ask>` or `Handoff reply: <answer>`, naming the
+  commit. A direct message may fail; the comment is what the other session
+  reads.
 - There is no CI and no automated test. Checking is by looking: each changed
   page at 320, 390 and 1280 px and wider, light and dark theme, with
   JavaScript off, and with the console open.
